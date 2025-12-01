@@ -1,6 +1,9 @@
+import { usePage } from "@inertiajs/react";
 import styles from "../../css/input.module.css";
 
 export default function Video() {
+    const props = usePage()
+    console.log(props)
     return (
         <>
             <section>
