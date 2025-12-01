@@ -2,8 +2,8 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-
+import { Head,Link } from '@inertiajs/react';
+import { useBear } from '@/context/bearer';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Panel de control',
@@ -12,8 +12,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
+    const {bears} = useBear();
+    console.log(bears)
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
+            <Link href="http://127.0.0.1/video">ir a video
+            </Link>
             <Head title="Panel de control" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
