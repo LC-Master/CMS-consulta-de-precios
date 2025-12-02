@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
-        $this->call(RolesPermissionsSeeder::class);
+        $this->call([RolesPermissionsSeeder::class, StatusSeeder::class]);
         User::firstOrCreate(
             ['email' => 'test@example.com'],
             [
@@ -23,5 +23,6 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+        
     }
 }

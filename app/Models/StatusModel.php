@@ -10,6 +10,10 @@ class StatusModel extends Model
 
     protected $primaryKey = "id";
 
+    protected $fillable = [
+        'status_name',
+    ];
+
     public $timestamps = true;
 
 }
