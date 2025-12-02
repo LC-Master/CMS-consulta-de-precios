@@ -16,8 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->dateTime('start_at');
             $table->dateTime('end_at');
-            $table->bigInteger('status_id')->unsigned()->index()->nullable();
-            $table->foreign('status_id')->references('id')->on('status');
+            $table->foreignId('status_id')->nullable()->constrained();
             $table->bigInteger('department_id')->unsigned()->index()->nullable();
             $table->foreign('department_id')->references('id')->on('departments');
             $table->bigInteger('agreement_id')->unsigned()->index()->nullable();
