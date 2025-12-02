@@ -13,7 +13,7 @@ class Campaign extends Model
     use HasFactory;
 
     protected $fillable = [
-        'campaign_name',
+        'title',
         'start_at',
         'end_at',
         'status_id',
@@ -52,16 +52,17 @@ class Campaign extends Model
 
     public function department()
     {
-        return $this->belongsTo(DepartmentsModel::class, 'department_id', 'id');
+        return $this->belongsTo(DepartmentsModel::class);
     }
 
     public function agreement()
     {
-        return $this->belongsTo(AgreementsModel::class, 'agreement_id', 'id');
+        return $this->belongsTo(AgreementsModel::class);
     }
+
 
     public function status()
     {
-        return $this->belongsTo(StatusModel::class, 'status_id', 'id');
+        return $this->belongsTo(StatusModel::class);
     }
 }

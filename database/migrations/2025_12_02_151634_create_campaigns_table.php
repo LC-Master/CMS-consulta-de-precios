@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('campaigns', function (Blueprint $table) {
             $table->id();
-            $table->string('campaign_name');
+            $table->string('title');
             $table->dateTime('start_at');
             $table->dateTime('end_at');
             $table->bigInteger('status_id')->unsigned()->index()->nullable();
