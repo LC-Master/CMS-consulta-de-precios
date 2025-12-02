@@ -12,6 +12,15 @@
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
+    --color-locatel-oscuro: #007853;
+    --color-locatel-medio: #00953b;
+    --color-locatel-claro: #76bc43;
+
+    --color-locatel-oro: #ffa400;
+    --color-locatel-naranja: #ff671d;
+    --color-locatel-morado: #9e28b5;
+
+    --color-locatel-guia: #2a5b48;
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
