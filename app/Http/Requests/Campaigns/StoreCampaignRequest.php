@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Campaigns;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class SaveCampaignRequest extends FormRequest
+class StoreCampaignRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+     public function authorize(): bool
     {
         if(Auth::id()){
             return true; 
@@ -26,21 +26,10 @@ class SaveCampaignRequest extends FormRequest
         return [
             'campaign_name' => 'required|string|max:255',
             'start_at'      => 'required|date',
-            // after_or_equal valida que la fecha final no sea menor a la de inicio
             'end_at'        => 'required|date|after_or_equal:start_at',
             'status_id'     => 'nullable|exists:status,id',
             'department_id' => 'nullable|exists:departments,id',
             'agreement_id'  => 'nullable|exists:agreements,id',
-        ];
-    }
-
-    /**
-     * (Opcional) Mensajes personalizados
-     */
-    public function messages(): array
-    {
-        return [
-           
         ];
     }
 }

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Campaigns\StoreCampaignRequest;
+use App\Http\Requests\Campaigns\UpdateCampaignRequest;
 use App\Models\Campaign;
 use App\Models\StatusModel;
 use App\Models\DepartmentsModel;
 use App\Models\AgreementsModel;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use App\Http\Requests\SaveCampaignRequest;
 
 class CampaignController extends Controller
 {
@@ -32,7 +33,7 @@ class CampaignController extends Controller
         ]);
     }
 
-   public function store(SaveCampaignRequest $request)
+   public function store(StoreCampaignRequest $request)
 {
     $data = $request->validated();
     
@@ -59,7 +60,7 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function update(SaveCampaignRequest $request, Campaign $campaign)
+    public function update(UpdateCampaignRequest $request, Campaign $campaign)
     {
         $data = $request->validated();
 
