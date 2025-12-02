@@ -6,12 +6,13 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Campaign extends Model
 {
     /** @use HasFactory<\Database\Factories\CampaignFactory> */
     use HasFactory;
-
+    use HasUuids;
     protected $fillable = [
         'title',
         'start_at',

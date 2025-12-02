@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('centers', function (Blueprint $table) {
-            $table->id();
+            $table->uuid();
+            $table->string('name')->unique();
+            $table->string('code')->unique();
             $table->timestamps();
         });
     }

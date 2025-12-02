@@ -12,20 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('campaigns', function (Blueprint $table) {
-            $table->id();
+            $table->uuid();
             $table->string('title');
             $table->dateTime('start_at');
             $table->dateTime('end_at');
-            $table->foreignId('status_id')->nullable()->constrained();
-            $table->bigInteger('department_id')->unsigned()->index()->nullable();
-            $table->foreign('department_id')->references('id')->on('departments');
-            $table->bigInteger('agreement_id')->unsigned()->index()->nullable();
-            $table->foreign('agreement_id')->references('id')->on('agreements');
-            $table->integer('created_by');
-            $table->integer('updated_by')->nullable();
+            $table->foreignUuid('status_id')->nullable()->constrained();
+            $table->foreignUuid('department_id')->nullable()->constrained();
+            $table->foreignUuid('agreement_id')->nullable()->constrained();
+            $table->uuid('created_by')->nullable(false);
+            $table->uuid('updated_by')->nullable(false);
             $table->timestamps();
         });
-    } 
+    }
 
     /**
      * Reverse the migrations.

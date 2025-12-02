@@ -6,12 +6,14 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Department extends Model
+class CampaignLog extends Model
 {
-    /** @use HasFactory<\Database\Factories\DepartmentFactory> */
+    /** @use HasFactory<\Database\Factories\CampaignLogFactory> */
     use HasFactory;
     use HasUuids;
-    protected $fillable = [
-        'Name',
-    ];
+
+    
+    public function campaign(){
+        return $this->belongsTo(Campaign::class);
+    }
 }
