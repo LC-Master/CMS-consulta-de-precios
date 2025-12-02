@@ -19,7 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::resource('campaigns', CampaignController::class);
+    Route::resource('campaign', CampaignController::class);
     
 });
 
