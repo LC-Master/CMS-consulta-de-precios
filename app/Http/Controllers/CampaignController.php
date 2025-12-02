@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CampaignsModel;
+use App\Models\Campaign;
 use App\Models\StatusModel;
 use App\Models\DepartmentsModel;
 use App\Models\AgreementsModel;
@@ -14,7 +14,7 @@ class CampaignController extends Controller
 {
     public function index()
     {
-        $campaigns = CampaignsModel::with(['status', 'department', 'agreement'])
+        $campaigns = Campaign::with(['status', 'department', 'agreement'])
             ->orderBy('id', 'desc')
             ->paginate(10);
 
@@ -36,20 +36,20 @@ class CampaignController extends Controller
 {
     $data = $request->validated();
     
-    CampaignsModel::create(array_merge($data, [
+    Campaign::create(array_merge($data, [
         'created_by' => Auth::id(),
     ]));
 
     return redirect()->route('campaigns.index')->with('success', 'Campaña creada correctamente.');
 }
 
-    public function show(CampaignsModel $campaign)
+    public function show(Campaign $campaign)
     {
         $campaign->with(['status', 'department', 'agreement']);
         return Inertia::render('Campaigns/Show', ['campaign' => $campaign]);
     }
 
-    public function edit(CampaignsModel $campaign)
+    public function edit(Campaign $campaign)
     {
         return Inertia::render('Campaigns/Edit', [
             'campaign' => $campaign,
@@ -59,7 +59,7 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function update(SaveCampaignRequest $request, CampaignsModel $campaign)
+    public function update(SaveCampaignRequest $request, Campaign $campaign)
     {
         $data = $request->validated();
 
@@ -71,7 +71,7 @@ class CampaignController extends Controller
             ->with('success', 'Campaña actualizada correctamente.');
     }
 
-    public function destroy(CampaignsModel $campaign)
+    public function destroy(Campaign $campaign)
     {
         $campaign->delete();
 
