@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campaign_content', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('campaign_id')->unsigned()->index()->nullable();
-            $table->foreign('campaign_id')->references('id')->on('campaigns');
+        Schema::create('campaign_contents', function (Blueprint $table) {
+            $table->uuid();
+            $table->foreignUuid('campaign_id')->constrained();
             $table->string('campaign_type');
             $table->text('url');
             $table->text('metadata');
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaign_content');
+        Schema::dropIfExists('campaign_contents');
     }
 };

@@ -12,11 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('campaign_stores', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('campaign_id')->unsigned()->index()->nullable();
-            $table->foreign('campaign_id')->references('id')->on('campaigns');
-            $table->bigInteger('center_id')->unsigned()->index()->nullable();
-            $table->foreign('center_id')->references('id')->on('centers');
+            $table->uuid();
+            $table->foreignUuid('campaign_id')->constrained();
+            $table->foreignUuid('center_id')->constrained();
             $table->timestamps();
         });
     }
