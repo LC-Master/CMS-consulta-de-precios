@@ -12,8 +12,8 @@ class SaveCampaignRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if (Auth::id()) {
-            return true;
+        if(Auth::id()){
+            return true; 
         }
         return false;
     }
@@ -25,12 +25,12 @@ class SaveCampaignRequest extends FormRequest
     {
         return [
             'campaign_name' => 'required|string|max:255',
-            'start_at' => 'required|date',
+            'start_at'      => 'required|date',
             // after_or_equal valida que la fecha final no sea menor a la de inicio
-            'end_at' => 'required|date|after_or_equal:start_at',
-            'status_id' => 'nullable|exists:status,id',
+            'end_at'        => 'required|date|after_or_equal:start_at',
+            'status_id'     => 'nullable|exists:status,id',
             'department_id' => 'nullable|exists:departments,id',
-            'agreement_id' => 'nullable|exists:agreements,id',
+            'agreement_id'  => 'nullable|exists:agreements,id',
         ];
     }
 
@@ -40,7 +40,7 @@ class SaveCampaignRequest extends FormRequest
     public function messages(): array
     {
         return [
-
+           
         ];
     }
 }

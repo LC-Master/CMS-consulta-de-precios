@@ -8,7 +8,6 @@ use App\Models\DepartmentsModel;
 use App\Models\AgreementsModel;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Carbon\Carbon;
 use App\Http\Requests\SaveCampaignRequest;
 
 class CampaignController extends Controller
@@ -39,20 +38,19 @@ class CampaignController extends Controller
 
         $data['created_by'] = Auth::id();
 
-        CampaignsModel::create($data);
+        $created = CampaignsModel::create($data);
 
         return redirect()->route('campaigns.index', ["success" => "Campaña creada correctamente."], 201);
     }
 
-    public function show($id)
+    public function show(CampaignsModel $campaign)
     {
-        $campaign = CampaignsModel::with(['status', 'department', 'agreement'])->findOrFail($id);
+        $campaign->with(['status', 'department', 'agreement']);
         return Inertia::render('Campaigns/Show', ['campaign' => $campaign]);
     }
 
-    public function edit($id)
+    public function edit(CampaignsModel $campaign)
     {
-        $campaign = CampaignsModel::findOrFail($id);
         return Inertia::render('Campaigns/Edit', [
             'campaign' => $campaign,
             'statuses' => StatusModel::all(),
@@ -61,31 +59,20 @@ class CampaignController extends Controller
         ]);
     }
 
-    // --- AQUÍ TAMBIÉN CAMBIA ---
-    public function update(SaveCampaignRequest $request, $id)
+    public function update(SaveCampaignRequest $request, CampaignsModel $campaign)
     {
-        $campaign = CampaignsModel::findOrFail($id);
-
-        // 1. Obtener datos validados
         $data = $request->validated();
 
-        // 2. Formateo de fechas para SQL Server
-        $data['start_at'] = Carbon::parse($data['start_at'])->format('Y-m-d H:i:s');
-        $data['end_at'] = Carbon::parse($data['end_at'])->format('Y-m-d H:i:s');
-
-        // 3. Auditoría
         $data['updated_by'] = Auth::id();
 
-        // 4. Actualizar
         $campaign->update($data);
 
         return redirect()->route('campaigns.index')
             ->with('success', 'Campaña actualizada correctamente.');
     }
 
-    public function destroy($id)
+    public function destroy(CampaignsModel $campaign)
     {
-        $campaign = CampaignsModel::findOrFail($id);
         $campaign->delete();
 
         return redirect()->route('campaigns.index')
