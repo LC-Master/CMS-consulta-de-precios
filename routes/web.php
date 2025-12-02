@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\CampaignController;
+use App\Http\Requests\StorePostRequest;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
-Route::get('/', function () {
+Route::get('/', function (Request $req) {
     return Inertia::render('welcome', [
         'canRegister' => Features::enabled(Features::registration()),
     ]);
@@ -21,4 +23,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
 });
 
-require __DIR__ . '/settings.php';
+Route::get('/video', function () {
+    return Inertia::render('video');
+});
+
+Route::get('/files', function () {
+    return response()->file(Storage::disk('public')->path('1416529-hd_1920_1080_30fps.mp4'));
+});
+
+require __DIR__.'/settings.php';

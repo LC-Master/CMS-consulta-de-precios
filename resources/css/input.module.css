@@ -1,0 +1,14 @@
+.input_hidden {
+    display: none;
+}
+
+.container{
+    display:flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100px;
+    height: 199px;
+    max-width: 400px;
+    place-items: center;
+    background-color: white;
+}
