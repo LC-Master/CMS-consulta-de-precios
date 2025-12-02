@@ -32,16 +32,16 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function store(SaveCampaignRequest $request)
-    {
-        $data = $request->validated();
+   public function store(SaveCampaignRequest $request)
+{
+    $data = $request->validated();
+    
+    CampaignsModel::create(array_merge($data, [
+        'created_by' => Auth::id(),
+    ]));
 
-        $data['created_by'] = Auth::id();
-
-        $created = CampaignsModel::create($data);
-
-        return redirect()->route('campaigns.index', ["success" => "Campaña creada correctamente."], 201);
-    }
+    return redirect()->route('campaigns.index')->with('success', 'Campaña creada correctamente.');
+}
 
     public function show(CampaignsModel $campaign)
     {
