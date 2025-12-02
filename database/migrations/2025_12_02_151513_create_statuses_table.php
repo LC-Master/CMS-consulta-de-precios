@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('centers', function (Blueprint $table) {
-            $table->uuid();
-            $table->string('name')->unique();
-            $table->string('code')->unique();
+        Schema::create('statuses', function (Blueprint $table) {
+            $table->uuid("id")->primary();
+            $table->string('status')->unique();
             $table->timestamps();
         });
     }
@@ -24,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('centers');
+        Schema::dropIfExists('statuses');
     }
 };

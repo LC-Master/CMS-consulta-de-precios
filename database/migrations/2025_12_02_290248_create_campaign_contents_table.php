@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('devices', function (Blueprint $table) {
-            $table->uuid();
-            $table->foreignId('center_id')->nullable()->constrained();
-            $table->string('name');
-            $table->string('type');
-            $table->text('description');
-            $table->boolean('is_active')->default(true);
+        Schema::create('campaign_contents', function (Blueprint $table) {
+            $table->uuid("id")->primary();
+            $table->foreignUuid('campaign_id')->constrained();
+            $table->string('campaign_type');
+            $table->text('url');
+            $table->text('metadata');
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('devices');
+        Schema::dropIfExists('campaign_contents');
     }
 };

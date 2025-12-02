@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campaign_contents', function (Blueprint $table) {
-            $table->uuid();
+        Schema::create('campaign_stores', function (Blueprint $table) {
+            $table->uuid("id")->primary();
             $table->foreignUuid('campaign_id')->constrained();
-            $table->string('campaign_type');
-            $table->text('url');
-            $table->text('metadata');
+            $table->foreignUuid('center_id')->constrained();
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaign_contents');
+        Schema::dropIfExists('campaign_stores');
     }
 };

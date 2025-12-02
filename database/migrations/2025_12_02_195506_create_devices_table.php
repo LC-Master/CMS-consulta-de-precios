@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campaign_logs', function (Blueprint $table) {
-            $table->uuid();           
-            $table->foreignUuid('campaign_id')->constrained();
-            $table->text('message');
-            $table->string('level');
+        Schema::create('devices', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('center_id')->nullable()->constrained();
+            $table->string('name');
+            $table->string('type');
+            $table->text('description');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaign_logs');
+        Schema::dropIfExists('devices');
     }
 };
