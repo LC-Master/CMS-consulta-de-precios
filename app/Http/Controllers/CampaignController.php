@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Campaigns\StoreCampaignRequest;
 use App\Http\Requests\Campaigns\UpdateCampaignRequest;
 use App\Models\Campaign;
-use App\Models\StatusModel;
-use App\Models\DepartmentsModel;
-use App\Models\AgreementsModel;
+use App\Models\Status;
+use App\Models\Department;
+use App\Models\Agreement;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -27,9 +27,9 @@ class CampaignController extends Controller
     public function create()
     {
         return Inertia::render('Campaigns/Create', [
-            'statuses' => StatusModel::all(),
-            'departments' => DepartmentsModel::all(),
-            'agreements' => AgreementsModel::all(),
+            'statuses' => Status::all(),
+            'departments' => Department::all(),
+            'agreements' => Agreement::all(),
         ]);
     }
 
@@ -54,9 +54,9 @@ class CampaignController extends Controller
     {
         return Inertia::render('Campaigns/Edit', [
             'campaign' => $campaign,
-            'statuses' => StatusModel::all(),
-            'departments' => DepartmentsModel::all(),
-            'agreements' => AgreementsModel::all(),
+            'statuses' => Status::all(),
+            'departments' => Department::all(),
+            'agreements' => Agreement::all(),
         ]);
     }
 

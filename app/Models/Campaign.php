@@ -52,17 +52,17 @@ class Campaign extends Model
 
     public function department()
     {
-        return $this->belongsTo(DepartmentsModel::class);
+        return $this->belongsTo(Department::class);
     }
 
     public function agreement()
     {
-        return $this->belongsTo(AgreementsModel::class);
+        return $this->belongsTo(Agreement::class);
     }
 
 
     public function status()
     {
-        return $this->belongsTo(StatusModel::class);
+        return $this->belongsTo(Status::class);
     }
 }
