@@ -13,8 +13,10 @@ class StatusSeeder extends Seeder
      */
     public function run(): void
     {
-        StatusModel::create(['status_name' => 'Borrador']);
-        StatusModel::create(['status_name' => 'Activo']);
-        StatusModel::create(['status_name' => 'Finalizado']);
+        $statuses = ['Borrador', 'Activa', 'Finalizada'];
+    
+    foreach ($statuses as $status) {
+        StatusModel::create(['status_name' => $status]);
+    }
     }
 }

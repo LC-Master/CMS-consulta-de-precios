@@ -8,9 +8,14 @@ use Carbon\Carbon;
 use App\Models\DepartmentsModel;
 use App\Models\AgreementsModel;
 use App\Models\StatusModel;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Database\Factories\CampaignFactory;
 
+#[UseFactory(CampaignFactory::class)]
 class CampaignsModel extends Model
 {
+    use HasFactory;
     protected $table = "campaigns";
 
     protected $primaryKey = "id";
