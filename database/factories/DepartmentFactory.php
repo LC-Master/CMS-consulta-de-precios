@@ -15,10 +15,11 @@ class DepartmentFactory extends Factory
      * @return array<string, mixed>
      */
     
-    public function definition(): array
+   public function definition(): array
 {
     return [
-        'name_department' => fake()->company(),
+        // En lugar de commerce()->department()
+        'name_department' => $this->faker->jobTitle(), 
     ];
 }
 }

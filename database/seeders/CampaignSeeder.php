@@ -2,52 +2,54 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\CampaignsModel;
 use App\Models\StatusModel;
 use App\Models\DepartmentsModel;
 use App\Models\AgreementsModel;
 use App\Models\CentersModel;
-use App\Models\CampaignLogsModel;
 use App\Models\CampaignStoresModel;
+use App\Models\CampaignLogsModel;
 
 class CampaignSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
-{
-    // Obtenemos los IDs existentes para no crear nuevos y llenar la BD de basura
-    $statuses = StatusModel::all();
-    $departments = DepartmentsModel::all();
-    $agreements = AgreementsModel::all();
-    $centers = CentersModel::all();
+    {
+        // 1. Obtenemos los catálogos existentes
+        $statuses = StatusModel::all();
+        $departments = DepartmentsModel::all();
+        $agreements = AgreementsModel::all();
+        $centers = CentersModel::all();
 
-    // Crear 50 campañas
-    CampaignsModel::factory()
-        ->count(30)
-        ->make() // Usamos make() para generar los datos pero interceptarlos antes de guardar
-        ->each(function ($campaign) use ($statuses, $departments, $agreements, $centers) {
-            
-            // Asignar relaciones aleatorias existentes
-            $campaign->status_id = $statuses->random()->id;
-            $campaign->department_id = $departments->random()->id;
-            $campaign->agreement_id = $agreements->random()->id;
-            $campaign->save();
+        // 2. Crear 30 campañas
+        // USAMOS recycle(): Esto le dice a Laravel: "Usa estos modelos existentes, no crees nuevos"
+        // Esto evita el error de "Maximum retries" porque no llama al Faker de departamentos
+        CampaignsModel::factory()
+            ->count(30)
+            ->recycle($statuses)     // Recicla estatus existentes
+            ->recycle($departments)  // Recicla departamentos existentes
+            ->recycle($agreements)   // Recicla acuerdos existentes
+            ->create()               // Usamos create directo (ya no make) porque recycle asigna los IDs
+            ->each(function ($campaign) use ($centers) {
+                
+                // --- CORRECCIÓN DE LA TABLA PIVOTE (CampaignStores) ---
+                
+                // ERROR ANTERIOR: $centers->random()->id se ejecutaba UNA VEZ y se repetía.
+                // CORRECCIÓN: Tomamos X centros aleatorios ÚNICOS y los iteramos.
+                
+                $randomCenters = $centers->random(rand(1, 5));
 
-            // En lugar de attach, usamos el factory directo de la tabla intermedia
-    CampaignStoresModel::factory()->count(rand(1, 5))->create([
-        'campaign_id' => $campaign->id,
-        // Aquí tomamos un ID de centro al azar
-        'center_id' => $centers->random()->id 
-    ]);
+                foreach ($randomCenters as $center) {
+                    CampaignStoresModel::factory()->create([
+                        'campaign_id' => $campaign->id,
+                        'center_id' => $center->id 
+                    ]);
+                }
 
-            // 2. Crear Logs para esta campaña
-            CampaignLogsModel::factory()->count(rand(0, 5))->create([
-                'campaign_id' => $campaign->id
-            ]);
-        });
-}
+                // 3. Crear Logs para esta campaña
+                CampaignLogsModel::factory()->count(rand(0, 5))->create([
+                    'campaign_id' => $campaign->id
+                ]);
+            });
+    }
 }
