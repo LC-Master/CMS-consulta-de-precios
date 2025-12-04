@@ -18,7 +18,7 @@ class AgreementFactory extends Factory
     public function definition(): array
     {
     return [
-        'name_agreement' => $this->faker->unique()->company() . ' Agreement',
+        'name' => $this->faker->unique()->company() . ' Agreement',
     ];
     }
 }

@@ -18,8 +18,7 @@ class DepartmentFactory extends Factory
    public function definition(): array
 {
     return [
-        // En lugar de commerce()->department()
-        'name_department' => $this->faker->jobTitle(), 
+        'name' => $this->faker->jobTitle(), 
     ];
 }
 }

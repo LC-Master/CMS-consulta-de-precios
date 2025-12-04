@@ -3,28 +3,28 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\CampaignsModel;
-use App\Models\StatusModel;
-use App\Models\DepartmentsModel;
-use App\Models\AgreementsModel;
-use App\Models\CentersModel;
-use App\Models\CampaignStoresModel;
-use App\Models\CampaignLogsModel;
+use App\Models\Campaign;
+use App\Models\Status;
+use App\Models\Department;
+use App\Models\Agreement;
+use App\Models\Center;
+use App\Models\CampaignStore;
+use App\Models\CampaignLog;
 
 class CampaignSeeder extends Seeder
 {
     public function run(): void
     {
         // 1. Obtenemos los catálogos existentes
-        $statuses = StatusModel::all();
-        $departments = DepartmentsModel::all();
-        $agreements = AgreementsModel::all();
-        $centers = CentersModel::all();
+        $statuses = Status::all();
+        $departments = Department::all();
+        $agreements = Agreement::all();
+        $centers = Center::all();
 
         // 2. Crear 30 campañas
         // USAMOS recycle(): Esto le dice a Laravel: "Usa estos modelos existentes, no crees nuevos"
         // Esto evita el error de "Maximum retries" porque no llama al Faker de departamentos
-        CampaignsModel::factory()
+        Campaign::factory()
             ->count(30)
             ->recycle($statuses)     // Recicla estatus existentes
             ->recycle($departments)  // Recicla departamentos existentes
@@ -40,14 +40,14 @@ class CampaignSeeder extends Seeder
                 $randomCenters = $centers->random(rand(1, 5));
 
                 foreach ($randomCenters as $center) {
-                    CampaignStoresModel::factory()->create([
+                    CampaignStore::factory()->create([
                         'campaign_id' => $campaign->id,
                         'center_id' => $center->id 
                     ]);
                 }
 
                 // 3. Crear Logs para esta campaña
-                CampaignLogsModel::factory()->count(rand(0, 5))->create([
+                CampaignLog::factory()->count(rand(0, 5))->create([
                     'campaign_id' => $campaign->id
                 ]);
             });

@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\AgreementsModel;
+use App\Models\Agreement;
 
 class AgreementSeeder extends Seeder
 {
@@ -13,6 +13,6 @@ class AgreementSeeder extends Seeder
      */
     public function run(): void
 {
-    AgreementsModel::factory()->count(5)->create();
+    Agreement::factory()->count(5)->create();
 }
 }

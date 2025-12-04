@@ -17,7 +17,7 @@ class CenterFactory extends Factory
     public function definition(): array
 {
     return [
-        'center_name' => $this->faker->city() . ' Center',
+        'name' => $this->faker->city() . ' Center',
         'code' => strtoupper($this->faker->unique()->bothify('CTR-####')),
     ];
 }

@@ -25,15 +25,10 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RolesPermissionsSeeder::class,
-            // 1. Catálogos Base (Sin dependencias)
             StatusSeeder::class,
             DepartmentSeeder::class,
             AgreementSeeder::class,
             DeviceSeeder::class,
-            // 2. Estructura Física (Centros y Dispositivos)
-            CenterSeeder::class, // Este crea devices internamente
-            
-            // 3. Operaciones (Campañas, pivotes y logs)
             CampaignSeeder::class, 
         ]);
         

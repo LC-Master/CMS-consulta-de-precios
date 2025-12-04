@@ -17,7 +17,7 @@ class StatusFactory extends Factory
     public function definition(): array
 {
     return [
-        'status_name' => $this->faker->unique()->randomElement(['Borrador', 'Activo', 'Finalizado']),
+        'status' => $this->faker->unique()->randomElement(['Borrador', 'Activo', 'Finalizado']),
     ];
 }
 }

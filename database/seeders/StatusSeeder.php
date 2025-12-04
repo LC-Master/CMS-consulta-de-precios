@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\StatusModel;
+use App\Models\Status;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,7 +16,7 @@ class StatusSeeder extends Seeder
         $statuses = ['Borrador', 'Activa', 'Finalizada'];
     
     foreach ($statuses as $status) {
-        StatusModel::create(['status_name' => $status]);
+        Status::create(['status' => $status]);
     }
     }
 }

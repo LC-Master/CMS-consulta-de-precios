@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\CampaignsModel;
+use App\Models\Campaign;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
@@ -18,7 +18,7 @@ class CampaignLogFactory extends Factory
     public function definition(): array
 {
     return [
-        'campaign_id' => CampaignsModel::factory(),
+        'campaign_id' => Campaign::factory(),
         'message' => $this->faker->realText(100),
         'level' => $this->faker->randomElement(['INFO', 'WARNING', 'ERROR', 'DEBUG']),
     ];
