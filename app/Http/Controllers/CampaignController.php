@@ -19,9 +19,13 @@ class CampaignController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(10);
 
-        return Inertia::render('Campaigns/Index', [
+        /*return Inertia::render('Campaigns/Index', [
             'campaigns' => $campaigns
-        ]);
+        ]); */
+
+        return Inertia::render('Campaigns/Index', [
+        'campaigns' => Inertia::scroll(fn () => Campaign::paginate())
+    , "others"=> Status::all()]);
     }
 
     public function create()
