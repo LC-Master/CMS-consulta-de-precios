@@ -3,9 +3,11 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\CampaignsModel;
+use App\Models\CentersModel;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\CampaignStore>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
  */
 class CampaignStoreFactory extends Factory
 {
@@ -15,9 +17,10 @@ class CampaignStoreFactory extends Factory
      * @return array<string, mixed>
      */
     public function definition(): array
-    {
-        return [
-            //
-        ];
-    }
+   {
+    return [
+        'campaign_id' => CampaignsModel::factory(),
+        'center_id' => CentersModel::factory(),
+    ];
+   }
 }

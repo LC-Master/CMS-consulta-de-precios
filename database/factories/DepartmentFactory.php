@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Department>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
  */
 class DepartmentFactory extends Factory
 {
@@ -14,10 +14,12 @@ class DepartmentFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition(): array
-    {
-        return [
-            //
-        ];
-    }
+    
+   public function definition(): array
+{
+    return [
+        // En lugar de commerce()->department()
+        'name_department' => $this->faker->jobTitle(), 
+    ];
+}
 }

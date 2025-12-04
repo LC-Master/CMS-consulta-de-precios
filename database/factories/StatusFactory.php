@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Status>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
  */
 class StatusFactory extends Factory
 {
@@ -15,9 +15,9 @@ class StatusFactory extends Factory
      * @return array<string, mixed>
      */
     public function definition(): array
-    {
-        return [
-
-        ];
-    }
+{
+    return [
+        'status_name' => $this->faker->unique()->randomElement(['Borrador', 'Activo', 'Finalizado']),
+    ];
+}
 }

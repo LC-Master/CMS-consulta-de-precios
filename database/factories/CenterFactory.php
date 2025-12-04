@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Center>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
  */
 class CenterFactory extends Factory
 {
@@ -15,9 +15,10 @@ class CenterFactory extends Factory
      * @return array<string, mixed>
      */
     public function definition(): array
-    {
-        return [
-            //
-        ];
-    }
+{
+    return [
+        'center_name' => $this->faker->city() . ' Center',
+        'code' => strtoupper($this->faker->unique()->bothify('CTR-####')),
+    ];
+}
 }

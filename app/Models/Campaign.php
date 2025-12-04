@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+<<<<<<< HEAD:app/Models/Campaign.php
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -13,6 +14,26 @@ class Campaign extends Model
     /** @use HasFactory<\Database\Factories\CampaignFactory> */
     use HasFactory;
     use HasUuids;
+=======
+use Carbon\Carbon; 
+use App\Models\DepartmentsModel;
+use App\Models\AgreementsModel;
+use App\Models\StatusModel;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Database\Factories\CampaignFactory;
+
+#[UseFactory(CampaignFactory::class)]
+class CampaignsModel extends Model
+{
+    use HasFactory;
+    protected $table = "campaigns";
+
+    protected $primaryKey = "id";
+
+    public $timestamps = true;
+
+>>>>>>> main:app/Models/CampaignsModel.php
     protected $fillable = [
         'title',
         'start_at',
