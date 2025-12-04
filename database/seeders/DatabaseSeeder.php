@@ -14,7 +14,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
-        $this->call([RolesPermissionsSeeder::class, StatusSeeder::class]);
         User::firstOrCreate(
             ['email' => 'test@example.com'],
             [
@@ -23,6 +22,20 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        $this->call([
+            RolesPermissionsSeeder::class,
+            // 1. Catálogos Base (Sin dependencias)
+            StatusSeeder::class,
+            DepartmentSeeder::class,
+            AgreementSeeder::class,
+            DeviceSeeder::class,
+            // 2. Estructura Física (Centros y Dispositivos)
+            CenterSeeder::class, // Este crea devices internamente
+            
+            // 3. Operaciones (Campañas, pivotes y logs)
+            CampaignSeeder::class, 
+        ]);
         
     }
 }
