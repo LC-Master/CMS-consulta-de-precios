@@ -9,4 +9,10 @@ class TimeLineItem extends Model
 {
     /** @use HasFactory<\Database\Factories\TimeLineItemFactory> */
     use HasFactory;
+
+    protected $filleable = [
+        'campaign_id',
+        'media_id',
+        'scheduled_at',
+    ];
 }
