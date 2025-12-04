@@ -10,7 +10,7 @@ class TimeLineItem extends Model
     /** @use HasFactory<\Database\Factories\TimeLineItemFactory> */
     use HasFactory;
 
-    protected $filleable = [
+    protected $fillable = [
         'campaign_id',
         'media_id',
         'scheduled_at',
