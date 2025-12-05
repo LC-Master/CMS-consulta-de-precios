@@ -1,10 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-use Inertia\Inertia;
+
 use App\Models\TimeLineItem;
-use App\Http\Requests\StoreTimeLineItemRequest;
-use App\Http\Requests\UpdateTimeLineItemRequest;
+use App\Models\Campaign;
+use App\Models\Media;    
+use App\Http\Requests\Timeline\StoreTimeLineItemRequest;
+use App\Http\Requests\Timeline\UpdateTimeLineItemRequest;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Redirect;
 
 class TimeLineController extends Controller
 {
@@ -13,7 +17,9 @@ class TimeLineController extends Controller
      */
     public function index()
     {
-        //
+         return Inertia::render('TimeLineItems/Index', [
+            'timelineitem' => Inertia::scroll(fn () => TimeLineItem::with(['campaign','media'])->paginate()),
+        ]);
     }
 
     /**
@@ -21,7 +27,12 @@ class TimeLineController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Timeline/Create');
+        return Inertia::render('TimeLineItems/Create', [
+            // Enviamos las listas para los dropdowns
+            'campaigns' => Campaign::orderBy('name')->get(['id', 'name']), 
+            // Para media, quizás quieras mostrar el path o el nombre
+            'media' => Media::orderBy('id', 'desc')->get(['id', 'path', 'mime_type']),
+        ]);
     }
 
     /**
@@ -29,7 +40,10 @@ class TimeLineController extends Controller
      */
     public function store(StoreTimeLineItemRequest $request)
     {
-        //
+        TimeLineItem::create($request->validated());
+
+        return Redirect::route('timeline-items.index')
+            ->with('success', 'Item programado correctamente.');
     }
 
     /**
@@ -37,7 +51,11 @@ class TimeLineController extends Controller
      */
     public function show(TimeLineItem $timeLineItem)
     {
-        //
+        $timeLineItem->load(['campaign', 'media']);
+
+        return Inertia::render('TimeLineItems/Show', [
+            'timeLineItem' => $timeLineItem
+        ]);
     }
 
     /**
@@ -45,7 +63,11 @@ class TimeLineController extends Controller
      */
     public function edit(TimeLineItem $timeLineItem)
     {
-        //
+        return Inertia::render('TimeLineItems/Edit', [
+            'timeLineItem' => $timeLineItem,
+            'campaigns' => Campaign::orderBy('name')->get(['id', 'name']),
+            'media' => Media::orderBy('id', 'desc')->get(['id', 'path', 'mime_type']),
+        ]);
     }
 
     /**
@@ -53,7 +75,10 @@ class TimeLineController extends Controller
      */
     public function update(UpdateTimeLineItemRequest $request, TimeLineItem $timeLineItem)
     {
-        //
+        $timeLineItem->update($request->validated());
+
+        return Redirect::route('timeline-items.index')
+            ->with('success', 'Programación actualizada correctamente.');
     }
 
     /**
@@ -61,6 +86,9 @@ class TimeLineController extends Controller
      */
     public function destroy(TimeLineItem $timeLineItem)
     {
-        //
+        $timeLineItem->delete();
+
+        return Redirect::route('timeline-items.index')
+            ->with('success', 'Item eliminado de la línea de tiempo.');
     }
 }

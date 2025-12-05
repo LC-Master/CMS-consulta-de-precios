@@ -3,64 +3,66 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agreement;
-use App\Http\Requests\StoreAgreementRequest;
-use App\Http\Requests\UpdateAgreementRequest;
+use App\Http\Requests\Agreement\StoreAgreementRequest; 
+use App\Http\Requests\Agreement\UpdateAgreementRequest; 
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Redirect;
 
 class AgreementController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Inertia::render('Agreements/Index', [
+            'agreements' => Inertia::scroll(fn () => Agreement::paginate()),
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return Inertia::render('Agreements/Create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store usa StoreAgreementRequest
      */
     public function store(StoreAgreementRequest $request)
     {
-        //
+        Agreement::create($request->validated());
+
+        return Redirect::route('agreements.index')
+            ->with('success', 'Acuerdo creado correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Agreement $agreement)
     {
-        //
+        return Inertia::render('Agreements/Show', [
+            'agreement' => $agreement
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Agreement $agreement)
     {
-        //
+        return Inertia::render('Agreements/Edit', [
+            'agreement' => $agreement
+        ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update usa UpdateAgreementRequest
      */
     public function update(UpdateAgreementRequest $request, Agreement $agreement)
     {
-        //
+        $agreement->update($request->validated());
+
+        return Redirect::route('agreements.index')
+            ->with('success', 'Acuerdo actualizado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Agreement $agreement)
     {
-        //
+        $agreement->delete();
+
+        return Redirect::route('agreements.index')
+            ->with('success', 'Acuerdo eliminado correctamente.');
     }
 }

@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
-use App\Http\Requests\StoreDeviceRequest;
-use App\Http\Requests\UpdateDeviceRequest;
+use App\Models\Center; // Importamos Center para los dropdowns
+use App\Http\Requests\Devices\StoreDeviceRequest;
+use App\Http\Requests\Devices\UpdateDeviceRequest;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Redirect;
 
 class DeviceController extends Controller
 {
@@ -13,7 +16,9 @@ class DeviceController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('Devices/Index', [
+            'devices' => Inertia::scroll(fn () => Device::with(['center'])->paginate()),
+        ]);
     }
 
     /**
@@ -21,7 +26,11 @@ class DeviceController extends Controller
      */
     public function create()
     {
-        //
+        $centers = Center::orderBy('name')->select('id', 'name')->get();
+
+        return Inertia::render('Devices/Create', [
+            'centers' => $centers
+        ]);
     }
 
     /**
@@ -29,7 +38,10 @@ class DeviceController extends Controller
      */
     public function store(StoreDeviceRequest $request)
     {
-        //
+        Device::create($request->validated());
+
+        return Redirect::route('devices.index')
+            ->with('success', 'Dispositivo creado correctamente.');
     }
 
     /**
@@ -37,7 +49,12 @@ class DeviceController extends Controller
      */
     public function show(Device $device)
     {
-        //
+        // Cargamos el centro por si queremos mostrar detalles completos
+        $device->load('center');
+
+        return Inertia::render('Devices/Show', [
+            'device' => $device
+        ]);
     }
 
     /**
@@ -45,7 +62,12 @@ class DeviceController extends Controller
      */
     public function edit(Device $device)
     {
-        //
+        $centers = Center::orderBy('name')->select('id', 'name')->get();
+
+        return Inertia::render('Devices/Edit', [
+            'device' => $device,
+            'centers' => $centers
+        ]);
     }
 
     /**
@@ -53,7 +75,10 @@ class DeviceController extends Controller
      */
     public function update(UpdateDeviceRequest $request, Device $device)
     {
-        //
+        $device->update($request->validated());
+
+        return Redirect::route('devices.index')
+            ->with('success', 'Dispositivo actualizado correctamente.');
     }
 
     /**
@@ -61,6 +86,9 @@ class DeviceController extends Controller
      */
     public function destroy(Device $device)
     {
-        //
+        $device->delete();
+
+        return Redirect::route('devices.index')
+            ->with('success', 'Dispositivo eliminado correctamente.');
     }
 }

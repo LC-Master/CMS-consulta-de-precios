@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Media;
-use App\Http\Requests\StoreMediaRequest;
-use App\Http\Requests\UpdateMediaRequest;
+use App\Http\Requests\Media\StoreMediaRequest;
+use App\Http\Requests\Media\UpdateMediaRequest;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class MediaController extends Controller
 {
@@ -13,7 +17,9 @@ class MediaController extends Controller
      */
     public function index()
     {
-        //
+       return Inertia::render('Media/Index', [
+            'medias' => Inertia::scroll(fn () => Media::paginate()),
+        ]);
     }
 
     /**
@@ -21,7 +27,7 @@ class MediaController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Media/Create');
     }
 
     /**
@@ -29,7 +35,31 @@ class MediaController extends Controller
      */
     public function store(StoreMediaRequest $request)
     {
-        //
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            
+            // 1. Guardar archivo en disco (carpeta 'uploads' en disco 'public')
+            $path = $file->store('uploads', 'public');
+            
+            // 2. Calcular checksum (hash MD5 del archivo)
+            $checksum = md5_file($file->getRealPath());
+
+            // 3. Guardar registro en BD
+            Media::create([
+                'disk' => 'public',
+                'path' => $path,
+                'mime_type' => $file->getClientMimeType(),
+                'size' => $file->getSize(),
+                'duration_seconds' => null, // Requeriría librería externa (FFMpeg) si es video
+                'checksum' => $checksum,
+                'created_by' => Auth::id(), // Asignamos el usuario actual
+            ]);
+
+            return Redirect::route('media.index')
+                ->with('success', 'Archivo subido correctamente.');
+        }
+
+        return Redirect::back()->withErrors(['file' => 'Error al subir el archivo.']);
     }
 
     /**
@@ -37,7 +67,11 @@ class MediaController extends Controller
      */
     public function show(Media $media)
     {
-        //
+        return Inertia::render('Media/Show', [
+            'media' => $media,
+            // Enviamos la URL pública para poder visualizar la imagen/archivo
+            'url' => Storage::url($media->path) 
+        ]);
     }
 
     /**
@@ -45,7 +79,10 @@ class MediaController extends Controller
      */
     public function edit(Media $media)
     {
-        //
+        return Inertia::render('Media/Edit', [
+            'media' => $media,
+            'url' => Storage::url($media->path)
+        ]);
     }
 
     /**
@@ -53,7 +90,34 @@ class MediaController extends Controller
      */
     public function update(UpdateMediaRequest $request, Media $media)
     {
-        //
+        // Solo actualizamos si el usuario subió un archivo nuevo para reemplazar el anterior
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+
+            // 1. Eliminar archivo viejo
+            if (Storage::disk($media->disk)->exists($media->path)) {
+                Storage::disk($media->disk)->delete($media->path);
+            }
+
+            // 2. Subir archivo nuevo
+            $path = $file->store('uploads', 'public');
+            $checksum = md5_file($file->getRealPath());
+
+            // 3. Actualizar BD
+            $media->update([
+                'path' => $path,
+                'mime_type' => $file->getClientMimeType(),
+                'size' => $file->getSize(),
+                'checksum' => $checksum,
+                // 'created_by' usualmente no se cambia en update
+            ]);
+
+            return Redirect::route('media.index')
+                ->with('success', 'Archivo reemplazado correctamente.');
+        }
+
+        return Redirect::route('media.index')
+            ->with('info', 'No se realizaron cambios.');
     }
 
     /**
@@ -61,6 +125,15 @@ class MediaController extends Controller
      */
     public function destroy(Media $media)
     {
-        //
+        // 1. Eliminar el archivo físico
+        if (Storage::disk($media->disk)->exists($media->path)) {
+            Storage::disk($media->disk)->delete($media->path);
+        }
+
+        // 2. Eliminar el registro de la BD
+        $media->delete();
+
+        return Redirect::route('media.index')
+            ->with('success', 'Archivo eliminado correctamente.');
     }
 }

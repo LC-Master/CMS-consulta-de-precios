@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
-use App\Http\Requests\StoreDepartmentRequest;
-use App\Http\Requests\UpdateDepartmentRequest;
+use App\Http\Requests\Department\StoreDepartmentRequest;
+use App\Http\Requests\Department\UpdateDepartmentRequest;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Redirect;
 
 class DepartmentController extends Controller
 {
@@ -13,7 +15,9 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('Departments/Index', [
+            'agreements' => Inertia::scroll(fn () => Department::paginate()),
+        ]);
     }
 
     /**
@@ -21,7 +25,7 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Departments/Create');
     }
 
     /**
@@ -29,7 +33,11 @@ class DepartmentController extends Controller
      */
     public function store(StoreDepartmentRequest $request)
     {
-        //
+        // Creamos usando los datos ya validados
+        Department::create($request->validated());
+
+        return Redirect::route('departments.index')
+            ->with('success', 'Departamento creado correctamente.');
     }
 
     /**
@@ -37,7 +45,9 @@ class DepartmentController extends Controller
      */
     public function show(Department $department)
     {
-        //
+        return Inertia::render('Departments/Show', [
+            'department' => $department
+        ]);
     }
 
     /**
@@ -45,7 +55,9 @@ class DepartmentController extends Controller
      */
     public function edit(Department $department)
     {
-        //
+        return Inertia::render('Departments/Edit', [
+            'department' => $department
+        ]);
     }
 
     /**
@@ -53,7 +65,11 @@ class DepartmentController extends Controller
      */
     public function update(UpdateDepartmentRequest $request, Department $department)
     {
-        //
+        // Actualizamos usando los datos validados
+        $department->update($request->validated());
+
+        return Redirect::route('departments.index')
+            ->with('success', 'Departamento actualizado correctamente.');
     }
 
     /**
@@ -61,6 +77,9 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
-        //
+        $department->delete();
+
+        return Redirect::route('departments.index')
+            ->with('success', 'Departamento eliminado correctamente.');
     }
 }

@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\CampaignContent;
-use App\Http\Requests\StoreCampaignContentRequest;
-use App\Http\Requests\UpdateCampaignContentRequest;
+use App\Models\Campaign; 
+use App\Http\Requests\CampaignContent\StoreCampaignContentRequest;
+use App\Http\Requests\CampaignContent\UpdateCampaignContentRequest;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Redirect;
 
 class CampaignContentController extends Controller
 {
@@ -13,7 +17,9 @@ class CampaignContentController extends Controller
      */
     public function index()
     {
-        //
+         return Inertia::render('CampaignContents/Index', [
+            'campaigncontent' => Inertia::scroll(fn () => CampaignContent::with(['campaign'])->paginate()),
+        ]);
     }
 
     /**
@@ -21,7 +27,12 @@ class CampaignContentController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('CampaignContents/Create', [
+            // Enviamos la lista de campañas para el select
+            'campaigns' => Campaign::orderBy('name')->select('id', 'name')->get(),
+            // Opcional: Si tienes una lista fija de tipos, puedes enviarla también
+            'types' => ['video', 'image', 'article', 'landing_page'],
+        ]);
     }
 
     /**
@@ -29,7 +40,10 @@ class CampaignContentController extends Controller
      */
     public function store(StoreCampaignContentRequest $request)
     {
-        //
+        CampaignContent::create($request->validated());
+
+        return Redirect::route('campaign-contents.index')
+            ->with('success', 'Contenido de campaña creado correctamente.');
     }
 
     /**
@@ -37,7 +51,11 @@ class CampaignContentController extends Controller
      */
     public function show(CampaignContent $campaignContent)
     {
-        //
+        $campaignContent->load('campaign');
+
+        return Inertia::render('CampaignContents/Show', [
+            'campaignContent' => $campaignContent
+        ]);
     }
 
     /**
@@ -45,7 +63,11 @@ class CampaignContentController extends Controller
      */
     public function edit(CampaignContent $campaignContent)
     {
-        //
+        return Inertia::render('CampaignContents/Edit', [
+            'campaignContent' => $campaignContent,
+            'campaigns' => Campaign::orderBy('name')->select('id', 'name')->get(),
+            'types' => ['video', 'image', 'article', 'landing_page'],
+        ]);
     }
 
     /**
@@ -53,7 +75,10 @@ class CampaignContentController extends Controller
      */
     public function update(UpdateCampaignContentRequest $request, CampaignContent $campaignContent)
     {
-        //
+        $campaignContent->update($request->validated());
+
+        return Redirect::route('campaign-contents.index')
+            ->with('success', 'Contenido de campaña actualizado correctamente.');
     }
 
     /**
@@ -61,6 +86,9 @@ class CampaignContentController extends Controller
      */
     public function destroy(CampaignContent $campaignContent)
     {
-        //
+        $campaignContent->delete();
+
+        return Redirect::route('campaign-contents.index')
+            ->with('success', 'Contenido eliminado correctamente.');
     }
 }

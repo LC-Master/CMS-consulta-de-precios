@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\CampaignLog;
-use App\Http\Requests\StoreCampaignLogRequest;
-use App\Http\Requests\UpdateCampaignLogRequest;
+use App\Models\Campaign;
+use App\Http\Requests\CampaignLog\StoreCampaignLogRequest;
+use App\Http\Requests\CampaignLog\UpdateCampaignLogRequest;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Redirect;
 
 class CampaignLogController extends Controller
 {
@@ -13,7 +16,9 @@ class CampaignLogController extends Controller
      */
     public function index()
     {
-        //
+         return Inertia::render('CampaignLogs/Index', [
+            'campaignlog' => Inertia::scroll(fn () => CampaignLog::with(['campaign'])->paginate()),
+        ]);
     }
 
     /**
@@ -21,7 +26,11 @@ class CampaignLogController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('CampaignLogs/Create', [
+            'campaigns' => Campaign::orderBy('name')->select('id', 'name')->get(),
+            // Opcional: Lista de niveles sugeridos para el select
+            'levels' => ['info', 'warning', 'error', 'debug', 'critical'],
+        ]);
     }
 
     /**
@@ -29,7 +38,10 @@ class CampaignLogController extends Controller
      */
     public function store(StoreCampaignLogRequest $request)
     {
-        //
+        CampaignLog::create($request->validated());
+
+        return Redirect::route('campaign-logs.index')
+            ->with('success', 'Log registrado correctamente.');
     }
 
     /**
@@ -37,7 +49,11 @@ class CampaignLogController extends Controller
      */
     public function show(CampaignLog $campaignLog)
     {
-        //
+        $campaignLog->load('campaign');
+
+        return Inertia::render('CampaignLogs/Show', [
+            'campaignLog' => $campaignLog
+        ]);
     }
 
     /**
@@ -45,7 +61,11 @@ class CampaignLogController extends Controller
      */
     public function edit(CampaignLog $campaignLog)
     {
-        //
+        return Inertia::render('CampaignLogs/Edit', [
+            'campaignLog' => $campaignLog,
+            'campaigns' => Campaign::orderBy('name')->select('id', 'name')->get(),
+            'levels' => ['info', 'warning', 'error', 'debug', 'critical'],
+        ]);
     }
 
     /**
@@ -53,7 +73,10 @@ class CampaignLogController extends Controller
      */
     public function update(UpdateCampaignLogRequest $request, CampaignLog $campaignLog)
     {
-        //
+        $campaignLog->update($request->validated());
+
+        return Redirect::route('campaign-logs.index')
+            ->with('success', 'Log actualizado correctamente.');
     }
 
     /**
@@ -61,6 +84,9 @@ class CampaignLogController extends Controller
      */
     public function destroy(CampaignLog $campaignLog)
     {
-        //
+        $campaignLog->delete();
+
+        return Redirect::route('campaign-logs.index')
+            ->with('success', 'Log eliminado correctamente.');
     }
 }
