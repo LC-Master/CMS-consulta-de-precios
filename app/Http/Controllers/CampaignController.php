@@ -15,14 +15,14 @@ class CampaignController extends Controller
 {
     public function index()
     {
-        return Inertia::render('campaign/Index', [
+        return Inertia::render('Campaign/Index', [
             'campaigns' => Inertia::scroll(fn () => Campaign::with(['status', 'department', 'agreement'])->paginate()),
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('campaign/Create', [
+        return Inertia::render('Campaign/Create', [
             'statuses' => Status::all(),
             'departments' => Department::all(),
             'agreements' => Agreement::all(),
@@ -44,12 +44,12 @@ class CampaignController extends Controller
     {
         $campaign->with(['status', 'department', 'agreement']);
 
-        return Inertia::render('campaign/Show', ['campaign' => $campaign]);
+        return Inertia::render('Campaign/Show', ['campaign' => $campaign]);
     }
 
     public function edit(Campaign $campaign)
     {
-        return Inertia::render('campaign/Edit', [
+        return Inertia::render('Campaign/Edit', [
             'campaign' => $campaign,
             'statuses' => Status::all(),
             'departments' => Department::all(),
