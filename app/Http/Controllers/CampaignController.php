@@ -8,15 +8,29 @@ use App\Models\Agreement;
 use App\Models\Campaign;
 use App\Models\Department;
 use App\Models\Status;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class CampaignController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = Campaign::with(['status', 'department', 'agreement']);
+
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status_id', $request->status);
+        }
+
         return Inertia::render('Campaign/Index', [
-            'campaigns' => Inertia::scroll(fn () => Campaign::with(['status', 'department', 'agreement'])->paginate()),
+            'campaigns' => Inertia::scroll(fn () => $query->latest()->paginate()),
+            'filters' => $request->only(['search', 'status']),
+            'statuses' => fn () => Status::all(),
         ]);
     }
 
@@ -29,16 +43,16 @@ class CampaignController extends Controller
         ]);
     }
 
-   public function store(StoreCampaignRequest $request)
-{
-    $data = $request->validated();
-    
-    Campaign::create(attributes: array_merge($data, [
-        'created_by' => Auth::id(),
-    ]));
+    public function store(StoreCampaignRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
 
-    return redirect()->route('timeline.create')->with('success', 'Campaña creada correctamente.');
-}
+        Campaign::create(attributes: array_merge($data, [
+            'created_by' => Auth::id(),
+        ]));
+
+        return redirect()->route('timeline.create')->with('success', 'Campaña creada correctamente.');
+    }
 
     public function show(Campaign $campaign)
     {
@@ -73,7 +87,7 @@ class CampaignController extends Controller
     {
         $campaign->delete();
 
-            return redirect()->route('campaign.index')
+        return redirect()->route('campaign.index')
             ->with('success', 'Campaña eliminada.');
     }
 }
