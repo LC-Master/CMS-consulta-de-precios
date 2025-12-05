@@ -15,12 +15,8 @@ class CampaignController extends Controller
 {
     public function index()
     {
-        $campaigns = Campaign::with(['status', 'department', 'agreement'])
-            ->orderBy('id', 'desc')
-            ->paginate(10);
-
         return Inertia::render('Campaign/Index', [
-            'campaigns' => $campaigns
+            'campaigns' => Inertia::scroll(fn () => Campaign::with(['status', 'department', 'agreement'])->paginate()),
         ]);
     }
 
@@ -48,12 +44,12 @@ class CampaignController extends Controller
     {
         $campaign->with(['status', 'department', 'agreement']);
 
-        return Inertia::render('campaign/Show', ['campaign' => $campaign]);
+        return Inertia::render('Campaign/Show', ['campaign' => $campaign]);
     }
 
     public function edit(Campaign $campaign)
     {
-        return Inertia::render('campaign/Edit', [
+        return Inertia::render('Campaign/Edit', [
             'campaign' => $campaign,
             'statuses' => Status::all(),
             'departments' => Department::all(),
