@@ -29,16 +29,16 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function store(StoreCampaignRequest $request)
-    {
-        $data = $request->validated();
+   public function store(StoreCampaignRequest $request)
+{
+    $data = $request->validated();
+    
+    Campaign::create(attributes: array_merge($data, [
+        'created_by' => Auth::id(),
+    ]));
 
-        Campaign::create(array_merge($data, [
-            'created_by' => Auth::id(),
-        ]));
-
-        return redirect()->route('campaign.index')->with('success', 'Campaña creada correctamente.');
-    }
+    return redirect()->route('timeline.create')->with('success', 'Campaña creada correctamente.');
+}
 
     public function show(Campaign $campaign)
     {
