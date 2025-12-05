@@ -19,14 +19,14 @@ class CampaignController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(10);
 
-        return Inertia::render('Campaigns/Index', [
+        return Inertia::render('Campaign/Index', [
             'campaigns' => $campaigns
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Campaigns/Create', [
+        return Inertia::render('Campaign/Create', [
             'statuses' => Status::all(),
             'departments' => Department::all(),
             'agreements' => Agreement::all(),
@@ -41,7 +41,7 @@ class CampaignController extends Controller
         'created_by' => Auth::id(),
     ]));
 
-    return redirect()->route('campaigns.index')->with('success', 'Campaña creada correctamente.');
+    return redirect()->route('timeline.create')->with('success', 'Campaña creada correctamente.');
 }
 
     public function show(Campaign $campaign)
