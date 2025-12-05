@@ -37,7 +37,7 @@ class CampaignController extends Controller
 {
     $data = $request->validated();
     
-    Campaign::create(array_merge($data, [
+    Campaign::create(attributes: array_merge($data, [
         'created_by' => Auth::id(),
     ]));
 
