@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import { Form } from '@inertiajs/react'
 import { useState } from "react"
-export default function Campaign() {
+export default function CampaignCreate() {
     const [selectedIndex, setSelectedIndex] = useState(0)
     const steps = [
         { name: 'Paso 1', title: 'Campaña' },

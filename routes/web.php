@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\CampaignController;
-use App\Http\Requests\StorePostRequest;
+use App\Http\Controllers\TimeLineController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -20,6 +20,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::resource('campaign', CampaignController::class);
+    Route::resource('timeline', TimeLineController::class);
+
     
 });
 
