@@ -313,7 +313,7 @@ function TimelineEditor({ initialTimeline = [], initialLibrary = [] }: { initial
                 };
                 addTimelineItem(newItem);
             } else if (item.source === 'timeline') {
-                const movedItem = { ...item, start: newStart } as TimelineItem;
+                const movedItem = { ...item, start: newStart } as unknown as TimelineItem;
                 if (!hasCollision(movedItem, timelineItems, item.id)) {
                     setTimelineItems(prev => prev.map(i => i.id === item.id ? { ...i, start: newStart } : i));
                 }
