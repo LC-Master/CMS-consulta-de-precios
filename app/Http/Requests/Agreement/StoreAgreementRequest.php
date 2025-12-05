@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Agreement;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -11,7 +11,8 @@ class StoreAgreementRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Cambia esto a false si necesitas lógica de permisos (ej. solo admins)
+        return true; 
     }
 
     /**
@@ -22,7 +23,15 @@ class StoreAgreementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'string', 'max:255', 'unique:agreements,name'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'El nombre del acuerdo es obligatorio.',
+            'name.unique' => 'Ya existe un acuerdo con este nombre.',
         ];
     }
 }

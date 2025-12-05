@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Center;
-use App\Http\Requests\StoreCenterRequest;
-use App\Http\Requests\UpdateCenterRequest;
+use App\Http\Requests\Center\StoreCenterRequest;
+use App\Http\Requests\Center\UpdateCenterRequest;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Redirect;
 
 class CenterController extends Controller
 {
@@ -13,7 +15,9 @@ class CenterController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('Centers/Index', [
+            'centers' => Inertia::scroll(fn () => Center::paginate()),
+        ]);
     }
 
     /**
@@ -21,7 +25,7 @@ class CenterController extends Controller
      */
     public function create()
     {
-        //
+         return Inertia::render('Centers/Create');
     }
 
     /**
@@ -29,7 +33,10 @@ class CenterController extends Controller
      */
     public function store(StoreCenterRequest $request)
     {
-        //
+        Center::create($request->validated());
+
+        return Redirect::route('centers.index')
+            ->with('success', 'Centro creado correctamente.');
     }
 
     /**
@@ -37,7 +44,9 @@ class CenterController extends Controller
      */
     public function show(Center $center)
     {
-        //
+        return Inertia::render('Centers/Show', [
+            'center' => $center
+        ]);
     }
 
     /**
@@ -45,7 +54,9 @@ class CenterController extends Controller
      */
     public function edit(Center $center)
     {
-        //
+        return Inertia::render('Centers/Edit', [
+            'center' => $center
+        ]);
     }
 
     /**
@@ -53,7 +64,10 @@ class CenterController extends Controller
      */
     public function update(UpdateCenterRequest $request, Center $center)
     {
-        //
+        $center->update($request->validated());
+
+        return Redirect::route('centers.index')
+            ->with('success', 'Centro actualizado correctamente.');
     }
 
     /**
@@ -61,6 +75,9 @@ class CenterController extends Controller
      */
     public function destroy(Center $center)
     {
-        //
+        $center->delete();
+
+        return Redirect::route('centers.index')
+            ->with('success', 'Centro eliminado correctamente.');
     }
 }

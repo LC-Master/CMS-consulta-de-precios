@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Department;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -11,18 +11,25 @@ class StoreDepartmentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            //
+            // Respetamos la mayúscula de 'Name' según tu modelo
+            'Name' => ['required', 'string', 'max:255', 'unique:departments,Name'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'Name.required' => 'El nombre del departamento es obligatorio.',
+            'Name.unique' => 'Ya existe un departamento con este nombre.',
         ];
     }
 }
