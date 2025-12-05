@@ -1,0 +1,24 @@
+architecture-beta
+    group cms(cloud)[CMS Centralizado]
+    service cms_store(disk)[Almacenamiento] in cms
+    service cms_app(server)[CMS Core] in cms
+    service cms_db(database)[SQL SERVER] in cms
+
+    group cds(cloud)[Media Server  CDS]
+    service cds_db(database)[SQL SERVER] in cds
+    service cds_main(server)[CDS Core] in cds
+    service cds_store(disk)[Almacenamiento] in cds
+
+    group store(cloud)[Tienda  Player]
+    service player_app(internet)[Player Frontend] in store
+    service player_dsk(disk)[Cache Local] in store
+
+    cms_store:R -- L:cms_app
+    cms_app:B -- T:cms_db
+    cms_app:R -- L:cds_main
+    
+    cds_db:B -- T:cds_main
+    cds_store:T -- B:cds_main
+    cds_main:R -- L:player_app
+    
+    player_app:B -- T:player_dsk

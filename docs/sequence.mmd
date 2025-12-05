@@ -1,0 +1,51 @@
+sequenceDiagram
+    autonumber
+    actor User as Administrador
+    participant CMS as CMS Core
+    participant CMS_DB as CMS DB (SQL)
+    participant CMS_Store as CMS Storage
+    participant CDS as CDS Core
+    participant CDS_DB as CDS DB (SQL)
+    participant CDS_Store as CDS Storage
+    participant Player as Player Frontend
+    participant Player_Disk as Player Cache
+
+    Note over User, CMS_Store: Fase 1: Creación y Programación (CMS)
+    User->>CMS: Crear Campaña (Subir Archivos + Parrilla)
+    CMS->>CMS_Store: Guardar Archivos Originales
+    CMS->>CMS_DB: Guardar Metadatos de Campaña
+    CMS-->>User: Confirmación de Guardado
+
+    Note over CMS, CDS_Store: Fase 2: Distribución y Procesamiento (CDS)
+    CMS->>CDS: Sincronizar/Publicar Contenido
+    CDS->>CMS_Store: Recuperar Archivos Originales
+    CDS->>CDS_Store: Almacenar Archivos Raw
+    activate CDS
+    CDS->>CDS: Transcodificar (MP4 H.264 / Bitrates)
+    CDS->>CDS: Generar Checksums de Integridad
+    deactivate CDS
+    CDS->>CDS_Store: Almacenar Archivos Optimizados
+    CDS->>CDS_DB: Registrar Estado y Metadatos
+
+    Note over CDS, Player_Disk: Fase 3: Despliegue a Tiendas (Player)
+    loop Heartbeat / Polling
+        Player->>CDS: Consultar Parrilla/Actualizaciones
+        alt Hay Nuevo Contenido
+            CDS-->>Player: Retornar Manifiesto (URLs + Checksums)
+            Player->>CDS_Store: Descargar Archivos Optimizados
+            Player->>Player: Verificar Integridad (Checksum)
+            alt Integridad OK
+                Player->>Player_Disk: Guardar en Caché Local
+                Player->>CDS: Reportar Éxito de Descarga
+            else Error de Integridad
+                Player->>CDS: Reportar Error (Reintentar)
+            end
+        else Sin Cambios
+            CDS-->>Player: Sin Actualizaciones
+        end
+    end
+
+    Note over Player, Player_Disk: Fase 4: Reproducción y Monitoreo
+    Player->>Player_Disk: Leer Contenido Local (Fallback)
+    Player->>Player: Reproducir según Horario
+    Player->>CDS: Enviar Métricas y Estado (Heartbeat)
