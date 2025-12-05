@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Inertia\Inertia;
 use App\Models\TimeLineItem;
 use App\Http\Requests\StoreTimeLineItemRequest;
 use App\Http\Requests\UpdateTimeLineItemRequest;
 
-class TimeLineItemController extends Controller
+class TimeLineController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,7 +21,7 @@ class TimeLineItemController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Timeline/Create');
     }
 
     /**
