@@ -4,14 +4,15 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Campaign extends Model
 {
     /** @use HasFactory<\Database\Factories\CampaignFactory> */
     use HasFactory;
+
     use HasUuids;
 
     protected $fillable = [
@@ -61,6 +62,10 @@ class Campaign extends Model
         return $this->belongsTo(Agreement::class);
     }
 
+    public function centers()
+    {
+        return $this->belongsToMany(Center::class, 'campaign_centers');
+    }
 
     public function status()
     {
