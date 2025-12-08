@@ -24,12 +24,13 @@ class StoreCampaignRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'campaign_name' => 'required|string|max:255',
-            'start_at'      => 'required|date',
-            'end_at'        => 'required|date|after_or_equal:start_at',
-            'status_id'     => 'nullable|exists:status,id',
-            'department_id' => 'nullable|exists:departments,id',
+            'title' => 'required|string|max:255',
+            'start_at'      => 'required|date|before:end_at',
+            'end_at'        => 'required|date|after:start_at',
+            'centers'     => 'nullable|array|min:1',
+            'department_id' => 'required|exists:departments,id',
             'agreement_id'  => 'nullable|exists:agreements,id',
+            'centers.*'   => 'string|exists:centers,code',
         ];
     }
 }

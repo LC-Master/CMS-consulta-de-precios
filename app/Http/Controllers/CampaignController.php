@@ -51,8 +51,7 @@ class CampaignController extends Controller
         Campaign::create(attributes: array_merge($data, [
             'created_by' => Auth::id(),
         ]));
-
-        return redirect()->route('timeline.create')->with('success', 'Campaña creada correctamente.');
+        return redirect()->route('/timeline/create')->with('success', 'Campaña creada correctamente.');
     }
 
     public function show(Campaign $campaign)
