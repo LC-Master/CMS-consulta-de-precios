@@ -2,22 +2,18 @@
 
 namespace Database\Factories;
 
+use App\Models\Campaign;
+use App\Models\Center;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\CampaignCenter>
- */
 class CampaignCenterFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            //
+            // Definición por defecto (crea nuevos si no se especifican)
+            'campaign_id' => Campaign::factory(),
+            'center_id' => Center::factory(),
         ];
     }
 }
