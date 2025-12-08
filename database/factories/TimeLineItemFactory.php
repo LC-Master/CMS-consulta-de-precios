@@ -11,7 +11,6 @@ class TimeLineItemFactory extends Factory
     public function definition(): array
     {
         return [
-            // Laravel intentará crear una Campaign y un Media si no se pasan al llamar al factory
             'campaign_id' => Campaign::factory(),
             'media_id' => Media::factory(),
             'scheduled_at' => $this->faker->time('H:i:s'),
