@@ -30,7 +30,7 @@ class StoreCampaignRequest extends FormRequest
             'centers'     => 'nullable|array|min:1',
             'department_id' => 'required|exists:departments,id',
             'agreement_id'  => 'nullable|exists:agreements,id',
-            'centers.*'   => 'string|exists:centers,code',
+            'centers.*'   => 'string|exists:centers,id',
         ];
     }
 }
