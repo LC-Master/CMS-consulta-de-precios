@@ -17,7 +17,7 @@ class TimeLineController extends Controller
      */
     public function index()
     {
-         return Inertia::render('TimeLineItems/Index', [
+         return Inertia::render('TimeLine/Index', [
             'timelineitem' => Inertia::scroll(fn () => TimeLineItem::with(['campaign','media'])->paginate()),
         ]);
     }
@@ -27,10 +27,8 @@ class TimeLineController extends Controller
      */
     public function create()
     {
-        return Inertia::render('TimeLineItems/Create', [
-            // Enviamos las listas para los dropdowns
-            'campaigns' => Campaign::orderBy('name')->get(['id', 'name']), 
-            // Para media, quizás quieras mostrar el path o el nombre
+        return Inertia::render('TimeLine/Create', [
+            'campaigns' => Campaign::orderBy('title')->get(['id', 'title']), 
             'media' => Media::orderBy('id', 'desc')->get(['id', 'path', 'mime_type']),
         ]);
     }
@@ -53,7 +51,7 @@ class TimeLineController extends Controller
     {
         $timeLineItem->load(['campaign', 'media']);
 
-        return Inertia::render('TimeLineItems/Show', [
+        return Inertia::render('TimeLine/Show', [
             'timeLineItem' => $timeLineItem
         ]);
     }
@@ -63,7 +61,7 @@ class TimeLineController extends Controller
      */
     public function edit(TimeLineItem $timeLineItem)
     {
-        return Inertia::render('TimeLineItems/Edit', [
+        return Inertia::render('TimeLine/Edit', [
             'timeLineItem' => $timeLineItem,
             'campaigns' => Campaign::orderBy('name')->get(['id', 'name']),
             'media' => Media::orderBy('id', 'desc')->get(['id', 'path', 'mime_type']),
@@ -77,7 +75,7 @@ class TimeLineController extends Controller
     {
         $timeLineItem->update($request->validated());
 
-        return Redirect::route('timeline-items.index')
+        return Redirect::route('timeline.index')
             ->with('success', 'Programación actualizada correctamente.');
     }
 
@@ -88,7 +86,7 @@ class TimeLineController extends Controller
     {
         $timeLineItem->delete();
 
-        return Redirect::route('timeline-items.index')
+        return Redirect::route('timeline.index')
             ->with('success', 'Item eliminado de la línea de tiempo.');
     }
 }

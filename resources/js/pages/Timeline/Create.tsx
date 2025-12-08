@@ -5,10 +5,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import AppLayout from '@/layouts/app-layout';
 import { router } from '@inertiajs/react';
 
-if (typeof window !== 'undefined' && typeof (window as any).global === 'undefined') {
-    (window as any).global = window;
-}
-
 const GREEN_PRIMARY = '#007853';
 const elements = [
     { id: 'lib-1', type: 'video', name: 'Intro_Comercial.mp4', duration: 60, color: GREEN_PRIMARY },
@@ -253,7 +249,7 @@ function TimelineEditor({ initialTimeline = [], initialLibrary = [] }: { initial
 
         if (item.source === 'timeline') {
             const delta = monitor.getDifferenceFromInitialOffset();
-            if (!delta) return item.start; // No movement yet
+            if (!delta) return item.start;
 
             const deltaMinutes = Math.round((delta.x / PIXELS_PER_MINUTE) / SNAP_MINUTES) * SNAP_MINUTES;
             startMinute = item.start + deltaMinutes;
@@ -394,23 +390,6 @@ function TimelineEditor({ initialTimeline = [], initialLibrary = [] }: { initial
 
     return (
         <div className="flex flex-col h-screen bg-gray-50 font-sans text-gray-800">
-
-            {/* HEADER */}
-            <header className="bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm z-10">
-                <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    <Video className="w-6 h-6" style={{ color: GREEN_PRIMARY }} />
-                    Gestor de Contenido
-                </h1>
-                <div className="flex gap-3">
-                    <button className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md font-medium transition">Cancelar</button>
-                    <button 
-                        onClick={saveTimeline}
-                        className="px-6 py-2 text-white rounded-md font-medium shadow-md transition hover:opacity-90 flex items-center gap-2"
-                        style={{ backgroundColor: GREEN_PRIMARY }}>
-                        <Save className="w-4 h-4" /> Guardar Programación
-                    </button>
-                </div>
-            </header>
 
             {/* MAIN CONTENT */}
             <div className="flex-1 flex flex-col overflow-hidden">

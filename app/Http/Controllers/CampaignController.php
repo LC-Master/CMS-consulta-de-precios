@@ -6,6 +6,7 @@ use App\Http\Requests\Campaigns\StoreCampaignRequest;
 use App\Http\Requests\Campaigns\UpdateCampaignRequest;
 use App\Models\Agreement;
 use App\Models\Campaign;
+use App\Models\Center;
 use App\Models\Department;
 use App\Models\Status;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +21,7 @@ class CampaignController extends Controller
         $query = Campaign::with(['status', 'department', 'agreement']);
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
+            $query->where('title', 'like', '%'.$request->search.'%');
         }
 
         if ($request->filled('status')) {
@@ -37,9 +38,9 @@ class CampaignController extends Controller
     public function create()
     {
         return Inertia::render('Campaign/Create', [
-            'statuses' => Status::all(),
-            'departments' => Department::all(),
-            'agreements' => Agreement::all(),
+            'centers' => Center::select('code', 'name')->get(),
+            'departments' => Department::select('id', 'name')->get(),
+            'agreements' => Agreement::select('id', 'name')->get(),
         ]);
     }
 
@@ -50,8 +51,7 @@ class CampaignController extends Controller
         Campaign::create(attributes: array_merge($data, [
             'created_by' => Auth::id(),
         ]));
-
-        return redirect()->route('timeline.create')->with('success', 'Campaña creada correctamente.');
+        return redirect()->route('/timeline/create')->with('success', 'Campaña creada correctamente.');
     }
 
     public function show(Campaign $campaign)

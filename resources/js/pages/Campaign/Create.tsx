@@ -1,172 +1,174 @@
 import AppLayout from '@/layouts/app-layout'
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
-import { Form } from '@inertiajs/react'
-import { useState } from "react"
+import { index } from '@/routes/campaign'
+import { BreadcrumbItem } from '@/types'
+import { usePage, useForm } from '@inertiajs/react'
+import Select from 'react-select'
+
+interface Center {
+    code: string
+    name: string
+}
+interface Department {
+    id: string
+    name: string
+}
+
+type Agreement = Department
+
+interface Option {
+    value: string
+    label: string
+}
+
 export default function CampaignCreate() {
-    const [selectedIndex, setSelectedIndex] = useState(0)
-    const steps = [
-        { name: 'Paso 1', title: 'Campaña' },
-        { name: 'Paso 2', title: 'Configuración de Opciones' },
-        { name: 'Paso 3', title: 'Confirmación e Instalación' },
-    ]
-    const goToNextStep = () => {
-        if (selectedIndex < steps.length - 1) {
-            setSelectedIndex(selectedIndex + 1)
-           
-        }
-    }
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Crear campaña',
+            href: index().url,
+        },
+    ];
 
-    const goToPreviousStep = () => {
-        if (selectedIndex > 0) {
-            setSelectedIndex(selectedIndex - 1)
-        }
-    }
-
-    const handleFinish = () => {
-        alert('¡Instalación simulada completada con éxito!')
+    const { centers, departments, agreements } = usePage<{ centers: Center[], departments: Department[], agreements: Agreement[] }>().props
+    const { data, setData, processing, errors, post } = useForm({
+        title: '',
+        start_at: '',
+        end_at: '',
+        centers: [] as string[],
+        department_id: '',
+        agreement_id: '',
+    })
+    console.log(usePage().props);
+    const optionsCenter: Option[] = centers.map((center: Center) => {
+        return { value: center.code, label: center.name }
+    })
+    const optionsDepartment: Option[] = departments.map((department: Department) => {
+        return { value: department.id, label: department.name }
+    })
+    const optionsAgreement: Option[] = agreements.map((agreement: Agreement) => {
+        return { value: agreement.id, label: agreement.name }
+    })
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        post('/campaign')
     }
     return (
-        <AppLayout>
-            <div className="max-w-x mt-4 mx-auto p-6 bg-white shadow-lg rounded-xl">
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <div className="p-6 space-y-6">
+                <form id="form" method="post" onSubmit={handleSubmit} className="space-y-4" action="/campaigns">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título</label>
+                            <input
+                                type="text"
+                                id="title"
+                                value={data.title}
+                                name="title"
+                                onChange={e => setData('title', e.target.value)}
+                                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
+                            />
+                            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+                        </div>
 
-                <TabGroup
-                    selectedIndex={selectedIndex}
-                    onChange={setSelectedIndex}
-                    manual
-                >
-                    <TabList className="hidden">
-                        {steps.map((step) => (
-                            <Tab
-                                key={step.name}
-                            >
-                                {step.name}
-                            </Tab>
-                        ))}
-                    </TabList>
-
-                    <TabPanels className="w-[900px] h-[400px]">
-                        <TabPanel className="flex flex-col p-4 rounded-xl bg-gray-50 w-full h-full shadow-md">
-                            <h3 className="text-xl font-bold mb-3 text-locatel-oscuro shrink-0">{steps[0].title}</h3>
-                            <Form className="grid grid-cols-2 gap-4">
-                                <div className="flex flex-col col-span-2">
-                                    <label htmlFor="name" className="text-sm font-medium mb-1 text-gray-700">Nombre de la Campaña</label>
-                                    <input 
-                                        type="text" 
-                                        id="name" 
-                                        name="name" 
-                                        placeholder="Ej: Campaña de Verano"
-                                        className="block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-locatel-claro focus:border-locatel-claro"
-                                    />
-                                </div>
-
-                                <div className="flex flex-col">
-                                    <label htmlFor="startAt" className="text-sm font-medium mb-1 text-gray-700">Fecha de Inicio</label>
-                                    <input 
-                                        type="date" 
-                                        id="startAt" 
-                                        name="startAt" 
-                                        className="block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-locatel-claro focus:border-locatel-claro"
-                                    />
-                                </div>
-
-                                <div className="flex flex-col">
-                                    <label htmlFor="endAt" className="text-sm font-medium mb-1 text-gray-700">Fecha de Fin</label>
-                                    <input 
-                                        type="date" 
-                                        id="endAt" 
-                                        name="endAt" 
-                                        className="block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-locatel-claro focus:border-locatel-claro"
-                                    />
-                                </div>
-
-                                <div className="flex flex-col">
-                                    <label htmlFor="status" className="text-sm font-medium mb-1 text-gray-700">Estado</label>
-                                    <select 
-                                        id="status" 
-                                        name="status" 
-                                        className="block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-locatel-claro focus:border-locatel-claro"
-                                    >
-                                        <option value="active">Activo</option>
-                                        <option value="inactive">Inactivo</option>
-                                    </select>
-                                </div>
-
-                                <div className="flex flex-col">
-                                    <label htmlFor="agreement" className="text-sm font-medium mb-1 text-gray-700">Convenio</label>
-                                    <select 
-                                        id="agreement" 
-                                        name="agreement" 
-                                        className="block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-locatel-claro focus:border-locatel-claro"
-                                    >
-                                        <option value="active">Activo</option>
-                                        <option value="inactive">Inactivo</option>
-                                    </select>
-                                </div>
-
-                                <div className="flex flex-col">
-                                    <label htmlFor="department" className="text-sm font-medium mb-1 text-gray-700">Departamento</label>
-                                    <select 
-                                        id="department" 
-                                        name="department" 
-                                        className="block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-locatel-claro focus:border-locatel-claro"
-                                    >
-                                        <option value="medicine">Medicina</option>
-                                        <option value="nursing">Enfermería</option>
-                                    </select>
-                                </div>
-                            </Form>
-                        </TabPanel>
-
-                        <TabPanel className="p-4 rounded-xl bg-gray-50 w-full h-full">
-                            <h3 className="text-xl font-semibold mb-3">{steps[1].title}</h3>
-                            <label className="block mb-2">
-                                Ruta de Instalación:
-                                <input type="text" defaultValue="/aplicacion/" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
-                            </label>
-                        </TabPanel>
-
-                        <TabPanel className="p-4 rounded-xl bg-gray-50 w-full h-full">
-                            <h3 className="text-xl font-semibold mb-3">{steps[2].title}</h3>
-                            <p>Revisa la configuración. Al hacer clic en "Finalizar", comenzará la instalación.</p>
-                            <ul className="list-disc list-inside mt-3">
-                                <li>Ruta: /aplicacion/</li>
-                                <li>Modo: Completo</li>
-                            </ul>
-                        </TabPanel>
-                    </TabPanels>
-
-                    <div className="mt-6 flex justify-between">
-                        <button
-                            onClick={goToPreviousStep}
-                            disabled={selectedIndex === 0}
-                            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors 
-              ${selectedIndex === 0
-                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                    : 'bg-locatel-claro text-white hover:bg-locatel-oscuro'
-                                }`
-                            }
-                        >
-                            &larr; Anterior
-                        </button>
-
-                        {selectedIndex < steps.length - 1 ? (
-                            <button
-                                onClick={goToNextStep}
-                                className="px-4 py-2 text-sm font-medium rounded-md bg-locatel-claro hover:bg-locatel-oscuro text-white transition-colors"
-                            >
-                                Siguiente &rarr;
-                            </button>
-                        ) : (
-                            <button
-                                onClick={handleFinish}
-                                className="px-4 py-2 text-sm font-medium rounded-md bg-locatel-oro text-white hover:bg-locatel-naranja transition-colors"
-                            >
-                                Finalizar
-                            </button>
-                        )}
+                        <div>
+                            <label htmlFor="department_id" className="block text-sm font-medium text-gray-700">Departamento</label>
+                            <Select<Option, false>
+                                options={optionsDepartment}
+                                id="departments"
+                                value={optionsDepartment.find(o => o.value === data.department_id) || null}
+                                name="departments"
+                                className="mt-1"
+                                classNamePrefix="react-select"
+                                onChange={(val) => setData('department_id', (val as Option | null)?.value ?? '')}
+                                placeholder="Selecciona un departamento"
+                                isClearable
+                            />
+                            {errors.department_id && <p className="text-red-500 text-sm mt-1">{errors.department_id}</p>}
+                        </div>
                     </div>
-                </TabGroup>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="start_date" className="block text-sm font-medium text-gray-700">Fecha y hora (inicio)</label>
+                            <input
+                                type="datetime-local"
+                                id="start_date"
+                                value={data.start_at}
+                                required
+                                name="start_date"
+                                onChange={e => setData('start_at', e.target.value)}
+                                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
+                            />
+                            {errors.start_at && <p className="text-red-500 text-sm mt-1">{errors.start_at}</p>}
+                        </div>
+
+                        <div>
+                            <label htmlFor="end_date" className="block text-sm font-medium text-gray-700">Fecha y hora (fin)</label>
+                            <input
+                                type="datetime-local"
+                                id="end_date"
+                                value={data.end_at}
+                                required
+                                name="end_date"
+                                onChange={e => setData('end_at', e.target.value)}
+                                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
+                            />
+                            {errors.end_at && <p className="text-red-500 text-sm mt-1">{errors.end_at}</p>}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label htmlFor="centers" className="block text-sm font-medium text-gray-700">Centros</label>
+                        <Select<Option, true>
+                            options={optionsCenter}
+                            id="centers"
+                            value={optionsCenter.filter(o => data.centers.includes(o.value))}
+                            name="centers"
+                            required
+                            isMulti
+                            className="mt-1"
+                            classNamePrefix="react-select"
+                            onChange={(val) => setData('centers', (val as Option[]).map(v => v.value))}
+                            placeholder="Selecciona centros..."
+                        />
+                        {errors.centers && <p className="text-red-500 text-sm mt-1">{errors.centers}</p>}
+                    </div>
+
+                    <div>
+                        <label htmlFor="agreements" className="block text-sm font-medium text-gray-700">Acuerdo</label>
+                        <Select<Option, false>
+                            options={optionsAgreement}
+                            id="agreements"
+                            value={optionsAgreement.find(o => o.value === data.agreement_id) || null}
+                            name="agreements"
+                            required
+                            className="mt-1"
+                            classNamePrefix="react-select"
+                            onChange={(val) => setData('agreement_id', (val as Option | null)?.value ?? '')}
+                            placeholder="Selecciona un acuerdo"
+                            isClearable
+                        />
+                        {errors.agreement_id && <p className="text-red-500 text-sm mt-1">{errors.agreement_id}</p>}
+                    </div>
+                </form>
+
+                <div className="flex flex-wrap justify-center gap-3">
+                    <button
+                        form="form"
+                        className="bg-locatel-medio text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
+                        disabled={processing}
+                    >
+                        Guardar
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => (window.location.href = '/campaign')}
+                        className="bg-red-500 text-white rounded-md px-6 py-3 shadow hover:brightness-95"
+                    >
+                        Cancelar
+                    </button>
+                </div>
             </div>
-        </AppLayout >
+        </AppLayout>
     )
 }
