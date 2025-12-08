@@ -4,15 +4,14 @@ import { BreadcrumbItem } from '@/types'
 import { usePage, useForm } from '@inertiajs/react'
 import Select from 'react-select'
 
-interface Center {
-    code: string
-    name: string
-}
+
 interface Department {
     id: string
     name: string
 }
-
+interface Center extends Pick<Department, 'id' | 'name'> {
+    code: string
+}
 type Agreement = Department
 
 interface Option {
@@ -39,7 +38,7 @@ export default function CampaignCreate() {
     })
     console.log(usePage().props);
     const optionsCenter: Option[] = centers.map((center: Center) => {
-        return { value: center.code, label: center.name }
+        return { value: center.id, label: center.name + " - " + center.code }
     })
     const optionsDepartment: Option[] = departments.map((department: Department) => {
         return { value: department.id, label: department.name }
@@ -63,6 +62,8 @@ export default function CampaignCreate() {
                                 id="title"
                                 value={data.title}
                                 name="title"
+                                required
+                                placeholder='Titulo de la campaña'
                                 onChange={e => setData('title', e.target.value)}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                             />
