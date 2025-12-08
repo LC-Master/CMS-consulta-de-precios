@@ -3,21 +3,7 @@ import { index } from '@/routes/campaign'
 import { BreadcrumbItem } from '@/types'
 import { usePage, useForm } from '@inertiajs/react'
 import Select from 'react-select'
-
-
-interface Department {
-    id: string
-    name: string
-}
-interface Center extends Pick<Department, 'id' | 'name'> {
-    code: string
-}
-type Agreement = Department
-
-interface Option {
-    value: string
-    label: string
-}
+import { Center, Department, Option, Agreement } from '@/types/campaign/index.types'
 
 export default function CampaignCreate() {
     const breadcrumbs: BreadcrumbItem[] = [
