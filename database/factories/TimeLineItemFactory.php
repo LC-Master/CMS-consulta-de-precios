@@ -2,22 +2,18 @@
 
 namespace Database\Factories;
 
+use App\Models\Campaign;
+use App\Models\Media;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TimeLineItem>
- */
 class TimeLineItemFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            //
+            'campaign_id' => Campaign::factory(),
+            'media_id' => Media::factory(),
+            'scheduled_at' => $this->faker->time('H:i:s'),
         ];
     }
 }
