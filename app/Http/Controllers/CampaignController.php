@@ -56,10 +56,11 @@ class CampaignController extends Controller
         ]));
 
         $campaign->centers()->attach($centerIds);
-
-        return redirect()->route('/timeline/create')->with('success', 'Campaña creada correctamente.');
+        
+        return to_route('timeline.create')
+            ->with('success', 'Campaña creada correctamente.');
     }
-
+ 
     public function show(Campaign $campaign)
     {
         $campaign->with(['status', 'department', 'agreement']);
