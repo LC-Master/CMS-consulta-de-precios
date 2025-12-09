@@ -11,7 +11,6 @@ class CampaignCenterFactory extends Factory
     public function definition(): array
     {
         return [
-            // Definición por defecto (crea nuevos si no se especifican)
             'campaign_id' => Campaign::factory(),
             'center_id' => Center::factory(),
         ];
