@@ -19,8 +19,8 @@ return new class extends Migration
             $table->foreignUuid('status_id')->nullable()->constrained();
             $table->foreignUuid('department_id')->nullable()->constrained();
             $table->foreignUuid('agreement_id')->nullable()->constrained();
-            $table->uuid('created_by')->nullable(true);
-            $table->uuid('updated_by')->nullable(true);
+            $table->integer('created_by')->nullable(true);
+            $table->integer('updated_by')->nullable(true);
             $table->timestamps();
         });
     }

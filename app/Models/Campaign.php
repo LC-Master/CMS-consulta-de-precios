@@ -64,7 +64,7 @@ class Campaign extends Model
 
     public function centers()
     {
-        return $this->belongsToMany(Center::class, 'campaign_centers');
+        return $this->belongsToMany(Center::class, 'campaign_centers')->withTimestamps();
     }
 
     public function status()

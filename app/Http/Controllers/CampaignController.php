@@ -48,9 +48,14 @@ class CampaignController extends Controller
     {
         $data = $request->validated();
 
-        Campaign::create(attributes: array_merge($data, [
+        $centerIds = $data['centers'] ?? [];
+        unset($data['centers']);
+
+        $campaign = Campaign::create(attributes: array_merge($data, [
             'created_by' => Auth::id(),
         ]));
+
+        $campaign->centers()->attach($centerIds);
 
         return redirect()->route('/timeline/create')->with('success', 'Campaña creada correctamente.');
     }

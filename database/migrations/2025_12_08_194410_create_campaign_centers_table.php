@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('campaign_centers', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('campaign_id')->constrained()->onDelete('cascade');
-            $table->foreignUuid('center_id')->constrained()->onDelete('cascade');
+            $table->primary(['campaign_id', 'center_id']);
+            $table->foreignUuid('campaign_id')->constrained();
+            $table->foreignUuid('center_id')->constrained();
             $table->unique(['campaign_id', 'center_id']);
             $table->timestamps();
         });
