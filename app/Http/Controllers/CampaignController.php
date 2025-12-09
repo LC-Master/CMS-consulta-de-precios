@@ -38,7 +38,7 @@ class CampaignController extends Controller
     public function create()
     {
         return Inertia::render('Campaign/Create', [
-            'centers' => Center::select('code', 'name')->get(),
+            'centers' => Center::select('id', 'code', 'name')->get(),
             'departments' => Department::select('id', 'name')->get(),
             'agreements' => Agreement::select('id', 'name')->get(),
         ]);
@@ -48,12 +48,19 @@ class CampaignController extends Controller
     {
         $data = $request->validated();
 
-        Campaign::create(attributes: array_merge($data, [
+        $centerIds = $data['centers'] ?? [];
+        unset($data['centers']);
+
+        $campaign = Campaign::create(attributes: array_merge($data, [
             'created_by' => Auth::id(),
         ]));
-        return redirect()->route('/timeline/create')->with('success', 'Campaña creada correctamente.');
-    }
 
+        $campaign->centers()->attach($centerIds);
+        
+        return to_route('timeline.create')
+            ->with('success', 'Campaña creada correctamente.');
+    }
+ 
     public function show(Campaign $campaign)
     {
         $campaign->with(['status', 'department', 'agreement']);

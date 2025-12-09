@@ -24,10 +24,10 @@ class StoreCampaignRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:155',
             'start_at'      => 'required|date|before:end_at',
             'end_at'        => 'required|date|after:start_at',
-            'centers'     => 'nullable|array|min:1',
+            'centers'     => 'required|array|min:1',
             'department_id' => 'required|exists:departments,id',
             'agreement_id'  => 'nullable|exists:agreements,id',
             'centers.*'   => 'string|exists:centers,id',
