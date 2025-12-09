@@ -32,7 +32,6 @@ class DatabaseSeeder extends Seeder
             CampaignSeeder::class,
             MediaSeeder::class,
             TimeLineItemSeeder::class,
-            CampaignCenterSeeder::class,
         ]);
         
     }

@@ -29,14 +29,9 @@ class CampaignSeeder extends Seeder
             ->create()              
             ->each(function ($campaign) use ($centers) {
                 
-                $randomCenters = $centers->random(rand(1, 5));
-
-                foreach ($randomCenters as $center) {
-                    CampaignStore::factory()->create([
-                        'campaign_id' => $campaign->id,
-                        'center_id' => $center->id 
-                    ]);
-                }
+                $campaign->centers()->attach(
+                    $centers->random(rand(1, 3))->pluck('id')->toArray()
+                );
 
                 CampaignLog::factory()->count(rand(0, 5))->create([
                     'campaign_id' => $campaign->id
