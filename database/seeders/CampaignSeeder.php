@@ -30,8 +30,19 @@ class CampaignSeeder extends Seeder
             ->each(function ($campaign) use ($centers) {
                 
                 $campaign->centers()->attach(
-                    $centers->random(rand(1, 3))->pluck('id')->toArray()
-                );
+    $centers->random(rand(1, 3))->mapWithKeys(function ($center) {
+        
+        $createdAt = fake()->dateTimeBetween('-1 year', 'now');
+        $updatedAt = fake()->dateTimeBetween($createdAt, 'now');
+
+        return [
+            $center->id => [
+                'created_at' => $createdAt,
+                'updated_at' => $updatedAt,
+            ]
+        ];
+    })->toArray()
+);
 
                 CampaignLog::factory()->count(rand(0, 5))->create([
                     'campaign_id' => $campaign->id
