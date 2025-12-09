@@ -10,18 +10,24 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { dashboard, } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, SquarePlus } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
+        title: 'Crear campaña',
+        href: '/campaign/create',
+        icon: SquarePlus,
+    }
+    , {
         title: 'Panel de control',
         href: dashboard(),
         icon: LayoutGrid,
     },
+
 ];
 
 const footerNavItems: NavItem[] = [
