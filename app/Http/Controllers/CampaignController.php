@@ -12,6 +12,8 @@ use App\Models\Status;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Actions\Campaign\CreateCampaignAction;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class CampaignController extends Controller
@@ -44,26 +46,22 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function store(StoreCampaignRequest $request): RedirectResponse
+    public function store(StoreCampaignRequest $request, CreateCampaignAction $createCampaignAction): RedirectResponse
     {
-        $data = $request->validated();
+        try {
 
-        $centerIds = $data['centers'] ?? [];
-        unset($data['centers']);
+           $createCampaignAction->execute($request->validated());
 
-        $status = Status::select('id')->where('status','Borrador')->first();
+            return to_route('timeline.create')
+                ->with('success', 'Campaña creada correctamente.');
 
-        $borrador = $status->id;
-
-        $campaign = Campaign::create(attributes: array_merge($data, [
-            'created_by' => Auth::id(),
-            'status_id' => $borrador
-        ]));
-
-        $campaign->centers()->attach($centerIds);
-        
-        return to_route('timeline.create')
-            ->with('success', 'Campaña creada correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error creating campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+            
+            return back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error inesperado al crear la campaña. Por favor, intente nuevamente.');
+        }
     }
  
     public function show(Campaign $campaign)

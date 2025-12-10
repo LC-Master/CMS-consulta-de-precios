@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Status;
+use App\Enums\CampaignStatus;
 use Illuminate\Database\Seeder;
 
 class StatusSeeder extends Seeder
@@ -12,10 +13,10 @@ class StatusSeeder extends Seeder
      */
     public function run(): void
     {
-        $statuses = ['Borrador', 'Activa', 'Finalizada'];
+        $statuses = CampaignStatus::cases();
 
         foreach ($statuses as $status) {
-            Status::create(['status' => $status]);
+            Status::create(['status' => $status->value]);
         }
     }
 }
