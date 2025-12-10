@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->dateTime('start_at');
             $table->dateTime('end_at');
-            $table->foreignUuid('status_id')->nullable()->constrained();
+            $table->foreignUuid('status_id')->nullable(false)->constrained();
             $table->foreignUuid('department_id')->nullable()->constrained();
             $table->foreignUuid('agreement_id')->nullable()->constrained();
             $table->integer('created_by')->nullable(true);

@@ -34,7 +34,6 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
             { preserveState: true, replace: true, preserveScroll: true }
         )
     }, [search, status])
-
     return (
         <AppLayout>
             <div className="space-y-4 px-4 pb-4">
@@ -81,23 +80,25 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-100">
                                 {Array.isArray(campaigns?.data) && campaigns.data.length > 0 ? (
-                                    campaigns.data.map((campaign) => (
-                                        <tr key={campaign.id} className="hover:bg-gray-50">
-                                            <td className="px-4 py-3 text-sm text-gray-900">{campaign.title}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-700">{campaign.status.status}</td>
-                                            <td className="px-4 py-3 text-sm text-gray-700">
-                                                {campaign.created_at ? new Date(campaign.created_at).toLocaleString() : '-'}
-                                            </td>
-                                            <td className="px-4 py-3 text-sm">
-                                                <a
-                                                    href={`/campaigns/${campaign.id}`}
-                                                    className="text-blue-600 hover:underline"
-                                                >
-                                                    Ver
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    ))
+                                    campaigns.data.map((campaign) => {
+                                        return (
+                                            <tr key={campaign.id} className="hover:bg-gray-50">
+                                                <td className="px-4 py-3 text-sm text-gray-900">{campaign.title}</td>
+                                                <td className="px-4 py-3 text-sm text-gray-700">{campaign.status?.status}</td>
+                                                <td className="px-4 py-3 text-sm text-gray-700">
+                                                    {campaign.created_at ? new Date(campaign.created_at).toLocaleString() : '-'}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <a
+                                                        href={`/campaigns/${campaign.id}`}
+                                                        className="text-blue-600 hover:underline"
+                                                    >
+                                                        Ver
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })
                                 ) : (
                                     <tr>
                                         <td colSpan={5} className="px-4 py-6 text-center text-sm text-gray-500">
