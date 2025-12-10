@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Status;
-use CampaignStatus;
+use App\Enums\CampaignStatus;
 use Illuminate\Database\Seeder;
 
 class StatusSeeder extends Seeder
