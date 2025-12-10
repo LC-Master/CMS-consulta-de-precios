@@ -127,11 +127,10 @@ const DraggableTimelineItem = ({
     return (
         <div
             ref={(node) => { drag(node); }}
-            className={`absolute top-1/2 -translate-y-1/2 h-24 rounded-lg shadow-lg group overflow-hidden border border-white/20 hover:z-20 transition-colors ${isDragging ? 'opacity-0' : ''}`}
+            className={`absolute top-1/2 -translate-y-1/2 bg-locatel-oscuro h-24 rounded-lg shadow-lg group overflow-hidden border border-white/20 hover:z-20 transition-colors ${isDragging ? 'opacity-0' : ''}`}
             style={{
                 left: `${item.start * pixelsPerMinute}px`,
                 width: `${item.duration * pixelsPerMinute}px`,
-                backgroundColor: item.color,
                 cursor: 'grab'
             }}
         >
