@@ -64,8 +64,8 @@ const DraggableLibraryItem = ({ item, onRemove }: { item: LibraryItem; onRemove:
             <div className="flex gap-3 items-center">
                 {/* Thumbnail Placeholder */}
                 <div
-                    className="w-16 h-12 rounded flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: GREEN_PRIMARY }}
+                    className="w-16 h-12 rounded flex items-center bg-locatel-oscuro justify-center shrink-0"
+                    
                 >
                     {item.type === 'video' ?
                         <Video className="text-white w-6 h-6" /> :
@@ -328,8 +328,8 @@ function TimelineEditor({ initialTimeline = [], initialLibrary = [] }: { initial
             name: file.name,
             duration: 60,
             url: URL.createObjectURL(file),
-            color: GREEN_PRIMARY,
-            file: file // Guardamos el archivo real para subirlo
+            color: 'locatel-oscuro',
+            file: file 
         }));
         setLibraryItems([...libraryItems, ...newItems]);
     };
