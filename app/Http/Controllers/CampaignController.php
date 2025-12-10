@@ -46,22 +46,17 @@ class CampaignController extends Controller
 
     public function store(StoreCampaignRequest $request): RedirectResponse
     {
-        $data = $request->validated();
+        $validated = $request->validated();
 
-        $centerIds = $data['centers'] ?? [];
-        unset($data['centers']);
-
-        $status = Status::select('id')->where('status','Borrador')->first();
-
-        $borrador = $status->id;
-
-        $campaign = Campaign::create(attributes: array_merge($data, [
+        $campaign = Campaign::create(array_merge($validated, [
             'created_by' => Auth::id(),
-            'status_id' => $borrador
-        ]));
+            'status_id' => Status::where('status', 'Borrador')->value('id'),
+        ]));    
 
-        $campaign->centers()->attach($centerIds);
-        
+        if (isset($validated['centers'])) {
+            $campaign->centers()->attach($validated['centers']);
+        }
+
         return to_route('timeline.create')
             ->with('success', 'Campaña creada correctamente.');
     }
