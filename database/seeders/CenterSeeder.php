@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Center;
+use Illuminate\Database\Seeder;
 
 class CenterSeeder extends Seeder
 {
@@ -13,10 +12,7 @@ class CenterSeeder extends Seeder
      */
     public function run(): void
     {
-        Center::create([
-            'name' => 'Todo',
-            'code' => 'CTR-0001',
-        ])
+        Center::factory()
             ->count(20)
             ->create();
     }

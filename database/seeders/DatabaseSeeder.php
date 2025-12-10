@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Center;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -22,7 +23,10 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
-
+        Center::create([
+            'name' => 'Todo',
+            'code' => 'CTR-0001',
+        ]);
         $this->call([
             RolesPermissionsSeeder::class,
             StatusSeeder::class,
@@ -33,6 +37,6 @@ class DatabaseSeeder extends Seeder
             MediaSeeder::class,
             TimeLineItemSeeder::class,
         ]);
-        
+
     }
 }
