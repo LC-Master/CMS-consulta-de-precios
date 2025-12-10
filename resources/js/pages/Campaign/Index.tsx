@@ -76,7 +76,6 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
                         <table className="min-w-full bg-white divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">ID</th>
                                     <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Título</th>
                                     <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Estado</th>
                                     <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Creada</th>
@@ -87,7 +86,6 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
                                 {Array.isArray(campaigns?.data) && campaigns.data.length > 0 ? (
                                     campaigns.data.map((campaign) => (
                                         <tr key={campaign.id} className="hover:bg-gray-50">
-                                            <td className="px-4 py-3 text-sm text-gray-900">{campaign.id}</td>
                                             <td className="px-4 py-3 text-sm text-gray-900">{campaign.title}</td>
                                             <td className="px-4 py-3 text-sm text-gray-700">{campaign.status.status}</td>
                                             <td className="px-4 py-3 text-sm text-gray-700">
