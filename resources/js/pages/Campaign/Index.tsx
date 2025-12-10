@@ -26,16 +26,12 @@ interface Props {
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] }: Props) {
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
-    console.log(usePage().props)
     useEffect(() => {
-        const timer = setTimeout(() => {
-            router.get(
-                window.location.pathname,
-                { search, status },
-                { preserveState: true, replace: true, preserveScroll: true }
-            )
-        }, 300)
-        return () => clearTimeout(timer)
+        router.get(
+            window.location.pathname,
+            { search, status },
+            { preserveState: true, replace: true, preserveScroll: true }
+        )
     }, [search, status])
 
     return (
