@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
-import { InfiniteScroll, router, usePage } from '@inertiajs/react'
+import { useState } from 'react'
+import { InfiniteScroll, router } from '@inertiajs/react'
 import { Search } from 'lucide-react'
 import AppLayout from '@/layouts/app-layout';
 import Select from 'react-select';
+import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 
 interface Status {
     id: string;
@@ -26,7 +27,7 @@ interface Props {
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] }: Props) {
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
-    useEffect(() => {
+    useUpdateEffect(() => {
         router.get(
             window.location.pathname,
             { search, status },
@@ -36,9 +37,9 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
 
     return (
         <AppLayout>
-            <div className="space-y-4">
+            <div className="space-y-4 px-4 pb-4">
                 {/* Filtros */}
-                <div className="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex flex-col sm:flex-row gap-4 mt-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <input
