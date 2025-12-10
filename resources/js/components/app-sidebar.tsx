@@ -11,16 +11,23 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard, } from '@/routes';
+import { index, create } from '@/routes/campaign';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, SquarePlus } from 'lucide-react';
-import AppLogo from './app-logo';
+import { BookOpen, Folder, LayoutGrid, SquarePlus, List } from 'lucide-react';
+import { lazy } from 'react';
 
+const Logo = lazy(() => import('@/components/app-logo'));
 const mainNavItems: NavItem[] = [
     {
         title: 'Crear campaña',
-        href: '/campaign/create',
+        href: create().url,
         icon: SquarePlus,
+    }
+    , {
+        title: 'Campañas',
+        href: index().url,
+        icon: List,
     }
     , {
         title: 'Panel de control',
@@ -46,26 +53,26 @@ const footerNavItems: NavItem[] = [
 export function AppSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
-                <SidebarMenu>
+            <SidebarHeader className="bg-locatel-medio rounded-t-lg">
+                <SidebarMenu className='bg-white rounded-lg'>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href={dashboard()} prefetch>
-                                <AppLogo />
+                                <Logo />
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
+            <SidebarContent className='bg-locatel-medio text-white'>
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
-            <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+            <SidebarFooter className='bg-locatel-medio rounded-b-lg text-white'>
+                <NavFooter items={footerNavItems} className="mt-auto " />
                 <NavUser />
             </SidebarFooter>
-        </Sidebar>
+        </Sidebar >
     );
 }
