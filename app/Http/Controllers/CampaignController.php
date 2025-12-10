@@ -51,8 +51,13 @@ class CampaignController extends Controller
         $centerIds = $data['centers'] ?? [];
         unset($data['centers']);
 
+        $status = Status::select('id')->where('status','Borrador')->first();
+
+        $borrador = $status->id;
+
         $campaign = Campaign::create(attributes: array_merge($data, [
             'created_by' => Auth::id(),
+            'status_id' => $borrador
         ]));
 
         $campaign->centers()->attach($centerIds);
