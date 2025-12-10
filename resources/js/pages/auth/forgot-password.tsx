@@ -60,7 +60,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                 </Form>
 
                 <div className="space-x-1 text-center text-sm text-muted-foreground">
-                    <span>O</span>
+                    <span>O, Vuelva a</span>
                     <TextLink href={login()}>Iniciar Sesión</TextLink>
                 </div>
             </div>
