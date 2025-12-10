@@ -4,7 +4,7 @@ import { DndProvider, useDrag, useDrop, DropTargetMonitor } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import AppLayout from '@/layouts/app-layout';
 import { router } from '@inertiajs/react';
-
+import { usePage } from '@inertiajs/react';
 const GREEN_PRIMARY = '#007853';
 const elements = [
     { id: 'lib-1', type: 'video', name: 'Intro_Comercial.mp4', duration: 60, color: GREEN_PRIMARY },
@@ -515,6 +515,8 @@ function TimelineEditor({ initialTimeline = [], initialLibrary = [] }: { initial
 }
 
 export default function TimeLineCreate({ initialTimeline, initialLibrary }: { initialTimeline?: TimelineItem[], initialLibrary?: LibraryItem[] }) {
+    console.log(usePage())
+    
     return (
         <AppLayout>
             <DndProvider backend={HTML5Backend}>
