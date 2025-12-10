@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { InfiniteScroll, router } from '@inertiajs/react'
+import { InfiniteScroll, router, usePage } from '@inertiajs/react'
 import { Search } from 'lucide-react'
 import AppLayout from '@/layouts/app-layout';
+import Select from 'react-select';
 
 interface Status {
     id: string;
@@ -25,7 +26,7 @@ interface Props {
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] }: Props) {
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
-
+    console.log(usePage().props)
     useEffect(() => {
         const timer = setTimeout(() => {
             router.get(
@@ -53,18 +54,20 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
                         />
                     </div>
                     <div className="w-full sm:w-48">
-                        <select
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#007853] focus:border-[#007853] outline-none bg-white"
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                        >
-                            <option value="">Todos los estados</option>
-                            {statuses.map((s) => (
-                                <option key={s.id} value={s.id}>
-                                    {s.status}
-                                </option>
-                            ))}
-                        </select>
+                        <Select
+                            options={[{ id: '', status: 'Todos' }, ...statuses].map((s) => ({
+                                value: s.id,
+                                label: s.status,
+                            }))}
+                            value={status ? { value: status, label: statuses.find((s) => s.id === status)?.status || '' } : { value: '', label: 'Todos' }}
+                            onChange={(selectedOption) => {
+                                setStatus(selectedOption ? selectedOption.value : '')
+                            }}
+                            isClearable={false}
+                            placeholder="Filtrar por estado"
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                        />
                     </div>
                 </div>
 
