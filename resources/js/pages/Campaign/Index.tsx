@@ -45,7 +45,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
                         <input
                             type="text"
                             placeholder="Buscar por título..."
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#007853] focus:border-[#007853] outline-none transition-all"
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-locatel-oscuro focus:border-locatel-oscuro outline-none transition-all"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />

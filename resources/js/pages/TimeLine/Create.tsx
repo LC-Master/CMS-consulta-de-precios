@@ -1,15 +1,14 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, Trash2, GripVertical, Image as ImageIcon, Video, Save } from 'lucide-react';
+import { Upload, X, Trash2, GripVertical, Image as ImageIcon, Video } from 'lucide-react';
 import { DndProvider, useDrag, useDrop, DropTargetMonitor } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import AppLayout from '@/layouts/app-layout';
 import { router } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
-const GREEN_PRIMARY = '#007853';
 const elements = [
-    { id: 'lib-1', type: 'video', name: 'Intro_Comercial.mp4', duration: 60, color: GREEN_PRIMARY },
-    { id: 'lib-2', type: 'image', name: 'Banner_Promo.jpg', duration: 60, color: GREEN_PRIMARY },
-    { id: 'lib-3', type: 'video', name: 'Entrevista_CEO.mp4', duration: 120, color: GREEN_PRIMARY },
+    { id: 'lib-1', type: 'video', name: 'Intro_Comercial.mp4', duration: 60, color: 'locatel-oscuro' },
+    { id: 'lib-2', type: 'image', name: 'Banner_Promo.jpg', duration: 60, color: 'locatel-oscuro' },
+    { id: 'lib-3', type: 'video', name: 'Entrevista_CEO.mp4', duration: 120, color: 'locatel-oscuro' },
 ]
 const ItemTypes = {
     MEDIA: 'media',
@@ -38,14 +37,14 @@ interface TimelineItem {
     mediaId: string;
     name: string;
     type: string;
-    start: number;
+    start: number | undefined;
     duration: number;
     color: string;
 }
 
 interface DraggingItem extends LibraryItem {
     source: 'library' | 'timeline';
-    start?: number; // Optional because library items don't have it
+    start?: number; 
 }
 
 const DraggableLibraryItem = ({ item, onRemove }: { item: LibraryItem; onRemove: (id: string) => void }) => {
@@ -60,7 +59,7 @@ const DraggableLibraryItem = ({ item, onRemove }: { item: LibraryItem; onRemove:
     return (
         <div
             ref={(node) => { drag(node); }}
-            className={`relative p-3 rounded-lg border border-gray-200 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all group bg-white hover:border-[#007853] ${isDragging ? 'opacity-50' : ''}`}
+            className={`relative p-3 rounded-lg border border-gray-200 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all group bg-white hover:border-locatel-oscuro ${isDragging ? 'opacity-50' : ''}`}
         >
             <div className="flex gap-3 items-center">
                 {/* Thumbnail Placeholder */}
@@ -481,11 +480,11 @@ function TimelineEditor({ initialTimeline = [], initialLibrary = [] }: { initial
                     <div className="w-2/3 bg-gray-50 p-8 flex flex-col justify-center items-center">
                         <div className="w-full max-w-md">
                             <label
-                                className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-white hover:bg-gray-50 hover:border-[#007853] transition-colors group"
+                                className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-white hover:bg-gray-50 hover:border-locatel-oscuro transition-colors group"
                             >
                                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <div className="mb-4 p-4 rounded-full bg-gray-50 group-hover:bg-[#007853]/10 transition-colors">
-                                        <Upload className="w-10 h-10 text-gray-400 group-hover:text-[#007853]" />
+                                    <div className="mb-4 p-4 rounded-full bg-gray-50 group-hover:bg-locatel-oscuro/10 transition-colors">
+                                        <Upload className="w-10 h-10 text-gray-400 group-hover:text-locatel-oscuro" />
                                     </div>
                                     <p className="mb-2 text-sm text-gray-500 font-medium">Haz clic o arrastra archivos aquí</p>
                                     <p className="text-xs text-gray-400">Soporta: MP4, AVI, JPG, PNG</p>
@@ -500,8 +499,8 @@ function TimelineEditor({ initialTimeline = [], initialLibrary = [] }: { initial
                             </label>
 
                             <div className="mt-6 flex gap-4 text-xs text-gray-400 justify-center">
-                                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#007853]"></div> Videos permitidos</span>
-                                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#007853]"></div> Imágenes permitidas</span>
+                                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-locatel-oscuro"></div> Videos permitidos</span>
+                                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-locatel-oscuro"></div> Imágenes permitidas</span>
                             </div>
                         </div>
                     </div>
