@@ -13,11 +13,7 @@ class CenterSeeder extends Seeder
      */
     public function run(): void
     {
-        Center::create([
-            'name' => 'Todo',
-            'code' => 'CTR-0001',
-        ])
-            ->count(20)
+        Center::factory()->count(20)
             ->create();
     }
 }

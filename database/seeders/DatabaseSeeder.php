@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Center;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,6 +14,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+         Center::create([
+            'name' => 'Todo',
+            'code' => 'CTR-0001',
+        ]);
+
         User::factory(10)->create();
         User::firstOrCreate(
             ['email' => 'test@example.com'],
