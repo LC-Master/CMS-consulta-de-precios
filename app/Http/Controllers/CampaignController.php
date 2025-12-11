@@ -89,7 +89,7 @@ class CampaignController extends Controller
 
         $campaign->update($data);
 
-        return redirect()->route('campaign.index')
+        return to_route('campaign.index')
             ->with('success', 'Campaña actualizada correctamente.');
     }
 
@@ -97,7 +97,7 @@ class CampaignController extends Controller
     {
         $campaign->delete();
 
-        return redirect()->route('campaign.index')
+        return to_route('campaign.index')
             ->with('success', 'Campaña eliminada.');
     }
 }
