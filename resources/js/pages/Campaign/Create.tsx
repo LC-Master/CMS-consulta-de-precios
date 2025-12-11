@@ -4,6 +4,7 @@ import { BreadcrumbItem } from '@/types'
 import { usePage, useForm } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, Agreement } from '@/types/campaign/index.types'
+import { Input } from '@/components/ui/input'
 
 export default function CampaignCreate() {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -22,7 +23,6 @@ export default function CampaignCreate() {
         department_id: '',
         agreement_id: '',
     })
-    console.log(usePage().props);
     const optionsCenter: Option[] = centers.map((center: Center) => {
         return { value: center.id, label: center.name + " - " + center.code }
     })
@@ -43,14 +43,14 @@ export default function CampaignCreate() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título</label>
-                            <input
+                            <Input
                                 type="text"
                                 id="title"
                                 value={data.title}
                                 name="title"
                                 required
                                 placeholder='Titulo de la campaña'
-                                onChange={e => setData('title', e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('title', e.target.value)}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                             />
                             {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
@@ -63,7 +63,7 @@ export default function CampaignCreate() {
                                 id="departments"
                                 value={optionsDepartment.find(o => o.value === data.department_id) || null}
                                 name="departments"
-                                className="mt-1"
+                                className="mt-1 rounded-md"
                                 classNamePrefix="react-select"
                                 onChange={(val) => setData('department_id', (val as Option | null)?.value ?? '')}
                                 placeholder="Selecciona un departamento"
@@ -76,7 +76,7 @@ export default function CampaignCreate() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="start_date" className="block text-sm font-medium text-gray-700">Fecha y hora (inicio)</label>
-                            <input
+                            <Input
                                 type="datetime-local"
                                 id="start_date"
                                 value={data.start_at}
@@ -90,7 +90,7 @@ export default function CampaignCreate() {
 
                         <div>
                             <label htmlFor="end_date" className="block text-sm font-medium text-gray-700">Fecha y hora (fin)</label>
-                            <input
+                            <Input
                                 type="datetime-local"
                                 id="end_date"
                                 value={data.end_at}
@@ -112,7 +112,7 @@ export default function CampaignCreate() {
                             name="centers"
                             required
                             isMulti
-                            className="mt-1"
+                            className="mt-1 rounded-md"
                             classNamePrefix="react-select"
                             onChange={(val) => setData('centers', (val as Option[]).map(v => v.value))}
                             placeholder="Selecciona centros..."
@@ -128,7 +128,7 @@ export default function CampaignCreate() {
                             value={optionsAgreement.find(o => o.value === data.agreement_id) || null}
                             name="agreements"
                             required
-                            className="mt-1"
+                            className="mt-1 rounded-md"
                             classNamePrefix="react-select"
                             onChange={(val) => setData('agreement_id', (val as Option | null)?.value ?? '')}
                             placeholder="Selecciona un acuerdo"
