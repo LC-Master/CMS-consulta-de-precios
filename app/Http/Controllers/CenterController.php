@@ -6,7 +6,6 @@ use App\Models\Center;
 use App\Http\Requests\Center\StoreCenterRequest;
 use App\Http\Requests\Center\UpdateCenterRequest;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Redirect;
 
 class CenterController extends Controller
 {
@@ -35,7 +34,7 @@ class CenterController extends Controller
     {
         Center::create($request->validated());
 
-        return Redirect::route('centers.index')
+        return to_route('centers.index')
             ->with('success', 'Centro creado correctamente.');
     }
 
@@ -66,7 +65,7 @@ class CenterController extends Controller
     {
         $center->update($request->validated());
 
-        return Redirect::route('centers.index')
+        return to_route('centers.index')
             ->with('success', 'Centro actualizado correctamente.');
     }
 
@@ -77,7 +76,7 @@ class CenterController extends Controller
     {
         $center->delete();
 
-        return Redirect::route('centers.index')
+        return to_route('centers.index')
             ->with('success', 'Centro eliminado correctamente.');
     }
 }

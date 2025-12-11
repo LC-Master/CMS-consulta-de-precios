@@ -6,7 +6,6 @@ use App\Models\Department;
 use App\Http\Requests\Department\StoreDepartmentRequest;
 use App\Http\Requests\Department\UpdateDepartmentRequest;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Redirect;
 
 class DepartmentController extends Controller
 {
@@ -36,7 +35,7 @@ class DepartmentController extends Controller
         // Creamos usando los datos ya validados
         Department::create($request->validated());
 
-        return Redirect::route('departments.index')
+        return to_route('departments.index')
             ->with('success', 'Departamento creado correctamente.');
     }
 
@@ -68,7 +67,7 @@ class DepartmentController extends Controller
         // Actualizamos usando los datos validados
         $department->update($request->validated());
 
-        return Redirect::route('departments.index')
+        return to_route('departments.index')
             ->with('success', 'Departamento actualizado correctamente.');
     }
 
@@ -79,7 +78,7 @@ class DepartmentController extends Controller
     {
         $department->delete();
 
-        return Redirect::route('departments.index')
+        return to_route('departments.index')
             ->with('success', 'Departamento eliminado correctamente.');
     }
 }
