@@ -11,7 +11,7 @@ interface Status {
 }
 
 interface Campaign {
-    id: number;
+    id: string;
     title: string;
     status: Status;
     created_at: string;
@@ -90,7 +90,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
                                                 </td>
                                                 <td className="px-4 py-3 text-sm">
                                                     <a
-                                                        href={`/campaigns/${campaign.id}`}
+                                                        href={`/campaign/${campaign.id}`}
                                                         className="text-blue-600 hover:underline"
                                                     >
                                                         Ver
