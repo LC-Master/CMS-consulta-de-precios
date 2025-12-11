@@ -12,11 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('media', function (Blueprint $table) {
-            $table->uuid("id")->primary();
-            $table->string("disk")->default("local");
-            $table->string('path'); 
+            $table->uuid('id')->primary();
+            $table->string('disk')->default('local');
+            $table->string('name');
+            $table->string('path');
             $table->string('mime_type');
-            $table->unsignedBigInteger('size'); 
+            $table->unsignedBigInteger('size');
             $table->unsignedInteger('duration_seconds')->nullable();
             $table->string('checksum')->nullable();
             $table->foreignId('created_by')->constrained('users');

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Actions\Campaign\CreateCampaignAction;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use App\Models\Media;
 
 class CampaignController extends Controller
 {
@@ -40,6 +41,7 @@ class CampaignController extends Controller
     public function create()
     {
         return Inertia::render('Campaign/Create', [
+            'media' => Media::
             'centers' => Center::select('id', 'code', 'name')->get(),
             'departments' => Department::select('id', 'name')->get(),
             'agreements' => Agreement::select('id', 'name')->get(),
