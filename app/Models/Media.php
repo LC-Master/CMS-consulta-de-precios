@@ -13,6 +13,7 @@ class Media extends Model
 
     protected $fillable = [
         'id',
+        'name',
         'disk',
         'path',
         'mime_type',

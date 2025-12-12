@@ -1,79 +1,150 @@
-import { DndContext, closestCenter, useDroppable, useDraggable } from '@dnd-kit/core'
-import { useState } from 'react'
-import { X } from 'lucide-react'
+import {
+    DragDropProvider,
+    useDroppable,
+    useDraggable,
+} from "@dnd-kit/react";
+import { useState } from "react";
 
-function DropZone({ id, items, onRemove }: { id: string; items: any[]; onRemove: (itemId: string) => void }) {
-    const { setNodeRef, isOver } = useDroppable({ id })
-
-    return (
-        <div className='w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center' ref={setNodeRef}>
-            {isOver ? 'suelta aqui' : 'Arrastra y suelta los elementos aqui'}
-            {items.map((item) => (
-                <div className='p-4 bg-gray-200 rounded mb-2 cursor-move'>
-                    {item.type === 'image' ? '🖼️' : '🎬'} {item.name}
-                    <button onClick={() => onRemove(item.id)}><X className='hover:transform-stroke '/></button>
-                </div>
-            ))}
-        </div>
-    )
+interface MediaItem {
+    id: string;
+    type: "image" | "video";
+    name: string;
 }
 
-function DraggableItem({ id, children }: { id: string; children: React.ReactNode }) {
-    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id })
+interface DropZoneProps {
+    id: string;
+    items: MediaItem[];
+    onRemove: (id: string) => void;
+}
+
+function DropZone({ id, items, onRemove }: DropZoneProps) {
+    const { ref, isDropTarget } = useDroppable({ id });
+
     return (
         <div
-            ref={setNodeRef}
-            style={{
-                transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-                opacity: isDragging ? 0.5 : 1,
-            }}
-            {...attributes}
-            {...listeners}
+            ref={ref}
+            className={`border p-4 min-h-[200px] transition-colors ${isDropTarget ? "bg-green-100 border-green-500" : "bg-gray-100 border-gray-300"
+                }`}
         >
-            {children}
+            <h3 className="mb-2 font-semibold text-gray-700">
+                {isDropTarget ? "¡Suelta aquí!" : "Zona de Medios"}
+            </h3>
+
+            {items.map((item) => (
+                <div
+                    key={item.id}
+                    className="p-2 bg-white border border-gray-200 rounded mb-2 flex justify-between items-center shadow-sm"
+                >
+                    <span className="flex items-center gap-2">
+                        {item.type === "image" ? "🖼️" : "🎬"} {item.name}
+                    </span>
+
+                    <button
+                        className="text-red-500 hover:text-red-700 font-bold px-2"
+                        onClick={() => onRemove(item.id)}
+                    >
+                        ✕
+                    </button>
+                </div>
+            ))}
+            {items.length === 0 && !isDropTarget && (
+                <p className="text-gray-400 text-sm text-center mt-4">Arrastra elementos aquí</p>
+            )}
         </div>
-    )
+    );
+}
+
+interface DraggableItemProps {
+    item: MediaItem;
+}
+
+function DraggableItem({ item }: DraggableItemProps) {
+    const { ref, isDragging } = useDraggable({ id: item.id });
+
+    return (
+        <div
+            ref={ref}
+            className={`p-3 bg-white border border-gray-200 rounded mb-2 cursor-move shadow-sm hover:shadow-md transition-all flex items-center gap-2 ${isDragging ? "opacity-50" : "opacity-100"
+                }`}
+        >
+            {item.type === "image" ? "🖼️" : "🎬"} {item.name}
+        </div>
+    );
+}
+
+interface DragEndEvent {
+    operation: {
+        source: { id: string | number } | null;
+        target?: { id: string | number } | null;
+    };
+    canceled: boolean;
 }
 
 export default function CampaignShow() {
-    const [media, setMedia] = useState([{
-        id: '12', type: 'image', name: 'Imagen 1', url: '', duration: 60
-    }, {
-        id: '32', type: 'video', name: 'Video 1', url: '', duration: 120
-    }])
-    const handleRemove = (itemId: string) => {
-        const itemToMove = mediaZone.find(item => item.id === itemId)
-        if (itemToMove) {
-            setMedia([...media, itemToMove])
-            setMediaZone(mediaZone.filter(item => item.id !== itemId))
-        }
-    }
+    const [media, setMedia] = useState<MediaItem[]>([
+        { id: "12", type: "image", name: "Imagen 1" },
+        { id: "32", type: "video", name: "Video 1" },
+        { id: "45", type: "image", name: "Banner Principal" },
+        { id: "56", type: "video", name: "Intro Comercial" },
+    ]);
+    const [mediaZone, setMediaZone] = useState<MediaItem[]>([]);
 
-    const [mediaZone, setMediaZone] = useState([])
-    const handleDragEnd = (e) => {
-        console.log(e, typeof (e))
-        const { active, over } = e
-        if (over && over.id === 'drop-zone-1') {
-            const item = media.find(m => m.id === active.id)
-            if (item) {
-                setMediaZone([...mediaZone, item])
-                setMedia(media.filter(m => m.id !== active.id))
-            }
+    const handleRemove = (itemId: string) => {
+        const item = mediaZone.find((i) => i.id === itemId);
+        if (!item) return;
+
+        setMedia((prev) => [...prev, item]);
+        setMediaZone((prev) => prev.filter((i) => i.id !== itemId));
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { operation, canceled } = event;
+
+        if (canceled) return;
+
+        const { source, target } = operation;
+
+        if (!source || !target) return;
+
+        // Verificar si el destino es la zona de drop
+        if (target.id === "drop-zone-1") {
+            const item = media.find((i) => i.id === source.id);
+            if (!item) return;
+
+            setMedia((prev) => prev.filter((i) => i.id !== source.id));
+            setMediaZone((prev) => [...prev, item]);
         }
-    }
+    };
+
     return (
-        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <div className=''>
-                <h1>Campaign Show</h1>
-                <DropZone onRemove={handleRemove} id="drop-zone-1" items={mediaZone} />
-                {media.map((item) => {
-                    return <DraggableItem key={item.id} id={item.id}>
-                        <div className='p-4 bg-gray-200 rounded mb-2 cursor-move'>
-                            {item.type === 'image' ? '🖼️' : '🎬'} {item.name}
+        <div className="p-6 max-w-4xl mx-auto">
+            <h1 className="text-2xl font-bold mb-6 text-gray-800">Gestión de Contenido de Campaña</h1>
+
+            <DragDropProvider onDragEnd={handleDragEnd}>
+                <div className="flex flex-col md:flex-row gap-6">
+                    <div className="flex-1">
+                        <h2 className="text-lg font-semibold mb-3 text-gray-700">Contenido Asignado</h2>
+                        <DropZone
+                            id="drop-zone-1"
+                            items={mediaZone}
+                            onRemove={handleRemove}
+                        />
+                    </div>
+
+                    <div className="w-full md:w-72">
+                        <h2 className="text-lg font-semibold mb-3 text-gray-700">Disponibles</h2>
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 min-h-[200px]">
+                            {media.length === 0 ? (
+                                <p className="text-gray-400 text-center text-sm">No hay medios disponibles</p>
+                            ) : (
+                                media.map((item) => (
+                                    <DraggableItem key={item.id} item={item} />
+                                ))
+                            )}
                         </div>
-                    </DraggableItem>
-                })}
-            </div>
-        </DndContext>
-    )
+                    </div>
+                </div>
+            </DragDropProvider>
+        </div>
+    );
 }
