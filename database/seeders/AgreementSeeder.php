@@ -13,6 +13,6 @@ class AgreementSeeder extends Seeder
      */
     public function run(): void
 {
-    Agreement::factory()->count(5)->create();
+    Agreement::factory()->count(20)->create();
 }
 }
