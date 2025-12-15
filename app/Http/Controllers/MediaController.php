@@ -35,31 +35,7 @@ class MediaController extends Controller
      */
     public function store(StoreMediaRequest $request)
     {
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            
-            // 1. Guardar archivo en disco (carpeta 'uploads' en disco 'public')
-            $path = $file->store('uploads', 'public');
-            
-            // 2. Calcular checksum (hash MD5 del archivo)
-            $checksum = md5_file($file->getRealPath());
-
-            // 3. Guardar registro en BD
-            Media::create([
-                'disk' => 'public',
-                'path' => $path,
-                'mime_type' => $file->getClientMimeType(),
-                'size' => $file->getSize(),
-                'duration_seconds' => null, // Requeriría librería externa (FFMpeg) si es video
-                'checksum' => $checksum,
-                'created_by' => Auth::id(), // Asignamos el usuario actual
-            ]);
-
-            return Redirect::route('media.index')
-                ->with('success', 'Archivo subido correctamente.');
-        }
-
-        return Redirect::back()->withErrors(['file' => 'Error al subir el archivo.']);
+        $request->file('file')->store('uploads', 'public');
     }
 
     /**

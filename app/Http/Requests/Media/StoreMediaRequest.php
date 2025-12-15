@@ -18,7 +18,7 @@ class StoreMediaRequest extends FormRequest
                 'required', 
                 'file', 
                 'mimes:jpg,jpeg,png,mp4', 
-                'max:157286400' // 150 MB
+                'max:157286400' 
             ],
         ];
     }

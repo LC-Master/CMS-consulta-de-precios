@@ -3,8 +3,14 @@ import { index } from '@/routes/campaign'
 import { BreadcrumbItem } from '@/types'
 import { usePage, useForm } from '@inertiajs/react'
 import Select from 'react-select'
-import { Center, Department, Option, Agreement } from '@/types/campaign/index.types'
+import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
+import { useState } from 'react'
+import {
+    DragDropProvider,
+} from "@dnd-kit/react";
+import DropZone from '@/components/dnd/DropZone'
+import MediaItemElement from '@/components/MediaItemElement'
 
 export default function CampaignCreate() {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -14,7 +20,14 @@ export default function CampaignCreate() {
         },
     ];
 
-    const { centers, departments, agreements } = usePage<{ centers: Center[], departments: Department[], agreements: Agreement[] }>().props
+    const { centers, departments, agreements, media } = usePage<{ centers: Center[], departments: Department[], agreements: Agreement[], media: MediaItem[] }>().props
+
+    const [multimedia, setMultimedia] = useState({
+        pool: media,
+        am: [] as MediaItem[],
+        pm: [] as MediaItem[],
+    })
+
     const { data, setData, processing, errors, post } = useForm({
         title: '',
         start_at: '',
@@ -23,6 +36,7 @@ export default function CampaignCreate() {
         department_id: '',
         agreement_id: '',
     })
+    console.log(media)
     const optionsCenter: Option[] = centers.map((center: Center) => {
         return { value: center.id, label: center.name + " - " + center.code }
     })
@@ -136,6 +150,18 @@ export default function CampaignCreate() {
                         />
                         {errors.agreement_id && <p className="text-red-500 text-sm mt-1">{errors.agreement_id}</p>}
                     </div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Multimedia</label>
+                    {/* <DragDropProvider onDragOver={(event) => {
+                        setMultimedia((items) => move(items, event));
+                    }}>
+                        {Object.entries(multimedia).map(([column, items]) => (
+                            <DropZone key={column} id={column}>
+                                {items.map((id, index) => (
+                                    <MediaItemElement item={id} index={index} column={column} />
+                                ))}
+                            </DropZone>
+                        ))}
+                    </DragDropProvider> */}
                 </form>
 
                 <div className="flex flex-wrap justify-center gap-3">
@@ -156,6 +182,6 @@ export default function CampaignCreate() {
                     </button>
                 </div>
             </div>
-        </AppLayout>
+        </AppLayout >
     )
 }
