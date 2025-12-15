@@ -6,8 +6,9 @@ import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Column, DataTable } from '@/components/DataTable';
 import { Agreement, Props } from '@/types/agreement/index.types';
 import { Filter } from '@/components/Filter';
+import AnchorIcon from '@/components/ui/AnchorIcon';
 
-export default function AgreementsIndex({ agreements, filters = {},statuses }: Props) {
+export default function AgreementsIndex({ agreements, filters = {}, statuses }: Props) {
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
     const columns: Column<Agreement>[] = [
@@ -53,19 +54,12 @@ export default function AgreementsIndex({ agreements, filters = {},statuses }: P
             header: 'Acciones',
             render: (a) => (
                 <div className="flex gap-2">
-                    <a
-                        href={`/agreement/${a.id}`}
-                        className="p-2 bg-locatel-medio text-white rounded-md"
-                    >
-                        <Eye className="w-4 h-4" />
-                    </a>
+                    <AnchorIcon url={`/agreement/${a.id}`} icon={Eye} />
 
-                    <a
-                        href={`/agreement/${a.id}/edit`}
-                        className="p-2 bg-locatel-oscuro text-white rounded-md"
-                    >
-                        <Pencil className="w-4 h-4" />
-                    </a>
+                    <AnchorIcon
+                        url={`/agreement/${a.id}/edit`}
+                        icon={Pencil}
+                    />
                 </div>
             ),
         },
@@ -97,7 +91,7 @@ export default function AgreementsIndex({ agreements, filters = {},statuses }: P
                             placeholder: 'Filtrar por estado',
                             options: [
                                 { value: '', label: 'Todos' },
-                                ...statuses.map((s,index) => ({
+                                ...statuses.map((s, index) => ({
                                     value: index,
                                     label: s,
                                 })),
