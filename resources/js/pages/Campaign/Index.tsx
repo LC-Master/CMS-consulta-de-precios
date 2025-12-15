@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import {  router } from '@inertiajs/react'
+import { router } from '@inertiajs/react'
 import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Filter } from '@/components/Filter';
@@ -7,7 +7,7 @@ import { Column } from '@/types/datatable.types';
 import AnchorIcon from '@/components/ui/AnchorIcon';
 import { Eye } from 'lucide-react';
 import { DataTable } from '@/components/DataTable';
-import { Campaign, Props } from '@/types/campaign/campaign.types';
+import { Campaign, Props } from '@/types/campaign/index.types';
 
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] }: Props) {
     const [search, setSearch] = useState(filters.search || '')
