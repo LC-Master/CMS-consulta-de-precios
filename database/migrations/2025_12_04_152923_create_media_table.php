@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid("id")->primary();
             $table->string("disk")->default("local");
             $table->string('path'); 
+            $table->string('name');
             $table->string('mime_type');
             $table->unsignedBigInteger('size'); 
             $table->unsignedInteger('duration_seconds')->nullable();

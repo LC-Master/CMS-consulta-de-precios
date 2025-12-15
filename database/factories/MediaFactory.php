@@ -15,6 +15,7 @@ class MediaFactory extends Factory
             'disk' => 'public',
             'path' => 'uploads/' . $this->faker->uuid() . ($isVideo ? '.mp4' : '.jpg'),
             'mime_type' => $mimeType,
+            'name' => $this->faker->word() . ($isVideo ? '.mp4' : '.jpg'),
             'size' => $this->faker->numberBetween(1024, 50000000),
             'duration_seconds' => $isVideo ? $this->faker->numberBetween(10, 300) : null,
             'checksum' => md5($this->faker->text()),
