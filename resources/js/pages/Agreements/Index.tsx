@@ -1,40 +1,65 @@
 import { useState } from 'react'
-import {  router } from '@inertiajs/react'
+import { router } from '@inertiajs/react'
+import { Eye, Pencil } from 'lucide-react'
 import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
-import { Campaign, Props } from '@/types/campaign/index.types';
+import { Column, DataTable } from '@/components/DataTable';
+import { Agreement, Props } from '@/types/agreement/index.types';
 import { Filter } from '@/components/Filter';
-import { Column } from '@/types/datatable.types';
 import AnchorIcon from '@/components/ui/AnchorIcon';
-import { Eye } from 'lucide-react';
-import { DataTable } from '@/components/DataTable';
 
-
-export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] }: Props) {
+export default function AgreementsIndex({ agreements, filters = {}, statuses }: Props) {
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
-    const columns: Column<Campaign>[] = [
+    const columns: Column<Agreement>[] = [
         {
-            key: 'title',
-            header: 'Título',
-            render: (a) => a.title,
+            key: 'name',
+            header: 'Nombre',
+            render: (a) => a.name,
+        },
+        {
+            key: 'legal_name',
+            header: 'Nombre Legal',
+            render: (a) => a.legal_name,
+        },
+        {
+            key: 'tax_id',
+            header: 'RIF',
+            render: (a) => a.tax_id,
+        }, {
+            key: 'contact_phone',
+            header: 'Teléfono',
+            render: (a) => a.contact_phone,
+        }, {
+            key: 'contact_person',
+            header: 'Persona Contacto',
+            render: (a) => a.contact_person,
         },
         {
             key: 'status',
-            header: 'Estado',
-            render: (a) => a.status.status,
-        },
-        {
-            key: 'created_at',
-            header: 'Creada',
-            render: (a) => a.created_at,
+            header: 'Estatus',
+            render: (a) => (
+                <span
+                    className={`px-2 inline-flex text-xs font-semibold rounded-full ${Number(a.is_active)
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                        }`}
+                >
+                    {Number(a.is_active) ? 'Activo' : 'Inactivo'}
+                </span>
+            ),
         },
         {
             key: 'actions',
             header: 'Acciones',
             render: (a) => (
                 <div className="flex gap-2">
-                    <AnchorIcon url={`/campaign/${a.id}`} icon={Eye} />
+                    <AnchorIcon url={`/agreement/${a.id}`} icon={Eye} />
+
+                    <AnchorIcon
+                        url={`/agreement/${a.id}/edit`}
+                        icon={Pencil}
+                    />
                 </div>
             ),
         },
@@ -46,6 +71,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
             { preserveState: true, replace: true, preserveScroll: true }
         )
     }, [search, status])
+
     return (
         <AppLayout>
             <div className="space-y-4 px-4 pb-4">
@@ -65,21 +91,22 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
                             placeholder: 'Filtrar por estado',
                             options: [
                                 { value: '', label: 'Todos' },
-                                ...statuses.map(s => ({
-                                    value: s.id,
-                                    label: s.status,
+                                ...statuses.map((s, index) => ({
+                                    value: index,
+                                    label: s,
                                 })),
                             ],
                             onChange: setStatus,
                         },
+
                     ]}
                 />
 
                 <DataTable
-                    data={campaigns.data}
+                    data={agreements.data}
                     columns={columns}
                     rowKey={(a) => a.id}
-                    infiniteData="campaigns"
+                    infiniteData="agreements"
                 />
 
             </div>
