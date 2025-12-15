@@ -1,28 +1,11 @@
 import { useState } from 'react'
 import { InfiniteScroll, router } from '@inertiajs/react'
-import { Search } from 'lucide-react'
 import AppLayout from '@/layouts/app-layout';
-import Select from 'react-select';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
+import { Props } from '@/types/campaign/index.types';
+import { Filter } from '@/components/Filter';
 
-interface Status {
-    id: string;
-    status: string;
-}
 
-interface Campaign {
-    id: string;
-    title: string;
-    status: Status;
-    created_at: string;
-    [key: string]: unknown;
-}
-
-interface Props {
-    campaigns: { data: Campaign[] };
-    filters: { search?: string; status?: string };
-    statuses: Status[];
-}
 
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] }: Props) {
     const [search, setSearch] = useState(filters.search || '')
@@ -37,36 +20,32 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
     return (
         <AppLayout>
             <div className="space-y-4 px-4 pb-4">
-                {/* Filtros */}
-                <div className="flex flex-col sm:flex-row gap-4 mt-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <input
-                            type="text"
-                            placeholder="Buscar por título..."
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-locatel-oscuro focus:border-locatel-oscuro outline-none transition-all"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                    </div>
-                    <div className="w-full sm:w-48">
-                        <Select
-                            options={[{ id: '', status: 'Todos' }, ...statuses].map((s) => ({
-                                value: s.id,
-                                label: s.status,
-                            }))}
-                            value={status ? { value: status, label: statuses.find((s) => s.id === status)?.status || '' } : { value: '', label: 'Todos' }}
-                            onChange={(selectedOption) => {
-                                setStatus(selectedOption ? selectedOption.value : '')
-                            }}
-                            isClearable={false}
-                            placeholder="Filtrar por estado"
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                        />
-                    </div>
-                </div>
-
+                <Filter
+                    filters={[
+                        {
+                            type: 'search',
+                            key: 'search',
+                            value: search,
+                            placeholder: 'Buscar por título...',
+                            onChange: setSearch,
+                        },
+                        {
+                            type: 'select',
+                            key: 'status',
+                            value: status,
+                            placeholder: 'Filtrar por estado',
+                            options: [
+                                { value: '', label: 'Todos' },
+                                ...statuses.map(s => ({
+                                    value: s.id,
+                                    label: s.status,
+                                })),
+                            ],
+                            onChange: setStatus,
+                        },
+                        
+                    ]}
+                />
                 <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
                     <InfiniteScroll data="campaigns">
                         <table className="min-w-full bg-white divide-y divide-gray-200">
