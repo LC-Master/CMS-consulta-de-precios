@@ -3,6 +3,7 @@
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\TimeLineController;
 use App\Http\Controllers\AgreementController;
+use App\Http\Controllers\MediaController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -22,6 +23,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('campaign', CampaignController::class);
     Route::resource('timeline', TimeLineController::class);
     Route::resource('agreement', AgreementController::class);
+    Route::resource('media', MediaController::class);
 });
 
 Route::get('/video', function () {

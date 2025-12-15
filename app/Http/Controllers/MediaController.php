@@ -9,16 +9,43 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class MediaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-       return Inertia::render('Media/Index', [
-            'medias' => Inertia::scroll(fn () => Media::paginate()),
+        $query = Media::with('campaigns');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+        
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhereHas('campaigns', function ($qCamp) use ($search) {
+                      $qCamp->where('title', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('mime_type', $request->type);
+        }
+
+        $mimeTypes = Media::query()
+            ->select('mime_type')
+            ->distinct()
+            ->whereNotNull('mime_type')
+            ->orderBy('mime_type')
+            ->pluck('mime_type');
+
+        return Inertia::render('Media/Index', [
+            'medias' => Inertia::scroll(fn () => $query->latest()->paginate()),
+            'filters' => $request->only(['search', 'type']),
+            'mimeTypes' => $mimeTypes, 
         ]);
     }
 

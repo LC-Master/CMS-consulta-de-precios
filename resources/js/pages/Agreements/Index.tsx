@@ -81,7 +81,7 @@ export default function AgreementsIndex({ agreements, filters = {}, statuses }: 
                             type: 'search',
                             key: 'search',
                             value: search,
-                            placeholder: 'Buscar por título...',
+                            placeholder: 'Buscar por nombre o RIF...',
                             onChange: setSearch,
                         },
                         {

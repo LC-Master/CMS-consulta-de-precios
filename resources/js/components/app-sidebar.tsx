@@ -14,7 +14,7 @@ import { dashboard, } from '@/routes';
 import { index, create } from '@/routes/campaign';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, SquarePlus, List, Handshake } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, SquarePlus, List, Handshake, Film } from 'lucide-react';
 import { lazy } from 'react';
 
 const Logo = lazy(() => import('@/components/app-logo'));
@@ -49,9 +49,9 @@ const mainNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repositorio',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
+        title: 'Listado de Videos',
+        href: '/media',
+        icon: Film,
     },
     {
         title: 'Documentación',
