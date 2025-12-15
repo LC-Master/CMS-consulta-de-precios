@@ -19,7 +19,6 @@ class AgreementController extends Controller
     {
     $query = Agreement::query();
 
-    // 1. Buscador: Nombre o RIF (tax_id)
     if ($request->filled('search')) {
         $search = $request->search;
         $query->where(function ($q) use ($search) {
@@ -28,15 +27,12 @@ class AgreementController extends Controller
         });
     }
 
-    // 2. Filtro por Estatus (0 o 1)
     if ($request->filled('status')) {
         $query->where('is_active', $request->status);
     }
 
     return Inertia::render('Agreements/Index', [
-        // Usamos latest() para ver los más recientes primero
         'agreements' => Inertia::scroll(fn () => $query->latest()->paginate()),
-        // Devolvemos los filtros para mantener el estado de los inputs
         'filters' => $request->only(['search', 'status']),
     ]);
     }
