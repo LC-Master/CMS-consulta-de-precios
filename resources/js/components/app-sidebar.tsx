@@ -14,7 +14,7 @@ import { dashboard, } from '@/routes';
 import { index, create } from '@/routes/campaign';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, SquarePlus, List } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, SquarePlus, List, Handshake } from 'lucide-react';
 import { lazy } from 'react';
 
 const Logo = lazy(() => import('@/components/app-logo'));
@@ -28,6 +28,16 @@ const mainNavItems: NavItem[] = [
         title: 'Campañas',
         href: index().url,
         icon: List,
+    }
+    , {
+        title: 'Crear Convenios',
+        href: '/agreement/create',
+        icon: SquarePlus,
+    }
+    , {
+        title: 'Convenios',
+        href: '/agreement',
+        icon: Handshake,
     }
     , {
         title: 'Panel de control',
