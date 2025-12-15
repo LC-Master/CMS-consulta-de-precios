@@ -17,6 +17,66 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
             { preserveState: true, replace: true, preserveScroll: true }
         )
     }, [search, status])
+    const columns: Column<Agreement>[] = [
+        {
+            key: 'name',
+            header: 'Nombre',
+            render: (a) => a.name,
+        },
+        {
+            key: 'legal_name',
+            header: 'Nombre Legal',
+            render: (a) => a.legal_name,
+        },
+        {
+            key: 'tax_id',
+            header: 'RIF',
+            render: (a) => a.tax_id,
+        }, {
+            key: 'contact_phone',
+            header: 'Teléfono',
+            render: (a) => a.contact_phone,
+        }, {
+            key: 'contact_person',
+            header: 'Persona Contacto',
+            render: (a) => a.contact_person,
+        },
+        {
+            key: 'status',
+            header: 'Estatus',
+            render: (a) => (
+                <span
+                    className={`px-2 inline-flex text-xs font-semibold rounded-full ${Number(a.is_active)
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                        }`}
+                >
+                    {Number(a.is_active) ? 'Activo' : 'Inactivo'}
+                </span>
+            ),
+        },
+        {
+            key: 'actions',
+            header: 'Acciones',
+            render: (a) => (
+                <div className="flex gap-2">
+                    <a
+                        href={`/agreement/${a.id}`}
+                        className="p-2 bg-locatel-medio text-white rounded-md"
+                    >
+                        <Eye className="w-4 h-4" />
+                    </a>
+
+                    <a
+                        href={`/agreement/${a.id}/edit`}
+                        className="p-2 bg-locatel-oscuro text-white rounded-md"
+                    >
+                        <Pencil className="w-4 h-4" />
+                    </a>
+                </div>
+            ),
+        },
+    ]
     return (
         <AppLayout>
             <div className="space-y-4 px-4 pb-4">
@@ -43,52 +103,10 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
                             ],
                             onChange: setStatus,
                         },
-                        
+
                     ]}
                 />
-                <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-                    <InfiniteScroll data="campaigns">
-                        <table className="min-w-full bg-white divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Título</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Estado</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Creada</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-100">
-                                {Array.isArray(campaigns?.data) && campaigns.data.length > 0 ? (
-                                    campaigns.data.map((campaign) => {
-                                        return (
-                                            <tr key={campaign.id} className="hover:bg-gray-50">
-                                                <td className="px-4 py-3 text-sm text-gray-900">{campaign.title}</td>
-                                                <td className="px-4 py-3 text-sm text-gray-700">{campaign.status?.status}</td>
-                                                <td className="px-4 py-3 text-sm text-gray-700">
-                                                    {campaign.created_at ? new Date(campaign.created_at).toLocaleString() : '-'}
-                                                </td>
-                                                <td className="px-4 py-3 text-sm">
-                                                    <a
-                                                        href={`/campaign/${campaign.id}`}
-                                                        className="text-blue-600 hover:underline"
-                                                    >
-                                                        Ver
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        )
-                                    })
-                                ) : (
-                                    <tr>
-                                        <td colSpan={5} className="px-4 py-6 text-center text-sm text-gray-500">
-                                            No hay campañas
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </InfiniteScroll>
-                </div>
+
             </div>
         </AppLayout>
     )
