@@ -54,7 +54,7 @@ class CampaignController extends Controller
 
             $createCampaignAction->execute($request->validated());
             dd($request);
-            return to_route('timeline.create')
+            return to_route('campaign.index')
                 ->with('success', 'Campaña creada correctamente.');
 
         } catch (\Throwable $e) {

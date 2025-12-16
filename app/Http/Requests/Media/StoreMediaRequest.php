@@ -15,11 +15,11 @@ class StoreMediaRequest extends FormRequest
     {
         return [
             'files' => ['required', 'array'],
-            'files.*' => [
+            'files.*.img' => [
                 'required',
                 'file',
                 'mimes:jpg,jpeg,png,mp4',
-                'max:157286400',
+                'max:153600',
             ],
         ];
     }
