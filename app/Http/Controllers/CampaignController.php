@@ -66,9 +66,11 @@ class CampaignController extends Controller
  
     public function show(Campaign $campaign)
     {
-        $campaign->with(['status', 'department', 'agreement']);
+        $campaign->load(['status', 'department', 'agreement', 'centers']);
 
-        return Inertia::render('Campaign/Show', ['campaign' => $campaign]);
+        return Inertia::render('Campaign/Show', [
+            'campaign' => $campaign
+        ]);
     }
 
     public function edit(Campaign $campaign)
