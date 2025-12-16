@@ -11,8 +11,7 @@ export default function Show() {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault()
-        console.log(data.files)
-        // post('/video-upload')
+        post('/video-upload')
     }
     return (
         <form
