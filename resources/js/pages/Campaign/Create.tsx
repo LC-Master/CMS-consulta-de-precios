@@ -6,10 +6,15 @@ import Select from 'react-select'
 import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import useModal from '@/hooks/use-modal'
+import { CampaignCreateProps } from '@/types/campaign/page.type'
+import { createPortal } from 'react-dom'
+import Modal from '@/components/Modal'
 
 export default function CampaignCreate() {
+    const { isOpen, openModal, closeModal } = useModal(false)
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Crear campaña',
@@ -17,11 +22,22 @@ export default function CampaignCreate() {
         },
     ];
 
-    const { centers, departments, agreements, media } = usePage<{ centers: Center[], departments: Department[], agreements: Agreement[], media: MediaItem[] }>().props
+    const { centers, departments, agreements, media } = usePage<CampaignCreateProps>().props
 
     const [pm, setPm] = useState<MediaItem[]>([])
     const [am, setAm] = useState<MediaItem[]>([])
-    const [mediaList, setMediaList] = useState<MediaItem[]>(media ?? [])
+    const [mediaList, setMediaList] = useState<MediaItem[]>(() => (media ? [...media] : []))
+
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset'; 
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
 
     const { data, setData, processing, errors, post } = useForm({
         title: '',
@@ -31,7 +47,6 @@ export default function CampaignCreate() {
         department_id: '',
         agreement_id: '',
     })
-    console.log(media)
     const optionsCenter: Option[] = centers.map((center: Center) => {
         return { value: center.id, label: center.name + " - " + center.code }
     })
@@ -161,107 +176,123 @@ export default function CampaignCreate() {
                         {errors.agreement_id && <p id="agreement_id-error" role="alert" className="text-red-500 text-sm mt-1">{errors.agreement_id}</p>}
                     </div>
 
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Multimedia</label>
-                    <div>
+                    <div className='flex flex-row justify-between items-center'>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Multimedia</label>
+                        <Button type='button' onClick={openModal}>Agregar Multimedia</Button>
+                        {isOpen && (
+                            createPortal(
+                                <Modal closeModal={closeModal}>
+                                    <h2 className="text-lg font-semibold mb-4">Agregar Multimedia</h2>
+                                    <div className="border-dashed border-2 border-gray-300 p-4 rounded-md mb-4">
+                                        <p className="mb-4">Selecciona los elementos multimedia para AM y PM.</p>
+                                    </div>
+                                </Modal>
+                                , document.body)
+                        )}
 
-                        <div>
-                            <Label htmlFor='am'>AM</Label>
-                            <div className="max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
-                                {am.map((item: MediaItem) => {
-                                    return (
-                                        <div key={item.id} className="p-2 border flex flex-row gap-2 justify-between rounded mb-2">
-                                            <div>
-                                                <p><strong>Nombre:</strong> {item.name}</p>
-                                                <p><strong>Tipo:</strong> {item.mime_type}</p>
+                    </div>
+                    <div>
+                        <div className="flex w-full gap-4 mb-4">
+                            <div className="w-1/2">
+                                <Label htmlFor='am'>AM</Label>
+                                <div className="h-60 max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
+                                    {am.map((item: MediaItem) => {
+                                        return (
+                                            <div key={item.id} className="p-2 border flex flex-row gap-2 justify-between rounded mb-2">
+                                                <div>
+                                                    <p><strong>Nombre:</strong> {item.name}</p>
+                                                    <p><strong>Tipo:</strong> {item.mime_type}</p>
+                                                </div>
+                                                <div className="mt-2 flex items-center gap-2">
+                                                    <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                                        e.preventDefault()
+                                                        setPm([...pm, item])
+                                                        setAm(am.filter(m => m.id !== item.id))
+                                                    }}>
+                                                        PM
+                                                    </Button>
+                                                    <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                                        e.preventDefault()
+                                                        const index = am.findIndex(m => m.id === item.id)
+                                                        if (index > 0) {
+                                                            const newAm = [...am]
+                                                            const temp = newAm[index - 1]
+                                                            newAm[index - 1] = newAm[index]
+                                                            newAm[index] = temp
+                                                            setAm(newAm)
+                                                        }
+                                                    }}>
+                                                        ↑
+                                                    </Button>
+                                                    <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                                        e.preventDefault()
+                                                        const index = am.findIndex(m => m.id === item.id)
+                                                        if (index < am.length - 1) {
+                                                            const newAm = [...am]
+                                                            const temp = newAm[index + 1]
+                                                            newAm[index + 1] = newAm[index]
+                                                            newAm[index] = temp
+                                                            setAm(newAm)
+                                                        }
+                                                    }}>
+                                                        ↓
+                                                    </Button>
+                                                </div>
                                             </div>
-                                            <div className="mt-2 flex items-center gap-2">
-                                                <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                    e.preventDefault()
-                                                    setPm([...pm, item])
-                                                    setAm(am.filter(m => m.id !== item.id))
-                                                }}>
-                                                    PM
-                                                </Button>
-                                                <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                    e.preventDefault()
-                                                    const index = am.findIndex(m => m.id === item.id)
-                                                    if (index > 0) {
-                                                        const newAm = [...am]
-                                                        const temp = newAm[index - 1]
-                                                        newAm[index - 1] = newAm[index]
-                                                        newAm[index] = temp
-                                                        setAm(newAm)
-                                                    }
-                                                }}>
-                                                    ↑
-                                                </Button>
-                                                <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                    e.preventDefault()
-                                                    const index = am.findIndex(m => m.id === item.id)
-                                                    if (index < am.length - 1) {
-                                                        const newAm = [...am]
-                                                        const temp = newAm[index + 1]
-                                                        newAm[index + 1] = newAm[index]
-                                                        newAm[index] = temp
-                                                        setAm(newAm)
-                                                    }
-                                                }}>
-                                                    ↓
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    )
-                                })}
+                                        )
+                                    })}
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <Label htmlFor='pm'>PM</Label>
-                            <div className="max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
-                                {pm.map((item: MediaItem) => {
-                                    return (
-                                        <div key={item.id} className="p-2 border flex flex-row gap-2 justify-between  rounded mb-2">
-                                            <div>
-                                                <p><strong>Nombre:</strong> {item.name}</p>
-                                                <p><strong>Tipo:</strong> {item.mime_type}</p>
+
+                            <div className="w-1/2">
+                                <Label htmlFor='pm'>PM</Label>
+                                <div className="h-60 max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
+                                    {pm.map((item: MediaItem) => {
+                                        return (
+                                            <div key={item.id} className="p-2 border flex flex-row gap-2 justify-between rounded mb-2">
+                                                <div>
+                                                    <p><strong>Nombre:</strong> {item.name}</p>
+                                                    <p><strong>Tipo:</strong> {item.mime_type}</p>
+                                                </div>
+                                                <div className="mt-2 flex items-center gap-2">
+                                                    <Button type='button' onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                                                        e.preventDefault()
+                                                        setAm([...am, item])
+                                                        setPm(pm.filter(m => m.id !== item.id))
+                                                    }}>
+                                                        AM
+                                                    </Button>
+                                                    <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                                        e.preventDefault()
+                                                        const index = pm.findIndex(m => m.id === item.id)
+                                                        if (index > 0) {
+                                                            const newPm = [...pm]
+                                                            const temp = newPm[index - 1]
+                                                            newPm[index - 1] = newPm[index]
+                                                            newPm[index] = temp
+                                                            setPm(newPm)
+                                                        }
+                                                    }}>
+                                                        ↑
+                                                    </Button>
+                                                    <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                                        e.preventDefault()
+                                                        const index = pm.findIndex(m => m.id === item.id)
+                                                        if (index < pm.length - 1) {
+                                                            const newPm = [...pm]
+                                                            const temp = newPm[index + 1]
+                                                            newPm[index + 1] = newPm[index]
+                                                            newPm[index] = temp
+                                                            setPm(newPm)
+                                                        }
+                                                    }}>
+                                                        ↓
+                                                    </Button>
+                                                </div>
                                             </div>
-                                            <div className="mt-2 flex items-center gap-2">
-                                                <Button type='button' onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-                                                    e.preventDefault()
-                                                    setAm([...am, item])
-                                                    setPm(pm.filter(m => m.id !== item.id))
-                                                }}>
-                                                    AM
-                                                </Button>
-                                                <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                    e.preventDefault()
-                                                    const index = pm.findIndex(m => m.id === item.id)
-                                                    if (index > 0) {
-                                                        const newPm = [...pm]
-                                                        const temp = newPm[index - 1]
-                                                        newPm[index - 1] = newPm[index]
-                                                        newPm[index] = temp
-                                                        setPm(newPm)
-                                                    }
-                                                }}>
-                                                    ↑
-                                                </Button>
-                                                <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                    e.preventDefault()
-                                                    const index = pm.findIndex(m => m.id === item.id)
-                                                    if (index < pm.length - 1) {
-                                                        const newPm = [...pm]
-                                                        const temp = newPm[index + 1]
-                                                        newPm[index + 1] = newPm[index]
-                                                        newPm[index] = temp
-                                                        setPm(newPm)
-                                                    }
-                                                }}>
-                                                    ↓
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    )
-                                })}
+                                        )
+                                    })}
+                                </div>
                             </div>
                         </div>
                         <div>
@@ -293,12 +324,6 @@ export default function CampaignCreate() {
                                         </div>
                                     )
                                 })}
-                            </div>
-                        </div>
-                        <div>
-                            <Label htmlFor='mediaForm'>Media content</Label>
-                            <div id="mediaForm" className="h-60  max-h-60 overflow-y-auto border-dashed border border-gray-300 rounded p-2">
-                                <input className='block w-full text-sm text-gray-600' type="file" multiple />
                             </div>
                         </div>
                     </div>
