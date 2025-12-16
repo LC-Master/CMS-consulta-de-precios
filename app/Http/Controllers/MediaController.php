@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Media;
 use App\Http\Requests\Media\StoreMediaRequest;
 use App\Http\Requests\Media\UpdateMediaRequest;
-use Inertia\Inertia;
+use App\Models\Media;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class MediaController extends Controller
 {
@@ -17,7 +17,7 @@ class MediaController extends Controller
      */
     public function index()
     {
-       return Inertia::render('Media/Index', [
+        return Inertia::render('Media/Index', [
             'medias' => Inertia::scroll(fn () => Media::paginate()),
         ]);
     }
@@ -35,7 +35,37 @@ class MediaController extends Controller
      */
     public function store(StoreMediaRequest $request)
     {
-        $request->file('file')->store('uploads', 'public');
+        $validated = $request->validated();
+        $files = $request->file('files', []);
+        $metas = [];
+
+        foreach ($files as $file) {
+            $path = $file->store('uploads', 'public');
+            $checksum = md5_file($file->getRealPath());
+
+            $media = Media::create([
+                'path' => $path,
+                'mime_type' => $file->getClientMimeType(),
+                'size' => $file->getSize(),
+                'checksum' => $checksum,
+                'name' => $file->getClientOriginalName(),
+                'created_by' => Auth::id(),
+            ]);
+
+            $metas[] = [
+                'id' => $media->id,
+                'path' => $path,
+                'url' => Storage::url($path),
+                'mime_type' => $media->mime_type,
+                'size' => $media->size,
+                'checksum' => $media->checksum,
+                'original_name' => $media->original_name,
+                'created_by' => $media->created_by,
+                'created_at' => $media->created_at,
+            ];
+        }
+
+        return response()->json(['files' => $metas], 201);
     }
 
     /**
@@ -45,8 +75,7 @@ class MediaController extends Controller
     {
         return Inertia::render('Media/Show', [
             'media' => $media,
-            // Enviamos la URL pública para poder visualizar la imagen/archivo
-            'url' => Storage::url($media->path) 
+            'url' => Storage::url($media->path),
         ]);
     }
 
@@ -57,7 +86,7 @@ class MediaController extends Controller
     {
         return Inertia::render('Media/Edit', [
             'media' => $media,
-            'url' => Storage::url($media->path)
+            'url' => Storage::url($media->path),
         ]);
     }
 

@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignUuid('media_id')
                 ->constrained();
             $table->time('scheduled_at');
-
             $table->timestamps();
         });
     }

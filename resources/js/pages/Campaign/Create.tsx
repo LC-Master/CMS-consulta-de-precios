@@ -9,9 +9,10 @@ import { useState } from 'react'
 import {
     DragDropProvider,
 } from "@dnd-kit/react";
-import DropZone from '@/components/dnd/DropZone'
-import MediaItemElement from '@/components/MediaItemElement'
+import { move } from '@dnd-kit/helpers'
 
+import DropZone from '@/components/dnd/DropZone'
+import MediaItemElement from '@/components/dnd/MediaItemElement'
 export default function CampaignCreate() {
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -151,17 +152,19 @@ export default function CampaignCreate() {
                         {errors.agreement_id && <p className="text-red-500 text-sm mt-1">{errors.agreement_id}</p>}
                     </div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Multimedia</label>
-                    {/* <DragDropProvider onDragOver={(event) => {
+                    <DragDropProvider onDragOver={(event) => {
                         setMultimedia((items) => move(items, event));
                     }}>
-                        {Object.entries(multimedia).map(([column, items]) => (
-                            <DropZone key={column} id={column}>
-                                {items.map((id, index) => (
-                                    <MediaItemElement item={id} index={index} column={column} />
-                                ))}
-                            </DropZone>
-                        ))}
-                    </DragDropProvider> */}
+                        <div className='flex flex-col gap-6'>
+                            {Object.entries(multimedia).map(([column, items]) => (
+                                <DropZone key={column} id={column}>
+                                    {items.map((id, index) => (
+                                        <MediaItemElement item={id} index={index} column={column} />
+                                    ))}
+                                </DropZone>
+                            ))}
+                        </div>
+                    </DragDropProvider>
                 </form>
 
                 <div className="flex flex-wrap justify-center gap-3">

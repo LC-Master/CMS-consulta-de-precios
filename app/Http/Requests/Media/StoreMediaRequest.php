@@ -14,11 +14,12 @@ class StoreMediaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => [
-                'required', 
-                'file', 
-                'mimes:jpg,jpeg,png,mp4', 
-                'max:157286400' 
+            'files' => ['required', 'array'],
+            'files.*' => [
+                'required',
+                'file',
+                'mimes:jpg,jpeg,png,mp4',
+                'max:157286400',
             ],
         ];
     }
@@ -26,9 +27,12 @@ class StoreMediaRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'file.required' => 'Debes subir un archivo.',
-            'file.mimes' => 'El formato del archivo no es compatible.',
-            'file.max' => 'El archivo no puede pesar más de 150MB.',
+            'files.required' => 'Debes subir al menos un archivo.',
+            'files.array' => 'El campo files debe ser un arreglo.',
+            'files.*.required' => 'Cada archivo es obligatorio.',
+            'files.*.file' => 'Cada elemento debe ser un archivo válido.',
+            'files.*.mimes' => 'Los archivos deben ser de tipo: jpg, jpeg, png o mp4.',
+            'files.*.max' => 'Cada archivo no debe exceder los 150 MB.',
         ];
     }
 }

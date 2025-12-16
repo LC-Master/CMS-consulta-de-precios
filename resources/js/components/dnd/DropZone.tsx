@@ -1,28 +1,18 @@
-import { DropZoneProps } from "@/types/campaign/index.types";
-import { useDroppable } from "@dnd-kit/core";
+import React from 'react';
+import { useDroppable } from '@dnd-kit/react';
+import { CollisionPriority } from '@dnd-kit/abstract';
 
-export default function DropZone({ id, items, children, className }: DropZoneProps) {
-    const { setNodeRef, isOver } = useDroppable({
+export default function DropZone({ id, children }: { id: string; children?: React.ReactNode; }) {
+    const { ref } = useDroppable({
         id,
-        data: {
-            type: "container",
-            children: items,
-        }
+        type: 'column',
+        accept: ['item'],
+        collisionPriority: CollisionPriority.Low,
     });
+
     return (
-        <section
-            ref={setNodeRef}
-            className={`${className ?? ""} border p-4 min-h-[200px] max-h-80 overflow-y-auto overscroll-contain transition-colors ${isOver ? "bg-green-100 border-green-500" : "bg-gray-100 border-gray-300"
-                }`}
-            style={{ WebkitOverflowScrolling: 'touch' }}
-        >
-            <h3 className="text-lg font-bold mb-2 capitalize">{id}</h3>
-            <div className="space-y-2">
-                {children}
-            </div>
-            {isOver && (
-                <p className="text-gray-400 text-sm text-center mt-4">Arrastra elementos aquí</p>
-            )}
-        </section>
+        <div className='flex flex-col gap-1 p-2 min-w-2 bg-gray-500 border-r' ref={ref}>
+            {children}
+        </div>
     );
 }       

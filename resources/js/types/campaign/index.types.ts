@@ -24,6 +24,7 @@ export interface TypeMediaItemElement {
     column: string;
     onRemove?: (id: string) => void;
     className?: string;
+    dragOverlay?: boolean;
 }
 
 export interface DropZoneProps {

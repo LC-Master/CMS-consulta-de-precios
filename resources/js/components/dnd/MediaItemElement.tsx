@@ -1,36 +1,22 @@
 import { TypeMediaItemElement } from "@/types/campaign/index.types";
 import { XCircle } from 'lucide-react'
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from "@dnd-kit/utilities";
+import { useSortable } from '@dnd-kit/react/sortable';
 
 export default function MediaItemElement({ item, index, column, onRemove }: TypeMediaItemElement) {
     const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
+        ref,
+        isDragging
     } = useSortable({
         id: item.id,
-        data: {
-            type: "item",
-            item: item,
-        },
+        index,
+        group: column,
+        type: 'item',
+        accept: ['item'],
     });
-
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-    };
-
 
     return (
         <div
-            ref={setNodeRef}
-            style={style}
-            {...attributes}
-            {...listeners}
+            ref={ref}
             key={item.id}
             className={`p-2 bg-white border border-gray-200 rounded mb-2 flex justify-between items-center shadow-sm ${isDragging ? "opacity-50 cursor-grabbing" : "opacity-100 cursor-grab"}`}
         >
