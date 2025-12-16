@@ -5,14 +5,7 @@ import { usePage, useForm } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
-import { useState } from 'react'
-import {
-    DragDropProvider,
-} from "@dnd-kit/react";
-import { move } from '@dnd-kit/helpers'
 
-import DropZone from '@/components/dnd/DropZone'
-import MediaItemElement from '@/components/dnd/MediaItemElement'
 export default function CampaignCreate() {
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -23,11 +16,6 @@ export default function CampaignCreate() {
 
     const { centers, departments, agreements, media } = usePage<{ centers: Center[], departments: Department[], agreements: Agreement[], media: MediaItem[] }>().props
 
-    const [multimedia, setMultimedia] = useState({
-        pool: media,
-        am: [] as MediaItem[],
-        pm: [] as MediaItem[],
-    })
 
     const { data, setData, processing, errors, post } = useForm({
         title: '',
@@ -152,19 +140,7 @@ export default function CampaignCreate() {
                         {errors.agreement_id && <p className="text-red-500 text-sm mt-1">{errors.agreement_id}</p>}
                     </div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Multimedia</label>
-                    <DragDropProvider onDragOver={(event) => {
-                        setMultimedia((items) => move(items, event));
-                    }}>
-                        <div className='flex flex-col gap-6'>
-                            {Object.entries(multimedia).map(([column, items]) => (
-                                <DropZone key={column} id={column}>
-                                    {items.map((id, index) => (
-                                        <MediaItemElement item={id} index={index} column={column} />
-                                    ))}
-                                </DropZone>
-                            ))}
-                        </div>
-                    </DragDropProvider>
+                   
                 </form>
 
                 <div className="flex flex-wrap justify-center gap-3">
