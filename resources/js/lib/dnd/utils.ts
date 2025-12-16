@@ -6,14 +6,20 @@ type BoardSections = {
 
 export function findBoardSectionContainer(
     boardSections: BoardSections,
-    id: string
+    id?: string | number
 ) {
-    if (id in boardSections) {
-        return id;
+    if (id === undefined || id === null) {
+        return undefined;
+    }
+
+    const key = typeof id === "string" ? id : String(id);
+
+    if (key in boardSections) {
+        return key;
     }
 
     const container = Object.keys(boardSections).find((key) =>
-        boardSections[key].find((item) => item.id === id)
+        boardSections[k].find((item) => item.id === key)
     );
 
     return container;

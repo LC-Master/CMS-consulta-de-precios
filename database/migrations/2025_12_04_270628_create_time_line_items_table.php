@@ -18,8 +18,8 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->foreignUuid('media_id')
                 ->constrained();
-            $table->time('scheduled_at');
-
+            $table->enum('slot', ['am', 'pm']);   
+            $table->unsignedInteger('position');  
             $table->timestamps();
         });
     }

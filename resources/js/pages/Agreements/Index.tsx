@@ -7,10 +7,18 @@ import { Column, DataTable } from '@/components/DataTable';
 import { Agreement, Props } from '@/types/agreement/index.types';
 import { Filter } from '@/components/Filter';
 import AnchorIcon from '@/components/ui/AnchorIcon';
+import { index } from '@/routes/agreement';
+import { BreadcrumbItem } from '@/types';
 
 export default function AgreementsIndex({ agreements, filters = {}, statuses }: Props) {
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Lista de convenios',
+            href: index().url,
+        },
+    ];
     const columns: Column<Agreement>[] = [
         {
             key: 'name',
@@ -73,7 +81,7 @@ export default function AgreementsIndex({ agreements, filters = {}, statuses }: 
     }, [search, status])
 
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <div className="space-y-4 px-4 pb-4">
                 <Filter
                     filters={[

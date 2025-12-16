@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('path'); 
             $table->string('name');
             $table->string('mime_type');
-            $table->unsignedBigInteger('size'); 
+            $table->unsignedBigInteger('size');
             $table->unsignedInteger('duration_seconds')->nullable();
             $table->string('checksum')->nullable();
             $table->foreignId('created_by')->constrained('users');

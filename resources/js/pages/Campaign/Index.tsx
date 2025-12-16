@@ -1,18 +1,25 @@
 import { useState } from 'react'
-import {  router } from '@inertiajs/react'
+import { router } from '@inertiajs/react'
 import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
-import { Campaign, Props } from '@/types/campaign/index.types';
 import { Filter } from '@/components/Filter';
 import { Column } from '@/types/datatable.types';
 import AnchorIcon from '@/components/ui/AnchorIcon';
 import { Eye } from 'lucide-react';
 import { DataTable } from '@/components/DataTable';
-
+import { Campaign, Props } from '@/types/campaign/index.types';
+import { BreadcrumbItem } from '@/types';
+import { index } from '@/routes/campaign';
 
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] }: Props) {
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Lista de campañas',
+            href: index().url,
+        },
+    ];
     const columns: Column<Campaign>[] = [
         {
             key: 'title',
@@ -47,7 +54,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
         )
     }, [search, status])
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <div className="space-y-4 px-4 pb-4">
                 <Filter
                     filters={[
