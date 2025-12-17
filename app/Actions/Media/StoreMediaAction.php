@@ -17,7 +17,7 @@ class StoreMediaAction
             $thumbIndex = 0;
 
             foreach ($files as $file) {
-                $path = $file->store('media', 'public');
+                $path = $file->store('uploads', 'public');
                 $media = Media::create([
                     'name' => $file->getClientOriginalName(),
                     'disk' => 'public',
@@ -39,8 +39,8 @@ class StoreMediaAction
                         'mime_type' => $thumbFile->getClientMimeType(),
                         'disk' => 'public',
                     ]);
+                    $thumbIndex++;
                 }
-                $thumbIndex++;
             }
         });
     }
