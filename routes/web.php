@@ -28,7 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('/video', function () {
     return Inertia::render('video');
 });
-Route::post('/video-upload', [MediaController::class, 'store'])->name('video.upload');
+Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
 
 Route::get('/files', fn () => response()->file(Storage::disk('public')->path('uploads/ORC4PXDMTUIwA83x2fotA1Iakml6Fw5EmyC3lgwm.mp4')));
 

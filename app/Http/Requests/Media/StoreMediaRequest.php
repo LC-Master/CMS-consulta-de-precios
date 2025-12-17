@@ -14,25 +14,55 @@ class StoreMediaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'files' => ['required', 'array'],
-            'files.*.img' => [
+            'files' => ['required', 'array', 'min:1'],
+            'files.*' => [
                 'required',
                 'file',
-                'mimes:jpg,jpeg,png,mp4',
-                'max:153600',
+                'max:153600', // 150MB
+                'mimetypes:video/mp4,image/jpeg,image/png,image/webp',
+            ],
+
+            'thumbnails' => ['nullable', 'array'],
+            'thumbnails.*' => [
+                'file',
+                'image',
+                'mimes:jpeg,jpg',
+                'max:5120', // 5MB
             ],
         ];
+    }
+
+    /**
+     * Validaciones cruzadas (video => thumbnail obligatorio)
+     */
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $files = $this->file('files', []);
+            $thumbnails = $this->file('thumbnails', []);
+
+            $thumbIndex = 0;
+
+            foreach ($files as $index => $file) {
+                if ($file->getMimeType() === 'video/mp4') {
+                    if (! isset($thumbnails[$thumbIndex])) {
+                        $validator->errors()->add(
+                            'thumbnails',
+                            "El archivo '{$file->getClientOriginalName()}' es un video y requiere thumbnail."
+                        );
+                    }
+                    $thumbIndex++;
+                }
+            }
+        });
     }
 
     public function messages(): array
     {
         return [
             'files.required' => 'Debes subir al menos un archivo.',
-            'files.array' => 'El campo files debe ser un arreglo.',
-            'files.*.required' => 'Cada archivo es obligatorio.',
-            'files.*.file' => 'Cada elemento debe ser un archivo válido.',
-            'files.*.mimes' => 'Los archivos deben ser de tipo: jpg, jpeg, png o mp4.',
-            'files.*.max' => 'Cada archivo no debe exceder los 150 MB.',
+            'files.*.mimetypes' => 'Formato no permitido.',
+            'thumbnails.*.image' => 'Los thumbnails deben ser imágenes JPG.',
         ];
     }
 }

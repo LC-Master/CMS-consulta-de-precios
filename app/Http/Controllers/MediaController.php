@@ -35,37 +35,39 @@ class MediaController extends Controller
      */
     public function store(StoreMediaRequest $request)
     {
-        $validated = $request->validated();
-        $files = $request->file('files', []);
-        $metas = [];
 
-        foreach ($files as $file) {
-            $path = $file->store('uploads', 'public');
-            $checksum = md5_file($file->getRealPath());
+        dd($request);
+        // $validated = $request->validated();
+        // $files = $request->file('files', []);
+        // $metas = [];
 
-            $media = Media::create([
-                'path' => $path,
-                'mime_type' => $file->getClientMimeType(),
-                'size' => $file->getSize(),
-                'checksum' => $checksum,
-                'name' => $file->getClientOriginalName(),
-                'created_by' => Auth::id(),
-            ]);
+        // foreach ($files as $file) {
+        //     $path = $file->store('uploads', 'public');
+        //     $checksum = md5_file($file->getRealPath());
 
-            $metas[] = [
-                'id' => $media->id,
-                'path' => $path,
-                'url' => Storage::url($path),
-                'mime_type' => $media->mime_type,
-                'size' => $media->size,
-                'checksum' => $media->checksum,
-                'original_name' => $media->original_name,
-                'created_by' => $media->created_by,
-                'created_at' => $media->created_at,
-            ];
-        }
+        //     $media = Media::create([
+        //         'path' => $path,
+        //         'mime_type' => $file->getClientMimeType(),
+        //         'size' => $file->getSize(),
+        //         'checksum' => $checksum,
+        //         'name' => $file->getClientOriginalName(),
+        //         'created_by' => Auth::id(),
+        //     ]);
 
-        return response()->json(['files' => $metas], 201);
+        //     $metas[] = [
+        //         'id' => $media->id,
+        //         'path' => $path,
+        //         'url' => Storage::url($path),
+        //         'mime_type' => $media->mime_type,
+        //         'size' => $media->size,
+        //         'checksum' => $media->checksum,
+        //         'original_name' => $media->original_name,
+        //         'created_by' => $media->created_by,
+        //         'created_at' => $media->created_at,
+        //     ];
+        // }
+
+        // return response()->json(['files' => $metas], 201);
     }
 
     /**

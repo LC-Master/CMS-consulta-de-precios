@@ -1,17 +1,16 @@
 import AppLayout from '@/layouts/app-layout'
 import { index } from '@/routes/campaign'
 import { BreadcrumbItem } from '@/types'
-import { usePage, useForm } from '@inertiajs/react'
+import { usePage, useForm, router } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import React, { useState,useEffect } from 'react'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import useModal from '@/hooks/use-modal'
 import { CampaignCreateProps } from '@/types/campaign/page.type'
-import { createPortal } from 'react-dom'
-import Modal from '@/components/Modal'
+import UploadMediaModal from '@/components/modals/UploadMediaModal'
 
 export default function CampaignCreate() {
     const { isOpen, openModal, closeModal } = useModal(false)
@@ -21,23 +20,18 @@ export default function CampaignCreate() {
             href: index().url,
         },
     ];
-
+    const handleSuccess = () => {
+        router.reload(
+            {
+                only: ['media'],
+            }
+        )
+    }
     const { centers, departments, agreements, media } = usePage<CampaignCreateProps>().props
 
     const [pm, setPm] = useState<MediaItem[]>([])
     const [am, setAm] = useState<MediaItem[]>([])
     const [mediaList, setMediaList] = useState<MediaItem[]>(() => (media ? [...media] : []))
-
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset'; 
-        }
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
-    }, [isOpen]);
 
     const { data, setData, processing, errors, post } = useForm({
         title: '',
@@ -179,16 +173,7 @@ export default function CampaignCreate() {
                     <div className='flex flex-row justify-between items-center'>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Multimedia</label>
                         <Button type='button' onClick={openModal}>Agregar Multimedia</Button>
-                        {isOpen && (
-                            createPortal(
-                                <Modal closeModal={closeModal}>
-                                    <h2 className="text-lg font-semibold mb-4">Agregar Multimedia</h2>
-                                    <div className="border-dashed border-2 border-gray-300 p-4 rounded-md mb-4">
-                                        <p className="mb-4">Selecciona los elementos multimedia para AM y PM.</p>
-                                    </div>
-                                </Modal>
-                                , document.body)
-                        )}
+                        {isOpen && <UploadMediaModal closeModal={closeModal} success={handleSuccess} />}
 
                     </div>
                     <div>
