@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout'
 import { index } from '@/routes/campaign'
 import { BreadcrumbItem } from '@/types'
-import { usePage, useForm, router } from '@inertiajs/react'
+import { useForm, router } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
@@ -12,7 +12,7 @@ import useModal from '@/hooks/use-modal'
 import { CampaignCreateProps } from '@/types/campaign/page.type'
 import UploadMediaModal from '@/components/modals/UploadMediaModal'
 
-export default function CampaignCreate() {
+export default function CampaignCreate({ centers, departments, agreements, media }: CampaignCreateProps) {
     const { isOpen, openModal, closeModal } = useModal(false)
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -27,8 +27,7 @@ export default function CampaignCreate() {
             }
         )
     }
-    const { centers, departments, agreements, media } = usePage<CampaignCreateProps>().props
-
+    console.log(media)
     const [pm, setPm] = useState<MediaItem[]>([])
     const [am, setAm] = useState<MediaItem[]>([])
     const [mediaList, setMediaList] = useState<MediaItem[]>(() => (media ? [...media] : []))

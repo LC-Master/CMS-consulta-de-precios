@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Thumbnail;
 use App\Http\Requests\StoreThumbnailRequest;
 use App\Http\Requests\UpdateThumbnailRequest;
+use App\Models\Thumbnail;
+use Illuminate\Support\Facades\Storage;
 
 class ThumbnailController extends Controller
 {
@@ -37,7 +38,13 @@ class ThumbnailController extends Controller
      */
     public function show(Thumbnail $thumbnail)
     {
-        //
+        $path = Storage::disk('public')->path($thumbnail->path);
+
+        if (! Storage::disk('public')->exists($thumbnail->path)) {
+            abort(404, 'El archivo físico no existe en el servidor.');
+        }
+
+        return response()->file($path);
     }
 
     /**
