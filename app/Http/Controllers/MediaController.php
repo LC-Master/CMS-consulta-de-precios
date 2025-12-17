@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Media\StoreMediaAction;
 use App\Http\Requests\Media\StoreMediaRequest;
 use App\Http\Requests\Media\UpdateMediaRequest;
 use App\Models\Media;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -33,41 +34,16 @@ class MediaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreMediaRequest $request)
+    public function store(StoreMediaRequest $request, StoreMediaAction $storeMediaAction): JsonResponse
     {
+        try {
+            $request->validated();
+            $storeMediaAction->execute($request);
 
-        dd($request);
-        // $validated = $request->validated();
-        // $files = $request->file('files', []);
-        // $metas = [];
-
-        // foreach ($files as $file) {
-        //     $path = $file->store('uploads', 'public');
-        //     $checksum = md5_file($file->getRealPath());
-
-        //     $media = Media::create([
-        //         'path' => $path,
-        //         'mime_type' => $file->getClientMimeType(),
-        //         'size' => $file->getSize(),
-        //         'checksum' => $checksum,
-        //         'name' => $file->getClientOriginalName(),
-        //         'created_by' => Auth::id(),
-        //     ]);
-
-        //     $metas[] = [
-        //         'id' => $media->id,
-        //         'path' => $path,
-        //         'url' => Storage::url($path),
-        //         'mime_type' => $media->mime_type,
-        //         'size' => $media->size,
-        //         'checksum' => $media->checksum,
-        //         'original_name' => $media->original_name,
-        //         'created_by' => $media->created_by,
-        //         'created_at' => $media->created_at,
-        //     ];
-        // }
-
-        // return response()->json(['files' => $metas], 201);
+            return response()->json(['message' => 'Archivos subidos correctamente.'], 201);
+        } catch (\Throwable $e) {
+            return response()->json(['message' => 'Error al subir los archivos.', 'error' => $e->getMessage()], 500);
+        }
     }
 
     /**
