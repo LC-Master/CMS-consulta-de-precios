@@ -8,6 +8,9 @@ export interface Center extends Pick<Department, 'id' | 'name'> {
 export type Agreement = Department;
 
 export interface MediaItem extends Pick<Department, 'id' | 'name'> {
+    size: string;
+    duration_seconds: string;
+    campaigns?: Campaign[];
     mime_type: 'image/jpeg' | 'video/mp4';
     thumbnails?: {
         id: string;
@@ -68,9 +71,11 @@ export interface Campaign {
     [key: string]: unknown;
 }
 
-export interface Props {
+export type Props = {
     flash?: { success?: string; error?: string };
     campaigns: { data: Campaign[] };
-    filters: { search?: string; status?: string };
+    filters: { search?: string; status?: string; type?: string };
     statuses: Status[];
-}
+    medias?: { data: MediaItem[] };
+    mimeTypes?: string[];
+};

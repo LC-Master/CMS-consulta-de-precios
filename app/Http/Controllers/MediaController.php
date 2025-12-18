@@ -3,24 +3,54 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Media\StoreMediaAction;
+use App\Enums\CampaignStatus;
 use App\Http\Requests\Media\StoreMediaRequest;
 use App\Http\Requests\Media\UpdateMediaRequest;
 use App\Models\Media;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 
 class MediaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $query = Media::query()->with('campaigns');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('campaigns', function ($qCamp) use ($search) {
+                        // Esto ahora buscará en 'campaigns' usando 'timeline_items'
+                        $qCamp->where('title', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('mime_type', $request->type);
+        }
+
+        $mimeTypes = Media::query()
+            ->select('mime_type')
+            ->distinct()
+            ->whereNotNull('mime_type')
+            ->orderBy('mime_type')
+            ->pluck('mime_type');
+
         return Inertia::render('Media/Index', [
-            'medias' => Inertia::scroll(fn () => Media::paginate()),
+            'medias' => Inertia::scroll(fn() => $query->latest()->paginate(20)->withQueryString()),
+            'filters' => $request->only(['search', 'type']),
+            'mimeTypes' => $mimeTypes,
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -72,26 +102,21 @@ class MediaController extends Controller
      */
     public function update(UpdateMediaRequest $request, Media $media)
     {
-        // Solo actualizamos si el usuario subió un archivo nuevo para reemplazar el anterior
         if ($request->hasFile('file')) {
             $file = $request->file('file');
 
-            // 1. Eliminar archivo viejo
             if (Storage::disk($media->disk)->exists($media->path)) {
                 Storage::disk($media->disk)->delete($media->path);
             }
 
-            // 2. Subir archivo nuevo
             $path = $file->store('uploads', 'public');
             $checksum = md5_file($file->getRealPath());
 
-            // 3. Actualizar BD
             $media->update([
                 'path' => $path,
                 'mime_type' => $file->getClientMimeType(),
                 'size' => $file->getSize(),
                 'checksum' => $checksum,
-                // 'created_by' usualmente no se cambia en update
             ]);
 
             return Redirect::route('media.index')
@@ -107,23 +132,35 @@ class MediaController extends Controller
      */
     public function destroy(Media $media)
     {
-        // 1. Eliminar el archivo físico
+        try{
+            $isInUse = $media->campaigns()->whereHas('status', function ($query) {
+            $query->whereIn('status', [
+                CampaignStatus::ACTIVE->value,
+                CampaignStatus::DRAFT->value
+            ]);
+        })->exists();
+
+        if ($isInUse) {
+            return back()->with('error', 'La imagen está siendo utilizada en una campaña en borrador o activa.');
+        }
+
         if (Storage::disk($media->disk)->exists($media->path)) {
             Storage::disk($media->disk)->delete($media->path);
         }
 
-        // 2. Eliminar el registro de la BD
         $media->delete();
 
-        return Redirect::route('media.index')
-            ->with('success', 'Archivo eliminado correctamente.');
+        return back()->with('success', 'Archivo eliminado correctamente.');
+        }catch (\Throwable $e) {
+            return back()->with('error', 'Ocurrió un error al eliminar el archivo.');
+        }
     }
 
     public function preview(Media $media)
     {
         $path = Storage::disk('public')->path($media->path);
 
-        if (! Storage::disk('public')->exists($media->path)) {
+        if (!Storage::disk('public')->exists($media->path)) {
             abort(404, 'El archivo físico no existe en el servidor.');
         }
 

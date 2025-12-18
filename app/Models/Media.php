@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Media extends Model
 {
     /** @use HasFactory<\Database\Factories\MediaFactory> */
-    use HasFactory, HasUuids;
+    use HasFactory;
+    use HasUuids;
 
     protected $fillable = [
         'id',
@@ -26,5 +27,14 @@ class Media extends Model
     public function thumbnails()
     {
         return $this->hasOne(Thumbnail::class);
+    }
+    public function campaigns()
+    {
+        return $this->belongsToMany(
+            Campaign::class,
+            'time_line_items',
+            'media_id',
+            'campaign_id'
+        );
     }
 }

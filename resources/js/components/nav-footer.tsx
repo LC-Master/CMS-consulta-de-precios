@@ -9,6 +9,7 @@ import {
 import { resolveUrl } from '@/lib/utils';
 import { type NavItem } from '@/types';
 import { type ComponentPropsWithoutRef } from 'react';
+import { usePage } from '@inertiajs/react';
 
 export function NavFooter({
     items,
@@ -17,6 +18,7 @@ export function NavFooter({
 }: ComponentPropsWithoutRef<typeof SidebarGroup> & {
     items: NavItem[];
 }) {
+    const url = usePage().url
     return (
         <SidebarGroup
             {...props}
@@ -29,11 +31,11 @@ export function NavFooter({
                             <SidebarMenuButton
                                 asChild
                                 // text-neutral-600 hover:text-neutral-800
-                                className=" text-white dark:text-neutral-300 dark:hover:text-neutral-100"
+                                className={`${url === item.href ? "bg-white text-black" : "text-white"}  transition-colors active:bg-black active:text-white dark:text-neutral-300 dark:hover:text-neutral-100`}
                             >
                                 <a
                                     href={resolveUrl(item.href)}
-                                    target="_blank"
+                                    // target="_blank"
                                     rel="noopener noreferrer"
                                 >
                                     {item.icon && (
