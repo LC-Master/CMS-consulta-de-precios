@@ -60,7 +60,7 @@ function MediaItemCard({ item, controls }: { item: MediaItem; controls: React.Re
 
 function MediaColumn({ title, items, onMoveToOther, onMoveUp, onMoveDown, onRemove }: MediaColumnProps) {
     return (
-        <div className="w-1/2">
+        <div>
             <Label>{title}</Label>
             <div className="h-60 max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
                 {items.map((item) => (
@@ -401,7 +401,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                 />
                                 {errors.am_media && <p className="text-red-500 text-sm mt-1">{errors.am_media}</p>}
                             </div>
-                            <div>
+                            <div  className='w-1/2'>
                                 <MediaColumn
                                     title="PM"
                                     items={pm}

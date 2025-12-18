@@ -10,11 +10,12 @@ class StoreCampaignRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-     public function authorize(): bool
+    public function authorize(): bool
     {
-        if(Auth::id()){
-            return true; 
+        if (Auth::id()) {
+            return true;
         }
+
         return false;
     }
 
@@ -25,12 +26,16 @@ class StoreCampaignRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:155',
-            'start_at'      => 'required|date|before:end_at',
-            'end_at'        => 'required|date|after:start_at',
-            'centers'     => 'required|array|min:1',
+            'start_at' => 'required|date|before:end_at',
+            'end_at' => 'required|date|after:start_at',
+            'centers' => 'required|array|min:1',
             'department_id' => 'required|exists:departments,id',
-            'agreement_id'  => 'nullable|exists:agreements,id',
-            'centers.*'   => 'string|exists:centers,id',
+            'agreement_id' => 'nullable|exists:agreements,id',
+            'centers.*' => 'string|exists:centers,id',
+            'am_media' => ['required', 'array', 'min:1'],
+            'am_media.*' => ['string', 'exists:media,id'],
+            'pm_media' => ['required', 'array', 'min:1'],
+            'pm_media.*' => ['string', 'exists:media,id'],        
         ];
     }
 }

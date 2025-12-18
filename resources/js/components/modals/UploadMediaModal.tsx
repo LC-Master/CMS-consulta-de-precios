@@ -9,7 +9,6 @@ import {
     ChangeEvent,
     DragEvent,
     FormEvent,
-    useEffect,
 } from 'react'
 import { useForm } from '@inertiajs/react'
 
@@ -19,14 +18,13 @@ type FormState = {
 }
 
 export default function UploadMediaModal({ closeModal, success }: { closeModal: () => void, success?: () => void }) {
-    const { setData, post, progress, errors, reset } = useForm<FormState>({
+    const { setData, post, progress, errors, reset, transform,processing } = useForm<FormState>({
         files: [],
         thumbnails: [],
     })
 
     const [selectedFiles, setSelectedFiles] = useState<File[]>([])
     const [isDragging, setIsDragging] = useState(false)
-    const [readyToSubmit, setReadyToSubmit] = useState(false)
 
     const inputRef = useRef<HTMLInputElement | null>(null)
 
@@ -163,29 +161,22 @@ export default function UploadMediaModal({ closeModal, success }: { closeModal: 
             }
         }
 
-        setData('thumbnails', thumbs)
-        setReadyToSubmit(true)
-    }
-
-    useEffect(() => {
-        if (!readyToSubmit) return
+        transform((data) => ({
+            ...data,
+            thumbnails: thumbs,
+        }))
 
         post('/media/upload', {
             forceFormData: true,
-            onSuccess: (page) => {
-                console.log(page.props,'buenas')
+            onSuccess: () => {
                 clearFiles()
                 closeModal()
                 if (success) success()
-                setReadyToSubmit(false)
             },
             onError: () => {
-                setReadyToSubmit(false)
             },
         })
-    }, [readyToSubmit])
-
-
+    }
     return createPortal(
         <Modal closeModal={closeModal}>
             <form onSubmit={handleSubmit}>
@@ -250,7 +241,7 @@ export default function UploadMediaModal({ closeModal, success }: { closeModal: 
                 )}
 
                 <div className="flex gap-2">
-                    <Button type="submit" className="w-1/2" disabled={selectedFiles.length === 0 || readyToSubmit}>
+                    <Button type="submit" className="w-1/2" disabled={selectedFiles.length === 0 || processing}>
                         Enviar
                     </Button>
                     <Button
