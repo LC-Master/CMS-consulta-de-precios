@@ -21,6 +21,7 @@ type MediaColumnProps = {
     onMoveUp: (id: MediaItem['id']) => void
     onMoveDown: (id: MediaItem['id']) => void
     onRemove: (item: MediaItem) => void
+    errors?: string
 }
 
 function MediaItemCard({ item, controls }: { item: MediaItem; controls: React.ReactNode }) {
@@ -58,9 +59,9 @@ function MediaItemCard({ item, controls }: { item: MediaItem; controls: React.Re
     )
 }
 
-function MediaColumn({ title, items, onMoveToOther, onMoveUp, onMoveDown, onRemove }: MediaColumnProps) {
+function MediaColumn({ title, items, onMoveToOther, onMoveUp, onMoveDown, onRemove, errors }: MediaColumnProps) {
     return (
-        <div>
+        <div className='w-1/2'>
             <Label>{title}</Label>
             <div className="h-60 max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
                 {items.map((item) => (
@@ -80,6 +81,7 @@ function MediaColumn({ title, items, onMoveToOther, onMoveUp, onMoveDown, onRemo
                     />
                 ))}
             </div>
+            {errors && <div className="text-red-500 text-sm mt-1">{errors}</div>}
         </div>
     )
 }
@@ -297,7 +299,6 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                 inputId="department_id"
                                 value={optionsDepartment.find(o => o.value === data.department_id) || null}
                                 name="department_id"
-                                className="mt-1 rounded-md"
                                 classNamePrefix="react-select"
                                 onChange={(val) => setData('department_id', (val as Option | null)?.value ?? '')}
                                 placeholder="Selecciona un departamento"
@@ -305,6 +306,17 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                 aria-required={false}
                                 aria-invalid={!!errors.department_id}
                                 aria-describedby={errors.department_id ? 'department_id-error' : undefined}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        borderColor: errors.department_id ? '#ef4444' : provided.borderColor,
+                                        boxShadow: errors.department_id ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
+                                        '&:hover': {
+                                            borderColor: errors.department_id ? '#ef4444' : provided.borderColor,
+                                        },
+                                        borderRadius: '0.375rem',
+                                    }),
+                                }}
                             />
                             {errors.department_id && <p id="department_id-error" role="alert" className="text-red-500 text-sm mt-1">{errors.department_id}</p>}
                         </div>
@@ -360,6 +372,17 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             aria-required={true}
                             aria-invalid={!!errors.centers}
                             aria-describedby={errors.centers ? 'centers-error' : undefined}
+                            styles={{
+                                control: (provided) => ({
+                                    ...provided,
+                                    borderColor: errors.centers ? '#ef4444' : provided.borderColor,
+                                    boxShadow: errors.centers ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
+                                    '&:hover': {
+                                        borderColor: errors.centers ? '#ef4444' : provided.borderColor,
+                                    },
+                                    borderRadius: '0.375rem',
+                                }),
+                            }}
                         />
                         {errors.centers && <p id="centers-error" role="alert" className="text-red-500 text-sm mt-1">{errors.centers}</p>}
                     </div>
@@ -371,7 +394,6 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             inputId="agreement_id"
                             value={optionsAgreement.find(o => o.value === data.agreement_id) || null}
                             name="agreement_id"
-                            className="mt-1 border rounded-lg"
                             classNamePrefix="react-select"
                             onChange={(val) => setData('agreement_id', (val as Option | null)?.value ?? '')}
                             placeholder="Selecciona un acuerdo"
@@ -379,6 +401,17 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             aria-required={false}
                             aria-invalid={!!errors.agreement_id}
                             aria-describedby={errors.agreement_id ? 'agreement_id-error' : undefined}
+                            styles={{
+                                control: (provided) => ({
+                                    ...provided,
+                                    borderColor: errors.agreement_id ? '#ef4444' : provided.borderColor,
+                                    boxShadow: errors.agreement_id ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
+                                    '&:hover': {
+                                        borderColor: errors.agreement_id ? '#ef4444' : provided.borderColor,
+                                    },
+                                    borderRadius: '0.375rem',
+                                }),
+                            }}
                         />
                         {errors.agreement_id && <p id="agreement_id-error" role="alert" className="text-red-500 text-sm mt-1">{errors.agreement_id}</p>}
                     </div>
@@ -391,28 +424,24 @@ export default function CampaignCreate({ centers, departments, agreements, media
 
                     <div>
                         <div className="flex w-full gap-4 mb-4">
-                            <div>
-                                <MediaColumn
-                                    title="AM"
-                                    items={am}
-                                    onMoveToOther={moveFromAmToPm}
-                                    onMoveUp={amMoveUp}
-                                    onMoveDown={amMoveDown}
-                                    onRemove={removeFromAmToMedia}
-                                />
-                                {errors.am_media && <p className="text-red-500 text-sm mt-1">{errors.am_media}</p>}
-                            </div>
-                            <div className='w-1/2'>
-                                <MediaColumn
-                                    title="PM"
-                                    items={pm}
-                                    onMoveToOther={moveFromPmToAm}
-                                    onMoveUp={pmMoveUp}
-                                    onMoveDown={pmMoveDown}
-                                    onRemove={removeFromPmToMedia}
-                                />
-                                {errors.pm_media && <p className="text-red-500 text-sm mt-1">{errors.pm_media}</p>}
-                            </div>
+                            <MediaColumn
+                                title="AM"
+                                items={am}
+                                onMoveToOther={moveFromAmToPm}
+                                onMoveUp={amMoveUp}
+                                onMoveDown={amMoveDown}
+                                onRemove={removeFromAmToMedia}
+                                errors={errors.am_media}
+                            />
+                            <MediaColumn
+                                title="PM"
+                                items={pm}
+                                onMoveToOther={moveFromPmToAm}
+                                onMoveUp={pmMoveUp}
+                                onMoveDown={pmMoveDown}
+                                onRemove={removeFromPmToMedia}
+                                errors={errors.pm_media}
+                            />
                         </div>
 
                         <div>
