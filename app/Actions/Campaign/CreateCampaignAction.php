@@ -2,6 +2,7 @@
 
 namespace App\Actions\Campaign;
 
+use App\Enums\Schedules;
 use App\Models\Campaign;
 use App\Models\Status;
 use App\Enums\CampaignStatus;
@@ -34,7 +35,7 @@ class CreateCampaignAction
                 foreach ($data['am_media'] as $position => $mediaId) {
                     $campaign->timeLineItems()->create([
                         'media_id' => $mediaId,
-                        'slot' => 'am',
+                        'slot' => Schedules::AM->value,
                         'position' => $position + 1,
                     ]);
                 }
@@ -43,7 +44,7 @@ class CreateCampaignAction
                 foreach ($data['pm_media'] as $position => $mediaId) {
                     $campaign->timeLineItems()->create([
                         'media_id' => $mediaId,
-                        'slot' => 'pm',
+                        'slot' => Schedules::PM->value,
                         'position' => $position + 1,
                     ]);
                 }
