@@ -10,10 +10,12 @@ import { DataTable } from '@/components/DataTable';
 import { Campaign, Props } from '@/types/campaign/index.types';
 import { BreadcrumbItem } from '@/types';
 import { index } from '@/routes/campaign';
+import useToast from '@/hooks/use-toast';
 
-export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] }: Props) {
+export default function CampaignsIndex({ campaigns, filters = {}, statuses = [], flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
+    const { ToastContainer } = useToast(flash);
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Lista de campañas',
@@ -55,6 +57,8 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
     }, [search, status])
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
+            {ToastContainer()}
+
             <div className="space-y-4 px-4 pb-4">
                 <Filter
                     filters={[

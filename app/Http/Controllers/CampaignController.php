@@ -57,7 +57,6 @@ class CampaignController extends Controller
         try {
 
             $createCampaignAction->execute($request->validated());
-            dd($request);
             return to_route('campaign.index')
                 ->with('success', 'Campaña creada correctamente.');
 
