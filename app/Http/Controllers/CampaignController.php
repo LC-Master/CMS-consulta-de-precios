@@ -41,7 +41,11 @@ class CampaignController extends Controller
     public function create()
     {
         return Inertia::render('Campaign/Create', [
-            'media' => Media::select('id', 'name', 'mime_type')->get(),
+            'media' => Media::select('id', 'name', 'mime_type')
+                ->with(['thumbnails' => function ($query) {
+                    $query->select('id', 'media_id');
+                }])
+                ->get(),
             'centers' => Center::select('id', 'code', 'name')->get(),
             'departments' => Department::select('id', 'name')->get(),
             'agreements' => Agreement::select('id', 'name')->get(),

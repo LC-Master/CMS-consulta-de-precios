@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\CampaignCenter;
+use App\Models\TimeLineItem;
 
 class Campaign extends Model
 {
@@ -52,7 +52,9 @@ class Campaign extends Model
             set: fn ($value) => Carbon::parse($value)->format('Y-m-d H:i:s'),
         );
     }
-
+    public function timeLineItems(){
+        return $this->belongsToMany(TimeLineItem::class);
+    }
     public function department()
     {
         return $this->belongsTo(Department::class);

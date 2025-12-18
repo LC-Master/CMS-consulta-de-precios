@@ -22,4 +22,9 @@ class Media extends Model
         'checksum',
         'created_by',
     ];
+
+    public function thumbnails()
+    {
+        return $this->hasOne(Thumbnail::class);
+    }
 }

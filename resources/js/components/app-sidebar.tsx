@@ -18,6 +18,7 @@ import { BookOpen, Folder, LayoutGrid, SquarePlus, List, Handshake } from 'lucid
 import { lazy } from 'react';
 
 const Logo = lazy(() => import('@/components/app-logo'));
+
 const mainNavItems: NavItem[] = [
     {
         title: 'Crear campaña',

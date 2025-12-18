@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Media\StoreMediaAction;
 use App\Http\Requests\Media\StoreMediaRequest;
 use App\Http\Requests\Media\UpdateMediaRequest;
 use App\Models\Media;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -33,39 +33,16 @@ class MediaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreMediaRequest $request)
+    public function store(StoreMediaRequest $request, StoreMediaAction $storeMediaAction)
     {
-        $validated = $request->validated();
-        $files = $request->file('files', []);
-        $metas = [];
+        try {
+            $request->validated();
+            $storeMediaAction->execute($request);
 
-        foreach ($files as $file) {
-            $path = $file->store('uploads', 'public');
-            $checksum = md5_file($file->getRealPath());
-
-            $media = Media::create([
-                'path' => $path,
-                'mime_type' => $file->getClientMimeType(),
-                'size' => $file->getSize(),
-                'checksum' => $checksum,
-                'name' => $file->getClientOriginalName(),
-                'created_by' => Auth::id(),
-            ]);
-
-            $metas[] = [
-                'id' => $media->id,
-                'path' => $path,
-                'url' => Storage::url($path),
-                'mime_type' => $media->mime_type,
-                'size' => $media->size,
-                'checksum' => $media->checksum,
-                'original_name' => $media->original_name,
-                'created_by' => $media->created_by,
-                'created_at' => $media->created_at,
-            ];
+            return session()->flash('success', 'Archivos subidos correctamente.');
+        } catch (\Throwable $e) {
+            return session()->flash('error', 'Error al subir los archivos.');
         }
-
-        return response()->json(['files' => $metas], 201);
     }
 
     /**
@@ -140,5 +117,16 @@ class MediaController extends Controller
 
         return Redirect::route('media.index')
             ->with('success', 'Archivo eliminado correctamente.');
+    }
+
+    public function preview(Media $media)
+    {
+        $path = Storage::disk('public')->path($media->path);
+
+        if (! Storage::disk('public')->exists($media->path)) {
+            abort(404, 'El archivo físico no existe en el servidor.');
+        }
+
+        return response()->file($path);
     }
 }
