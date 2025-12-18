@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { router } from '@inertiajs/react'
-import { Pencil, Trash2 } from 'lucide-react' // Asumiendo Trash2
+import { Pencil, Trash } from 'lucide-react'
 import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Column, DataTable } from '@/components/DataTable';
 import { User, Props } from '@/types/user/index.types';
 import { Filter } from '@/components/Filter';
 import AnchorIcon from '@/components/ui/AnchorIcon';
-import DeleteIcon from '@/components/ui/DeleteIcon'; // Si tienes un componente para borrar
+import DeleteIcon from '@/components/ui/DeleteIcon';
 import { BreadcrumbItem } from '@/types';
 
 export default function UsersIndex({ users, filters = {} }: Props) {
@@ -16,7 +16,7 @@ export default function UsersIndex({ users, filters = {} }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Lista de usuarios',
-            href: '/users',
+            href: '/user',
         },
     ];
 
@@ -45,10 +45,9 @@ export default function UsersIndex({ users, filters = {} }: Props) {
                         url={`/users/${u.id}/edit`}
                         icon={Pencil}
                     />
-                    {/* Asumiendo que tienes un DeleteIcon o lógica similar */}
                     <DeleteIcon 
                          url={`/users/${u.id}`} 
-                         icon={Trash2} 
+                         icon={Trash} 
                     />
                 </div>
             ),
