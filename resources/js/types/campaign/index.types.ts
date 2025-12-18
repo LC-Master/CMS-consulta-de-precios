@@ -9,6 +9,10 @@ export type Agreement = Department;
 
 export interface MediaItem extends Pick<Department, 'id' | 'name'> {
     mime_type: 'image/jpeg' | 'video/mp4';
+    thumbnails?: {
+        id: string;
+        media_id: string;
+    } | null;
 }
 
 export interface Option {

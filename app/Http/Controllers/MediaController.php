@@ -6,7 +6,6 @@ use App\Actions\Media\StoreMediaAction;
 use App\Http\Requests\Media\StoreMediaRequest;
 use App\Http\Requests\Media\UpdateMediaRequest;
 use App\Models\Media;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -34,15 +33,15 @@ class MediaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreMediaRequest $request, StoreMediaAction $storeMediaAction): JsonResponse
+    public function store(StoreMediaRequest $request, StoreMediaAction $storeMediaAction)
     {
         try {
             $request->validated();
             $storeMediaAction->execute($request);
 
-            return response()->json(['message' => 'Archivos subidos correctamente.'], 201);
+            return session()->flash('success', 'Archivos subidos correctamente.');
         } catch (\Throwable $e) {
-            return response()->json(['message' => 'Error al subir los archivos.', 'error' => $e->getMessage()], 500);
+            return session()->flash('error', 'Error al subir los archivos.');
         }
     }
 
@@ -118,5 +117,16 @@ class MediaController extends Controller
 
         return Redirect::route('media.index')
             ->with('success', 'Archivo eliminado correctamente.');
+    }
+
+    public function preview(Media $media)
+    {
+        $path = Storage::disk('public')->path($media->path);
+
+        if (! Storage::disk('public')->exists($media->path)) {
+            abort(404, 'El archivo físico no existe en el servidor.');
+        }
+
+        return response()->file($path);
     }
 }

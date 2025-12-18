@@ -172,11 +172,12 @@ export default function UploadMediaModal({ closeModal, success }: { closeModal: 
 
         post('/media/upload', {
             forceFormData: true,
-            onSuccess: () => {
+            onSuccess: (page) => {
+                console.log(page.props,'buenas')
                 clearFiles()
                 closeModal()
-                setReadyToSubmit(false)
                 if (success) success()
+                setReadyToSubmit(false)
             },
             onError: () => {
                 setReadyToSubmit(false)

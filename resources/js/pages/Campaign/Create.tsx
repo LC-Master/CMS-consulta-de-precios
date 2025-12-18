@@ -6,14 +6,152 @@ import Select from 'react-select'
 import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import React, { useState } from 'react'
+import React, { useState, ChangeEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import useModal from '@/hooks/use-modal'
 import { CampaignCreateProps } from '@/types/campaign/page.type'
 import UploadMediaModal from '@/components/modals/UploadMediaModal'
+import useToast from '@/hooks/use-toast'
+import { useMediaSync } from '@/hooks/use-mediasync'
 
-export default function CampaignCreate({ centers, departments, agreements, media }: CampaignCreateProps) {
+type MediaColumnProps = {
+    title: string
+    items: MediaItem[]
+    onMoveToOther: (item: MediaItem) => void
+    onMoveUp: (id: MediaItem['id']) => void
+    onMoveDown: (id: MediaItem['id']) => void
+    onRemove: (item: MediaItem) => void
+}
+
+function MediaItemCard({ item, controls }: { item: MediaItem; controls: React.ReactNode }) {
+    return (
+        <div className="p-3 mb-2 border rounded-md flex items-center justify-between gap-4 bg-white shadow-sm">
+            <div className="flex items-center gap-4 min-w-0">
+                {item.mime_type.startsWith('image/') ? (
+                    <img
+                        src={`/media/cdn/${item.id}`}
+                        alt={item.name}
+                        className="w-24 h-14 object-cover rounded-md shrink-0" loading='lazy'
+                    />
+                ) : item.thumbnails ? (
+                    <img
+                        src={`/thumbnail/cdn/${item.thumbnails.id}`}
+                        alt={`Thumbnail ${item.name}`}
+                        className="w-24 h-14 object-cover rounded-md shrink-0" loading='lazy'
+                    />
+                ) : (
+                    <div className="w-24 h-14 bg-gray-100 rounded-md flex items-center justify-center text-xs text-gray-500 shrink-0">
+                        Sin vista previa
+                    </div>
+                )}
+
+                <div className="min-w-0">
+                    <p className="font-medium text-sm text-gray-800 truncate">{item.name}</p>
+                    <p className="text-xs text-gray-500 mt-1">{item.mime_type}</p>
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+                {controls}
+            </div>
+        </div>
+    )
+}
+
+function MediaColumn({ title, items, onMoveToOther, onMoveUp, onMoveDown, onRemove }: MediaColumnProps) {
+    return (
+        <div className="w-1/2">
+            <Label>{title}</Label>
+            <div className="h-60 max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
+                {items.map((item) => (
+                    <MediaItemCard
+                        key={item.id}
+                        item={item}
+                        controls={
+                            <>
+                                <Button type="button" onClick={(e) => { e.preventDefault(); onMoveToOther(item) }}>
+                                    {title === 'AM' ? 'PM' : 'AM'}
+                                </Button>
+                                <Button type="button" onClick={(e) => { e.preventDefault(); onMoveUp(item.id) }}>↑</Button>
+                                <Button type="button" onClick={(e) => { e.preventDefault(); onMoveDown(item.id) }}>↓</Button>
+                                <Button type="button" onClick={(e) => { e.preventDefault(); onRemove(item) }}>Eliminar</Button>
+                            </>
+                        }
+                    />
+                ))}
+            </div>
+        </div>
+    )
+}
+
+
+type MediaListProps = {
+    mediaList: MediaItem[]
+    onMoveToAm: (item: MediaItem) => void
+    onMoveToPm: (item: MediaItem) => void
+    value: string
+    onSearch: (e: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+function MediaList({ value, onSearch, mediaList, onMoveToAm, onMoveToPm }: MediaListProps) {
+    return (
+        <div>
+            <Label htmlFor='media'>Contenido multimedia</Label>
+            <Input
+                id="media-search"
+                name="media_search"
+                type="search"
+                value={value}
+                placeholder="Buscar multimedia..."
+                className="mb-2 mt-2"
+                onChange={onSearch}
+                aria-label="Buscar multimedia"
+                aria-describedby="media-search-help"
+                aria-controls="media"
+                autoComplete="off"
+            />
+            <div id='media' className="min-h-40 max-h-60 overflow-y-auto border-2 border-gray-300 rounded-sm p-2">
+                {mediaList.length !== 0 ? mediaList.map((item) => (
+                    <MediaItemCard
+                        key={item.id}
+                        item={item}
+                        controls={
+                            <>
+                                <Button
+                                    type="button"
+                                    className="px-3 py-1 text-sm"
+                                    onClick={(e) => { e.preventDefault(); onMoveToAm(item) }}
+                                    aria-label={`Mover ${item.name} a AM`}
+                                >
+                                    AM
+                                </Button>
+
+                                <Button
+                                    type="button"
+                                    className="px-3 py-1 text-sm"
+                                    onClick={(e) => { e.preventDefault(); onMoveToPm(item) }}
+                                    aria-label={`Mover ${item.name} a PM`}
+                                >
+                                    PM
+                                </Button>
+                            </>
+                        }
+                    />
+                )) : <div className="flex items-center justify-center h-30 text-center text-gray-500">
+                    No hay elementos multimedia disponibles.
+                </div>}
+            </div>
+        </div>
+    )
+}
+
+export default function CampaignCreate({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
     const { isOpen, openModal, closeModal } = useModal(false)
+    const [search, setSearch] = useState<string>('')
+    const handlerSearch = (e: ChangeEvent<HTMLInputElement>) => {
+        setSearch(e.target.value)
+        setMediaList(media?.filter(item => item.name.toLowerCase().includes(e.target.value.toLowerCase())) || [])
+    }
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Crear campaña',
@@ -27,18 +165,20 @@ export default function CampaignCreate({ centers, departments, agreements, media
             }
         )
     }
-    console.log(media)
-    const [pm, setPm] = useState<MediaItem[]>([])
-    const [am, setAm] = useState<MediaItem[]>([])
-    const [mediaList, setMediaList] = useState<MediaItem[]>(() => (media ? [...media] : []))
-
-    const { data, setData, processing, errors, post } = useForm({
+    const {
+        mediaList, setMediaList,
+        pm, setPm,
+        am, setAm
+    } = useMediaSync(media);
+    const { data, setData, processing, errors, post, transform } = useForm({
         title: '',
         start_at: '',
         end_at: '',
         centers: [] as string[],
         department_id: '',
         agreement_id: '',
+        am_media: [] as string[],
+        pm_media: [] as string[],
     })
     const optionsCenter: Option[] = centers.map((center: Center) => {
         return { value: center.id, label: center.name + " - " + center.code }
@@ -51,15 +191,88 @@ export default function CampaignCreate({ centers, departments, agreements, media
     })
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        post('/campaign')
+        transform(data => ({
+            ...data,
+            am_media: am.map(item => item.id),
+            pm_media: pm.map(item => item.id),
+        }))
+        post('/campaign', { preserveScroll: true, forceFormData: true })
     }
+    const moveFromAmToPm = (item: MediaItem) => {
+        setPm(prev => [...prev, item])
+        setAm(prev => prev.filter(m => m.id !== item.id))
+    }
+    const amMoveUp = (id: MediaItem['id']) => {
+        const index = am.findIndex(m => m.id === id)
+        if (index > 0) {
+            const newAm = [...am]
+            const temp = newAm[index - 1]
+            newAm[index - 1] = newAm[index]
+            newAm[index] = temp
+            setAm(newAm)
+        }
+    }
+    const amMoveDown = (id: MediaItem['id']) => {
+        const index = am.findIndex(m => m.id === id)
+        if (index < am.length - 1 && index >= 0) {
+            const newAm = [...am]
+            const temp = newAm[index + 1]
+            newAm[index + 1] = newAm[index]
+            newAm[index] = temp
+            setAm(newAm)
+        }
+    }
+    const removeFromAmToMedia = (item: MediaItem) => {
+        setMediaList(prev => [...prev, item])
+        setAm(prev => prev.filter(m => m.id !== item.id))
+    }
+    const moveFromPmToAm = (item: MediaItem) => {
+        setAm(prev => [...prev, item])
+        setPm(prev => prev.filter(m => m.id !== item.id))
+    }
+    const pmMoveUp = (id: MediaItem['id']) => {
+        const index = pm.findIndex(m => m.id === id)
+        if (index > 0) {
+            const newPm = [...pm]
+            const temp = newPm[index - 1]
+            newPm[index - 1] = newPm[index]
+            newPm[index] = temp
+            setPm(newPm)
+        }
+    }
+    const pmMoveDown = (id: MediaItem['id']) => {
+        const index = pm.findIndex(m => m.id === id)
+        if (index < pm.length - 1 && index >= 0) {
+            const newPm = [...pm]
+            const temp = newPm[index + 1]
+            newPm[index + 1] = newPm[index]
+            newPm[index] = temp
+            setPm(newPm)
+        }
+    }
+    const removeFromPmToMedia = (item: MediaItem) => {
+        setMediaList(prev => [...prev, item])
+        setPm(prev => prev.filter(m => m.id !== item.id))
+    }
+
+    const moveMediaToAm = (item: MediaItem) => {
+        setAm(prev => [...prev, item])
+        setMediaList(prev => prev.filter(m => m.id !== item.id))
+    }
+    const moveMediaToPm = (item: MediaItem) => {
+        setPm(prev => [...prev, item])
+        setMediaList(prev => prev.filter(m => m.id !== item.id))
+    }
+
+    const ToastComponent = useToast(flash)
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
+            {ToastComponent.ToastContainer()}
             <div className="p-6 space-y-6">
                 <form id="form" method="post" onSubmit={handleSubmit} className="space-y-4" action="/campaigns" noValidate>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título</label>
+                            <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título. *</label>
                             <Input
                                 type="text"
                                 id="title"
@@ -77,7 +290,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                         </div>
 
                         <div>
-                            <label htmlFor="department_id" className="block text-sm font-medium text-gray-700">Departamento</label>
+                            <label htmlFor="department_id" className="block text-sm font-medium text-gray-700">Departamento. *</label>
                             <Select<Option, false>
                                 options={optionsDepartment}
                                 inputId="department_id"
@@ -98,7 +311,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="start_at" className="block text-sm font-medium text-gray-700">Fecha y hora (inicio)</label>
+                            <label htmlFor="start_at" className="block text-sm font-medium text-gray-700">Fecha y hora (inicio). *</label>
                             <Input
                                 type="datetime-local"
                                 id="start_at"
@@ -114,7 +327,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                         </div>
 
                         <div>
-                            <label htmlFor="end_at" className="block text-sm font-medium text-gray-700">Fecha y hora (fin)</label>
+                            <label htmlFor="end_at" className="block text-sm font-medium text-gray-700">Fecha y hora (fin). *</label>
                             <Input
                                 type="datetime-local"
                                 id="end_at"
@@ -131,7 +344,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                     </div>
 
                     <div>
-                        <label htmlFor="centers" className="block text-sm font-medium text-gray-700">Centros</label>
+                        <label htmlFor="centers" className="block text-sm font-medium text-gray-700">Centros. *</label>
                         <Select<Option, true>
                             options={optionsCenter}
                             inputId="centers"
@@ -157,7 +370,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             inputId="agreement_id"
                             value={optionsAgreement.find(o => o.value === data.agreement_id) || null}
                             name="agreement_id"
-                            className="mt-1 rounded-md"
+                            className="mt-1 border rounded-lg"
                             classNamePrefix="react-select"
                             onChange={(val) => setData('agreement_id', (val as Option | null)?.value ?? '')}
                             placeholder="Selecciona un acuerdo"
@@ -170,145 +383,45 @@ export default function CampaignCreate({ centers, departments, agreements, media
                     </div>
 
                     <div className='flex flex-row justify-between items-center'>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Multimedia</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Multimedia. *</label>
                         <Button type='button' onClick={openModal}>Agregar Multimedia</Button>
                         {isOpen && <UploadMediaModal closeModal={closeModal} success={handleSuccess} />}
-
                     </div>
+
                     <div>
                         <div className="flex w-full gap-4 mb-4">
-                            <div className="w-1/2">
-                                <Label htmlFor='am'>AM</Label>
-                                <div className="h-60 max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
-                                    {am.map((item: MediaItem) => {
-                                        return (
-                                            <div key={item.id} className="p-2 border flex flex-row gap-2 justify-between rounded mb-2">
-                                                <div>
-                                                    <p><strong>Nombre:</strong> {item.name}</p>
-                                                    <p><strong>Tipo:</strong> {item.mime_type}</p>
-                                                </div>
-                                                <div className="mt-2 flex items-center gap-2">
-                                                    <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                        e.preventDefault()
-                                                        setPm([...pm, item])
-                                                        setAm(am.filter(m => m.id !== item.id))
-                                                    }}>
-                                                        PM
-                                                    </Button>
-                                                    <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                        e.preventDefault()
-                                                        const index = am.findIndex(m => m.id === item.id)
-                                                        if (index > 0) {
-                                                            const newAm = [...am]
-                                                            const temp = newAm[index - 1]
-                                                            newAm[index - 1] = newAm[index]
-                                                            newAm[index] = temp
-                                                            setAm(newAm)
-                                                        }
-                                                    }}>
-                                                        ↑
-                                                    </Button>
-                                                    <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                        e.preventDefault()
-                                                        const index = am.findIndex(m => m.id === item.id)
-                                                        if (index < am.length - 1) {
-                                                            const newAm = [...am]
-                                                            const temp = newAm[index + 1]
-                                                            newAm[index + 1] = newAm[index]
-                                                            newAm[index] = temp
-                                                            setAm(newAm)
-                                                        }
-                                                    }}>
-                                                        ↓
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
-                                </div>
+                            <div>
+                                <MediaColumn
+                                    title="AM"
+                                    items={am}
+                                    onMoveToOther={moveFromAmToPm}
+                                    onMoveUp={amMoveUp}
+                                    onMoveDown={amMoveDown}
+                                    onRemove={removeFromAmToMedia}
+                                />
+                                {errors.am_media && <p className="text-red-500 text-sm mt-1">{errors.am_media}</p>}
                             </div>
-
-                            <div className="w-1/2">
-                                <Label htmlFor='pm'>PM</Label>
-                                <div className="h-60 max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
-                                    {pm.map((item: MediaItem) => {
-                                        return (
-                                            <div key={item.id} className="p-2 border flex flex-row gap-2 justify-between rounded mb-2">
-                                                <div>
-                                                    <p><strong>Nombre:</strong> {item.name}</p>
-                                                    <p><strong>Tipo:</strong> {item.mime_type}</p>
-                                                </div>
-                                                <div className="mt-2 flex items-center gap-2">
-                                                    <Button type='button' onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-                                                        e.preventDefault()
-                                                        setAm([...am, item])
-                                                        setPm(pm.filter(m => m.id !== item.id))
-                                                    }}>
-                                                        AM
-                                                    </Button>
-                                                    <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                        e.preventDefault()
-                                                        const index = pm.findIndex(m => m.id === item.id)
-                                                        if (index > 0) {
-                                                            const newPm = [...pm]
-                                                            const temp = newPm[index - 1]
-                                                            newPm[index - 1] = newPm[index]
-                                                            newPm[index] = temp
-                                                            setPm(newPm)
-                                                        }
-                                                    }}>
-                                                        ↑
-                                                    </Button>
-                                                    <Button type="button" onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                        e.preventDefault()
-                                                        const index = pm.findIndex(m => m.id === item.id)
-                                                        if (index < pm.length - 1) {
-                                                            const newPm = [...pm]
-                                                            const temp = newPm[index + 1]
-                                                            newPm[index + 1] = newPm[index]
-                                                            newPm[index] = temp
-                                                            setPm(newPm)
-                                                        }
-                                                    }}>
-                                                        ↓
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
-                                </div>
+                            <div>
+                                <MediaColumn
+                                    title="PM"
+                                    items={pm}
+                                    onMoveToOther={moveFromPmToAm}
+                                    onMoveUp={pmMoveUp}
+                                    onMoveDown={pmMoveDown}
+                                    onRemove={removeFromPmToMedia}
+                                />
+                                {errors.pm_media && <p className="text-red-500 text-sm mt-1">{errors.pm_media}</p>}
                             </div>
                         </div>
+
                         <div>
-                            <Label htmlFor='media'>Media content</Label>
-                            <div id='media' className="max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
-                                {mediaList.map((item: MediaItem) => {
-                                    return (
-                                        <div key={item.id} className="p-2 border flex flex-row gap-2 justify-between  rounded mb-2">
-                                            <div>
-                                                <p><strong>Nombre:</strong> {item.name}</p>
-                                                <p><strong>Tipo:</strong> {item.mime_type}</p>
-                                            </div>
-                                            <div className="mt-2 flex gap-2">
-                                                <Button type='button' onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-                                                    e.preventDefault()
-                                                    setAm([...am, item])
-                                                    setMediaList(mediaList.filter(m => m.id !== item.id))
-                                                }}>
-                                                    AM
-                                                </Button>
-                                                <Button type='button' onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-                                                    e.preventDefault()
-                                                    setPm([...pm, item])
-                                                    setMediaList(mediaList.filter(m => m.id !== item.id))
-                                                }}>
-                                                    PM
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    )
-                                })}
-                            </div>
+                            <MediaList
+                                value={search}
+                                onSearch={handlerSearch}
+                                mediaList={mediaList}
+                                onMoveToAm={moveMediaToAm}
+                                onMoveToPm={moveMediaToPm}
+                            />
                         </div>
                     </div>
                 </form>

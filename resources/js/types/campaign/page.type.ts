@@ -1,3 +1,9 @@
-import { Center, Department, Agreement, MediaItem } from "./index.types";
+import { Agreement, Center, Department, MediaItem } from './index.types';
 
-export type CampaignCreateProps = { centers: Center[], departments: Department[], agreements: Agreement[], media: MediaItem[]}
+export type CampaignCreateProps = {
+    centers: Center[];
+    departments: Department[];
+    agreements: Agreement[];
+    media: MediaItem[];
+    flash: { success?: string; error?: string };
+};
