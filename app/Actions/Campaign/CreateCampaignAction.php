@@ -30,6 +30,25 @@ class CreateCampaignAction
             if (! empty($data['centers'])) {
                 $campaign->centers()->attach($data['centers']);
             }
+            if (! empty($data['am_media'])){
+                foreach ($data['am_media'] as $position => $mediaId) {
+                    $campaign->timeLineItems()->create([
+                        'media_id' => $mediaId,
+                        'slot' => 'am',
+                        'position' => $position + 1,
+                    ]);
+                }
+            }
+            if (! empty($data['pm_media'])){
+                foreach ($data['pm_media'] as $position => $mediaId) {
+                    $campaign->timeLineItems()->create([
+                        'media_id' => $mediaId,
+                        'slot' => 'pm',
+                        'position' => $position + 1,
+                    ]);
+                }
+            }
+
 
             return $campaign;
         });
