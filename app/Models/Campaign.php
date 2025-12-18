@@ -53,7 +53,7 @@ class Campaign extends Model
         );
     }
     public function timeLineItems(){
-        return $this->belongsToMany(TimeLineItem::class);
+        return $this->hasMany(TimeLineItem::class);
     }
     public function department()
     {

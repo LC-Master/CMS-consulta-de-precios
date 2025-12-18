@@ -69,6 +69,7 @@ export interface Campaign {
 }
 
 export interface Props {
+    flash?: { success?: string; error?: string };
     campaigns: { data: Campaign[] };
     filters: { search?: string; status?: string };
     statuses: Status[];

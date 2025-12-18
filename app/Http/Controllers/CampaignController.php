@@ -24,7 +24,7 @@ class CampaignController extends Controller
         $query = Campaign::with(['status', 'department', 'agreement']);
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%'.$request->search.'%');
+            $query->where('title', 'like', '%' . $request->search . '%');
         }
 
         if ($request->filled('status')) {
@@ -32,9 +32,9 @@ class CampaignController extends Controller
         }
 
         return Inertia::render('Campaign/Index', [
-            'campaigns' => Inertia::scroll(fn () => $query->latest()->paginate()),
+            'campaigns' => Inertia::scroll(fn() => $query->latest()->paginate()),
             'filters' => $request->only(['search', 'status']),
-            'statuses' => fn () => Status::all(),
+            'statuses' => fn() => Status::all(),
         ]);
     }
 
@@ -42,9 +42,11 @@ class CampaignController extends Controller
     {
         return Inertia::render('Campaign/Create', [
             'media' => Media::select('id', 'name', 'mime_type')
-                ->with(['thumbnails' => function ($query) {
-                    $query->select('id', 'media_id');
-                }])
+                ->with([
+                    'thumbnails' => function ($query) {
+                        $query->select('id', 'media_id');
+                    }
+                ])
                 ->get(),
             'centers' => Center::select('id', 'code', 'name')->get(),
             'departments' => Department::select('id', 'name')->get(),
@@ -57,12 +59,11 @@ class CampaignController extends Controller
         try {
 
             $createCampaignAction->execute($request->validated());
-            dd($request);
             return to_route('campaign.index')
                 ->with('success', 'Campaña creada correctamente.');
 
         } catch (\Throwable $e) {
-            Log::error('Error creating campaign: '.$e->getMessage(), ['user_id' => Auth::id()]);
+            Log::error('Error creating campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
             return back()
                 ->withInput()
@@ -105,5 +106,22 @@ class CampaignController extends Controller
 
         return to_route('campaign.index')
             ->with('success', 'Campaña eliminada.');
+    }
+    public function activate(Campaign $campaign)
+    {
+        try {
+            $activeStatus = Status::where('status', 'Activa')->first();
+            $campaign->status_id = $activeStatus->id;
+            $campaign->save();
+
+            return to_route('campaign.index')
+                ->with('success', 'Campaña activada correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error activating campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error inesperado al activar la campaña. Por favor, intente nuevamente.');
+        }
     }
 }

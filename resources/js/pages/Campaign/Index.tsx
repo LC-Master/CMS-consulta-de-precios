@@ -10,10 +10,14 @@ import { DataTable } from '@/components/DataTable';
 import { Campaign, Props } from '@/types/campaign/index.types';
 import { BreadcrumbItem } from '@/types';
 import { index } from '@/routes/campaign';
+import useToast from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Check } from 'lucide-react'
 
-export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] }: Props) {
+export default function CampaignsIndex({ campaigns, filters = {}, statuses = [], flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
+    const { ToastContainer } = useToast(flash);
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Lista de campañas',
@@ -41,7 +45,14 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
             header: 'Acciones',
             render: (a) => (
                 <div className="flex gap-2">
-                    <AnchorIcon url={`/campaign/${a.id}`} icon={Eye} />
+                    {
+                        a.status.status !== 'Activa' && (
+                            <Button title='Activar campaña' className='p-2 bg-locatel-claro h-8 text-white rounded-md'>
+                                <Check className='w-4 h-4' />
+                            </Button>
+                        )
+                    }
+                    <AnchorIcon title="Ver campaña" href={`/campaign/${a.id}`} icon={Eye} />
                 </div>
             ),
         },
@@ -55,6 +66,8 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
     }, [search, status])
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
+            {ToastContainer()}
+
             <div className="space-y-4 px-4 pb-4">
                 <Filter
                     filters={[
