@@ -11,6 +11,8 @@ import { Campaign, Props } from '@/types/campaign/index.types';
 import { BreadcrumbItem } from '@/types';
 import { index } from '@/routes/campaign';
 import useToast from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Check } from 'lucide-react'
 
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [], flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
@@ -43,7 +45,14 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
             header: 'Acciones',
             render: (a) => (
                 <div className="flex gap-2">
-                    <AnchorIcon url={`/campaign/${a.id}`} icon={Eye} />
+                    {
+                        a.status.status !== 'Activa' && (
+                            <Button title='Activar campaña' className='p-2 bg-locatel-claro h-8 text-white rounded-md'>
+                                <Check className='w-4 h-4' />
+                            </Button>
+                        )
+                    }
+                    <AnchorIcon title="Ver campaña" href={`/campaign/${a.id}`} icon={Eye} />
                 </div>
             ),
         },
