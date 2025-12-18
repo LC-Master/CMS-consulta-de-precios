@@ -14,7 +14,7 @@ import { dashboard, } from '@/routes';
 import { index, create } from '@/routes/campaign';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, SquarePlus, List, Handshake } from 'lucide-react';
+import { Users, Folder, LayoutGrid, SquarePlus, List, Handshake } from 'lucide-react';
 import { lazy } from 'react';
 
 const Logo = lazy(() => import('@/components/app-logo'));
@@ -55,9 +55,9 @@ const footerNavItems: NavItem[] = [
         icon: Folder,
     },
     {
-        title: 'Documentación',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'Usuarios',
+        href: '/user',
+        icon: Users,
     },
 ];
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { router } from '@inertiajs/react'
-import { Pencil, Trash } from 'lucide-react'
+import { router, Link } from '@inertiajs/react' // 1. Importar Link
+import { Pencil, Trash, Plus } from 'lucide-react' // 2. Importar Plus
 import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Column, DataTable } from '@/components/DataTable';
@@ -42,11 +42,11 @@ export default function UsersIndex({ users, filters = {} }: Props) {
             render: (u) => (
                 <div className="flex gap-2">
                     <AnchorIcon
-                        url={`/users/${u.id}/edit`}
+                        href={`/user/${u.id}/edit`}
                         icon={Pencil}
                     />
                     <DeleteIcon 
-                         url={`/users/${u.id}`} 
+                         url={`/user/${u.id}`} 
                          icon={Trash} 
                     />
                 </div>
@@ -65,17 +65,34 @@ export default function UsersIndex({ users, filters = {} }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="space-y-4 px-4 pb-4">
-                <Filter
-                    filters={[
-                        {
-                            type: 'search',
-                            key: 'search',
-                            value: search,
-                            placeholder: 'Buscar por nombre o email...',
-                            onChange: setSearch,
-                        },
-                    ]}
-                />
+                
+                {/* 3. Contenedor Flex para alinear Filtro y Botón */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    
+                    {/* El Filtro ocupa el espacio disponible */}
+                    <div className="w-full sm:flex-1">
+                        <Filter
+                            filters={[
+                                {
+                                    type: 'search',
+                                    key: 'search',
+                                    value: search,
+                                    placeholder: 'Buscar por nombre o email...',
+                                    onChange: setSearch,
+                                },
+                            ]}
+                        />
+                    </div>
+
+                    {/* Botón de Agregar Usuario */}
+                    <Link
+                        href="/user/create"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-locatel-medio text-white rounded-md hover:brightness-95 transition-all shadow-sm font-medium text-sm whitespace-nowrap"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Agregar usuario
+                    </Link>
+                </div>
 
                 <DataTable
                     data={users.data}

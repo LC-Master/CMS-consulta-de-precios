@@ -1,35 +1,40 @@
 import AppLayout from '@/layouts/app-layout'
 import { BreadcrumbItem } from '@/types'
 import { useForm } from '@inertiajs/react'
+import { User } from '@/types/user/index.types'
 
-export default function UserCreate() {
+interface Props {
+    user: User;
+}
+
+export default function UserEdit({ user }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Crear usuario',
-            href: '/user/create', 
+            title: 'Usuarios',
+            href: '/user', 
+        },
+        {
+            title: 'Editar usuario',
+            href: `/user/${user.id}/edit`, 
         },
     ];
 
-    const { data, setData, processing, errors, post } = useForm({
-        name: '',
-        email: '',
+    const { data, setData, processing, errors, put } = useForm({
+        name: user.name,
+        email: user.email,
         password: '',
         password_confirmation: '',
     })
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        post('/user') 
+        put(`/user/${user.id}`) 
     }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="p-6 space-y-6">
-                <form id="form" onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
-                    {/* HACK: Inputs ocultos para engañar al navegador */}
-                    <input type="text" style={{display: 'none'}} />
-                    <input type="password" style={{display: 'none'}} />
-
+                <form id="form" onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Nombre */}
                         <div>
@@ -39,8 +44,6 @@ export default function UserCreate() {
                                 id="name"
                                 value={data.name}
                                 required
-                                placeholder='Nombre completo'
-                                autoComplete="off" // Simple off suele funcionar para nombres
                                 onChange={e => setData('name', e.target.value)}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                             />
@@ -55,12 +58,6 @@ export default function UserCreate() {
                                 id="email"
                                 value={data.email}
                                 required
-                                placeholder='ejemplo@correo.com'
-                                // CAMBIO 1: Usamos un valor no estándar o 'off' + readonly hack
-                                autoComplete="new-email" 
-                                name="new-email-field" // Cambiar el name a veces ayuda
-                                readOnly={true} // Inicia como readonly
-                                onFocus={(e) => e.target.readOnly = false} // Se activa al hacer click
                                 onChange={e => setData('email', e.target.value)}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                             />
@@ -69,20 +66,16 @@ export default function UserCreate() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Contraseña */}
+                        {/* Contraseña (Opcional) */}
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Contraseña</label>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                Contraseña <span className="text-gray-400 font-normal">(Dejar en blanco para mantener)</span>
+                            </label>
                             <input
                                 type="password"
                                 id="password"
-                                // CAMBIO 2: new-password es el estándar para creación
-                                autoComplete="new-password"
-                                name="new-password-field"
                                 value={data.password}
-                                required
                                 placeholder='********'
-                                readOnly={true} // Hack readonly
-                                onFocus={(e) => e.target.readOnly = false}
                                 onChange={e => setData('password', e.target.value)}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                             />
@@ -95,9 +88,7 @@ export default function UserCreate() {
                             <input
                                 type="password"
                                 id="password_confirmation"
-                                autoComplete="new-password"
                                 value={data.password_confirmation}
-                                required
                                 placeholder='********'
                                 onChange={e => setData('password_confirmation', e.target.value)}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
@@ -106,7 +97,6 @@ export default function UserCreate() {
                     </div>
                 </form>
 
-                {/* Botones... */}
                 <div className="flex flex-wrap justify-center gap-3">
                     <button
                         form="form"
@@ -114,7 +104,7 @@ export default function UserCreate() {
                         className="bg-locatel-medio text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
                         disabled={processing}
                     >
-                        Guardar
+                        Actualizar
                     </button>
 
                     <button
