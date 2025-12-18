@@ -180,6 +180,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
         am_media: [] as string[],
         pm_media: [] as string[],
     })
+    console.log(errors)
     const optionsCenter: Option[] = centers.map((center: Center) => {
         return { value: center.id, label: center.name + " - " + center.code }
     })
@@ -401,7 +402,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                 />
                                 {errors.am_media && <p className="text-red-500 text-sm mt-1">{errors.am_media}</p>}
                             </div>
-                            <div  className='w-1/2'>
+                            <div className='w-1/2'>
                                 <MediaColumn
                                     title="PM"
                                     items={pm}
