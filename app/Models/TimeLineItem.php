@@ -14,6 +14,7 @@ class TimeLineItem extends Model
     protected $fillable = [
         'campaign_id',
         'media_id',
-        'scheduled_at',
+        'slot',
+        'position',
     ];
 }
