@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Campaign\CreateCampaignAction;
+use App\Enums\CampaignStatus;
 use App\Http\Requests\Campaigns\StoreCampaignRequest;
 use App\Http\Requests\Campaigns\UpdateCampaignRequest;
 use App\Models\Agreement;
@@ -127,7 +128,7 @@ class CampaignController extends Controller
     public function finish(Campaign $campaign)
     {
         try {
-            $finishedStatus = Status::where('status', 'Finalizada')->first();
+            $finishedStatus = Status::where('status', CampaignStatus::FINISHED->value)->first();
             $campaign->status_id = $finishedStatus->id;
             $campaign->save();
 

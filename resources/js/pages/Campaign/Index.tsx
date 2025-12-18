@@ -49,25 +49,26 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
             render: (a) => (
                 <>
                     {isOpen && (<Modal className='w-90 bg-white p-6 ' closeModal={closeModal}>
-                            <h2 className="text-lg font-semibold mb-4">Confirmar finalización de campaña</h2>
-                            <p className="mb-6">¿Estás seguro de que deseas finalizar esta campaña? Esta acción no se puede deshacer.</p>
-                            <div className="flex justify-end w- gap-4">
-                                <Button className='bg-locatel-oscuro text-white hover:bg-green-800' onClick={closeModal}>Cancelar</Button>
-                                <Button
-                                    className="bg-red-600 text-white hover:bg-red-700"
-                                    onClick={() => {
-                                        router.get(`/campaign/finish/${a.id}`, {}, {
-                                            onSuccess: () => {
-                                                router.reload({ only: ['campaigns', 'flash'] });
-                                                closeModal();
-                                            },
-                                            preserveScroll: true
-                                        });
-                                    }}
-                                >
-                                    Finalizar campaña
-                                </Button>
-                            </div>
+                        <h2 className="text-lg font-semibold mb-4">Confirmar finalización de campaña</h2>
+                        <p className="mb-6">¿Estás seguro de que deseas finalizar esta campaña? Esta acción no se puede deshacer.</p>
+                        <div className="flex justify-end w- gap-4">
+                            <Button className='bg-locatel-oscuro text-white hover:bg-green-800' onClick={closeModal}>Cancelar</Button>
+                            <Button
+                                className="bg-red-600 text-white hover:bg-red-700"
+                                onClick={() => {
+                                    router.get(`/campaign/finish/${a.id}`, {
+                                        only: ['campaigns', 'flash'],
+                                        preserveScroll: true,
+                                    }, {
+                                        onSuccess: () => {
+                                            closeModal()
+                                        }
+                                    });
+                                }}
+                            >
+                                Finalizar campaña
+                            </Button>
+                        </div>
                     </Modal>)}
                     <div className="flex gap-2">
                         {a.status.status === 'Borrador' ? (
