@@ -5,6 +5,7 @@ use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ThumbnailController;
 use App\Http\Controllers\TimeLineController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -25,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('campaign', CampaignController::class);
     Route::resource('timeline', TimeLineController::class);
     Route::resource('agreement', AgreementController::class);
+    Route::resource('user', UserController::class);
     Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
     Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
 });
