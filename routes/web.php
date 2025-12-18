@@ -19,7 +19,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
-    Route::get('/campaign/active/{campaign}',[CampaignController::class]);
+    Route::get('/campaign/activate/{campaign}',[CampaignController::class, 'activate'])->name('campaign.activate');
+    Route::get('/campaign/finish/{campaign}',[CampaignController::class, 'finish'])->name('campaign.finish');
     Route::get('/media/cdn/{media}', [MediaController::class, 'preview']);
     Route::resource('campaign', CampaignController::class);
     Route::resource('timeline', TimeLineController::class);

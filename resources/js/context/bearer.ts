@@ -1,7 +1,7 @@
 import {create} from "zustand";
 
 interface BearerState {
-    sidebarOpen: boolean;
+    bears: number;
     increasePopulation: () => void;
     removeAllBears: () => void;
     updateBears: (newBears: number) => void;
@@ -9,8 +9,8 @@ interface BearerState {
 
 
 export const useBear = create<BearerState>((set) => ({
-  sidebarOpen: await cookieStore.get('sidebar_state') === 'true' || !await cookieStore.get('sidebar_state') ? true : false,
-  increasePopulation: () => set((state) => ({ sidebarOpen: state.sidebarOpen + 1 })),
-  removeAllBears: () => set({ sidebarOpen: 0 }),
-  updateBears: (newBears) => set({ sidebarOpen: newBears }),
-})
+  bears: 0,
+  increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
+  removeAllBears: () => set({ bears: 0 }),
+  updateBears: (newBears) => set({ bears: newBears }),
+}))

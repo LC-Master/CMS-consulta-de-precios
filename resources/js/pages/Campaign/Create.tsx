@@ -1,5 +1,4 @@
 import AppLayout from '@/layouts/app-layout'
-import { index } from '@/routes/campaign'
 import { BreadcrumbItem } from '@/types'
 import { useForm, router } from '@inertiajs/react'
 import Select from 'react-select'
@@ -13,6 +12,7 @@ import { CampaignCreateProps } from '@/types/campaign/page.type'
 import UploadMediaModal from '@/components/modals/UploadMediaModal'
 import useToast from '@/hooks/use-toast'
 import { useMediaSync } from '@/hooks/use-mediasync'
+import { index } from '@/routes/campaign'
 
 type MediaColumnProps = {
     title: string

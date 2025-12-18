@@ -114,7 +114,7 @@ class CampaignController extends Controller
             $campaign->status_id = $activeStatus->id;
             $campaign->save();
 
-            return to_route('campaign.index')
+            return back()
                 ->with('success', 'Campaña activada correctamente.');
         } catch (\Throwable $e) {
             Log::error('Error activating campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
@@ -122,6 +122,23 @@ class CampaignController extends Controller
             return back()
                 ->withInput()
                 ->with('error', 'Ocurrió un error inesperado al activar la campaña. Por favor, intente nuevamente.');
+        }
+    }
+    public function finish(Campaign $campaign)
+    {
+        try {
+            $finishedStatus = Status::where('status', 'Finalizada')->first();
+            $campaign->status_id = $finishedStatus->id;
+            $campaign->save();
+
+            return back()
+                ->with('success', 'Campaña finalizada correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error finishing campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error inesperado al finalizar la campaña. Por favor, intente nuevamente.');
         }
     }
 }
