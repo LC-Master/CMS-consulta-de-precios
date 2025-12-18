@@ -127,9 +127,19 @@ class CampaignController extends Controller
     }
     public function finish(Campaign $campaign)
     {
-        $finishedStatus = Status::where('status', CampaignStatus::FINISHED->value)->first();
-        $campaign->update(['status_id' => $finishedStatus->id]);
+        try {
+            $finishedStatus = Status::where('status', CampaignStatus::FINISHED->value)->first();
+            $campaign->status_id = $finishedStatus->id;
+            $campaign->save();
 
-        return redirect()->route('campaign.index')->with('success', 'Campaña finalizada.');
+            return back()
+                ->with('success', 'Campaña finalizada correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error finishing campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error inesperado al finalizar la campaña. Por favor, intente nuevamente.');
+        }
     }
 }
