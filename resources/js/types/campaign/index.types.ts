@@ -47,6 +47,28 @@ export interface DragEndEvent {
     };
     canceled: boolean;
 }
+
+export type MediaPivot = {
+    campaign_id: string;
+    media_id: string;
+    position: string;
+    slot: "am" | "pm";
+    created_at: string;
+    updated_at: string;
+};
+
+
+export type Media = {
+    id: string;
+    name: string;
+    mime_type: string;
+    duration_seconds: string | null;
+    created_at: string;
+    updated_at: string;
+    pivot: MediaPivot;
+};
+
+
 export interface Department {
     id: string;
     name: string;
@@ -63,14 +85,27 @@ export interface Status {
     status: string;
 }
 
-export interface Campaign {
+export type Campaign = {
     id: string;
     title: string;
     status: Status;
     created_at: string;
-    [key: string]: unknown;
 }
 
+export type CampaignExtended = Campaign & {
+    agreement: Agreement;
+    department: Department;
+
+    start_at: string;
+    end_at: string;
+
+    updated_at: string;
+
+    created_by: string;
+    updated_by: string | null;
+
+    media: Media[];
+};
 export type Props = {
     flash?: { success?: string; error?: string };
     campaigns: { data: Campaign[] };

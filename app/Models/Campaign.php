@@ -78,6 +78,7 @@ class Campaign extends Model
     }
     public function media()
     {
-        return $this->belongsToMany(Media::class, 'time_line_items', 'campaign_id', 'media_id');
+        return $this->belongsToMany(Media::class, 'time_line_items', 'campaign_id', 'media_id')->withPivot('slot', 'position')
+            ->withTimestamps();
     }
 }

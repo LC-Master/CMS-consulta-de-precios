@@ -79,20 +79,25 @@ class MediaController extends Controller
      */
     public function show(Media $media)
     {
-        $media->load([
-            'campaigns' => function ($query) {
-                $query->whereHas('status', function ($q) {
-                    $q->whereIn('status', [
-                        CampaignStatus::ACTIVE->value,
-                        CampaignStatus::DRAFT->value,
-                    ]);
-                });
-            }
-        ]);
+        try {
+            $media->load([
+                'campaigns' => function ($query) {
+                    $query->whereHas('status', function ($q) {
+                        $q->whereIn('status', [
+                            CampaignStatus::ACTIVE->value,
+                            CampaignStatus::DRAFT->value,
+                        ]);
+                    });
+                }
+            ]);
 
-        return Inertia::render('Media/Show', [
-            'media' => $media,
-        ]);
+            return Inertia::render('Media/Show', [
+                'media' => $media,
+            ]);
+        } catch (\Throwable $e) {
+            logger()->error('Error loading media details: ' . $e->getMessage(), ['media_id' => $media->id]);
+            return back()->with('error', 'Ocurrió un error al cargar el archivo.');
+        }
     }
 
     /**

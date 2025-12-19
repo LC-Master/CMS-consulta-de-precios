@@ -74,9 +74,18 @@ class CampaignController extends Controller
 
     public function show(Campaign $campaign)
     {
-        $campaign->with(['status', 'department', 'agreement']);
-
-        return Inertia::render('Campaign/Show', ['campaign' => $campaign]);
+        $campaign->load([
+            'status',
+            'department:id,name',
+            'agreement:id,name',
+            'media' => function ($query) {
+                $query->select('media.id', 'media.name', 'media.mime_type', 'media.duration_seconds');
+            }
+        ]);
+        $campaign->makeHidden(['status_id', 'department_id', 'agreement_id']);
+        return Inertia::render('Campaign/Show', [
+            'campaign' => $campaign
+        ]);
     }
 
     public function edit(Campaign $campaign)
