@@ -27,7 +27,6 @@ class MediaController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhereHas('campaigns', function ($qCamp) use ($search) {
-                        // Esto ahora buscará en 'campaigns' usando 'timeline_items'
                         $qCamp->where('title', 'like', "%{$search}%");
                     });
             });
@@ -80,9 +79,19 @@ class MediaController extends Controller
      */
     public function show(Media $media)
     {
+        $media->load([
+            'campaigns' => function ($query) {
+                $query->whereHas('status', function ($q) {
+                    $q->whereIn('status', [
+                        CampaignStatus::ACTIVE->value,
+                        CampaignStatus::DRAFT->value,
+                    ]);
+                });
+            }
+        ]);
+
         return Inertia::render('Media/Show', [
             'media' => $media,
-            'url' => Storage::url($media->path),
         ]);
     }
 
@@ -132,38 +141,44 @@ class MediaController extends Controller
      */
     public function destroy(Media $media)
     {
-        try{
+        try {
             $isInUse = $media->campaigns()->whereHas('status', function ($query) {
-            $query->whereIn('status', [
-                CampaignStatus::ACTIVE->value,
-                CampaignStatus::DRAFT->value
-            ]);
-        })->exists();
+                $query->whereIn('status', [
+                    CampaignStatus::ACTIVE->value,
+                    CampaignStatus::DRAFT->value
+                ]);
+            })->exists();
 
-        if ($isInUse) {
-            return back()->with('error', 'La imagen está siendo utilizada en una campaña en borrador o activa.');
-        }
+            if ($isInUse) {
+                return back()->with('error', 'La imagen está siendo utilizada en una campaña en borrador o activa.');
+            }
 
-        if (Storage::disk($media->disk)->exists($media->path)) {
-            Storage::disk($media->disk)->delete($media->path);
-        }
+            if (Storage::disk($media->disk)->exists($media->path)) {
+                Storage::disk($media->disk)->delete($media->path);
+            }
 
-        $media->delete();
+            $media->delete();
 
-        return back()->with('success', 'Archivo eliminado correctamente.');
-        }catch (\Throwable $e) {
+            return back()->with('success', 'Archivo eliminado correctamente.');
+        } catch (\Throwable $e) {
             return back()->with('error', 'Ocurrió un error al eliminar el archivo.');
         }
     }
 
     public function preview(Media $media)
     {
-        $path = Storage::disk('public')->path($media->path);
+        try {
+            $path = Storage::disk('public')->path($media->path);
 
-        if (!Storage::disk('public')->exists($media->path)) {
-            abort(404, 'El archivo físico no existe en el servidor.');
+            if (!Storage::disk('public')->exists($media->path)) {
+                logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->id]);
+                abort(404, 'El archivo físico no existe en el servidor.');
+            }
+
+            return response()->file($path);
+        } catch (\Throwable $e) {
+            logger()->error('Error generating media preview: ' . $e->getMessage(), ['media_id' => $media->id]);
+            abort(500, 'Ocurrió un error al generar la vista previa del archivo.');
         }
-
-        return response()->file($path);
     }
 }
