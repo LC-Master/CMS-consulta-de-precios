@@ -15,12 +15,14 @@ import { index } from '@/routes/campaign'
 import MediaColumn from '@/components/campaign/MediaColumn'
 import MediaList from '@/components/campaign/MediaList'
 import { breadcrumbs } from '@/tools/breadcrumbs'
+import { useMediaActions } from '@/hooks/use-media-actions'
 
 
 export default function CampaignEdit({ centers, departments, agreements, media, flash, campaign }: CampaignEditProps) {
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { isOpen, openModal, closeModal } = useModal(false)
     const ToastComponent = useToast(flash)
+    const { moveDown, moveUp, transfer } = useMediaActions<MediaItem>()
     const { handlerSearch, search } = useSearch<MediaItem>(media, setMediaList)
     const handleSuccess = () => {
         router.reload(
@@ -49,11 +51,11 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
         return { value: agreement.id, label: agreement.name }
     })
     useEffect(() => {
-        setMediaList(media);
         setAm(campaign.media.filter((item: MediaItem) => item.slot === 'am'));
         setPm(campaign.media.filter((item: MediaItem) => item.slot === 'pm'));
         console.log(media, pm)
-    }, [media, campaign]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [campaign]);
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         transform(data => ({
@@ -64,38 +66,6 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
         put('/campaign', { preserveScroll: true, forceFormData: true })
     }
 
-    const moveUp = (id: MediaItem['id'], items: MediaItem[], setItems: React.Dispatch<React.SetStateAction<MediaItem[]>>) => {
-        const index = items.findIndex(m => m.id === id)
-        if (index > 0) {
-            const newItems = [...items]
-            const temp = newItems[index - 1]
-            newItems[index - 1] = newItems[index]
-            newItems[index] = temp
-            setItems(newItems)
-        }
-    }
-    const moveDown = (id: MediaItem['id'], items: MediaItem[], setItems: React.Dispatch<React.SetStateAction<MediaItem[]>>) => {
-        const index = items.findIndex(m => m.id === id)
-        if (index < items.length - 1 && index >= 0) {
-            const newItems = [...items]
-            const temp = newItems[index + 1]
-            newItems[index + 1] = newItems[index]
-            newItems[index] = temp
-            setItems(newItems)
-        }
-    }
-    const removeToMedia = (item: MediaItem, setBlock: React.Dispatch<React.SetStateAction<MediaItem[]>>, setList: React.Dispatch<React.SetStateAction<MediaItem[]>>) => {
-        setList(prev => [...prev, item])
-        setBlock(prev => prev.filter(m => m.id !== item.id))
-    }
-    const moveToMedia = (item: MediaItem, setList: React.Dispatch<React.SetStateAction<MediaItem[]>>, setBlock: React.Dispatch<React.SetStateAction<MediaItem[]>>): void => {
-        setBlock(prev => [...prev, item])
-        setList(prev => prev.filter(m => m.id !== item.id))
-    }
-    const moveTo = (item: MediaItem, setOrigin: React.Dispatch<React.SetStateAction<MediaItem[]>>, setDestination: React.Dispatch<React.SetStateAction<MediaItem[]>>) => {
-        setDestination(prev => [...prev, item])
-        setOrigin(prev => prev.filter(m => m.id !== item.id))
-    }
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar campaña', index().url)} >
             {ToastComponent.ToastContainer()}
@@ -125,7 +95,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                             <Select<Option, false>
                                 options={optionsDepartment}
                                 inputId="department_id"
-                                value={optionsDepartment.find(o => o.value === data.department_id) || null}
+                                value={optionsDepartment.find(o => o.value === campaign.department_id) || null}
                                 name="department_id"
                                 classNamePrefix="react-select"
                                 onChange={(val) => setData('department_id', (val as Option | null)?.value ?? '')}
@@ -255,19 +225,19 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                             <MediaColumn
                                 title="AM"
                                 items={am}
-                                onMoveToOther={(item) => moveTo(item, setAm, setPm)}
+                                onMoveToOther={(item) => transfer(item, setAm, setPm)}
                                 onMoveUp={(id) => moveUp(id, am, setAm)}
                                 onMoveDown={(id) => moveDown(id, am, setAm)}
-                                onRemove={(item) => removeToMedia(item, setAm, setMediaList)}
+                                onRemove={(item) => transfer(item, setAm, setMediaList)}
                                 errors={errors.am_media}
                             />
                             <MediaColumn
                                 title="PM"
                                 items={pm}
-                                onMoveToOther={(item) => moveTo(item, setPm, setAm)}
+                                onMoveToOther={(item) => transfer(item, setPm, setAm)}
                                 onMoveUp={(id) => moveUp(id, pm, setPm)}
                                 onMoveDown={(id) => moveDown(id, pm, setPm)}
-                                onRemove={(item) => removeToMedia(item, setPm, setMediaList)}
+                                onRemove={(item) => transfer(item, setPm, setMediaList)}
                                 errors={errors.pm_media}
                             />
                         </div>
@@ -277,8 +247,8 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                                 value={search}
                                 onSearch={handlerSearch}
                                 mediaList={mediaList}
-                                onMoveToAm={item => moveToMedia(item, setMediaList, setAm)}
-                                onMoveToPm={item => moveToMedia(item, setMediaList, setPm)}
+                                onMoveToAm={item => transfer(item, setMediaList, setAm)}
+                                onMoveToPm={item => transfer(item, setMediaList, setPm)}
                             />
                         </div>
                     </div>
