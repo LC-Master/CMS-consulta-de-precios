@@ -10,6 +10,7 @@ export type Agreement = Department;
 export interface MediaItem extends Pick<Department, 'id' | 'name'> {
     size: string;
     duration_seconds: string;
+    slot?: 'am' | 'pm';
     campaigns?: Campaign[];
     mime_type: 'image/jpeg' | 'video/mp4';
     thumbnails?: {

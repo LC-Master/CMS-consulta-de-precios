@@ -110,12 +110,20 @@ class CampaignController extends Controller
         ]);
 
         $campaign->setRelation('media', $flattenedMedia);
-        $campaign->makeHidden(['updated_by']);
+        $campaign->makeHidden(['updated_by','created_by']);
         return Inertia::render('Campaign/Edit', [
             'campaign' => $campaign,
             'statuses' => Status::all(['id', 'status']),
             'departments' => Department::all(['id', 'name']),
             'agreements' => Agreement::all(['id', 'name']),
+            'media' => Media::select('id', 'name', 'mime_type')
+                ->with([
+                    'thumbnails' => function ($query) {
+                        $query->select('id', 'media_id');
+                    }
+                ])
+                ->get(),
+            'centers' => Center::select('id', 'code', 'name')->get(),
         ]);
     }
 
