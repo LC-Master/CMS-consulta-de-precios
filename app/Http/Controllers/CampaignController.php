@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Campaign\CreateCampaignAction;
+use App\Actions\Campaign\UpdateCampaignAction;
 use App\Enums\CampaignStatus;
 use App\Http\Requests\Campaigns\StoreCampaignRequest;
 use App\Http\Requests\Campaigns\UpdateCampaignRequest;
@@ -80,7 +81,7 @@ class CampaignController extends Controller
             'agreement:id,name',
             'media' => function ($query) {
                 $query->select('media.id', 'media.name', 'media.mime_type', 'media.duration_seconds');
-            }
+            },
         ]);
         $campaign->makeHidden(['status_id', 'department_id', 'agreement_id']);
         return Inertia::render('Campaign/Show', [
@@ -91,52 +92,53 @@ class CampaignController extends Controller
     public function edit(Campaign $campaign)
     {
         $campaign->load([
-            'media' => function ($query) {
-                $query->select('media.id', 'media.name', 'media.mime_type', 'media.duration_seconds')
-                    ->with('thumbnails:id,path,media_id')
-                    ->withPivot('slot', 'position')
-                    ->orderBy('time_line_items.position');
-            }
+            'media:id,name,mime_type,duration_seconds',
+            'media.thumbnails:id,path,media_id',
+            'centers:id,code,name'
         ]);
 
-        $flattenedMedia = $campaign->media->map(fn($item) => [
+        $campaign->setRelation('centers', $campaign->centers->map->only(['id', 'code', 'name']));
+
+        $campaign->setRelation('media', $campaign->media->map(fn($item) => [
             'id' => $item->id,
             'name' => $item->name,
             'mime_type' => $item->mime_type,
             'duration_seconds' => $item->duration_seconds,
             'slot' => $item->pivot->slot,
             'position' => $item->pivot->position,
-            'thumbnail_id' => $item->thumbnails?->id
-        ]);
+            'thumbnails' => [
+                'id' => $item->thumbnails?->id,
+            ],
+        ]));
 
-        $campaign->setRelation('media', $flattenedMedia);
-        $campaign->makeHidden(['updated_by','created_by']);
+        $campaign->makeHidden(['updated_by', 'created_by', 'status_id']);
+
         return Inertia::render('Campaign/Edit', [
             'campaign' => $campaign,
             'statuses' => Status::all(['id', 'status']),
             'departments' => Department::all(['id', 'name']),
             'agreements' => Agreement::all(['id', 'name']),
-            'media' => Media::select('id', 'name', 'mime_type')
-                ->with([
-                    'thumbnails' => function ($query) {
-                        $query->select('id', 'media_id');
-                    }
-                ])
-                ->get(),
-            'centers' => Center::select('id', 'code', 'name')->get(),
+            'media' => Media::with('thumbnails:id,media_id')->get(['id', 'name', 'mime_type']),
+            'centers' => Center::all(['id', 'code', 'name']),
         ]);
     }
 
-    public function update(UpdateCampaignRequest $request, Campaign $campaign)
+    public function update(UpdateCampaignRequest $request, Campaign $campaign, UpdateCampaignAction $updateCampaignAction): RedirectResponse
     {
-        $data = $request->validated();
+        try {
+            $request->validated();
 
-        $data['updated_by'] = Auth::id();
+            $updateCampaignAction->execute($request, $campaign);
 
-        $campaign->update($data);
+            return to_route('campaign.index')
+                ->with('success', 'Campaña actualizada correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error updating campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
-        return to_route('campaign.index')
-            ->with('success', 'Campaña actualizada correctamente.');
+            return back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error inesperado al actualizar la campaña. Por favor, intente nuevamente.');
+        }
     }
 
     public function destroy(Campaign $campaign)

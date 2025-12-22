@@ -17,7 +17,7 @@ export type CampaignEditProps = {
     flash: { success?: string; error?: string };
 };
 export type CampaignFormValues = {
-    id: number;
+    id: string;
     title: string;
     start_at: string;
     end_at: string;
@@ -27,4 +27,5 @@ export type CampaignFormValues = {
     media: MediaItem[];
     created_at: string;
     updated_at: string;
+    centers: Center[];
 };

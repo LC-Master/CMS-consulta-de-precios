@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('time_line_items', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('campaign_id')
-                ->constrained()
-                ->onDelete('cascade');
+                ->constrained();
             $table->foreignUuid('media_id')
                 ->constrained();
             $table->enum('slot', ['am', 'pm']);   

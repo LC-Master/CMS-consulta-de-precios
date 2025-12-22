@@ -20,16 +20,22 @@
     },
     "sidebarOpen": true,
     "campaign": {
-        "id": "019B32CB-D65B-70D7-B0DE-F12917AB7C60",
-        "title": "jliysd80780",
-        "start_at": "2025-12-18T14:51:00.000000Z",
-        "end_at": "2025-12-19T14:49:00.000000Z",
-        "status_id": "019B2C97-0C37-726E-A1F0-58E90B86D761",
-        "department_id": "019B2C97-0CDA-734D-A3E7-2856F163FEAD",
-        "agreement_id": "019B2C97-0D11-7197-9C7B-4C3EF187B376",
-        "created_at": "2025-12-18T18:49:38.217000Z",
-        "updated_at": "2025-12-18T18:49:38.217000Z",
+        "id": "019B3212-89A6-7073-AFAC-55979EDF88DA",
+        "title": "kjsdhfjksk",
+        "start_at": "2025-12-18T11:26:00.000000Z",
+        "end_at": "2025-12-19T11:27:00.000000Z",
+        "created_at": "2025-12-18T15:27:14.343000Z",
+        "updated_at": "2025-12-18T15:29:45.673000Z",
         "media": [
+            {
+                "id": "019B2C97-149F-72B2-B188-0A6CD2AA4C9E",
+                "name": "placeat.mp4",
+                "mime_type": "video/mp4",
+                "duration_seconds": "200",
+                "slot": "am",
+                "position": "2",
+                "thumbnail_id": null
+            },
             {
                 "id": "019B2D1B-6524-7137-811D-04EE60037F4E",
                 "name": "campaign_content_distribution.png",
@@ -44,26 +50,17 @@
                 "name": "numquam.jpg",
                 "mime_type": "image/jpeg",
                 "duration_seconds": null,
-                "slot": "pm",
-                "position": "1",
+                "slot": "am",
+                "position": "3",
                 "thumbnail_id": null
             },
             {
-                "id": "019B2C97-144E-72C1-B827-0ED6A3B352B2",
+                "id": "019B2C97-143A-7246-88E4-196CA2134386",
                 "name": "rerum.jpg",
                 "mime_type": "image/jpeg",
                 "duration_seconds": null,
                 "slot": "pm",
-                "position": "2",
-                "thumbnail_id": null
-            },
-            {
-                "id": "019B2C97-149F-72B2-B188-0A6CD2AA4C9E",
-                "name": "placeat.mp4",
-                "mime_type": "video/mp4",
-                "duration_seconds": "200",
-                "slot": "am",
-                "position": "2",
+                "position": "3",
                 "thumbnail_id": null
             },
             {
@@ -72,8 +69,29 @@
                 "mime_type": "video/mp4",
                 "duration_seconds": null,
                 "slot": "pm",
-                "position": "3",
+                "position": "2",
                 "thumbnail_id": "019B3162-9C42-7392-9115-05C58B41FD41"
+            },
+            {
+                "id": "019B2C97-144E-72C1-B827-0ED6A3B352B2",
+                "name": "rerum.jpg",
+                "mime_type": "image/jpeg",
+                "duration_seconds": null,
+                "slot": "pm",
+                "position": "1",
+                "thumbnail_id": null
+            }
+        ],
+        "centers": [
+            {
+                "id": "019B2C97-06C7-72AB-8B62-0D9A34177D78",
+                "code": "CTR-0001",
+                "name": "Todo"
+            },
+            {
+                "id": "019B2C97-0E51-71CE-A75E-55846D46B72C",
+                "code": "CTR-9899",
+                "name": "South Diannaburgh Center"
             }
         ]
     },

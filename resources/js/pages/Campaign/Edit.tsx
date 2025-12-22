@@ -1,9 +1,8 @@
 import AppLayout from '@/layouts/app-layout'
 import { useForm, router } from '@inertiajs/react'
 import Select from 'react-select'
-import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
+import { Option, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
-import React, { useEffect } from 'react'
 import useSearch from '@/hooks/use-search'
 import { Button } from '@/components/ui/button'
 import useModal from '@/hooks/use-modal'
@@ -11,16 +10,21 @@ import { CampaignEditProps } from '@/types/campaign/page.type'
 import UploadMediaModal from '@/components/modals/UploadMediaModal'
 import useToast from '@/hooks/use-toast'
 import { useMediaSync } from '@/hooks/use-mediasync'
-import { index } from '@/routes/campaign'
+import { index, update } from '@/routes/campaign'
 import MediaColumn from '@/components/campaign/MediaColumn'
 import MediaList from '@/components/campaign/MediaList'
 import { breadcrumbs } from '@/tools/breadcrumbs'
 import { useMediaActions } from '@/hooks/use-media-actions'
+import InputError from '@/components/input-error'
+import useLoadOptions from '@/hooks/use-load-options'
+import useLoadEdit from '@/hooks/use-load-edit'
 
 
 export default function CampaignEdit({ centers, departments, agreements, media, flash, campaign }: CampaignEditProps) {
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { isOpen, openModal, closeModal } = useModal(false)
+    useLoadEdit(campaign, setAm, setPm)
+    const { optionsCenter, optionsDepartment, optionsAgreement } = useLoadOptions(centers, departments, agreements)
     const ToastComponent = useToast(flash)
     const { moveDown, moveUp, transfer } = useMediaActions<MediaItem>()
     const { handlerSearch, search } = useSearch<MediaItem>(media, setMediaList)
@@ -32,30 +36,15 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
         )
     }
     const { data, setData, processing, errors, put, transform } = useForm({
-        title: '',
-        start_at: '',
-        end_at: '',
-        centers: [] as string[],
-        department_id: '',
-        agreement_id: '',
+        title: campaign.title || '',
+        start_at: campaign.start_at ? new Date(campaign.start_at).toISOString().slice(0, 16) : '',
+        end_at: campaign.end_at ? new Date(campaign.end_at).toISOString().slice(0, 16) : '',
+        centers: campaign.centers ? campaign.centers.map(center => String(center.id)) : [],
+        department_id: String(campaign.department_id || ''),
+        agreement_id: String(campaign.agreement_id || ''),
         am_media: [] as string[],
         pm_media: [] as string[],
     })
-    const optionsCenter: Option[] = centers.map((center: Center) => {
-        return { value: center.id, label: center.name + " - " + center.code }
-    })
-    const optionsDepartment: Option[] = departments.map((department: Department) => {
-        return { value: department.id, label: department.name }
-    })
-    const optionsAgreement: Option[] = agreements.map((agreement: Agreement) => {
-        return { value: agreement.id, label: agreement.name }
-    })
-    useEffect(() => {
-        setAm(campaign.media.filter((item: MediaItem) => item.slot === 'am'));
-        setPm(campaign.media.filter((item: MediaItem) => item.slot === 'pm'));
-        console.log(media, pm)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [campaign]);
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         transform(data => ({
@@ -63,14 +52,14 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
             am_media: am.map(item => item.id),
             pm_media: pm.map(item => item.id),
         }))
-        put('/campaign', { preserveScroll: true, forceFormData: true })
+        put(update({ id: campaign.id }).url, { preserveScroll: true, })
     }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar campaña', index().url)} >
             {ToastComponent.ToastContainer()}
             <div className="p-6 space-y-6">
-                <form id="form" method="post" onSubmit={handleSubmit} className="space-y-4" action="/campaigns" noValidate>
+                <form id="form" onSubmit={handleSubmit} method={update({ id: campaign.id }).method} action={update({ id: campaign.id }).url} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título. *</label>
@@ -87,7 +76,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('title', e.target.value)}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                             />
-                            {errors.title && <p id="title-error" role="alert" className="text-red-500 text-sm mt-1">{errors.title}</p>}
+                            <InputError message={errors.title} id="title-error" />
                         </div>
 
                         <div>
@@ -95,7 +84,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                             <Select<Option, false>
                                 options={optionsDepartment}
                                 inputId="department_id"
-                                value={optionsDepartment.find(o => o.value === campaign.department_id) || null}
+                                value={optionsDepartment.find(o => o.value === data.department_id) || null}
                                 name="department_id"
                                 classNamePrefix="react-select"
                                 onChange={(val) => setData('department_id', (val as Option | null)?.value ?? '')}
@@ -116,7 +105,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                                     }),
                                 }}
                             />
-                            {errors.department_id && <p id="department_id-error" role="alert" className="text-red-500 text-sm mt-1">{errors.department_id}</p>}
+                            <InputError message={errors.department_id} id="department_id-error" />
                         </div>
                     </div>
 
@@ -134,7 +123,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                                 aria-describedby={errors.start_at ? 'start_at-error' : undefined}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                             />
-                            {errors.start_at && <p id="start_at-error" role="alert" className="text-red-500 text-sm mt-1">{errors.start_at}</p>}
+                            <InputError message={errors.start_at} id="start_at-error" />
                         </div>
 
                         <div>
@@ -150,7 +139,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                                 aria-describedby={errors.end_at ? 'end_at-error' : undefined}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                             />
-                            {errors.end_at && <p id="end_at-error" role="alert" className="text-red-500 text-sm mt-1">{errors.end_at}</p>}
+                            <InputError message={errors.end_at} id="end_at-error" />
                         </div>
                     </div>
 
@@ -182,7 +171,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                                 }),
                             }}
                         />
-                        {errors.centers && <p id="centers-error" role="alert" className="text-red-500 text-sm mt-1">{errors.centers}</p>}
+                        <InputError message={errors.centers} id="centers-error" />
                     </div>
 
                     <div>
@@ -211,7 +200,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                                 }),
                             }}
                         />
-                        {errors.agreement_id && <p id="agreement_id-error" role="alert" className="text-red-500 text-sm mt-1">{errors.agreement_id}</p>}
+                        <InputError message={errors.agreement_id} id="agreement_id-error" />
                     </div>
 
                     <div className='flex flex-row justify-between items-center'>
@@ -226,8 +215,8 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                                 title="AM"
                                 items={am}
                                 onMoveToOther={(item) => transfer(item, setAm, setPm)}
-                                onMoveUp={(id) => moveUp(id, am, setAm)}
-                                onMoveDown={(id) => moveDown(id, am, setAm)}
+                                onMoveUp={(id) => moveUp(id, setAm)}
+                                onMoveDown={(id) => moveDown(id, setAm)}
                                 onRemove={(item) => transfer(item, setAm, setMediaList)}
                                 errors={errors.am_media}
                             />
@@ -235,8 +224,8 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                                 title="PM"
                                 items={pm}
                                 onMoveToOther={(item) => transfer(item, setPm, setAm)}
-                                onMoveUp={(id) => moveUp(id, pm, setPm)}
-                                onMoveDown={(id) => moveDown(id, pm, setPm)}
+                                onMoveUp={(id) => moveUp(id, setPm)}
+                                onMoveDown={(id) => moveDown(id, setPm)}
                                 onRemove={(item) => transfer(item, setPm, setMediaList)}
                                 errors={errors.pm_media}
                             />

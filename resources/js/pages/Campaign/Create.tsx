@@ -1,10 +1,9 @@
 import AppLayout from '@/layouts/app-layout'
-import { BreadcrumbItem } from '@/types'
 import { useForm, router } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
-import React, { useState, ChangeEvent } from 'react'
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import useModal from '@/hooks/use-modal'
 import { CampaignCreateProps } from '@/types/campaign/page.type'
@@ -14,21 +13,16 @@ import { useMediaSync } from '@/hooks/use-mediasync'
 import { index } from '@/routes/campaign'
 import MediaColumn from '@/components/campaign/MediaColumn'
 import MediaList from '@/components/campaign/MediaList'
+import { breadcrumbs } from '@/tools/breadcrumbs'
+import useSearch from '@/hooks/use-search'
+import { useMediaActions } from '@/hooks/use-media-actions'
 
 export default function CampaignCreate({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
     const { isOpen, openModal, closeModal } = useModal(false)
-    const [search, setSearch] = useState<string>('')
     const ToastComponent = useToast(flash)
-    const handlerSearch = (e: ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value)
-        setMediaList(media?.filter(item => item.name.toLowerCase().includes(e.target.value.toLowerCase())) || [])
-    }
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Crear campaña',
-            href: index().url,
-        },
-    ];
+    const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
+    const { handlerSearch, search } = useSearch(mediaList, setMediaList);
+    const { moveUp, moveDown, transfer } = useMediaActions<MediaItem>();
     const handleSuccess = () => {
         router.reload(
             {
@@ -36,7 +30,6 @@ export default function CampaignCreate({ centers, departments, agreements, media
             }
         )
     }
-    const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { data, setData, processing, errors, post, transform } = useForm({
         title: '',
         start_at: '',
@@ -65,72 +58,9 @@ export default function CampaignCreate({ centers, departments, agreements, media
         }))
         post('/campaign', { preserveScroll: true, forceFormData: true })
     }
-    const moveFromAmToPm = (item: MediaItem) => {
-        setPm(prev => [...prev, item])
-        setAm(prev => prev.filter(m => m.id !== item.id))
-    }
-    const amMoveUp = (id: MediaItem['id']) => {
-        const index = am.findIndex(m => m.id === id)
-        if (index > 0) {
-            const newAm = [...am]
-            const temp = newAm[index - 1]
-            newAm[index - 1] = newAm[index]
-            newAm[index] = temp
-            setAm(newAm)
-        }
-    }
-    const amMoveDown = (id: MediaItem['id']) => {
-        const index = am.findIndex(m => m.id === id)
-        if (index < am.length - 1 && index >= 0) {
-            const newAm = [...am]
-            const temp = newAm[index + 1]
-            newAm[index + 1] = newAm[index]
-            newAm[index] = temp
-            setAm(newAm)
-        }
-    }
-    const removeFromAmToMedia = (item: MediaItem) => {
-        setMediaList(prev => [...prev, item])
-        setAm(prev => prev.filter(m => m.id !== item.id))
-    }
-    const moveFromPmToAm = (item: MediaItem) => {
-        setAm(prev => [...prev, item])
-        setPm(prev => prev.filter(m => m.id !== item.id))
-    }
-    const pmMoveUp = (id: MediaItem['id']) => {
-        const index = pm.findIndex(m => m.id === id)
-        if (index > 0) {
-            const newPm = [...pm]
-            const temp = newPm[index - 1]
-            newPm[index - 1] = newPm[index]
-            newPm[index] = temp
-            setPm(newPm)
-        }
-    }
-    const pmMoveDown = (id: MediaItem['id']) => {
-        const index = pm.findIndex(m => m.id === id)
-        if (index < pm.length - 1 && index >= 0) {
-            const newPm = [...pm]
-            const temp = newPm[index + 1]
-            newPm[index + 1] = newPm[index]
-            newPm[index] = temp
-            setPm(newPm)
-        }
-    }
-    const removeFromPmToMedia = (item: MediaItem) => {
-        setMediaList(prev => [...prev, item])
-        setPm(prev => prev.filter(m => m.id !== item.id))
-    }
-    const moveMediaToAm = (item: MediaItem) => {
-        setAm(prev => [...prev, item])
-        setMediaList(prev => prev.filter(m => m.id !== item.id))
-    }
-    const moveMediaToPm = (item: MediaItem) => {
-        setPm(prev => [...prev, item])
-        setMediaList(prev => prev.filter(m => m.id !== item.id))
-    }
+
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs('Crear Campaña', index().url)}>
             {ToastComponent.ToastContainer()}
             <div className="p-6 space-y-6">
                 <form id="form" method="post" onSubmit={handleSubmit} className="space-y-4" action="/campaigns" noValidate>
@@ -288,19 +218,19 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             <MediaColumn
                                 title="AM"
                                 items={am}
-                                onMoveToOther={moveFromAmToPm}
-                                onMoveUp={amMoveUp}
-                                onMoveDown={amMoveDown}
-                                onRemove={removeFromAmToMedia}
+                                onMoveToOther={(item) => transfer(item, setAm, setPm)}
+                                onMoveUp={(id) => moveUp(id, am, setAm)}
+                                onMoveDown={(id) => moveDown(id, am, setAm)}
+                                onRemove={(item) => transfer(item, setAm, setMediaList)}
                                 errors={errors.am_media}
                             />
                             <MediaColumn
                                 title="PM"
                                 items={pm}
-                                onMoveToOther={moveFromPmToAm}
-                                onMoveUp={pmMoveUp}
-                                onMoveDown={pmMoveDown}
-                                onRemove={removeFromPmToMedia}
+                                onMoveToOther={(item) => transfer(item, setPm, setAm)}
+                                onMoveUp={(id) => moveUp(id, pm, setPm)}
+                                onMoveDown={(id) => moveDown(id, pm, setPm)}
+                                onRemove={(item) => transfer(item, setPm, setMediaList)}
                                 errors={errors.pm_media}
                             />
                         </div>
@@ -310,8 +240,8 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                 value={search}
                                 onSearch={handlerSearch}
                                 mediaList={mediaList}
-                                onMoveToAm={moveMediaToAm}
-                                onMoveToPm={moveMediaToPm}
+                                onMoveToAm={item => transfer(item, setMediaList, setAm)}
+                                onMoveToPm={item => transfer(item, setMediaList, setPm)}
                             />
                         </div>
                     </div>

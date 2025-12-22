@@ -12,6 +12,7 @@ export interface MediaItem extends Pick<Department, 'id' | 'name'> {
     duration_seconds: string;
     slot?: 'am' | 'pm';
     campaigns?: Campaign[];
+    position?: string;
     mime_type: 'image/jpeg' | 'video/mp4';
     thumbnails?: {
         id: string;

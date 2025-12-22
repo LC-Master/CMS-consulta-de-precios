@@ -5,7 +5,7 @@ import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Filter } from '@/components/Filter';
 import { Column } from '@/types/datatable.types';
 import AnchorIcon from '@/components/ui/AnchorIcon';
-import { Eye } from 'lucide-react';
+import { Eye, Pencil } from 'lucide-react';
 import { DataTable } from '@/components/DataTable';
 import { Campaign, Props } from '@/types/campaign/index.types';
 import { BreadcrumbItem } from '@/types';
@@ -71,6 +71,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                         )
                     )}
                     <AnchorIcon title="Ver campaña" href={`/campaign/${a.id}`} icon={Eye} />
+                    <AnchorIcon title="Editar campaña" className='p-2 bg-locatel-claro text-white rounded-md' href={`/campaign/${a.id}/edit`} icon={Pencil} />
                 </div>
             ),
         },
