@@ -11,7 +11,9 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard, } from '@/routes';
+import { store, index as agreement } from '@/routes/agreement';
 import { index, create } from '@/routes/campaign';
+import { index as user } from '@/routes/user';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Users, Folder, LayoutGrid, SquarePlus, List, Handshake } from 'lucide-react';
@@ -32,12 +34,12 @@ const mainNavItems: NavItem[] = [
     }
     , {
         title: 'Crear Convenios',
-        href: '/agreement/create',
+        href: store().url,
         icon: SquarePlus,
     }
     , {
         title: 'Convenios',
-        href: '/agreement',
+        href: agreement().url,
         icon: Handshake,
     }
     , {
@@ -56,7 +58,7 @@ const footerNavItems: NavItem[] = [
     },
     {
         title: 'Usuarios',
-        href: '/user',
+        href: user().url,
         icon: Users,
     },
 ];
