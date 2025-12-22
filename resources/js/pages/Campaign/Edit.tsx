@@ -7,7 +7,7 @@ import React, { useEffect } from 'react'
 import useSearch from '@/hooks/use-search'
 import { Button } from '@/components/ui/button'
 import useModal from '@/hooks/use-modal'
-import { CampaignCreateProps } from '@/types/campaign/page.type'
+import { CampaignEditProps } from '@/types/campaign/page.type'
 import UploadMediaModal from '@/components/modals/UploadMediaModal'
 import useToast from '@/hooks/use-toast'
 import { useMediaSync } from '@/hooks/use-mediasync'
@@ -16,7 +16,8 @@ import MediaColumn from '@/components/campaign/MediaColumn'
 import MediaList from '@/components/campaign/MediaList'
 import { breadcrumbs } from '@/tools/breadcrumbs'
 
-export default function CampaignEdit({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
+
+export default function CampaignEdit({ centers, departments, agreements, media, flash, campaign }: CampaignEditProps) {
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { isOpen, openModal, closeModal } = useModal(false)
     const ToastComponent = useToast(flash)
@@ -49,10 +50,10 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
     })
     useEffect(() => {
         setMediaList(media);
-        setAm(media.filter(item => item.slot === 'am'));
-        setPm(media.filter(item => item.slot === 'pm'));
-        console.log(am, pm)
-    }, [media]);
+        setAm(campaign.media.filter((item: MediaItem) => item.slot === 'am'));
+        setPm(campaign.media.filter((item: MediaItem) => item.slot === 'pm'));
+        console.log(media, pm)
+    }, [media, campaign]);
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         transform(data => ({
@@ -62,71 +63,39 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
         }))
         put('/campaign', { preserveScroll: true, forceFormData: true })
     }
-    const moveFromAmToPm = (item: MediaItem) => {
-        setPm(prev => [...prev, item])
-        setAm(prev => prev.filter(m => m.id !== item.id))
-    }
-    const amMoveUp = (id: MediaItem['id']) => {
-        const index = am.findIndex(m => m.id === id)
-        if (index > 0) {
-            const newAm = [...am]
-            const temp = newAm[index - 1]
-            newAm[index - 1] = newAm[index]
-            newAm[index] = temp
-            setAm(newAm)
-        }
-    }
-    const amMoveDown = (id: MediaItem['id']) => {
-        const index = am.findIndex(m => m.id === id)
-        if (index < am.length - 1 && index >= 0) {
-            const newAm = [...am]
-            const temp = newAm[index + 1]
-            newAm[index + 1] = newAm[index]
-            newAm[index] = temp
-            setAm(newAm)
-        }
-    }
-    const removeFromAmToMedia = (item: MediaItem) => {
-        setMediaList(prev => [...prev, item])
-        setAm(prev => prev.filter(m => m.id !== item.id))
-    }
-    const moveFromPmToAm = (item: MediaItem) => {
-        setAm(prev => [...prev, item])
-        setPm(prev => prev.filter(m => m.id !== item.id))
-    }
-    const pmMoveUp = (id: MediaItem['id']) => {
-        const index = pm.findIndex(m => m.id === id)
-        if (index > 0) {
-            const newPm = [...pm]
-            const temp = newPm[index - 1]
-            newPm[index - 1] = newPm[index]
-            newPm[index] = temp
-            setPm(newPm)
-        }
-    }
-    const pmMoveDown = (id: MediaItem['id']) => {
-        const index = pm.findIndex(m => m.id === id)
-        if (index < pm.length - 1 && index >= 0) {
-            const newPm = [...pm]
-            const temp = newPm[index + 1]
-            newPm[index + 1] = newPm[index]
-            newPm[index] = temp
-            setPm(newPm)
-        }
-    }
-    const removeFromPmToMedia = (item: MediaItem) => {
-        setMediaList(prev => [...prev, item])
-        setPm(prev => prev.filter(m => m.id !== item.id))
-    }
-    const moveMediaToAm = (item: MediaItem) => {
-        setAm(prev => [...prev, item])
-        setMediaList(prev => prev.filter(m => m.id !== item.id))
-    }
-    const moveMediaToPm = (item: MediaItem) => {
-        setPm(prev => [...prev, item])
-        setMediaList(prev => prev.filter(m => m.id !== item.id))
-    }
 
+    const moveUp = (id: MediaItem['id'], items: MediaItem[], setItems: React.Dispatch<React.SetStateAction<MediaItem[]>>) => {
+        const index = items.findIndex(m => m.id === id)
+        if (index > 0) {
+            const newItems = [...items]
+            const temp = newItems[index - 1]
+            newItems[index - 1] = newItems[index]
+            newItems[index] = temp
+            setItems(newItems)
+        }
+    }
+    const moveDown = (id: MediaItem['id'], items: MediaItem[], setItems: React.Dispatch<React.SetStateAction<MediaItem[]>>) => {
+        const index = items.findIndex(m => m.id === id)
+        if (index < items.length - 1 && index >= 0) {
+            const newItems = [...items]
+            const temp = newItems[index + 1]
+            newItems[index + 1] = newItems[index]
+            newItems[index] = temp
+            setItems(newItems)
+        }
+    }
+    const removeToMedia = (item: MediaItem, setBlock: React.Dispatch<React.SetStateAction<MediaItem[]>>, setList: React.Dispatch<React.SetStateAction<MediaItem[]>>) => {
+        setList(prev => [...prev, item])
+        setBlock(prev => prev.filter(m => m.id !== item.id))
+    }
+    const moveToMedia = (item: MediaItem, setList: React.Dispatch<React.SetStateAction<MediaItem[]>>, setBlock: React.Dispatch<React.SetStateAction<MediaItem[]>>): void => {
+        setBlock(prev => [...prev, item])
+        setList(prev => prev.filter(m => m.id !== item.id))
+    }
+    const moveTo = (item: MediaItem, setOrigin: React.Dispatch<React.SetStateAction<MediaItem[]>>, setDestination: React.Dispatch<React.SetStateAction<MediaItem[]>>) => {
+        setDestination(prev => [...prev, item])
+        setOrigin(prev => prev.filter(m => m.id !== item.id))
+    }
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar campaña', index().url)} >
             {ToastComponent.ToastContainer()}
@@ -286,19 +255,19 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                             <MediaColumn
                                 title="AM"
                                 items={am}
-                                onMoveToOther={moveFromAmToPm}
-                                onMoveUp={amMoveUp}
-                                onMoveDown={amMoveDown}
-                                onRemove={removeFromAmToMedia}
+                                onMoveToOther={(item) => moveTo(item, setAm, setPm)}
+                                onMoveUp={(id) => moveUp(id, am, setAm)}
+                                onMoveDown={(id) => moveDown(id, am, setAm)}
+                                onRemove={(item) => removeToMedia(item, setAm, setMediaList)}
                                 errors={errors.am_media}
                             />
                             <MediaColumn
                                 title="PM"
                                 items={pm}
-                                onMoveToOther={moveFromPmToAm}
-                                onMoveUp={pmMoveUp}
-                                onMoveDown={pmMoveDown}
-                                onRemove={removeFromPmToMedia}
+                                onMoveToOther={(item) => moveTo(item, setPm, setAm)}
+                                onMoveUp={(id) => moveUp(id, pm, setPm)}
+                                onMoveDown={(id) => moveDown(id, pm, setPm)}
+                                onRemove={(item) => removeToMedia(item, setPm, setMediaList)}
                                 errors={errors.pm_media}
                             />
                         </div>
@@ -308,8 +277,8 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                                 value={search}
                                 onSearch={handlerSearch}
                                 mediaList={mediaList}
-                                onMoveToAm={moveMediaToAm}
-                                onMoveToPm={moveMediaToPm}
+                                onMoveToAm={item => moveToMedia(item, setMediaList, setAm)}
+                                onMoveToPm={item => moveToMedia(item, setMediaList, setPm)}
                             />
                         </div>
                     </div>
