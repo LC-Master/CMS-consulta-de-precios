@@ -22,6 +22,17 @@ class StoreUserRequest extends FormRequest
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
     }
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if ($this->user()->id == $this->route('id')) {
+                $validator->errors()->add(
+                    'name',
+                    'No tienes permisos para modificar tu propio perfil desde este módulo.'
+                );
+            }
+        });
+    }
 
     public function messages(): array
     {

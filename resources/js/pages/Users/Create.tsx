@@ -51,10 +51,7 @@ export default function UserCreate({ roles }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            {/* CAMBIO 1: py-12 a py-6 para subir el formulario y reducir el scroll */}
             <div className="flex flex-col items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
-                
-                {/* CAMBIO 2: max-w-md a max-w-2xl para hacerlo más ancho */}
                 <div className="w-full max-w-2xl space-y-8 bg-white p-8 shadow rounded-lg">
                     
                     <div className="text-center">
@@ -86,7 +83,6 @@ export default function UserCreate({ roles }: Props) {
                             <InputError message={errors.name} />
                         </div>
 
-                        {/* Email */}
                         <div className="grid gap-2">
                             <Label htmlFor="email">Correo electrónico</Label>
                             <Input
@@ -104,7 +100,6 @@ export default function UserCreate({ roles }: Props) {
                             <InputError message={errors.email} />
                         </div>
 
-                        {/* Selector de Rol */}
                         <div className="grid gap-2">
                             <Label htmlFor="role">Rol de Usuario</Label>
                             <select
@@ -123,7 +118,6 @@ export default function UserCreate({ roles }: Props) {
                             </select>
                             <InputError message={errors.role} />
 
-                            {/* Caja de Permisos */}
                             {selectedRoleInfo && (
                                 <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-100 animate-in fade-in slide-in-from-top-1 duration-300">
                                     <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
@@ -148,7 +142,6 @@ export default function UserCreate({ roles }: Props) {
                             )}
                         </div>
 
-                        {/* Contraseña */}
                         <div className="grid gap-2">
                             <Label htmlFor="password">Contraseña</Label>
                             <Input
@@ -166,7 +159,6 @@ export default function UserCreate({ roles }: Props) {
                             <InputError message={errors.password} />
                         </div>
 
-                        {/* Confirmar Contraseña */}
                         <div className="grid gap-2">
                             <Label htmlFor="password_confirmation">Confirmar Contraseña</Label>
                             <Input
@@ -180,7 +172,6 @@ export default function UserCreate({ roles }: Props) {
                             />
                         </div>
 
-                        {/* Botones */}
                         <div className="flex flex-col gap-3 pt-4">
                             <Button
                                 type="submit"

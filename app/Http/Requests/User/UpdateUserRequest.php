@@ -40,8 +40,6 @@ class UpdateUserRequest extends FormRequest
                 $validator->errors()->add('status', 'Por seguridad, no puedes desactivar tu propia cuenta mientras estás logueado.');
             }
 
-            //Si el admin desea cambiar el rol por si mismo
-
             if ($this->user->id === Auth::id() && $this->input('role') !== $this->user->getRoleNames()->first()) {
                  $validator->errors()->add('role', 'Por seguridad, no puedes cambiar tu propio rol.');
             }
