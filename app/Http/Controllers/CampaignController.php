@@ -90,11 +90,32 @@ class CampaignController extends Controller
 
     public function edit(Campaign $campaign)
     {
+        $campaign->load([
+            'media' => function ($query) {
+                $query->select('media.id', 'media.name', 'media.mime_type', 'media.duration_seconds')
+                    ->with('thumbnails:id,path,media_id')
+                    ->withPivot('slot', 'position')
+                    ->orderBy('time_line_items.position');
+            }
+        ]);
+
+        $flattenedMedia = $campaign->media->map(fn($item) => [
+            'id' => $item->id,
+            'name' => $item->name,
+            'mime_type' => $item->mime_type,
+            'duration_seconds' => $item->duration_seconds,
+            'slot' => $item->pivot->slot,
+            'position' => $item->pivot->position,
+            'thumbnail_id' => $item->thumbnails?->id
+        ]);
+
+        $campaign->setRelation('media', $flattenedMedia);
+        $campaign->makeHidden(['updated_by']);
         return Inertia::render('Campaign/Edit', [
             'campaign' => $campaign,
-            'statuses' => Status::all(),
-            'departments' => Department::all(),
-            'agreements' => Agreement::all(),
+            'statuses' => Status::all(['id', 'status']),
+            'departments' => Department::all(['id', 'name']),
+            'agreements' => Agreement::all(['id', 'name']),
         ]);
     }
 
