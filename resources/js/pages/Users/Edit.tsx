@@ -37,7 +37,7 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="flex flex-col items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
-                <div className="w-full max-w-2xl space-y-8 bg-white p-8 shadow rounded-lg">
+                <div className="w-full max-w-2xl space-y-8 bg-white border-locatel-claro border-2 p-8 rounded-lg">
 
                     <div className="text-center">
                         <h2 className="text-2xl font-bold tracking-tight text-gray-900">

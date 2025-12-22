@@ -29,4 +29,6 @@ export type PropsEditPage = {
     user: User;
     statuses: { name: string; value: number }[];
     roles: Role[];
-}
+};
+
+export type PropsCreatePage = Pick<PropsEditPage, 'roles'>;

@@ -1,37 +1,23 @@
-import { useMemo } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { useForm } from '@inertiajs/react';
-
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { PropsCreatePage } from '@/types/user/index.types';
+import { store } from '@/routes/user';
+import Select from 'react-select';
 
-interface Permission {
-    id: number;
-    name: string;
-}
-
-interface Role {
-    id: number;
-    name: string;
-    permissions: Permission[];
-}
-
-interface Props {
-    roles: Role[];
-}
-
-export default function UserCreate({ roles }: Props) {
+export default function UserCreate({ roles }: PropsCreatePage) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Crear usuario',
             href: '/user/create',
         },
     ];
-
+    const optionsRoles = roles.map((role) => ({ value: role.name, label: role.name }))
     const { data, setData, processing, errors, post } = useForm({
         name: '',
         email: '',
@@ -40,20 +26,18 @@ export default function UserCreate({ roles }: Props) {
         password_confirmation: '',
     });
 
-    const selectedRoleInfo = useMemo(() => {
-        return roles.find(r => r.name === data.role);
-    }, [data.role, roles]);
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/user');
+        post(store().url);
     };
+
+    const selectedRole = roles.find(role => role.name === data.role);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="flex flex-col items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
-                <div className="w-full max-w-2xl space-y-8 bg-white p-8 shadow rounded-lg">
-                    
+                <div className="w-full max-w-2xl space-y-8 bg-white p-8 border-locatel-claro border-2 rounded-lg">
+
                     <div className="text-center">
                         <h2 className="text-2xl font-bold tracking-tight text-gray-900">
                             Registrar nuevo usuario
@@ -102,33 +86,43 @@ export default function UserCreate({ roles }: Props) {
 
                         <div className="grid gap-2">
                             <Label htmlFor="role">Rol de Usuario</Label>
-                            <select
-                                id="role"
-                                value={data.role}
-                                required
-                                onChange={(e) => setData('role', e.target.value)}
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                <option value="" disabled>Selecciona un rol</option>
-                                {roles.map((role) => (
-                                    <option key={role.id} value={role.name}>
-                                        {role.name}
-                                    </option>
-                                ))}
-                            </select>
+                            <Select
+                                value={optionsRoles.find(option => option.value === data.role)}
+                                onChange={(val) => setData('role', val ? String(val.value) : '')}
+                                options={optionsRoles}
+                                inputId="role"
+                                name="role"
+                                classNamePrefix="react-select"
+                                placeholder="Selecciona un rol"
+                                isClearable
+                                aria-required={false}
+                                aria-invalid={!!errors.role}
+                                aria-describedby={errors.role ? 'role-error' : undefined}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        borderColor: errors.role ? '#ef4444' : provided.borderColor,
+                                        boxShadow: errors.role ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
+                                        '&:hover': {
+                                            borderColor: errors.role ? '#ef4444' : provided.borderColor,
+                                        },
+                                        borderRadius: '0.375rem',
+                                    }),
+                                }}
+                            />
                             <InputError message={errors.role} />
 
-                            {selectedRoleInfo && (
+                            {data.role && (
                                 <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-100 animate-in fade-in slide-in-from-top-1 duration-300">
                                     <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
                                         Permisos incluidos:
                                     </p>
-                                    
-                                    {selectedRoleInfo.permissions.length > 0 ? (
+
+                                    {selectedRole?.permissions?.length ? (
                                         <div className="flex flex-wrap gap-1.5">
-                                            {selectedRoleInfo.permissions.map((perm) => (
-                                                <span 
-                                                    key={perm.id} 
+                                            {selectedRole.permissions.map((perm) => (
+                                                <span
+                                                    key={perm.id}
                                                     className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200"
                                                 >
                                                     {perm.name}
