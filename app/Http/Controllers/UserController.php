@@ -24,31 +24,37 @@ class UserController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
         return Inertia::render('Users/Index', [
-            'users' => Inertia::scroll(fn () => $query->latest()->paginate()),
+            'users' => Inertia::scroll(fn() => $query->latest()->paginate()),
             'filters' => $request->only(['search']),
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Users/Create');
+        return Inertia::render('Users/Create', [
+            'roles' => \Spatie\Permission\Models\Role::with('permissions:id,name')
+                ->select('id', 'name')
+                ->get()
+        ]);
     }
 
     public function store(StoreUserRequest $request, CreateUserAction $createUserAction): RedirectResponse
     {
         try {
-            $createUserAction->execute($request->validated());
+            $request->validated();
+
+            $createUserAction->execute($request);
 
             return to_route('user.index')
                 ->with('success', 'Usuario creado correctamente.');
 
         } catch (\Throwable $e) {
-            Log::error('Error creating user: '.$e->getMessage(), ['admin_id' => Auth::id()]);
+            Log::error('Error creating user: ' . $e->getMessage(), ['admin_id' => Auth::id()]);
 
             return back()
                 ->withInput()
@@ -56,23 +62,33 @@ class UserController extends Controller
         }
     }
 
+
     public function edit(User $user)
     {
+        $user->load('roles');
+
         return Inertia::render('Users/Edit', [
             'user' => $user,
+            'roles' => \Spatie\Permission\Models\Role::with('permissions:id,name')
+                ->select('id', 'name')
+                ->get()
         ]);
     }
 
     public function update(UpdateUserRequest $request, User $user, UpdateUserAction $updateUserAction): RedirectResponse
     {
         try {
-            $updateUserAction->execute($user, $request->validated());
+            
+            $request->validated();
+
+            $updateUserAction->execute($user, $request);
 
             return Redirect::route('user.index')
                 ->with('success', 'Usuario actualizado correctamente.');
-                
+
+
         } catch (\Throwable $e) {
-            Log::error('Error updating user: '.$e->getMessage(), ['admin_id' => Auth::id()]);
+            Log::error('Error updating user: ' . $e->getMessage(), ['admin_id' => Auth::id()]);
 
             return back()
                 ->withInput()

@@ -18,6 +18,7 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email:rfc,dns|max:255|unique:users,email',
+            'role' => 'required|string|exists:roles,name',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
     }
@@ -27,6 +28,7 @@ class StoreUserRequest extends FormRequest
         return [
             'email.unique' => 'Este correo electrónico ya está registrado.',
             'password.confirmed' => 'las contraseñas no coinciden.',
+            'role' => 'required|string|exists:roles,name',
         ];
     }
 }

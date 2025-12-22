@@ -27,16 +27,25 @@ class UpdateUserRequest extends FormRequest
             ],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'status' => ['required', 'in:0,1'],
+            
+            'role' => ['required', 'string', 'exists:roles,name'],
         ];
     }
 
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-           
+            
             if ($this->user->id === Auth::id() && $this->input('status') == 0) {
                 $validator->errors()->add('status', 'Por seguridad, no puedes desactivar tu propia cuenta mientras estás logueado.');
             }
+
+            //Si el admin desea cambiar el rol por si mismo
+
+            if ($this->user->id === Auth::id() && $this->input('role') !== $this->user->getRoleNames()->first()) {
+                 $validator->errors()->add('role', 'Por seguridad, no puedes cambiar tu propio rol.');
+            }
+
         });
     }
 }
