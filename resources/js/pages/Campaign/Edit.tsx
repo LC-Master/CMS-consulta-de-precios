@@ -42,8 +42,8 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
         centers: campaign.centers ? campaign.centers.map(center => String(center.id)) : [],
         department_id: String(campaign.department_id || ''),
         agreement_id: String(campaign.agreement_id || ''),
-        am_media: [] as string[],
-        pm_media: [] as string[],
+        am_media: campaign.media.filter(item => item.slot === 'am').map(item => item.id) || [] as string[],
+        pm_media: campaign.media.filter(item => item.slot === 'pm').map(item => item.id) || [] as string[],
     })
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
