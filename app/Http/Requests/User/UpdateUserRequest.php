@@ -25,8 +25,18 @@ class UpdateUserRequest extends FormRequest
                 'max:255', 
                 Rule::unique('users')->ignore($this->user->id)
             ],
-            // La contraseña es opcional al editar (nullable)
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'status' => ['required', 'in:0,1'],
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+           
+            if ($this->user->id === Auth::id() && $this->input('status') == 0) {
+                $validator->errors()->add('status', 'Por seguridad, no puedes desactivar tu propia cuenta mientras estás logueado.');
+            }
+        });
     }
 }

@@ -10,18 +10,15 @@ interface Props {
 export default function UserEdit({ user }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Usuarios',
-            href: '/user', 
-        },
-        {
             title: 'Editar usuario',
-            href: `/user/${user.id}/edit`, 
+            href: `/user/${user.id}/edit`, // Asegúrate que la ruta sea /users/ si es resource
         },
     ];
 
     const { data, setData, processing, errors, put } = useForm({
         name: user.name,
         email: user.email,
+        status: user.status ?? 1, 
         password: '',
         password_confirmation: '',
     })
@@ -65,11 +62,26 @@ export default function UserEdit({ user }: Props) {
                         </div>
                     </div>
 
+                    {/* Fila 2: Estatus (NUEVO) */}
+                    <div>
+                        <label htmlFor="status" className="block text-sm font-medium text-gray-700">Estatus</label>
+                        <select
+                            id="status"
+                            value={data.status}
+                            onChange={e => setData('status', Number(e.target.value))}
+                            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio bg-white"
+                        >
+                            <option value={1}>Activo</option>
+                            <option value={0}>Inactivo</option>
+                        </select>
+                        {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status}</p>}
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Contraseña (Opcional) */}
+                        {/* Contraseña */}
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Contraseña <span className="text-gray-400 font-normal">(Dejar en blanco para mantener)</span>
+                                Contraseña <span className="text-gray-400 font-normal">(Opcional)</span>
                             </label>
                             <input
                                 type="password"
@@ -106,7 +118,6 @@ export default function UserEdit({ user }: Props) {
                     >
                         Actualizar
                     </button>
-
                     <button
                         type="button"
                         onClick={() => (window.location.href = '/user')}

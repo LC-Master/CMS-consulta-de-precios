@@ -14,14 +14,14 @@ class UpdateUserAction
             $updateData = [
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'status' => $data['status'],
             ];
 
-            // Solo actualizamos la contraseña si se envió una nueva
             if (!empty($data['password'])) {
                 $updateData['password'] = Hash::make($data['password']);
             }
 
             return $user->update($updateData);
-        });
+    });
     }
 }
