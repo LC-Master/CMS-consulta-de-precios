@@ -3,7 +3,6 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head,Link } from '@inertiajs/react';
-import { useBear } from '@/context/bearer';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Panel de control',
@@ -12,8 +11,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
-    const {bears} = useBear();
-    console.log(bears)
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Link href="http://127.0.0.1/video">ir a video

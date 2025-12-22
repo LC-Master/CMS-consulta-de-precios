@@ -62,10 +62,10 @@ export default function AgreementsIndex({ agreements, filters = {}, statuses }: 
             header: 'Acciones',
             render: (a) => (
                 <div className="flex gap-2">
-                    <AnchorIcon url={`/agreement/${a.id}`} icon={Eye} />
+                    <AnchorIcon href={`/agreement/${a.id}`} icon={Eye} />
 
                     <AnchorIcon
-                        url={`/agreement/${a.id}/edit`}
+                        href={`/agreement/${a.id}/edit`}
                         icon={Pencil}
                     />
                 </div>
@@ -89,7 +89,7 @@ export default function AgreementsIndex({ agreements, filters = {}, statuses }: 
                             type: 'search',
                             key: 'search',
                             value: search,
-                            placeholder: 'Buscar por título...',
+                            placeholder: 'Buscar por nombre o RIF...',
                             onChange: setSearch,
                         },
                         {

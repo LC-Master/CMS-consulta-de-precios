@@ -20,8 +20,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', action: function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
-    Route::get('/campaign/activate/{campaign}',[CampaignController::class, 'activate'])->name('campaign.activate');
-    Route::get('/campaign/finish/{campaign}',[CampaignController::class, 'finish'])->name('campaign.finish');
+    Route::get('/campaign/activate/{campaign}', [CampaignController::class, 'activate'])->name('campaign.activate');
+    Route::get('/campaign/finish/{campaign}', [CampaignController::class, 'finish'])->name('campaign.finish');
+    Route::resource('media', MediaController::class)->parameters([
+        'media' => 'media'
+    ]);
     Route::get('/media/cdn/{media}', [MediaController::class, 'preview']);
     Route::resource('campaign', CampaignController::class);
     Route::resource('timeline', TimeLineController::class);
@@ -29,6 +32,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('user', UserController::class);
     Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
     Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
+
 });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';

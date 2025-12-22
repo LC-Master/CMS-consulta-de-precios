@@ -2,7 +2,6 @@ import { useSidebar } from "./ui/sidebar";
 
 export default function AppLogo() {
     const { open } = useSidebar()
-    console.log(open)
     return (
         <>
             <div className="flex aspect-square w-24 items-center justify-center rounded-md text-sidebar-primary-foreground transition-all duration-300 ease-in-out">

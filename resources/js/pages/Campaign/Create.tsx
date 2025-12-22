@@ -1,11 +1,9 @@
 import AppLayout from '@/layouts/app-layout'
-import { BreadcrumbItem } from '@/types'
 import { useForm, router } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import React, { useState, ChangeEvent } from 'react'
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import useModal from '@/hooks/use-modal'
 import { CampaignCreateProps } from '@/types/campaign/page.type'
@@ -13,153 +11,18 @@ import UploadMediaModal from '@/components/modals/UploadMediaModal'
 import useToast from '@/hooks/use-toast'
 import { useMediaSync } from '@/hooks/use-mediasync'
 import { index } from '@/routes/campaign'
-
-type MediaColumnProps = {
-    title: string
-    items: MediaItem[]
-    onMoveToOther: (item: MediaItem) => void
-    onMoveUp: (id: MediaItem['id']) => void
-    onMoveDown: (id: MediaItem['id']) => void
-    onRemove: (item: MediaItem) => void
-    errors?: string
-}
-
-function MediaItemCard({ item, controls }: { item: MediaItem; controls: React.ReactNode }) {
-    return (
-        <div className="p-3 mb-2 border rounded-md flex items-center justify-between gap-4 bg-white shadow-sm">
-            <div className="flex items-center gap-4 min-w-0">
-                {item.mime_type.startsWith('image/') ? (
-                    <img
-                        src={`/media/cdn/${item.id}`}
-                        alt={item.name}
-                        className="w-24 h-14 object-cover rounded-md shrink-0" loading='lazy'
-                    />
-                ) : item.thumbnails ? (
-                    <img
-                        src={`/thumbnail/cdn/${item.thumbnails.id}`}
-                        alt={`Thumbnail ${item.name}`}
-                        className="w-24 h-14 object-cover rounded-md shrink-0" loading='lazy'
-                    />
-                ) : (
-                    <div className="w-24 h-14 bg-gray-100 rounded-md flex items-center justify-center text-xs text-gray-500 shrink-0">
-                        Sin vista previa
-                    </div>
-                )}
-
-                <div className="min-w-0">
-                    <p className="font-medium text-sm text-gray-800 truncate">{item.name}</p>
-                    <p className="text-xs text-gray-500 mt-1">{item.mime_type}</p>
-                </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-                {controls}
-            </div>
-        </div>
-    )
-}
-
-function MediaColumn({ title, items, onMoveToOther, onMoveUp, onMoveDown, onRemove, errors }: MediaColumnProps) {
-    return (
-        <div className='w-1/2'>
-            <Label>{title}</Label>
-            <div className="h-60 max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
-                {items.map((item) => (
-                    <MediaItemCard
-                        key={item.id}
-                        item={item}
-                        controls={
-                            <>
-                                <Button type="button" onClick={(e) => { e.preventDefault(); onMoveToOther(item) }}>
-                                    {title === 'AM' ? 'PM' : 'AM'}
-                                </Button>
-                                <Button type="button" onClick={(e) => { e.preventDefault(); onMoveUp(item.id) }}>↑</Button>
-                                <Button type="button" onClick={(e) => { e.preventDefault(); onMoveDown(item.id) }}>↓</Button>
-                                <Button type="button" onClick={(e) => { e.preventDefault(); onRemove(item) }}>Eliminar</Button>
-                            </>
-                        }
-                    />
-                ))}
-            </div>
-            {errors && <div className="text-red-500 text-sm mt-1">{errors}</div>}
-        </div>
-    )
-}
-
-
-type MediaListProps = {
-    mediaList: MediaItem[]
-    onMoveToAm: (item: MediaItem) => void
-    onMoveToPm: (item: MediaItem) => void
-    value: string
-    onSearch: (e: React.ChangeEvent<HTMLInputElement>) => void
-}
-
-function MediaList({ value, onSearch, mediaList, onMoveToAm, onMoveToPm }: MediaListProps) {
-    return (
-        <div>
-            <Label htmlFor='media'>Contenido multimedia</Label>
-            <Input
-                id="media-search"
-                name="media_search"
-                type="search"
-                value={value}
-                placeholder="Buscar multimedia..."
-                className="mb-2 mt-2"
-                onChange={onSearch}
-                aria-label="Buscar multimedia"
-                aria-describedby="media-search-help"
-                aria-controls="media"
-                autoComplete="off"
-            />
-            <div id='media' className="min-h-40 max-h-60 overflow-y-auto border-2 border-gray-300 rounded-sm p-2">
-                {mediaList.length !== 0 ? mediaList.map((item) => (
-                    <MediaItemCard
-                        key={item.id}
-                        item={item}
-                        controls={
-                            <>
-                                <Button
-                                    type="button"
-                                    className="px-3 py-1 text-sm"
-                                    onClick={(e) => { e.preventDefault(); onMoveToAm(item) }}
-                                    aria-label={`Mover ${item.name} a AM`}
-                                >
-                                    AM
-                                </Button>
-
-                                <Button
-                                    type="button"
-                                    className="px-3 py-1 text-sm"
-                                    onClick={(e) => { e.preventDefault(); onMoveToPm(item) }}
-                                    aria-label={`Mover ${item.name} a PM`}
-                                >
-                                    PM
-                                </Button>
-                            </>
-                        }
-                    />
-                )) : <div className="flex items-center justify-center h-30 text-center text-gray-500">
-                    No hay elementos multimedia disponibles.
-                </div>}
-            </div>
-        </div>
-    )
-}
+import MediaColumn from '@/components/campaign/MediaColumn'
+import MediaList from '@/components/campaign/MediaList'
+import { breadcrumbs } from '@/tools/breadcrumbs'
+import useSearch from '@/hooks/use-search'
+import { useMediaActions } from '@/hooks/use-media-actions'
 
 export default function CampaignCreate({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
     const { isOpen, openModal, closeModal } = useModal(false)
-    const [search, setSearch] = useState<string>('')
-    const handlerSearch = (e: ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value)
-        setMediaList(media?.filter(item => item.name.toLowerCase().includes(e.target.value.toLowerCase())) || [])
-    }
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Crear campaña',
-            href: index().url,
-        },
-    ];
+    const ToastComponent = useToast(flash)
+    const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
+    const { handlerSearch, search } = useSearch(mediaList, setMediaList);
+    const { moveUp, moveDown, transfer } = useMediaActions<MediaItem>();
     const handleSuccess = () => {
         router.reload(
             {
@@ -167,11 +30,6 @@ export default function CampaignCreate({ centers, departments, agreements, media
             }
         )
     }
-    const {
-        mediaList, setMediaList,
-        pm, setPm,
-        am, setAm
-    } = useMediaSync(media);
     const { data, setData, processing, errors, post, transform } = useForm({
         title: '',
         start_at: '',
@@ -182,7 +40,6 @@ export default function CampaignCreate({ centers, departments, agreements, media
         am_media: [] as string[],
         pm_media: [] as string[],
     })
-    console.log(errors)
     const optionsCenter: Option[] = centers.map((center: Center) => {
         return { value: center.id, label: center.name + " - " + center.code }
     })
@@ -201,75 +58,9 @@ export default function CampaignCreate({ centers, departments, agreements, media
         }))
         post('/campaign', { preserveScroll: true, forceFormData: true })
     }
-    const moveFromAmToPm = (item: MediaItem) => {
-        setPm(prev => [...prev, item])
-        setAm(prev => prev.filter(m => m.id !== item.id))
-    }
-    const amMoveUp = (id: MediaItem['id']) => {
-        const index = am.findIndex(m => m.id === id)
-        if (index > 0) {
-            const newAm = [...am]
-            const temp = newAm[index - 1]
-            newAm[index - 1] = newAm[index]
-            newAm[index] = temp
-            setAm(newAm)
-        }
-    }
-    const amMoveDown = (id: MediaItem['id']) => {
-        const index = am.findIndex(m => m.id === id)
-        if (index < am.length - 1 && index >= 0) {
-            const newAm = [...am]
-            const temp = newAm[index + 1]
-            newAm[index + 1] = newAm[index]
-            newAm[index] = temp
-            setAm(newAm)
-        }
-    }
-    const removeFromAmToMedia = (item: MediaItem) => {
-        setMediaList(prev => [...prev, item])
-        setAm(prev => prev.filter(m => m.id !== item.id))
-    }
-    const moveFromPmToAm = (item: MediaItem) => {
-        setAm(prev => [...prev, item])
-        setPm(prev => prev.filter(m => m.id !== item.id))
-    }
-    const pmMoveUp = (id: MediaItem['id']) => {
-        const index = pm.findIndex(m => m.id === id)
-        if (index > 0) {
-            const newPm = [...pm]
-            const temp = newPm[index - 1]
-            newPm[index - 1] = newPm[index]
-            newPm[index] = temp
-            setPm(newPm)
-        }
-    }
-    const pmMoveDown = (id: MediaItem['id']) => {
-        const index = pm.findIndex(m => m.id === id)
-        if (index < pm.length - 1 && index >= 0) {
-            const newPm = [...pm]
-            const temp = newPm[index + 1]
-            newPm[index + 1] = newPm[index]
-            newPm[index] = temp
-            setPm(newPm)
-        }
-    }
-    const removeFromPmToMedia = (item: MediaItem) => {
-        setMediaList(prev => [...prev, item])
-        setPm(prev => prev.filter(m => m.id !== item.id))
-    }
 
-    const moveMediaToAm = (item: MediaItem) => {
-        setAm(prev => [...prev, item])
-        setMediaList(prev => prev.filter(m => m.id !== item.id))
-    }
-    const moveMediaToPm = (item: MediaItem) => {
-        setPm(prev => [...prev, item])
-        setMediaList(prev => prev.filter(m => m.id !== item.id))
-    }
-
-    const ToastComponent = useToast(flash)
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs('Crear Campaña', index().url)}>
             {ToastComponent.ToastContainer()}
             <div className="p-6 space-y-6">
                 <form id="form" method="post" onSubmit={handleSubmit} className="space-y-4" action="/campaigns" noValidate>
@@ -427,19 +218,19 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             <MediaColumn
                                 title="AM"
                                 items={am}
-                                onMoveToOther={moveFromAmToPm}
-                                onMoveUp={amMoveUp}
-                                onMoveDown={amMoveDown}
-                                onRemove={removeFromAmToMedia}
+                                onMoveToOther={(item) => transfer(item, setAm, setPm)}
+                                onMoveUp={(id) => moveUp(id, am, setAm)}
+                                onMoveDown={(id) => moveDown(id, am, setAm)}
+                                onRemove={(item) => transfer(item, setAm, setMediaList)}
                                 errors={errors.am_media}
                             />
                             <MediaColumn
                                 title="PM"
                                 items={pm}
-                                onMoveToOther={moveFromPmToAm}
-                                onMoveUp={pmMoveUp}
-                                onMoveDown={pmMoveDown}
-                                onRemove={removeFromPmToMedia}
+                                onMoveToOther={(item) => transfer(item, setPm, setAm)}
+                                onMoveUp={(id) => moveUp(id, pm, setPm)}
+                                onMoveDown={(id) => moveDown(id, pm, setPm)}
+                                onRemove={(item) => transfer(item, setPm, setMediaList)}
                                 errors={errors.pm_media}
                             />
                         </div>
@@ -449,8 +240,8 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                 value={search}
                                 onSearch={handlerSearch}
                                 mediaList={mediaList}
-                                onMoveToAm={moveMediaToAm}
-                                onMoveToPm={moveMediaToPm}
+                                onMoveToAm={item => transfer(item, setMediaList, setAm)}
+                                onMoveToPm={item => transfer(item, setMediaList, setPm)}
                             />
                         </div>
                     </div>

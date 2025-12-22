@@ -16,7 +16,7 @@ import { index, create } from '@/routes/campaign';
 import { index as user } from '@/routes/user';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Users, Folder, LayoutGrid, SquarePlus, List, Handshake } from 'lucide-react';
+import { BookOpen, lazy,  LayoutGrid, SquarePlus, List, Handshake, Film } from 'lucide-react';
 import { lazy } from 'react';
 
 const Logo = lazy(() => import('@/components/app-logo'));
@@ -52,15 +52,16 @@ const mainNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repositorio',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
+        title: 'Listado de Videos',
+        href: '/media',
+        icon: Film,
     },
     {
         title: 'Usuarios',
         href: user().url,
         icon: Users,
     },
+
 ];
 
 export function AppSidebar() {

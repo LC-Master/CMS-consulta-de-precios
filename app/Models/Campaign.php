@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\TimeLineItem;
+use App\Models\Media;
 
 class Campaign extends Model
 {
@@ -39,7 +40,7 @@ class Campaign extends Model
     protected function startAt(): Attribute
     {
         return Attribute::make(
-            set: fn ($value) => Carbon::parse($value)->format('Y-m-d H:i:s'),
+            set: fn($value) => Carbon::parse($value)->format('Y-m-d H:i:s'),
         );
     }
 
@@ -49,10 +50,11 @@ class Campaign extends Model
     protected function endAt(): Attribute
     {
         return Attribute::make(
-            set: fn ($value) => Carbon::parse($value)->format('Y-m-d H:i:s'),
+            set: fn($value) => Carbon::parse($value)->format('Y-m-d H:i:s'),
         );
     }
-    public function timeLineItems(){
+    public function timeLineItems()
+    {
         return $this->hasMany(TimeLineItem::class);
     }
     public function department()
@@ -73,5 +75,10 @@ class Campaign extends Model
     public function status()
     {
         return $this->belongsTo(Status::class);
+    }
+    public function media()
+    {
+        return $this->belongsToMany(Media::class, 'time_line_items', 'campaign_id', 'media_id')->withPivot('slot', 'position')
+            ->withTimestamps();
     }
 }

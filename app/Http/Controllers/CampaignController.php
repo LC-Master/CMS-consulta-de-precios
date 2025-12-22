@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Campaign\CreateCampaignAction;
+use App\Actions\Campaign\UpdateCampaignAction;
+use App\Enums\CampaignStatus;
 use App\Http\Requests\Campaigns\StoreCampaignRequest;
 use App\Http\Requests\Campaigns\UpdateCampaignRequest;
 use App\Models\Agreement;
@@ -73,31 +75,70 @@ class CampaignController extends Controller
 
     public function show(Campaign $campaign)
     {
-        $campaign->with(['status', 'department', 'agreement']);
-
-        return Inertia::render('Campaign/Show', ['campaign' => $campaign]);
+        $campaign->load([
+            'status',
+            'department:id,name',
+            'agreement:id,name',
+            'media' => function ($query) {
+                $query->select('media.id', 'media.name', 'media.mime_type', 'media.duration_seconds');
+            },
+        ]);
+        $campaign->makeHidden(['status_id', 'department_id', 'agreement_id']);
+        return Inertia::render('Campaign/Show', [
+            'campaign' => $campaign
+        ]);
     }
 
     public function edit(Campaign $campaign)
     {
+        $campaign->load([
+            'media:id,name,mime_type,duration_seconds',
+            'media.thumbnails:id,path,media_id',
+            'centers:id,code,name'
+        ]);
+
+        $campaign->setRelation('centers', $campaign->centers->map->only(['id', 'code', 'name']));
+
+        $campaign->setRelation('media', $campaign->media->map(fn($item) => [
+            'id' => $item->id,
+            'name' => $item->name,
+            'mime_type' => $item->mime_type,
+            'duration_seconds' => $item->duration_seconds,
+            'slot' => $item->pivot->slot,
+            'position' => $item->pivot->position,
+            'thumbnails' => [
+                'id' => $item->thumbnails?->id,
+            ],
+        ]));
+
+        $campaign->makeHidden(['updated_by', 'created_by', 'status_id']);
+
         return Inertia::render('Campaign/Edit', [
             'campaign' => $campaign,
-            'statuses' => Status::all(),
-            'departments' => Department::all(),
-            'agreements' => Agreement::all(),
+            'statuses' => Status::all(['id', 'status']),
+            'departments' => Department::all(['id', 'name']),
+            'agreements' => Agreement::all(['id', 'name']),
+            'media' => Media::with('thumbnails:id,media_id')->get(['id', 'name', 'mime_type']),
+            'centers' => Center::all(['id', 'code', 'name']),
         ]);
     }
 
-    public function update(UpdateCampaignRequest $request, Campaign $campaign)
+    public function update(UpdateCampaignRequest $request, Campaign $campaign, UpdateCampaignAction $updateCampaignAction): RedirectResponse
     {
-        $data = $request->validated();
+        try {
+            $request->validated();
 
-        $data['updated_by'] = Auth::id();
+            $updateCampaignAction->execute($request, $campaign);
 
-        $campaign->update($data);
+            return to_route('campaign.index')
+                ->with('success', 'Campaña actualizada correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error updating campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
-        return to_route('campaign.index')
-            ->with('success', 'Campaña actualizada correctamente.');
+            return back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error inesperado al actualizar la campaña. Por favor, intente nuevamente.');
+        }
     }
 
     public function destroy(Campaign $campaign)
@@ -126,19 +167,9 @@ class CampaignController extends Controller
     }
     public function finish(Campaign $campaign)
     {
-        try {
-            $finishedStatus = Status::where('status', 'Finalizada')->first();
-            $campaign->status_id = $finishedStatus->id;
-            $campaign->save();
+        $finishedStatus = Status::where('status', CampaignStatus::FINISHED->value)->first();
+        $campaign->update(['status_id' => $finishedStatus->id]);
 
-            return back()
-                ->with('success', 'Campaña finalizada correctamente.');
-        } catch (\Throwable $e) {
-            Log::error('Error finishing campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
-
-            return back()
-                ->withInput()
-                ->with('error', 'Ocurrió un error inesperado al finalizar la campaña. Por favor, intente nuevamente.');
-        }
+        return redirect()->route('campaign.index')->with('success', 'Campaña finalizada.');
     }
 }

@@ -1,10 +1,14 @@
 import { LucideIcon } from 'lucide-react'
 import { Icon } from '../icon'
+import { Link } from '@inertiajs/react'
 import React, { forwardRef } from 'react'
-type AnchorIconProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+
+type AnchorIconProps = {
     icon: LucideIcon
+    href: string
+    className?: string
     classNameIcon?: string
-}
+} & React.ComponentPropsWithoutRef<typeof Link>
 
 const AnchorIcon = forwardRef<HTMLAnchorElement, AnchorIconProps>(function AnchorIcon(
     { icon, href, className, classNameIcon, ...props },
@@ -15,9 +19,9 @@ const AnchorIcon = forwardRef<HTMLAnchorElement, AnchorIconProps>(function Ancho
     const finalClassNameIcon = classNameIcon ?? 'w-4 h-4'
 
     return (
-        <a ref={ref} href={finalHref} className={finalClassName} {...props}>
+        <Link viewTransition ref={ref} href={finalHref} className={finalClassName} {...props}>
             <Icon iconNode={icon} className={finalClassNameIcon} />
-        </a>
+        </Link>
     )
 })
 
