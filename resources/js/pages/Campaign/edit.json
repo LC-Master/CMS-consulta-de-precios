@@ -1,0 +1,772 @@
+{
+    "errors": {},
+    "name": "Locatel",
+    "auth": {
+        "user": {
+            "id": 11,
+            "name": "Test User",
+            "email": "test@example.com",
+            "email_verified_at": "2025-12-17T13:54:13.380000Z",
+            "created_at": "2025-12-17T13:54:13.783000Z",
+            "updated_at": "2025-12-17T13:54:13.783000Z",
+            "two_factor_confirmed_at": null
+        },
+        "roles": [],
+        "permissions": []
+    },
+    "flash": {
+        "success": null,
+        "error": null
+    },
+    "sidebarOpen": true,
+    "campaign": {
+        "id": "019B32CB-D65B-70D7-B0DE-F12917AB7C60",
+        "title": "jliysd80780",
+        "start_at": "2025-12-18T14:51:00.000000Z",
+        "end_at": "2025-12-19T14:49:00.000000Z",
+        "status_id": "019B2C97-0C37-726E-A1F0-58E90B86D761",
+        "department_id": "019B2C97-0CDA-734D-A3E7-2856F163FEAD",
+        "agreement_id": "019B2C97-0D11-7197-9C7B-4C3EF187B376",
+        "created_at": "2025-12-18T18:49:38.217000Z",
+        "updated_at": "2025-12-18T18:49:38.217000Z",
+        "media": [
+            {
+                "id": "019B2D1B-6524-7137-811D-04EE60037F4E",
+                "name": "campaign_content_distribution.png",
+                "mime_type": "image/png",
+                "duration_seconds": null,
+                "slot": "am",
+                "position": "1",
+                "thumbnail_id": null
+            },
+            {
+                "id": "019B2C97-1531-70E2-9074-0D5D85EB56BF",
+                "name": "numquam.jpg",
+                "mime_type": "image/jpeg",
+                "duration_seconds": null,
+                "slot": "pm",
+                "position": "1",
+                "thumbnail_id": null
+            },
+            {
+                "id": "019B2C97-144E-72C1-B827-0ED6A3B352B2",
+                "name": "rerum.jpg",
+                "mime_type": "image/jpeg",
+                "duration_seconds": null,
+                "slot": "pm",
+                "position": "2",
+                "thumbnail_id": null
+            },
+            {
+                "id": "019B2C97-149F-72B2-B188-0A6CD2AA4C9E",
+                "name": "placeat.mp4",
+                "mime_type": "video/mp4",
+                "duration_seconds": "200",
+                "slot": "am",
+                "position": "2",
+                "thumbnail_id": null
+            },
+            {
+                "id": "019B3162-9C2B-7037-A2BF-139BF3D12FE5",
+                "name": "qlqmanotodofino1}.mp4",
+                "mime_type": "video/mp4",
+                "duration_seconds": null,
+                "slot": "pm",
+                "position": "3",
+                "thumbnail_id": "019B3162-9C42-7392-9115-05C58B41FD41"
+            }
+        ]
+    },
+    "statuses": [
+        {
+            "id": "019B2C97-0C44-72AF-AA20-300E65529F77",
+            "status": "Activa"
+        },
+        {
+            "id": "019B2C97-0C37-726E-A1F0-58E90B86D761",
+            "status": "Borrador"
+        },
+        {
+            "id": "019B2C97-0C4C-7114-911F-EA3FDC477D21",
+            "status": "Finalizada"
+        }
+    ],
+    "departments": [
+        {
+            "id": "019B2C97-0CA7-70ED-962C-ED9BE243EB4A",
+            "name": "Biomedical Engineer"
+        },
+        {
+            "id": "019B2C97-0CDA-734D-A3E7-2856F163FEAD",
+            "name": "Cleaners of Vehicles"
+        },
+        {
+            "id": "019B2C97-0CAE-719A-A159-E011114198E0",
+            "name": "Database Manager"
+        },
+        {
+            "id": "019B2C97-0C89-73DF-94E1-8427A54E8E91",
+            "name": "Food Scientists and Technologist"
+        },
+        {
+            "id": "019B2C97-0C91-71F5-9431-E5629E40564D",
+            "name": "Radio Operator"
+        },
+        {
+            "id": "019B2C97-0CB6-7381-9143-598D924E88A5",
+            "name": "Securities Sales Agent"
+        },
+        {
+            "id": "019B2C97-0C63-7288-9974-90F54C94C114",
+            "name": "Sociology Teacher"
+        },
+        {
+            "id": "019B2C97-0C79-70C8-BCC2-3694B98CC21F",
+            "name": "User Experience Manager"
+        }
+    ],
+    "agreements": [
+        {
+            "id": "019B2C97-0D59-720E-99AE-C9B10D8759F7",
+            "name": "Abbott, Bogan and Lehner"
+        },
+        {
+            "id": "019B2C97-0D11-7197-9C7B-4C3EF187B376",
+            "name": "Balistreri-Rogahn"
+        },
+        {
+            "id": "019B2C97-0D82-72EC-B511-1E17B73F91EC",
+            "name": "Beer-Wintheiser"
+        },
+        {
+            "id": "019B2C97-0D68-724A-9B70-D1901E4B843B",
+            "name": "Cormier Group"
+        },
+        {
+            "id": "019B2C97-0D1B-7014-B7F0-93109B0B77D4",
+            "name": "Gorczany-Turner"
+        },
+        {
+            "id": "019B2C97-0D9D-722E-A358-D6B1C763E52B",
+            "name": "Hammes and Sons"
+        },
+        {
+            "id": "019B2C97-0D7C-7145-ADFA-85C27497C8A3",
+            "name": "Harber, Mosciski and Lakin"
+        },
+        {
+            "id": "019B2C97-0D90-728C-BEAE-1C4FA82BE23B",
+            "name": "Herman-Gleichner"
+        },
+        {
+            "id": "019B2C97-0D3D-71C0-9CAD-95168A10F4A9",
+            "name": "Hoppe, Gulgowski and Dicki"
+        },
+        {
+            "id": "019B2C97-0D4B-71AD-88A9-A2D82D770247",
+            "name": "Labadie Inc"
+        },
+        {
+            "id": "019B2C97-0D24-732E-A33D-DB72AF6BD42A",
+            "name": "Labadie LLC"
+        },
+        {
+            "id": "019B2C97-0D2C-73C8-9A5F-E2AAF29EB7C2",
+            "name": "Medhurst PLC"
+        },
+        {
+            "id": "019B2C97-0D6E-72E2-B0C8-86D1AF854852",
+            "name": "Okuneva, Borer and Mraz"
+        },
+        {
+            "id": "019B2C97-0D61-7026-9260-AD601C6C92BC",
+            "name": "Schimmel Group"
+        },
+        {
+            "id": "019B2C97-0D53-71A9-986E-099BDF0E427D",
+            "name": "Schowalter-Grady"
+        },
+        {
+            "id": "019B2C97-0D44-724C-82CB-C276DBE33B6E",
+            "name": "Upton Group"
+        },
+        {
+            "id": "019B2C97-0D97-706E-911F-754C6B1BCDFD",
+            "name": "Veum-Shanahan"
+        },
+        {
+            "id": "019B2C97-0CF8-73B7-8419-7F35C025F656",
+            "name": "Welch Ltd"
+        },
+        {
+            "id": "019B2C97-0D89-7253-8B38-712E3BD6539D",
+            "name": "Welch-Erdman"
+        },
+        {
+            "id": "019B2C97-0D74-738B-A943-BA2AC33D3093",
+            "name": "Wintheiser-Greenfelder"
+        }
+    ],
+    "media": [
+        {
+            "id": "019B2D1B-6524-7137-811D-04EE60037F4E",
+            "name": "campaign_content_distribution.png",
+            "mime_type": "image/png",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-149F-72B2-B188-0A6CD2AA4C9E",
+            "name": "placeat.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1531-70E2-9074-0D5D85EB56BF",
+            "name": "numquam.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-144E-72C1-B827-0ED6A3B352B2",
+            "name": "rerum.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B3162-9C2B-7037-A2BF-139BF3D12FE5",
+            "name": "qlqmanotodofino1}.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": {
+                "id": "019B3162-9C42-7392-9115-05C58B41FD41",
+                "media_id": "019B3162-9C2B-7037-A2BF-139BF3D12FE5"
+            }
+        },
+        {
+            "id": "019B2C97-143A-7246-88E4-196CA2134386",
+            "name": "rerum.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14F6-71F7-AA55-1C86FA309987",
+            "name": "minus.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14DB-7387-B2A8-1F0A4D80C5CA",
+            "name": "provident.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1408-7051-A2B0-21D9BAA41E4C",
+            "name": "unde.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14EF-7266-9D95-22BB32D50C0E",
+            "name": "dolorum.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14C6-7391-9C45-23C755837190",
+            "name": "sapiente.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1524-7341-86BB-24F2B65CAAD5",
+            "name": "illum.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14A5-7191-B257-2860DB0FDEC9",
+            "name": "sint.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-EF28-7197-8CC1-2A53734B56AE",
+            "name": "1MB_1080P_THETESTDATA.COM_mp4.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": {
+                "id": "019B2C97-EF3F-717E-996C-555E3B9386A9",
+                "media_id": "019B2C97-EF28-7197-8CC1-2A53734B56AE"
+            }
+        },
+        {
+            "id": "019B2C97-1472-718F-BF2F-2D073E3325C2",
+            "name": "et.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1486-71F8-8039-31EDDF5C6313",
+            "name": "adipisci.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2D6B-DCF2-7037-BEE9-348768AB4CB4",
+            "name": "qlq.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": {
+                "id": "019B2D6B-DD11-7379-9004-D7A14979BCFD",
+                "media_id": "019B2D6B-DCF2-7037-BEE9-348768AB4CB4"
+            }
+        },
+        {
+            "id": "019B2C97-1455-7078-A752-3546426AC786",
+            "name": "nisi.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2D1B-8917-716D-8F3A-38DE3FE95EA5",
+            "name": "campaign_content_distribution.png",
+            "mime_type": "image/png",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2D5E-A38C-72C9-AD2F-3AA42BD04FD4",
+            "name": "campaign_content_distribution.png",
+            "mime_type": "image/png",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1433-7049-9095-3DE8D8E5CF6B",
+            "name": "consequatur.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14AC-7000-86DD-3E4BF5129BF7",
+            "name": "cum.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2D14-DD6D-71E5-A1F1-491D93B5D64E",
+            "name": "qlq.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": {
+                "id": "019B2D14-DD88-73F7-A49C-D57B27501A03",
+                "media_id": "019B2D14-DD6D-71E5-A1F1-491D93B5D64E"
+            }
+        },
+        {
+            "id": "019B2C97-13FF-72A7-A855-50D57E7A878C",
+            "name": "ex.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2D17-762B-70A9-8E91-5221EF01A660",
+            "name": "campaign_content_distribution.png",
+            "mime_type": "image/png",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14E2-7316-A68C-52DA895C0054",
+            "name": "dolorem.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-148C-71C9-B3DD-545E03E87846",
+            "name": "non.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1448-7211-9171-59D8006660DE",
+            "name": "deserunt.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14CD-7132-9354-5DBD513F01A2",
+            "name": "ratione.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-147F-7250-9E2F-5E29E5058790",
+            "name": "aut.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14BF-7378-BB54-62AFB9CE205B",
+            "name": "ut.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-13D7-727A-9F1D-6BAF3DD1BB24",
+            "name": "doloribus.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-145B-71A3-805A-6C538CB04889",
+            "name": "in.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-13C1-70B5-9B2D-6FF194AC8327",
+            "name": "voluptatum.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2D04-7167-726D-AE31-7149EE3DE86A",
+            "name": "campaign_content_distribution.png",
+            "mime_type": "image/png",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14E8-70BD-BF57-7BAA2F92ABCB",
+            "name": "ducimus.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2D13-123D-73BC-BC70-7BD2545B32BA",
+            "name": "campaign_content_distribution.png",
+            "mime_type": "image/png",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-152A-73E8-9776-7ED6BA098553",
+            "name": "non.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1464-701C-89E1-7FB3FFBDA68A",
+            "name": "est.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14D4-719A-BAFB-89CBBB5104CA",
+            "name": "porro.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1503-7360-9CEE-8F32E346C8F0",
+            "name": "esse.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-13E1-706F-BC27-96894F8771E0",
+            "name": "laudantium.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": null
+        },
+        {
+            "id": "019B3161-735F-71A0-8FF2-9A376E56D7B4",
+            "name": "qlqmanotodofino.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": {
+                "id": "019B3161-7389-736D-BA72-ED171C3DE0E4",
+                "media_id": "019B3161-735F-71A0-8FF2-9A376E56D7B4"
+            }
+        },
+        {
+            "id": "019B2C97-142C-70E2-82A0-9A5D492FB135",
+            "name": "eaque.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14B3-723D-A921-9E031BBE80C2",
+            "name": "ipsum.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-EF4D-7021-8CE7-A0282329F0D2",
+            "name": "locatel.webp",
+            "mime_type": "image/webp",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1510-71EF-AD0C-A40137AD80C2",
+            "name": "ex.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-140F-70CD-85D6-A4C87C36BC84",
+            "name": "et.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14B9-706A-9558-AB3086C4552C",
+            "name": "autem.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1479-72A7-ADCF-AE2BA05A1CD9",
+            "name": "maxime.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-14FD-7049-BBC4-AE2CEFFE0439",
+            "name": "eaque.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-146A-720A-AF58-B2BD8B50D351",
+            "name": "aut.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-141F-729F-AE7B-B7344EFA90D3",
+            "name": "sit.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-151D-7047-9F45-B7908B990A8E",
+            "name": "et.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-13EE-7330-A839-BBA25737F4C9",
+            "name": "et.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1492-71A4-AB72-BE187002A0DC",
+            "name": "ad.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1517-72D9-A222-CC76E269E747",
+            "name": "ut.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2D1F-2728-7094-80B2-D1BE91494540",
+            "name": "qlq.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": {
+                "id": "019B2D1F-274C-72AD-94AB-75361EF46607",
+                "media_id": "019B2D1F-2728-7094-80B2-D1BE91494540"
+            }
+        },
+        {
+            "id": "019B2C97-1499-73FF-8023-D90CE48E6070",
+            "name": "aut.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B31B9-375C-7048-932D-DA26DC0C1609",
+            "name": "qlqmanotodofino1}amsds.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": {
+                "id": "019B31B9-39B8-7188-8AD6-99558B09A104",
+                "media_id": "019B31B9-375C-7048-932D-DA26DC0C1609"
+            }
+        },
+        {
+            "id": "019B2C97-EF93-73CB-BA9C-E07B49D3C35A",
+            "name": "1416529-hd_1920_1080_30fps.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": {
+                "id": "019B2C97-EF9B-720E-8C05-98F9EDC75997",
+                "media_id": "019B2C97-EF93-73CB-BA9C-E07B49D3C35A"
+            }
+        },
+        {
+            "id": "019B2D03-862D-7075-BED1-E47F3BCA0471",
+            "name": "qlq.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": {
+                "id": "019B2D03-864B-719E-B241-6DB2B08112DF",
+                "media_id": "019B2D03-862D-7075-BED1-E47F3BCA0471"
+            }
+        },
+        {
+            "id": "019B2C97-150A-72FD-B35E-E4F19400511A",
+            "name": "nulla.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1417-7018-BD72-E72C1B99EE0C",
+            "name": "sunt.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2CE6-CD39-72F8-835A-E951FB8A9F18",
+            "name": "campaign_content_distribution.png",
+            "mime_type": "image/png",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2C97-1441-731B-9A87-ED252D26CEB3",
+            "name": "occaecati.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2CF8-6DA7-7153-BF6D-EDDBCA0C49BC",
+            "name": "qlq.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": {
+                "id": "019B2CF8-6DD3-7109-A7F8-39A190D805F5",
+                "media_id": "019B2CF8-6DA7-7153-BF6D-EDDBCA0C49BC"
+            }
+        },
+        {
+            "id": "019B2C97-1426-7381-A2E2-EEE73C9A340E",
+            "name": "quia.jpg",
+            "mime_type": "image/jpeg",
+            "thumbnails": null
+        },
+        {
+            "id": "019B2D13-B7BC-72CE-88DA-F0E542640292",
+            "name": "qlq.mp4",
+            "mime_type": "video/mp4",
+            "thumbnails": {
+                "id": "019B2D13-B7E0-70B0-B2DA-2BD7AC1D4039",
+                "media_id": "019B2D13-B7BC-72CE-88DA-F0E542640292"
+            }
+        },
+        {
+            "id": "019B2D11-2B16-7047-AFED-FFF9C8E9B707",
+            "name": "campaign_content_distribution.png",
+            "mime_type": "image/png",
+            "thumbnails": null
+        }
+    ],
+    "centers": [
+        {
+            "id": "019B2C97-06C7-72AB-8B62-0D9A34177D78",
+            "code": "CTR-0001",
+            "name": "Todo"
+        },
+        {
+            "id": "019B2C97-0E28-7349-BDF0-1612B7C681A5",
+            "code": "CTR-3673",
+            "name": "Kuphalstad Center"
+        },
+        {
+            "id": "019B2C97-0DBC-7036-A8C6-4C68C0D7FF72",
+            "code": "CTR-3117",
+            "name": "Port Bellchester Center"
+        },
+        {
+            "id": "019B2C97-0DB4-730E-88F5-54828E4A576A",
+            "code": "CTR-3958",
+            "name": "South Cleorabury Center"
+        },
+        {
+            "id": "019B2C97-0E51-71CE-A75E-55846D46B72C",
+            "code": "CTR-9899",
+            "name": "South Diannaburgh Center"
+        },
+        {
+            "id": "019B2C97-0E35-731E-9A03-5C0D90094E53",
+            "code": "CTR-2074",
+            "name": "Port Raleigh Center"
+        },
+        {
+            "id": "019B2C97-0E1A-7044-AD39-648555A0A088",
+            "code": "CTR-9855",
+            "name": "Lake Scottiechester Center"
+        },
+        {
+            "id": "019B2C97-0E3C-70AB-B977-697D0EB117AA",
+            "code": "CTR-0190",
+            "name": "New Gideon Center"
+        },
+        {
+            "id": "019B2C97-0E2E-7084-98A9-6AD893E0075A",
+            "code": "CTR-8382",
+            "name": "Moenmouth Center"
+        },
+        {
+            "id": "019B2C97-0E0B-7100-B9DA-6C6FEEBBC800",
+            "code": "CTR-8717",
+            "name": "Koelpinbury Center"
+        },
+        {
+            "id": "019B2C97-0E04-73D6-B4A9-6DDE966241CA",
+            "code": "CTR-3704",
+            "name": "Leschchester Center"
+        },
+        {
+            "id": "019B2C97-0DD0-735A-B822-73D91084CD81",
+            "code": "CTR-6886",
+            "name": "Macejkovicshire Center"
+        },
+        {
+            "id": "019B2C97-0E43-715E-86FD-83EE23C7387A",
+            "code": "CTR-8253",
+            "name": "West Manuela Center"
+        },
+        {
+            "id": "019B2C97-0DF5-72D9-A86E-84A9987CC2D5",
+            "code": "CTR-1674",
+            "name": "Krajcikmouth Center"
+        },
+        {
+            "id": "019B2C97-0DAB-734E-AF2A-9848EEDFF5C3",
+            "code": "CTR-6997",
+            "name": "North Astrid Center"
+        },
+        {
+            "id": "019B2C97-0E12-71FB-B771-98CD00AE8034",
+            "code": "CTR-0643",
+            "name": "Ernserton Center"
+        },
+        {
+            "id": "019B2C97-0E22-707F-8AD7-A1AECF119D89",
+            "code": "CTR-2274",
+            "name": "West Margarettetown Center"
+        },
+        {
+            "id": "019B2C97-0DC4-71CA-86B5-AAED97A726F3",
+            "code": "CTR-1062",
+            "name": "Howellfort Center"
+        },
+        {
+            "id": "019B2C97-0DEC-7363-97FC-B5D01455594F",
+            "code": "CTR-6618",
+            "name": "Reeseshire Center"
+        },
+        {
+            "id": "019B2C97-0E4A-7027-99B9-DC68720C146A",
+            "code": "CTR-2574",
+            "name": "Cedrickbury Center"
+        },
+        {
+            "id": "019B2C97-0DFC-7299-B4DB-F73865070799",
+            "code": "CTR-5818",
+            "name": "East Adrienhaven Center"
+        }
+    ]
+}
