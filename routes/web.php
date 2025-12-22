@@ -5,6 +5,7 @@ use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ThumbnailController;
 use App\Http\Controllers\TimeLineController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -16,7 +17,7 @@ Route::get('/', function (Request $req) {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
+    Route::get('dashboard', action: function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
     Route::get('/campaign/activate/{campaign}', [CampaignController::class, 'activate'])->name('campaign.activate');
@@ -28,6 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('campaign', CampaignController::class);
     Route::resource('timeline', TimeLineController::class);
     Route::resource('agreement', AgreementController::class);
+    Route::resource('user', UserController::class);
     Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
     Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
 
