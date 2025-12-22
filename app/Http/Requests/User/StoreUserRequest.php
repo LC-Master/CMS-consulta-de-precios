@@ -28,7 +28,7 @@ class StoreUserRequest extends FormRequest
             if ($this->user()->id == $this->route('id')) {
                 $validator->errors()->add(
                     'name',
-                    'No tienes permisos para modificar tu propio perfil desde este módulo.'
+                    'No puedes modificar tu propio perfil.'
                 );
             }
         });

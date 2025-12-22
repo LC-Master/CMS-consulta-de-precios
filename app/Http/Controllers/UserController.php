@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\User\CreateUserAction;
 use App\Actions\User\UpdateUserAction;
+use App\Enums\UserStatusesEnum;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
@@ -69,6 +70,7 @@ class UserController extends Controller
 
         return Inertia::render('Users/Edit', [
             'user' => $user,
+            'statuses' => array_map(fn(UserStatusesEnum $s) => ['name' => $s->name, 'value' => $s->value], UserStatusesEnum::cases()),
             'roles' => \Spatie\Permission\Models\Role::with('permissions:id,name')
                 ->select('id', 'name')
                 ->get()
@@ -78,7 +80,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user, UpdateUserAction $updateUserAction): RedirectResponse
     {
         try {
-            
+
             $request->validated();
 
             $updateUserAction->execute($user, $request);
@@ -99,7 +101,7 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         if ($user->id === Auth::id()) {
-            return back()->with('error', 'No puedes eliminar tu propia cuenta.');
+            return back()->withErrors('name', 'No puedes eliminar tu propia cuenta.');
         }
 
         $user->delete();

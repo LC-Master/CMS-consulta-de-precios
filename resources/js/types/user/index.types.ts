@@ -6,7 +6,7 @@ export interface User {
     created_at: string;
     updated_at: string;
     status: number;
-    roles?: Role[];
+    roles: Role[];
 }
 
 export interface Props {
@@ -27,5 +27,6 @@ export interface Role {
 
 export type PropsEditPage = {
     user: User;
+    statuses: { name: string; value: number }[];
     roles: Role[];
 }

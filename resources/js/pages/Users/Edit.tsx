@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { useForm } from '@inertiajs/react';
@@ -11,8 +10,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { update } from '@/routes/user';
 import Select from 'react-select'
 
-export default function UserEdit({ user, roles }: PropsEditPage) {
-
+export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Editar usuario',
@@ -29,16 +27,13 @@ export default function UserEdit({ user, roles }: PropsEditPage) {
         password_confirmation: '',
     });
 
-    const selectedRoleInfo = useMemo(() => {
-        return roles.find(r => r.name === data.role);
-    }, [data.role, roles]);
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         e.stopPropagation();
         put(update({ id: user.id }).url);
     };
-
+    const optionsStatuses = statuses.map((status) => ({ value: status.value, label: status.name }))
+    const optionsRoles = roles.map((role) => ({ value: role.name, label: role.name }))
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="flex flex-col items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
@@ -52,7 +47,6 @@ export default function UserEdit({ user, roles }: PropsEditPage) {
                             Actualiza la información y permisos del usuario
                         </p>
                     </div>
-
                     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
                         <div className="grid gap-2">
                             <Label htmlFor="name">Nombre</Label>
@@ -68,32 +62,40 @@ export default function UserEdit({ user, roles }: PropsEditPage) {
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="role">Rol de Usuario</Label>
-                            <select
-                                id="role"
-                                value={data.role}
-                                required
-                                onChange={(e) => setData('role', e.target.value)}
-                                className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 
-                                    `}
-                            >
-                                <option value="" disabled>Selecciona un rol</option>
-                                {roles.map((role) => (
-                                    <option key={role.id} value={role.name}>
-                                        {role.name}
-                                    </option>
-                                ))}
-                            </select>
-
+                            <Select
+                                value={optionsRoles.find(option => option.value === data.role)}
+                                onChange={(val) => setData('role', val ? String(val.value) : '')}
+                                options={optionsRoles}
+                                inputId="role"
+                                name="role"
+                                classNamePrefix="react-select"
+                                placeholder="Selecciona un rol"
+                                isClearable
+                                aria-required={false}
+                                aria-invalid={!!errors.role}
+                                aria-describedby={errors.role ? 'role-error' : undefined}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        borderColor: errors.role ? '#ef4444' : provided.borderColor,
+                                        boxShadow: errors.role ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
+                                        '&:hover': {
+                                            borderColor: errors.role ? '#ef4444' : provided.borderColor,
+                                        },
+                                        borderRadius: '0.375rem',
+                                    }),
+                                }}
+                            />
                             <InputError message={errors.role} />
-                            {selectedRoleInfo && (
+                            {data.role && (
                                 <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-100 animate-in fade-in slide-in-from-top-1 duration-300">
                                     <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
                                         Permisos activos:
                                     </p>
 
-                                    {selectedRoleInfo.permissions.length > 0 ? (
+                                    {roles.find(role => role.name === data.role) ? (
                                         <div className="flex flex-wrap gap-1.5">
-                                            {selectedRoleInfo.permissions.map((perm) => (
+                                            {roles.find(role => role.name === data.role)?.permissions.map((perm) => (
                                                 <span
                                                     key={perm.id}
                                                     className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200"
@@ -113,16 +115,9 @@ export default function UserEdit({ user, roles }: PropsEditPage) {
                             <Label htmlFor="status">Estatus</Label>
                             <Select
                                 id='status'
-                                value={data.status === 1 ? { value: 1, label: 'Activo' } : { value: 0, label: 'Inactivo' }}
-                                onChange={(selectedOption) => {
-                                    if (selectedOption) {
-                                        setData('status', selectedOption.value);
-                                    }
-                                }}
-                                options={[
-                                    { value: 1, label: 'Activo' },
-                                    { value: 0, label: 'Inactivo' },
-                                ]}
+                                value={optionsStatuses.find(option => option.value === data.status)}
+                                onChange={(val) => setData('status', val ? Number(val.value) : 1)}
+                                options={optionsStatuses}
                             />
                         </div>
 
