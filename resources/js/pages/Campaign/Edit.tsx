@@ -3,7 +3,8 @@ import { useForm, router } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
-import React, { useState, ChangeEvent, useEffect } from 'react'
+import React, { useEffect } from 'react'
+import useSearch from '@/hooks/use-search'
 import { Button } from '@/components/ui/button'
 import useModal from '@/hooks/use-modal'
 import { CampaignCreateProps } from '@/types/campaign/page.type'
@@ -16,15 +17,10 @@ import MediaList from '@/components/campaign/MediaList'
 import { breadcrumbs } from '@/tools/breadcrumbs'
 
 export default function CampaignEdit({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
-
+    const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { isOpen, openModal, closeModal } = useModal(false)
-    const [search, setSearch] = useState<string>('')
     const ToastComponent = useToast(flash)
-    const handlerSearch = (e: ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value)
-        setMediaList(media?.filter(item => item.name.toLowerCase().includes(e.target.value.toLowerCase())) || [])
-    }
-
+    const { handlerSearch, search } = useSearch<MediaItem>(media, setMediaList)
     const handleSuccess = () => {
         router.reload(
             {
@@ -32,7 +28,6 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
             }
         )
     }
-    const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { data, setData, processing, errors, put, transform } = useForm({
         title: '',
         start_at: '',
