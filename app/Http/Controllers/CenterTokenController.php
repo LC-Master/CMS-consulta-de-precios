@@ -14,8 +14,26 @@ class CenterTokenController extends Controller
 {
     public function index(Request $request)
     {
+        $query = PersonalAccessToken::with('tokenable')
+            ->where('tokenable_type', Center::class);
+
+        if ($request->filled('center')) {
+            $query->where('tokenable_id', $request->input('center'));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('tokenable', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%")
+                            ->orWhere('code', 'like', "%{$search}%");
+                    });
+            });
+        }
+
         return Inertia::render('CenterTokens/Index', [
-            'centerTokens' => Inertia::scroll(fn() => PersonalAccessToken::with('tokenable')->latest()->paginate()->through(fn($token) => [
+            'centerTokens' => Inertia::scroll(fn() => $query->latest()->paginate()->through(fn($token) => [
                 'id' => $token->id,
                 'name' => $token->name ?? null,
                 'abilities' => $token->abilities,
@@ -29,7 +47,7 @@ class CenterTokenController extends Controller
                     ]
                     : null,
             ])),
-            'filters' => $request->only(['search']),
+            'filters' => $request->only(['search', 'center']),
             'centers' => Center::select('id', 'name', 'code')->get(),
         ]);
     }
@@ -44,7 +62,22 @@ class CenterTokenController extends Controller
      */
     public function store(StoreCenterTokenRequest $request)
     {
-        //
+        try {
+            $request->validated();
+            $center = Center::findOrFail($request->center_id);
+
+            $token = $center->createToken($request->name)->plainTextToken;
+
+            return back()->with([
+                'flash' => ['success' => 'Token creado correctamente', 'token' => $token],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Error creating center token: ' . $e->getMessage(), ['admin_id' => auth()->id()]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error inesperado al crear el token.');
+        }
     }
 
     public function show(PersonalAccessToken $centerToken)
@@ -74,10 +107,6 @@ class CenterTokenController extends Controller
 
     public function destroy(PersonalAccessToken $centertoken)
     {
-        if (!$centertoken->exists) {
-            abort(404, 'Token no encontrado.');
-        }
-
         try {
             $centertoken->delete();
 

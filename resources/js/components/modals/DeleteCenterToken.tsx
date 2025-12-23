@@ -1,6 +1,6 @@
 import Modal from "@/components/Modal";
 import { useState, useEffect } from "react";
-import { useForm } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import { Button } from "../ui/button";
 import { destroy } from "@/routes/centertokens";
 
@@ -15,14 +15,13 @@ export default function DeleteCenterToken({ closeModal, tokenId }: { closeModal:
     const { delete: deleteToken } = useForm("delete")
 
     return (
-        <Modal blur={false} closeModal={closeModal}>
+        <Modal blur={false} className="bg-white" closeModal={closeModal}>
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
                     deleteToken(destroy({ centertoken: tokenId }).url, {
-                        only: ['flash', 'centerTokens'],
                         onSuccess: () => {
-
+                            router.reload({ only: ['centerTokens', 'flash'] });
                             closeModal();
                         },
                         preserveScroll: true
@@ -39,14 +38,14 @@ export default function DeleteCenterToken({ closeModal, tokenId }: { closeModal:
                     <Button
                         type='button'
                         onClick={closeModal}
-                        className="px-4 py-2 bg-gray-300 text-gray-800 rounded"
+                        className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
                     >
                         Cancelar
                     </Button>
                     <Button
                         type="submit"
                         disabled={counter > 0}
-                        className="px-4 py-2 bg-red-600 text-white rounded"
+                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
                     >
                         Eliminar {counter > 0 ? `(${counter})` : ''}
                     </Button>

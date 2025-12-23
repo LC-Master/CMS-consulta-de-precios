@@ -3,6 +3,7 @@ export type Props = {
     centerTokens: { data: CenterToken[] };
     centers: Center[];
     flash?: { success?: string; error?: string };
+    filters: { search?: string; center?: string };
 };
 
 export type CenterToken = {
