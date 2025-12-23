@@ -69,7 +69,7 @@ class CenterTokenController extends Controller
             $token = $center->createToken($request->name)->plainTextToken;
 
             return back()->with([
-                'flash' => ['success' => 'Token creado correctamente', 'token' => $token],
+                'success' => ['success' => 'Token creado correctamente', 'token' => $token],
             ]);
         } catch (\Throwable $e) {
             Log::error('Error creating center token: ' . $e->getMessage(), ['admin_id' => auth()->id()]);

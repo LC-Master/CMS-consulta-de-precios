@@ -7,15 +7,22 @@ import InputError from "../input-error";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { store } from "@/routes/centertokens";
+import { useState } from "react";
 
 export default function CreateCenterToken({ centers, closeModal }: { closeModal: () => void, centers: Center[] }) {
+    const [tokenValue, setTokenValue] = useState<string | null>(null);
     const { post, setData, processing, errors } = useForm({
         name: '',
         center_id: ''
     });
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(store().url);
+
+        post(store().url, {
+            onSuccess: (page: any) => {
+                setTokenValue(page?.props?.flash?.success?.token ?? null);
+            }
+        });
     }
     return (
         <Modal className="border-locatel-claro border-2 bg-white" closeModal={closeModal} blur={false} >
@@ -70,6 +77,12 @@ export default function CreateCenterToken({ centers, closeModal }: { closeModal:
                             />
                         </div>
                         <InputError message={errors.center_id} />
+                        {tokenValue && (
+                            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
+                                <h2 className="text-sm font-medium text-green-800 mb-2">Token creado exitosamente</h2>
+                                <p className="text-sm text-green-700 break-all">{tokenValue}</p>
+                            </div>
+                        )}
                     </div>
 
                     <footer className="pt-6 border-t flex flex-col-reverse sm:flex-row items-center justify-end gap-3">

@@ -21,7 +21,9 @@ export default function DeleteCenterToken({ closeModal, tokenId }: { closeModal:
                     e.preventDefault();
                     deleteToken(destroy({ centertoken: tokenId }).url, {
                         onSuccess: () => {
-                            router.reload({ only: ['centerTokens', 'flash'] });
+                            router.reload({
+                                only: ['centerTokens', 'flash'], reset: ['centerTokens']
+                            });
                             closeModal();
                         },
                         preserveScroll: true
@@ -51,7 +53,7 @@ export default function DeleteCenterToken({ closeModal, tokenId }: { closeModal:
                     </Button>
                 </div>
             </form>
-        </Modal>
+        </Modal >
     )
 
 }
