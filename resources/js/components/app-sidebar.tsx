@@ -16,7 +16,7 @@ import { index, create } from '@/routes/campaign';
 import { index as user } from '@/routes/user';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, lazy,  LayoutGrid, SquarePlus, List, Handshake, Film } from 'lucide-react';
+import { Users, LayoutGrid, SquarePlus, List, Handshake, Film } from 'lucide-react';
 import { lazy } from 'react';
 
 const Logo = lazy(() => import('@/components/app-logo'));
