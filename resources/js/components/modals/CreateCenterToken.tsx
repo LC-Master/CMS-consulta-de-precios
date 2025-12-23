@@ -95,12 +95,23 @@ export default function CreateCenterToken({ centers, closeModal }: { closeModal:
                     </div>
 
                     <footer className="pt-6 border-t flex flex-col-reverse sm:flex-row items-center justify-end gap-3">
-                        <Button type="button" onClick={closeModal} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-                            Cancelar
-                        </Button>
-                        <Button type="submit" disabled={processing} className="bg-locatel-oscuro text-white px-4 py-2 rounded hover:bg-green-800">
-                            Crear token
-                        </Button>
+                        {tokenValue ? (
+                            <Button
+                                type="button"
+                                onClick={closeModal}
+                            >
+                                Cerrar
+                            </Button>
+                        ) : (
+                            <>
+                                <Button type="button" onClick={closeModal} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                                    Cancelar
+                                </Button>
+                                <Button type="submit" disabled={processing} className="bg-locatel-oscuro text-white px-4 py-2 rounded hover:bg-green-800">
+                                    Crear token
+                                </Button>
+                            </>
+                        )}
                     </footer>
                 </div>
             </form>

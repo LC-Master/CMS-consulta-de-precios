@@ -15,9 +15,10 @@ import { create as agreementCreate, index as agreement } from '@/routes/agreemen
 import { index, create } from '@/routes/campaign';
 import { index as media } from '@/routes/media';
 import { index as user } from '@/routes/user';
+import { index as tokens } from '@/routes/centertokens';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Users, LayoutGrid, SquarePlus, List, Handshake, Film } from 'lucide-react';
+import { Users, KeyRound, LayoutGrid, SquarePlus, List, Handshake, Film } from 'lucide-react';
 import { lazy } from 'react';
 
 const Logo = lazy(() => import('@/components/app-logo'));
@@ -62,7 +63,11 @@ const footerNavItems: NavItem[] = [
         href: user().url,
         icon: Users,
     },
-
+    {
+        title: 'Lista de tokens',
+        href: tokens().url,
+        icon: KeyRound,
+    },
 ];
 
 export function AppSidebar() {
