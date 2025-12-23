@@ -20,7 +20,16 @@ export default function CreateCenterToken({ centers, closeModal }: { closeModal:
 
         post(store().url, {
             onSuccess: (page: any) => {
+                if (page?.props?.flash?.error) {
+                    setTokenValue(null);
+                    closeModal();
+                    return;
+                }
                 setTokenValue(page?.props?.flash?.success?.token ?? null);
+            },
+            onError: () => {
+                setTokenValue(null);
+                closeModal();
             }
         });
     }
