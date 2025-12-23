@@ -21,7 +21,6 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
         password: '',
         password_confirmation: '',
     });
-    console.log(user)
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         e.stopPropagation();

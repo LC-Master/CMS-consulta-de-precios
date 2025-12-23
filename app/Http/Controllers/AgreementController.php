@@ -16,7 +16,7 @@ use Inertia\Inertia;
 
 class AgreementController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request)a
     {
         $query = Agreement::query();
 
