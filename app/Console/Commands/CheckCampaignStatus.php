@@ -42,7 +42,6 @@ class CheckCampaignStatus extends Command
 
         $now = Carbon::now();
 
-        // Buscamos campañas que tengan el UUID de activa y cuya fecha haya vencido
         $affectedRows = Campaign::where('status_id', $statusActiva->id)
             ->where('end_at', '<=', $now)
             ->update(['status_id' => $statusFinalizada->id]);
