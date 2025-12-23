@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Test User',
                 'password' => 'password',
+                'status' => 1,
                 'email_verified_at' => now(),
             ]
         );

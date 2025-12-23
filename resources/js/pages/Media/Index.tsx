@@ -9,6 +9,8 @@ import Select from 'react-select';
 import { Campaign, MediaItem, Props } from '@/types/campaign/index.types';
 import { Button } from '@/components/ui/button';
 import useToast from '@/hooks/use-toast';
+import { breadcrumbs } from '@/tools/breadcrumbs';
+import { index } from '@/routes/media';
 
 const formatBytes = (bytes: number | string, decimals = 2) => {
     const value = Number(bytes);
@@ -146,7 +148,7 @@ export default function MediaIndex({ medias, filters = {}, mimeTypes = [], flash
     }, [search, type])
 
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={breadcrumbs('Lista de multimedia',index().url)}>
             <div className="space-y-4 px-4 pb-4">
                 {ToastContainer()}
                 <div className="flex flex-col sm:flex-row gap-4 mt-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">

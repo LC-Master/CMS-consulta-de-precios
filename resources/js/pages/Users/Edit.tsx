@@ -1,5 +1,4 @@
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { PropsEditPage } from '@/types/user/index.types';
 import InputError from '@/components/input-error';
@@ -9,24 +8,20 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { update } from '@/routes/user';
 import Select from 'react-select'
+import { Link } from '@inertiajs/react';
+import { edit, index } from '@/routes/user';
+import { breadcrumbs } from '@/tools/breadcrumbs';
 
 export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Editar usuario',
-            href: `/user/${user.id}/edit`,
-        },
-    ];
-
     const { data, setData, processing, errors, put } = useForm({
         name: user.name,
         email: user.email,
-        status: user.status ?? 1,
+        status: user.status ? Number(user.status) : 1,
         role: user.roles && user.roles.length > 0 ? user.roles[0].name : '',
         password: '',
         password_confirmation: '',
     });
-
+    console.log(user)
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -35,7 +30,7 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
     const optionsStatuses = statuses.map((status) => ({ value: status.value, label: status.name }))
     const optionsRoles = roles.map((role) => ({ value: role.name, label: role.name }))
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs('Editar usuario', edit({ id: user.id }).url)}>
             <div className="flex flex-col items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
                 <div className="w-full max-w-2xl space-y-8 bg-white border-locatel-claro border-2 p-8 rounded-lg">
 
@@ -171,13 +166,13 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
                                 Actualizar Usuario
                             </Button>
 
-                            <Button
-                                type="button"
-                                className="w-full bg-red-600 text-white hover:bg-red-700 cursor-pointer"
-                                onClick={() => (window.location.href = '/user')}
+                            <Link
+                                className="w-full flex items-center justify-center bg-red-600 rounded-md h-9 text-white hover:bg-red-700 cursor-pointer"
+                                href={index().url}
+                                viewTransition
                             >
                                 Cancelar
-                            </Button>
+                            </Link>
                         </div>
 
                     </form>

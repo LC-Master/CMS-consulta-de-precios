@@ -11,8 +11,9 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard, } from '@/routes';
-import { store, index as agreement } from '@/routes/agreement';
+import { create as agreementCreate, index as agreement } from '@/routes/agreement';
 import { index, create } from '@/routes/campaign';
+import { index as media } from '@/routes/media';
 import { index as user } from '@/routes/user';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
@@ -34,7 +35,7 @@ const mainNavItems: NavItem[] = [
     }
     , {
         title: 'Crear Convenios',
-        href: store().url,
+        href: agreementCreate().url,
         icon: SquarePlus,
     }
     , {
@@ -53,7 +54,7 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Listado de Videos',
-        href: '/media',
+        href: media().url,
         icon: Film,
     },
     {

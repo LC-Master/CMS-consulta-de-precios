@@ -9,7 +9,7 @@ import {
 import { resolveUrl } from '@/lib/utils';
 import { type NavItem } from '@/types';
 import { type ComponentPropsWithoutRef } from 'react';
-import { usePage } from '@inertiajs/react';
+import { usePage,Link } from '@inertiajs/react';
 
 export function NavFooter({
     items,
@@ -33,10 +33,11 @@ export function NavFooter({
                                 // text-neutral-600 hover:text-neutral-800
                                 className={`${url === item.href ? "bg-white text-black" : "text-white"}  transition-colors active:bg-black active:text-white dark:text-neutral-300 dark:hover:text-neutral-100`}
                             >
-                                <a
+                                <Link
                                     href={resolveUrl(item.href)}
                                     // target="_blank"
                                     rel="noopener noreferrer"
+                                    viewTransition
                                 >
                                     {item.icon && (
                                         <Icon
@@ -45,7 +46,7 @@ export function NavFooter({
                                         />
                                     )}
                                     <span>{item.title}</span>
-                                </a>
+                                </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))}
