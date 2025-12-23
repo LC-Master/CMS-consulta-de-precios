@@ -219,8 +219,8 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                 title="AM"
                                 items={am}
                                 onMoveToOther={(item) => transfer(item, setAm, setPm)}
-                                onMoveUp={(id) => moveUp(id, am, setAm)}
-                                onMoveDown={(id) => moveDown(id, am, setAm)}
+                                onMoveUp={(id) => moveUp(id, setAm)}
+                                onMoveDown={(id) => moveDown(id, setAm)}
                                 onRemove={(item) => transfer(item, setAm, setMediaList)}
                                 errors={errors.am_media}
                             />
@@ -228,8 +228,8 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                 title="PM"
                                 items={pm}
                                 onMoveToOther={(item) => transfer(item, setPm, setAm)}
-                                onMoveUp={(id) => moveUp(id, pm, setPm)}
-                                onMoveDown={(id) => moveDown(id, pm, setPm)}
+                                onMoveUp={(id) => moveUp(id, setPm)}
+                                onMoveDown={(id) => moveDown(id, setPm)}
                                 onRemove={(item) => transfer(item, setPm, setMediaList)}
                                 errors={errors.pm_media}
                             />

@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
+use App\Http\Controllers\CenterTokenController;
 
 Route::get('/', function (Request $req) {
     return Inertia::render('welcome', [
@@ -32,7 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('user', UserController::class);
     Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
     Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
-
+    Route::resource('centertokens', CenterTokenController::class);
 });
 
 require __DIR__ . '/settings.php';

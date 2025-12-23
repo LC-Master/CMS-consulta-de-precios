@@ -1,7 +1,7 @@
-export default function Modal({ children, closeModal, className }: { children: React.ReactNode; closeModal: () => void; className?: string }) {
+export default function Modal({ children, closeModal, className, blur = true }: { blur?: boolean; children: React.ReactNode; closeModal: () => void; className?: string }) {
     return (
         <div
-            className="fixed inset-0 flex items-center backdrop-blur-sm justify-center z-50"
+            className={`fixed inset-0 flex items-center ${blur ? 'backdrop-blur-md' : ''} justify-center z-50`}
             onClick={closeModal}
         >
 
