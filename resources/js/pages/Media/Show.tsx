@@ -1,19 +1,13 @@
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/media';
-import { BreadcrumbItem } from '@/types';
+import { breadcrumbs } from '@/tools/breadcrumbs';
 import { MediaItem } from '@/types/campaign/index.types';
-
+import { Link } from '@inertiajs/react';
 export default function MediaShow({ media }: { media: MediaItem }) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Detalle de medio - ' + media.name,
-            href: index().url,
-        },
-    ];
-    console.log(media)
+
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs(`${'Detalle de medio - ' + media.name}`, index().url)}>
             <div className="flex flex-col md:grid md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 flex flex-col mt-8 ml-2 shadow-2xl rounded-lg">
                     <div className="bg-white shadow rounded-lg p-6 flex-1 flex flex-col">
@@ -40,12 +34,12 @@ export default function MediaShow({ media }: { media: MediaItem }) {
                         </div>
 
                         <div className="mt-6 flex gap-3 shadow-2xs rounded-b-lg p-4 justify-end bg-gray-50">
-                            <a href={`/media/cdn/${media.id}`} download className="inline-block  text-white rounded-xl p-2 bg-locatel-claro hover:bg-locatel-medio">
+                            <Link viewTransition href={`/media/cdn/${media.id}`} download className="inline-block  text-white rounded-xl p-2 bg-locatel-claro hover:bg-locatel-medio">
                                 Descargar
-                            </a>
-                            <a href={index().url} className="inline-block bg-locatel-oro text-white rounded-xl p-2 hover:bg-locatel-naranja">
+                            </Link>
+                            <Link viewTransition href={index().url} className="inline-block bg-locatel-oro text-white rounded-xl p-2 hover:bg-locatel-naranja">
                                 Volver
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
