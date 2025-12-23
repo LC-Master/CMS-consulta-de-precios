@@ -32,12 +32,10 @@ class CheckCampaignStatus extends Command
 
         if (!$statusActiva) {
             $this->error('Error: No se encontró el estatus con nombre "Activa" en la tabla statuses.');
-            return Command::FAILURE;
         }
 
         if (!$statusFinalizada) {
             $this->error('Error: No se encontró el estatus con nombre "Finalizada" en la tabla statuses.');
-            return Command::FAILURE;
         }
 
         $now = Carbon::now();
@@ -51,7 +49,6 @@ class CheckCampaignStatus extends Command
         } else {
             $this->info("No se encontraron campañas vencidas para finalizar.");
         }
-        
-        return Command::SUCCESS;
+        $this->info('Proceso completado.');
     }
 }
