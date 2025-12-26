@@ -4,14 +4,19 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Models\User; 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash; 
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException; 
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
+use App\Http\Responses\LogoutResponse;
+use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -28,9 +33,32 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->app->instance(LogoutResponseContract::class, new LogoutResponse);
+        
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();
+
+
+        Fortify::authenticateUsing(function (Request $request) {
+         
+            $user = User::where('email', $request->email)->first();
+
+           
+            if ($user && Hash::check($request->password, $user->password)) {
+                
+                
+                if ($user->status == 1) {
+                    return $user;
+                }
+
+                throw ValidationException::withMessages([
+                    Fortify::username() => ['Tu cuenta está inactiva. Por favor contacta al soporte.'],
+                ]);
+            }
+
+            return null;
+        });
     }
 
     /**

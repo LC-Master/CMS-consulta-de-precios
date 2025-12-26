@@ -2,25 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Media;
+use App\Actions\Media\StoreMediaAction;
+use App\Enums\CampaignStatus;
 use App\Http\Requests\Media\StoreMediaRequest;
 use App\Http\Requests\Media\UpdateMediaRequest;
-use Inertia\Inertia;
+use App\Models\Media;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Illuminate\Http\Request;
 
 class MediaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-       return Inertia::render('Media/Index', [
-            'medias' => Inertia::scroll(fn () => Media::paginate()),
+        $query = Media::query()->with('campaigns');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('campaigns', function ($qCamp) use ($search) {
+                        $qCamp->where('title', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('mime_type', $request->type);
+        }
+
+        $mimeTypes = Media::query()
+            ->select('mime_type')
+            ->distinct()
+            ->whereNotNull('mime_type')
+            ->orderBy('mime_type')
+            ->pluck('mime_type');
+
+        return Inertia::render('Media/Index', [
+            'medias' => Inertia::scroll(fn() => $query->latest()->paginate(20)->withQueryString()),
+            'filters' => $request->only(['search', 'type']),
+            'mimeTypes' => $mimeTypes,
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -33,33 +62,16 @@ class MediaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreMediaRequest $request)
+    public function store(StoreMediaRequest $request, StoreMediaAction $storeMediaAction)
     {
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            
-            // 1. Guardar archivo en disco (carpeta 'uploads' en disco 'public')
-            $path = $file->store('uploads', 'public');
-            
-            // 2. Calcular checksum (hash MD5 del archivo)
-            $checksum = md5_file($file->getRealPath());
+        try {
+            $request->validated();
+            $storeMediaAction->execute($request);
 
-            // 3. Guardar registro en BD
-            Media::create([
-                'disk' => 'public',
-                'path' => $path,
-                'mime_type' => $file->getClientMimeType(),
-                'size' => $file->getSize(),
-                'duration_seconds' => null, // Requeriría librería externa (FFMpeg) si es video
-                'checksum' => $checksum,
-                'created_by' => Auth::id(), // Asignamos el usuario actual
-            ]);
-
-            return Redirect::route('media.index')
-                ->with('success', 'Archivo subido correctamente.');
+            return back()->with('success', 'Archivos subidos correctamente.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Error al subir los archivos.');
         }
-
-        return Redirect::back()->withErrors(['file' => 'Error al subir el archivo.']);
     }
 
     /**
@@ -67,11 +79,25 @@ class MediaController extends Controller
      */
     public function show(Media $media)
     {
-        return Inertia::render('Media/Show', [
-            'media' => $media,
-            // Enviamos la URL pública para poder visualizar la imagen/archivo
-            'url' => Storage::url($media->path) 
-        ]);
+        try {
+            $media->load([
+                'campaigns' => function ($query) {
+                    $query->whereHas('status', function ($q) {
+                        $q->whereIn('status', [
+                            CampaignStatus::ACTIVE->value,
+                            CampaignStatus::DRAFT->value,
+                        ]);
+                    });
+                }
+            ]);
+
+            return Inertia::render('Media/Show', [
+                'media' => $media,
+            ]);
+        } catch (\Throwable $e) {
+            logger()->error('Error loading media details: ' . $e->getMessage(), ['media_id' => $media->id]);
+            return back()->with('error', 'Ocurrió un error al cargar el archivo.');
+        }
     }
 
     /**
@@ -81,7 +107,7 @@ class MediaController extends Controller
     {
         return Inertia::render('Media/Edit', [
             'media' => $media,
-            'url' => Storage::url($media->path)
+            'url' => Storage::url($media->path),
         ]);
     }
 
@@ -90,26 +116,21 @@ class MediaController extends Controller
      */
     public function update(UpdateMediaRequest $request, Media $media)
     {
-        // Solo actualizamos si el usuario subió un archivo nuevo para reemplazar el anterior
         if ($request->hasFile('file')) {
             $file = $request->file('file');
 
-            // 1. Eliminar archivo viejo
             if (Storage::disk($media->disk)->exists($media->path)) {
                 Storage::disk($media->disk)->delete($media->path);
             }
 
-            // 2. Subir archivo nuevo
             $path = $file->store('uploads', 'public');
             $checksum = md5_file($file->getRealPath());
 
-            // 3. Actualizar BD
             $media->update([
                 'path' => $path,
                 'mime_type' => $file->getClientMimeType(),
                 'size' => $file->getSize(),
                 'checksum' => $checksum,
-                // 'created_by' usualmente no se cambia en update
             ]);
 
             return Redirect::route('media.index')
@@ -125,15 +146,60 @@ class MediaController extends Controller
      */
     public function destroy(Media $media)
     {
-        // 1. Eliminar el archivo físico
-        if (Storage::disk($media->disk)->exists($media->path)) {
-            Storage::disk($media->disk)->delete($media->path);
+        try {
+            $isInUse = $media->campaigns()->whereHas('status', function ($query) {
+                $query->whereIn('status', [
+                    CampaignStatus::ACTIVE->value,
+                    CampaignStatus::DRAFT->value
+                ]);
+            })->exists();
+
+            if ($isInUse) {
+                return back()->with('error', 'La imagen está siendo utilizada en una campaña en borrador o activa.');
+            }
+
+            if (Storage::disk($media->disk)->exists($media->path)) {
+                Storage::disk($media->disk)->delete($media->path);
+            }
+
+            $media->delete();
+
+            return back()->with('success', 'Archivo eliminado correctamente.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Ocurrió un error al eliminar el archivo.');
         }
+    }
 
-        // 2. Eliminar el registro de la BD
-        $media->delete();
+    public function preview(Media $media)
+    {
+        try {
+            $path = Storage::disk('public')->path($media->path);
 
-        return Redirect::route('media.index')
-            ->with('success', 'Archivo eliminado correctamente.');
+            if (!Storage::disk('public')->exists($media->path)) {
+                logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->id]);
+                abort(404, 'El archivo físico no existe en el servidor.');
+            }
+
+            return response()->file($path);
+        } catch (\Throwable $e) {
+            logger()->error('Error generating media preview: ' . $e->getMessage(), ['media_id' => $media->id]);
+            abort(500, 'Ocurrió un error al generar la vista previa del archivo.');
+        }
+    }   
+    public function download(Media $media)
+    {
+        try {
+            $path = Storage::disk('public')->path($media->path);
+
+            if (!Storage::disk('public')->exists($media->path)) {
+                logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->id]);
+                abort(404, 'El archivo físico no existe en el servidor.');
+            }
+
+            return response()->download($path, $media->name);
+        } catch (\Throwable $e) {
+            logger()->error('Error downloading media file: ' . $e->getMessage(), ['media_id' => $media->id]);
+            abort(500, 'Ocurrió un error al descargar el archivo.');
+        }
     }
 }

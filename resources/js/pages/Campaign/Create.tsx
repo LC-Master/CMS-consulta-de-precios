@@ -1,28 +1,39 @@
 import AppLayout from '@/layouts/app-layout'
-import { index } from '@/routes/campaign'
-import { BreadcrumbItem } from '@/types'
-import { usePage, useForm } from '@inertiajs/react'
+import { useForm } from '@inertiajs/react'
 import Select from 'react-select'
-import { Center, Department, Option, Agreement } from '@/types/campaign/index.types'
+import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
+import { Input } from '@/components/ui/input'
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import useModal from '@/hooks/use-modal'
+import { CampaignCreateProps } from '@/types/campaign/page.type'
+import UploadMediaModal from '@/components/modals/UploadMediaModal'
+import useToast from '@/hooks/use-toast'
+import { useMediaSync } from '@/hooks/use-mediasync'
+import { index, store } from '@/routes/campaign'
+import MediaColumn from '@/components/campaign/MediaColumn'
+import MediaList from '@/components/campaign/MediaList'
+import { breadcrumbs } from '@/tools/breadcrumbs'
+import useSearch from '@/hooks/use-search'
+import { useMediaActions } from '@/hooks/use-media-actions'
 
-export default function CampaignCreate() {
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Crear campaña',
-            href: index().url,
-        },
-    ];
+export default function CampaignCreate({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
+    const { isOpen, openModal, closeModal } = useModal(false)
+    const ToastComponent = useToast(flash)
+    const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
+    const { handlerSearch, search, filteredItems } = useSearch(mediaList);
+    const { moveUp, moveDown, transfer } = useMediaActions<MediaItem>();
 
-    const { centers, departments, agreements } = usePage<{ centers: Center[], departments: Department[], agreements: Agreement[] }>().props
-    const { data, setData, processing, errors, post } = useForm({
+    const { data, setData, processing, errors, post, transform } = useForm({
         title: '',
         start_at: '',
         end_at: '',
         centers: [] as string[],
         department_id: '',
         agreement_id: '',
+        am_media: [] as string[],
+        pm_media: [] as string[],
     })
-    console.log(usePage().props);
     const optionsCenter: Option[] = centers.map((center: Center) => {
         return { value: center.id, label: center.name + " - " + center.code }
     })
@@ -34,112 +45,205 @@ export default function CampaignCreate() {
     })
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        post('/campaign')
+        transform(data => ({
+            ...data,
+            am_media: am.map(item => item.id),
+            pm_media: pm.map(item => item.id),
+        }))
+        post(store().url, { preserveScroll: true, forceFormData: true })
     }
+
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs('Crear Campaña', index().url)}>
+            {ToastComponent.ToastContainer()}
             <div className="p-6 space-y-6">
-                <form id="form" method="post" onSubmit={handleSubmit} className="space-y-4" action="/campaigns">
+                <form id="form" method="post" onSubmit={handleSubmit} className="space-y-4" action="/campaigns" noValidate>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título</label>
-                            <input
+                            <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título. *</label>
+                            <Input
                                 type="text"
                                 id="title"
-                                value={data.title}
                                 name="title"
+                                value={data.title}
                                 required
-                                placeholder='Titulo de la campaña'
-                                onChange={e => setData('title', e.target.value)}
+                                placeholder="Título de la campaña"
+                                autoComplete="off"
+                                aria-invalid={!!errors.title}
+                                aria-describedby={errors.title ? 'title-error' : undefined}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('title', e.target.value)}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                             />
-                            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+                            {errors.title && <p id="title-error" role="alert" className="text-red-500 text-sm mt-1">{errors.title}</p>}
                         </div>
 
                         <div>
-                            <label htmlFor="department_id" className="block text-sm font-medium text-gray-700">Departamento</label>
+                            <label htmlFor="department_id" className="block text-sm font-medium text-gray-700">Departamento. *</label>
                             <Select<Option, false>
                                 options={optionsDepartment}
-                                id="departments"
+                                inputId="department_id"
                                 value={optionsDepartment.find(o => o.value === data.department_id) || null}
-                                name="departments"
-                                className="mt-1"
+                                name="department_id"
                                 classNamePrefix="react-select"
                                 onChange={(val) => setData('department_id', (val as Option | null)?.value ?? '')}
                                 placeholder="Selecciona un departamento"
                                 isClearable
+                                aria-required={false}
+                                aria-invalid={!!errors.department_id}
+                                aria-describedby={errors.department_id ? 'department_id-error' : undefined}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        borderColor: errors.department_id ? '#ef4444' : provided.borderColor,
+                                        boxShadow: errors.department_id ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
+                                        '&:hover': {
+                                            borderColor: errors.department_id ? '#ef4444' : provided.borderColor,
+                                        },
+                                        borderRadius: '0.375rem',
+                                    }),
+                                }}
                             />
-                            {errors.department_id && <p className="text-red-500 text-sm mt-1">{errors.department_id}</p>}
+                            {errors.department_id && <p id="department_id-error" role="alert" className="text-red-500 text-sm mt-1">{errors.department_id}</p>}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="start_date" className="block text-sm font-medium text-gray-700">Fecha y hora (inicio)</label>
-                            <input
+                            <label htmlFor="start_at" className="block text-sm font-medium text-gray-700">Fecha y hora (inicio). *</label>
+                            <Input
                                 type="datetime-local"
-                                id="start_date"
+                                id="start_at"
+                                name="start_at"
                                 value={data.start_at}
                                 required
-                                name="start_date"
                                 onChange={e => setData('start_at', e.target.value)}
+                                aria-invalid={!!errors.start_at}
+                                aria-describedby={errors.start_at ? 'start_at-error' : undefined}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                             />
-                            {errors.start_at && <p className="text-red-500 text-sm mt-1">{errors.start_at}</p>}
+                            {errors.start_at && <p id="start_at-error" role="alert" className="text-red-500 text-sm mt-1">{errors.start_at}</p>}
                         </div>
 
                         <div>
-                            <label htmlFor="end_date" className="block text-sm font-medium text-gray-700">Fecha y hora (fin)</label>
-                            <input
+                            <label htmlFor="end_at" className="block text-sm font-medium text-gray-700">Fecha y hora (fin). *</label>
+                            <Input
                                 type="datetime-local"
-                                id="end_date"
+                                id="end_at"
+                                name="end_at"
                                 value={data.end_at}
                                 required
-                                name="end_date"
                                 onChange={e => setData('end_at', e.target.value)}
+                                aria-invalid={!!errors.end_at}
+                                aria-describedby={errors.end_at ? 'end_at-error' : undefined}
                                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                             />
-                            {errors.end_at && <p className="text-red-500 text-sm mt-1">{errors.end_at}</p>}
+                            {errors.end_at && <p id="end_at-error" role="alert" className="text-red-500 text-sm mt-1">{errors.end_at}</p>}
                         </div>
                     </div>
 
                     <div>
-                        <label htmlFor="centers" className="block text-sm font-medium text-gray-700">Centros</label>
+                        <label htmlFor="centers" className="block text-sm font-medium text-gray-700">Centros. *</label>
                         <Select<Option, true>
                             options={optionsCenter}
-                            id="centers"
+                            inputId="centers"
                             value={optionsCenter.filter(o => data.centers.includes(o.value))}
                             name="centers"
-                            required
+                            required={false}
                             isMulti
-                            className="mt-1"
+                            className="mt-1 rounded-md"
                             classNamePrefix="react-select"
                             onChange={(val) => setData('centers', (val as Option[]).map(v => v.value))}
                             placeholder="Selecciona centros..."
+                            aria-required={true}
+                            aria-invalid={!!errors.centers}
+                            aria-describedby={errors.centers ? 'centers-error' : undefined}
+                            styles={{
+                                control: (provided) => ({
+                                    ...provided,
+                                    borderColor: errors.centers ? '#ef4444' : provided.borderColor,
+                                    boxShadow: errors.centers ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
+                                    '&:hover': {
+                                        borderColor: errors.centers ? '#ef4444' : provided.borderColor,
+                                    },
+                                    borderRadius: '0.375rem',
+                                }),
+                            }}
                         />
-                        {errors.centers && <p className="text-red-500 text-sm mt-1">{errors.centers}</p>}
+                        {errors.centers && <p id="centers-error" role="alert" className="text-red-500 text-sm mt-1">{errors.centers}</p>}
                     </div>
 
                     <div>
-                        <label htmlFor="agreements" className="block text-sm font-medium text-gray-700">Acuerdo</label>
+                        <label htmlFor="agreement_id" className="block text-sm font-medium text-gray-700">Acuerdo</label>
                         <Select<Option, false>
                             options={optionsAgreement}
-                            id="agreements"
+                            inputId="agreement_id"
                             value={optionsAgreement.find(o => o.value === data.agreement_id) || null}
-                            name="agreements"
-                            required
-                            className="mt-1"
+                            name="agreement_id"
                             classNamePrefix="react-select"
                             onChange={(val) => setData('agreement_id', (val as Option | null)?.value ?? '')}
                             placeholder="Selecciona un acuerdo"
                             isClearable
+                            aria-required={false}
+                            aria-invalid={!!errors.agreement_id}
+                            aria-describedby={errors.agreement_id ? 'agreement_id-error' : undefined}
+                            styles={{
+                                control: (provided) => ({
+                                    ...provided,
+                                    borderColor: errors.agreement_id ? '#ef4444' : provided.borderColor,
+                                    boxShadow: errors.agreement_id ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
+                                    '&:hover': {
+                                        borderColor: errors.agreement_id ? '#ef4444' : provided.borderColor,
+                                    },
+                                    borderRadius: '0.375rem',
+                                }),
+                            }}
                         />
-                        {errors.agreement_id && <p className="text-red-500 text-sm mt-1">{errors.agreement_id}</p>}
+                        {errors.agreement_id && <p id="agreement_id-error" role="alert" className="text-red-500 text-sm mt-1">{errors.agreement_id}</p>}
+                    </div>
+
+                    <div className='flex flex-row justify-between items-center'>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Multimedia. *</label>
+                        <Button type='button' onClick={openModal}>Agregar Multimedia</Button>
+                        {isOpen && <UploadMediaModal closeModal={closeModal} />}
+                    </div>
+
+                    <div>
+                        <div className="flex w-full gap-4 mb-4">
+                            <MediaColumn
+                                title="AM"
+                                items={am}
+                                onMoveToOther={(item) => transfer(item, setAm, setPm)}
+                                onMoveUp={(id) => moveUp(id, setAm)}
+                                onMoveDown={(id) => moveDown(id, setAm)}
+                                onRemove={(item) => transfer(item, setAm, setMediaList)}
+                                errors={errors.am_media}
+                            />
+                            <MediaColumn
+                                title="PM"
+                                items={pm}
+                                onMoveToOther={(item) => transfer(item, setPm, setAm)}
+                                onMoveUp={(id) => moveUp(id, setPm)}
+                                onMoveDown={(id) => moveDown(id, setPm)}
+                                onRemove={(item) => transfer(item, setPm, setMediaList)}
+                                errors={errors.pm_media}
+                            />
+                        </div>
+
+                        <div>
+                            <MediaList
+                                value={search}
+                                onSearch={handlerSearch}
+                                mediaList={filteredItems}
+                                onMoveToAm={item => transfer(item, setMediaList, setAm)}
+                                onMoveToPm={item => transfer(item, setMediaList, setPm)}
+                            />
+                        </div>
                     </div>
                 </form>
 
                 <div className="flex flex-wrap justify-center gap-3">
                     <button
+                        type="submit"
                         form="form"
                         className="bg-locatel-medio text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
                         disabled={processing}
@@ -156,6 +260,6 @@ export default function CampaignCreate() {
                     </button>
                 </div>
             </div>
-        </AppLayout>
+        </AppLayout >
     )
 }

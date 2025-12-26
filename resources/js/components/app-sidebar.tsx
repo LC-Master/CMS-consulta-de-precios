@@ -11,13 +11,18 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard, } from '@/routes';
+import { create as agreementCreate, index as agreement } from '@/routes/agreement';
 import { index, create } from '@/routes/campaign';
+import { index as media } from '@/routes/media';
+import { index as user } from '@/routes/user';
+import { index as tokens } from '@/routes/centertokens';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, SquarePlus, List, Handshake } from 'lucide-react';
+import { Users, KeyRound, LayoutGrid, SquarePlus, List, Handshake, Film } from 'lucide-react';
 import { lazy } from 'react';
 
 const Logo = lazy(() => import('@/components/app-logo'));
+
 const mainNavItems: NavItem[] = [
     {
         title: 'Crear campaña',
@@ -31,12 +36,12 @@ const mainNavItems: NavItem[] = [
     }
     , {
         title: 'Crear Convenios',
-        href: '/agreement/create',
+        href: agreementCreate().url,
         icon: SquarePlus,
     }
     , {
         title: 'Convenios',
-        href: '/agreement',
+        href: agreement().url,
         icon: Handshake,
     }
     , {
@@ -49,14 +54,19 @@ const mainNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repositorio',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
+        title: 'Listado de Videos',
+        href: media().url,
+        icon: Film,
     },
     {
-        title: 'Documentación',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'Usuarios',
+        href: user().url,
+        icon: Users,
+    },
+    {
+        title: 'Lista de tokens',
+        href: tokens().url,
+        icon: KeyRound,
     },
 ];
 
