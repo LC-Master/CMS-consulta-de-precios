@@ -10,7 +10,7 @@ import { CampaignCreateProps } from '@/types/campaign/page.type'
 import UploadMediaModal from '@/components/modals/UploadMediaModal'
 import useToast from '@/hooks/use-toast'
 import { useMediaSync } from '@/hooks/use-mediasync'
-import { index } from '@/routes/campaign'
+import { index, store } from '@/routes/campaign'
 import MediaColumn from '@/components/campaign/MediaColumn'
 import MediaList from '@/components/campaign/MediaList'
 import { breadcrumbs } from '@/tools/breadcrumbs'
@@ -21,7 +21,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
     const { isOpen, openModal, closeModal } = useModal(false)
     const ToastComponent = useToast(flash)
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
-    const { handlerSearch, search } = useSearch(mediaList, setMediaList);
+    const { handlerSearch, search, filteredItems } = useSearch(mediaList);
     const { moveUp, moveDown, transfer } = useMediaActions<MediaItem>();
 
     const { data, setData, processing, errors, post, transform } = useForm({
@@ -50,7 +50,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
             am_media: am.map(item => item.id),
             pm_media: pm.map(item => item.id),
         }))
-        post('/campaign', { preserveScroll: true, forceFormData: true })
+        post(store().url, { preserveScroll: true, forceFormData: true })
     }
 
     return (
@@ -233,7 +233,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             <MediaList
                                 value={search}
                                 onSearch={handlerSearch}
-                                mediaList={mediaList}
+                                mediaList={filteredItems}
                                 onMoveToAm={item => transfer(item, setMediaList, setAm)}
                                 onMoveToPm={item => transfer(item, setMediaList, setPm)}
                             />
