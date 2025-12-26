@@ -43,12 +43,12 @@ class StoreMediaRequest extends FormRequest
 
             $thumbIndex = 0;
 
-            foreach ($files as $index => $file) {
+            foreach ($files as $file) {
                 if ($file->getMimeType() === 'video/mp4') {
-                    if (! isset($thumbnails[$thumbIndex])) {
+                    if (!isset($thumbnails[$thumbIndex])) {
                         $validator->errors()->add(
                             'thumbnails',
-                            "El archivo '{$file->getClientOriginalName()}' es un video y requiere thumbnail."
+                            "El archivo '{$file->getClientOriginalName()}' es un video (MP4) y requiere un thumbnail en formato JPG/JPEG (máx. 5 MB)."
                         );
                     }
                     $thumbIndex++;
@@ -61,8 +61,15 @@ class StoreMediaRequest extends FormRequest
     {
         return [
             'files.required' => 'Debes subir al menos un archivo.',
-            'files.*.mimetypes' => 'Formato no permitido.',
-            'thumbnails.*.image' => 'Los thumbnails deben ser imágenes JPG.',
+            'files.array' => 'La entrada "files" debe ser un arreglo de archivos.',
+            'files.*.file' => 'Cada elemento de "files" debe ser un archivo válido.',
+            'files.*.mimetypes' => 'Formato no permitido. Se aceptan: video MP4 (.mp4), imágenes JPEG/JPG, PNG, WEBP (.jpg, .jpeg, .png, .webp).',
+            'files.*.max' => 'El archivo :attribute excede el tamaño máximo permitido de 150 MB.',
+
+            'thumbnails.*.file' => 'Cada thumbnail debe ser un archivo válido.',
+            'thumbnails.*.image' => 'Los thumbnails deben ser imágenes en formato JPG/JPEG.',
+            'thumbnails.*.mimes' => 'Formato de thumbnail no permitido. Se aceptan: JPEG / JPG (.jpg, .jpeg).',
+            'thumbnails.*.max' => 'El thumbnail :attribute excede el tamaño máximo permitido de 5 MB.',
         ];
     }
 }

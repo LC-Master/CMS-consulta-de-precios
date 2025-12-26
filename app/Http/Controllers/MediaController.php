@@ -68,9 +68,9 @@ class MediaController extends Controller
             $request->validated();
             $storeMediaAction->execute($request);
 
-            return session()->flash('success', 'Archivos subidos correctamente.');
+            return back()->with('success', 'Archivos subidos correctamente.');
         } catch (\Throwable $e) {
-            return session()->flash('error', 'Error al subir los archivos.');
+            return back()->with('error', 'Error al subir los archivos.');
         }
     }
 

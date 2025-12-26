@@ -1,5 +1,3 @@
-'use client'
-
 import { createPortal } from 'react-dom'
 import Modal from '@/components/Modal'
 import { Button } from '@/components/ui/button'
@@ -10,50 +8,36 @@ import {
     DragEvent,
     FormEvent,
 } from 'react'
-import { useForm } from '@inertiajs/react'
+import { router, useForm } from '@inertiajs/react'
+import { FormState } from '@/types/modal/index.type'
 
-type FormState = {
-    files: File[]
-    thumbnails: File[]
-}
-
-export default function UploadMediaModal({ closeModal, success }: { closeModal: () => void, success?: () => void }) {
-    const { setData, post, progress, errors, reset, transform,processing } = useForm<FormState>({
+export default function UploadMediaModal({ closeModal }: { closeModal: () => void }) {
+    const { setData, post, progress, errors, reset, transform, processing } = useForm<FormState>({
         files: [],
         thumbnails: [],
     })
-
     const [selectedFiles, setSelectedFiles] = useState<File[]>([])
     const [isDragging, setIsDragging] = useState(false)
-
     const inputRef = useRef<HTMLInputElement | null>(null)
-
-
     const syncFiles = (files: File[]) => {
         setSelectedFiles(files)
         setData('files', files)
     }
-
     const openFilePicker = () => inputRef.current?.click()
-
     const clearFiles = () => {
         if (inputRef.current) inputRef.current.value = ''
         setSelectedFiles([])
         reset()
     }
-
     const removeFile = (index: number) => {
         const next = selectedFiles.filter((_, i) => i !== index)
         syncFiles(next)
     }
-
-
     const onFilesChange = (e: ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files ? Array.from(e.target.files) : []
         syncFiles(files)
         setData('thumbnails', [])
     }
-
     const handleDrop = (e: DragEvent) => {
         e.preventDefault()
         setIsDragging(false)
@@ -77,18 +61,14 @@ export default function UploadMediaModal({ closeModal, success }: { closeModal: 
             e.dataTransfer?.clearData()
         }
     }
-
     const handleDragOver = (e: DragEvent) => {
         e.preventDefault()
         setIsDragging(true)
     }
-
     const handleDragLeave = (e: DragEvent) => {
         e.preventDefault()
         setIsDragging(false)
     }
-
-
     const createVideoThumbnail = (file: File): Promise<File | null> =>
         new Promise((resolve) => {
             const url = URL.createObjectURL(file)
@@ -145,8 +125,6 @@ export default function UploadMediaModal({ closeModal, success }: { closeModal: 
                 resolve(null)
             })
         })
-
-
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
 
@@ -171,9 +149,9 @@ export default function UploadMediaModal({ closeModal, success }: { closeModal: 
             onSuccess: () => {
                 clearFiles()
                 closeModal()
-                if (success) success()
-            },
-            onError: () => {
+                router.reload({
+                    only: ['media', 'flash'],
+                })
             },
         })
     }
@@ -230,28 +208,36 @@ export default function UploadMediaModal({ closeModal, success }: { closeModal: 
                     </div>
                 </div>
 
-                {progress && (
-                    <p className="text-sm">
-                        Subiendo: {Math.round(progress.percentage || 0)}%
-                    </p>
-                )}
+                <div className="flex flex-col gap-2">
+                    <div>
+                        <p className='mb-4'>
+                            Nota: los formatos aceptados son imágenes (JPG, PNG, webp) y videos (MP4).
+                        </p>
+                        {progress && (
+                            <p className="text-sm">
+                                Subiendo: {Math.round(progress.percentage || 0)}%
+                            </p>
+                        )}
+                        {errors && (
+                            Object.values(errors).flat().map((error: string, i) => (
+                                <p key={i} className="text-red-500 text-sm">{error}</p>
+                            ))
 
-                {errors.files && (
-                    <p className="text-sm text-red-600">{errors.files}</p>
-                )}
-
-                <div className="flex gap-2">
-                    <Button type="submit" className="w-1/2" disabled={selectedFiles.length === 0 || processing}>
-                        Enviar
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="destructive"
-                        className="w-1/2"
-                        onClick={closeModal}
-                    >
-                        Cancelar
-                    </Button>
+                        )}
+                    </div>
+                    <div className="flex gap-2">
+                        <Button type="submit" className="w-1/2" disabled={selectedFiles.length === 0 || processing}>
+                            Enviar
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            className="w-1/2"
+                            onClick={closeModal}
+                        >
+                            Cancelar
+                        </Button>
+                    </div>
                 </div>
             </form>
         </Modal>,

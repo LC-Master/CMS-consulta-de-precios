@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout'
-import { useForm, router } from '@inertiajs/react'
+import { useForm } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
@@ -23,13 +23,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { handlerSearch, search } = useSearch(mediaList, setMediaList);
     const { moveUp, moveDown, transfer } = useMediaActions<MediaItem>();
-    const handleSuccess = () => {
-        router.reload(
-            {
-                only: ['media'],
-            }
-        )
-    }
+
     const { data, setData, processing, errors, post, transform } = useForm({
         title: '',
         start_at: '',
@@ -210,7 +204,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                     <div className='flex flex-row justify-between items-center'>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Multimedia. *</label>
                         <Button type='button' onClick={openModal}>Agregar Multimedia</Button>
-                        {isOpen && <UploadMediaModal closeModal={closeModal} success={handleSuccess} />}
+                        {isOpen && <UploadMediaModal closeModal={closeModal} />}
                     </div>
 
                     <div>
