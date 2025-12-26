@@ -15,9 +15,8 @@ class CenterSnapshotController extends Controller
     {
         try {
             $campaignSnapshotDTO = $campaignSnapshotDTO->execute($request->user());
-
             if (!empty($campaignSnapshotDTO['campaigns'])) {
-                $campaignSnapshotDTO['campaigns'] = CampaignSnapshotDTO::normalize($campaignSnapshotDTO)['campaigns'];
+                $campaignSnapshotDTO['campaigns'] = CampaignSnapshotDTO::normalize($campaignSnapshotDTO['campaigns']);
             }
 
             $snapShot = CenterSnapshot::updateOrCreate(

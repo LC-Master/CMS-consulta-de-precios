@@ -13,11 +13,14 @@ class CampaignSnapshotDTO
      */
     public static function execute(Center $center)
     {
-        $campaigns = Campaign::whereHas('centers', fn($q) => $q->where('center_id', $center->id))
-            ->whereHas('status', fn($q) => $q->where('status', CampaignStatus::ACTIVE->value))
-            ->with(['status', 'department', 'agreement', 'media.thumbnails'])
+        $campaigns = Campaign::whereHas('centers', function ($q) use ($center) {
+            $q->where('centers.id', $center->id);
+        })
+            ->whereHas('status', function ($q) {
+                $q->where('status', CampaignStatus::ACTIVE->value);
+            })
+            ->with(['status', 'department', 'agreement', 'media'])
             ->get();
-
         $snapshot = [
             'center_id' => $center->id,
             'campaigns' => [],
@@ -40,10 +43,6 @@ class CampaignSnapshotDTO
                         'duration_seconds' => $m->duration_seconds,
                         'slot' => $m->pivot->slot,
                         'position' => $m->pivot->position,
-                        'thumbnails' => $m->thumbnails ? [
-                            'id' => $m->thumbnails->id,
-                            'path' => $m->thumbnails->path,
-                        ] : null,
                     ])
                     ->sortBy('pivot.position')
                     ->values()
@@ -56,13 +55,42 @@ class CampaignSnapshotDTO
 
     public static function normalize(array $data): array
     {
-        sort($data['campaigns']);
+        $sorted = collect($data)->map(function ($item) {
+            $mediaCollection = collect($item['media']);
 
-        foreach ($data['campaigns'] as &$campaign) {
-            sort($campaign['slots']['am']);
-            sort($campaign['slots']['pm']);
-        }
+            $mediaCollection = collect($item['media']);
 
-        return $data;
+            $normalizedMedia = $mediaCollection->map(function ($m) {
+                $m['position'] = isset($m['position']) ? (int) $m['position'] : 0;
+                $m['duration_seconds'] = isset($m['duration_seconds']) ? (int) $m['duration_seconds'] : 0;
+                return $m;
+            });
+
+            $item['slots'] = [
+                'am' => $normalizedMedia->where('slot', 'am')
+                    ->sortBy('position')
+                    ->values()
+                    ->map(function ($m) {
+                        unset($m['slot']);
+                        return $m;
+                    })
+                    ->all(),
+
+                'pm' => $normalizedMedia->where('slot', 'pm')
+                    ->sortBy('position')
+                    ->values()
+                    ->map(function ($m) {
+                        unset($m['slot']);
+                        return $m;
+                    })
+                    ->all(),
+            ];
+
+            unset($item['media']);
+
+            return $item;
+        });
+
+        return $sorted->all();
     }
 }

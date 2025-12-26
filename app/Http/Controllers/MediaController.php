@@ -185,5 +185,21 @@ class MediaController extends Controller
             logger()->error('Error generating media preview: ' . $e->getMessage(), ['media_id' => $media->id]);
             abort(500, 'Ocurrió un error al generar la vista previa del archivo.');
         }
+    }   
+    public function download(Media $media)
+    {
+        try {
+            $path = Storage::disk('public')->path($media->path);
+
+            if (!Storage::disk('public')->exists($media->path)) {
+                logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->id]);
+                abort(404, 'El archivo físico no existe en el servidor.');
+            }
+
+            return response()->download($path, $media->name);
+        } catch (\Throwable $e) {
+            logger()->error('Error downloading media file: ' . $e->getMessage(), ['media_id' => $media->id]);
+            abort(500, 'Ocurrió un error al descargar el archivo.');
+        }
     }
 }
