@@ -52,12 +52,12 @@ export default function CenterTokensIndex({ centers, centerTokens, flash, filter
         {
             key: 'last_used_at',
             header: 'Último uso',
-            render: (ct) => ct.last_used_at ? ct.last_used_at : 'Nunca',
+            render: (ct) => ct.last_used_at ? new Date(ct.last_used_at).toLocaleString() : 'Nunca',
         },
         {
             key: 'created_at',
             header: 'Creado',
-            render: (ct) => ct.created_at,
+            render: (ct) => new Date(ct.created_at).toLocaleString(),
         },
         {
             key: 'actions',

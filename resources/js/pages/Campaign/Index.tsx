@@ -37,7 +37,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
         {
             key: 'created_at',
             header: 'Creada',
-            render: (a) => a.created_at,
+            render: (a) => new Date(a.created_at).toLocaleString(),
         },
         {
             key: 'actions',
