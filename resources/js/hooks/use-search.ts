@@ -1,17 +1,18 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useMemo, useState } from 'react';
 
-export default function useSearch<T extends { name: string }>(
-    items: T[],
-    setItems: React.Dispatch<React.SetStateAction<T[]>>,
-) {
+export default function useSearch<T extends { name: string }>(items: T[]) {
     const [search, setSearch] = useState<string>('');
+
     const handlerSearch = (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
-        setItems(
-            items.filter((item) =>
-                item.name.toLowerCase().includes(e.target.value.toLowerCase()),
-            ) || [],
-        );
     };
-    return { search, handlerSearch };
+    const filteredItems = useMemo(() => {
+        if (!search) return items; 
+        
+        return items.filter((item) =>
+            item.name.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [search, items]);
+
+    return { search, handlerSearch, filteredItems };
 }

@@ -148,10 +148,10 @@ export default function UploadMediaModal({ closeModal }: { closeModal: () => voi
             forceFormData: true,
             onSuccess: () => {
                 clearFiles()
-                closeModal()
                 router.reload({
                     only: ['media', 'flash'],
                 })
+                closeModal()
             },
         })
     }
