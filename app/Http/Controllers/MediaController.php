@@ -68,9 +68,9 @@ class MediaController extends Controller
             $request->validated();
             $storeMediaAction->execute($request);
 
-            return session()->flash('success', 'Archivos subidos correctamente.');
+            return back()->with('success', 'Archivos subidos correctamente.');
         } catch (\Throwable $e) {
-            return session()->flash('error', 'Error al subir los archivos.');
+            return back()->with('error', 'Error al subir los archivos.');
         }
     }
 
@@ -184,6 +184,22 @@ class MediaController extends Controller
         } catch (\Throwable $e) {
             logger()->error('Error generating media preview: ' . $e->getMessage(), ['media_id' => $media->id]);
             abort(500, 'Ocurrió un error al generar la vista previa del archivo.');
+        }
+    }   
+    public function download(Media $media)
+    {
+        try {
+            $path = Storage::disk('public')->path($media->path);
+
+            if (!Storage::disk('public')->exists($media->path)) {
+                logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->id]);
+                abort(404, 'El archivo físico no existe en el servidor.');
+            }
+
+            return response()->download($path, $media->name);
+        } catch (\Throwable $e) {
+            logger()->error('Error downloading media file: ' . $e->getMessage(), ['media_id' => $media->id]);
+            abort(500, 'Ocurrió un error al descargar el archivo.');
         }
     }
 }
