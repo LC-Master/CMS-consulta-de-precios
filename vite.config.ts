@@ -5,12 +5,12 @@ import laravel from 'laravel-vite-plugin';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-    server:{
-        host: '0.0.0.0',
-        hmr:{
-            host: '172.20.3.36'
-        }
-    },
+    // server:{
+    //     host: '0.0.0.0',
+    //     hmr:{
+    //         host: '172.20.3.36'
+    //     }
+    // },
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],

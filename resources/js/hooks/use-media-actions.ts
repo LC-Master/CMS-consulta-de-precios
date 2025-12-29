@@ -37,9 +37,11 @@ export const useMediaActions = <T extends { id: string | number }>() => {
         item: T,
         setOrigin: Dispatch<SetStateAction<T[]>>,
         setDestination: Dispatch<SetStateAction<T[]>>,
+        main = false
     ) => {
-        setOrigin((prev) => prev.filter((m) => m.id !== item.id));
-
+        if (!main) {
+            setOrigin((prev) => prev.filter((m) => m.id !== item.id));
+        }
         setDestination((prev) => {
             const alreadyExists = prev.some((i) => i.id === item.id);
             if (alreadyExists) return prev;

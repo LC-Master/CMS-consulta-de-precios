@@ -234,8 +234,8 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                 value={search}
                                 onSearch={handlerSearch}
                                 mediaList={filteredItems}
-                                onMoveToAm={item => transfer(item, setMediaList, setAm)}
-                                onMoveToPm={item => transfer(item, setMediaList, setPm)}
+                                onMoveToAm={item => transfer(item, setMediaList, setAm, true)}
+                                onMoveToPm={item => transfer(item, setMediaList, setPm, true)}
                             />
                         </div>
                     </div>
