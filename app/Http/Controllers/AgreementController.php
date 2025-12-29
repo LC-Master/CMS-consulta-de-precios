@@ -33,9 +33,10 @@ class AgreementController extends Controller
         }
 
         return Inertia::render('Agreements/Index', [
-            'agreements' => Inertia::scroll(fn () => $query->latest()->paginate()),
+            'agreements' => Inertia::scroll(fn() => $query->latest()->paginate()),
             'filters' => $request->only(['search', 'status']),
-            'statuses' => array_reverse(AgreementStatus::cases(), false), ]);
+            'statuses' => array_reverse(AgreementStatus::cases(), false),
+        ]);
     }
 
     public function create()
@@ -56,7 +57,7 @@ class AgreementController extends Controller
                 ->with('success', 'Convenio creado correctamente.');
 
         } catch (\Throwable $e) {
-            Log::error('Error creating agreement: '.$e->getMessage(), ['user_id' => Auth::id()]);
+            Log::error('Error creating agreement: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
             return back()
                 ->withInput()
@@ -66,6 +67,20 @@ class AgreementController extends Controller
 
     public function show(Agreement $agreement)
     {
+        $agreement = [
+            'id' => $agreement->id,
+            'name' => $agreement->name,
+            'legal_name' => $agreement->legal_name,
+            'tax_id' => $agreement->tax_id,
+            'contact_person' => $agreement->contact_person,
+            'contact_email' => $agreement->contact_email,
+            'contact_phone' => $agreement->contact_phone,
+            'start_date' => $agreement->start_date,
+            'end_date' => $agreement->end_date,
+            'is_active' => filter_var($agreement->is_active, FILTER_VALIDATE_BOOLEAN),
+            'observations' => $agreement->observations,
+        ];
+
         return Inertia::render('Agreements/Show', [
             'agreement' => $agreement,
         ]);
@@ -83,10 +98,20 @@ class AgreementController extends Controller
      */
     public function update(UpdateAgreementRequest $request, Agreement $agreement)
     {
-        $agreement->update($request->validated());
+        try {
+            $request->validated();
 
-        return Redirect::route('agreements.index')
-            ->with('success', 'Acuerdo actualizado correctamente.');
+            $agreement->update($request->all());
+
+            return to_route('agreement.index')
+                ->with('success', 'Acuerdo actualizado correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error updating agreement: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error inesperado al actualizar el convenio. Por favor, intente nuevamente.');
+        }
     }
 
     public function destroy(Agreement $agreement)

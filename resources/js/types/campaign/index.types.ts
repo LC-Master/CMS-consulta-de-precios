@@ -1,3 +1,5 @@
+import { Agreement } from "../agreement/index.types";
+
 export interface Department {
     id: string;
     name: string;
@@ -5,7 +7,6 @@ export interface Department {
 export interface Center extends Pick<Department, 'id' | 'name'> {
     code: string;
 }
-export type Agreement = Department;
 
 export interface MediaItem extends Pick<Department, 'id' | 'name'> {
     size: string;

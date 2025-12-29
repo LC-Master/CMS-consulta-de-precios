@@ -1,14 +1,9 @@
 import AppLayout from '@/layouts/app-layout'
-import { BreadcrumbItem } from '@/types'
+import { index, store } from '@/routes/agreement'
+import { breadcrumbs } from '@/tools/breadcrumbs'
 import { useForm } from '@inertiajs/react'
 
 export default function AgreementCreate() {
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Crear convenio',
-            href: '/agreement', 
-        },
-    ];
 
     const { data, setData, processing, errors, post } = useForm({
         name: '',
@@ -24,11 +19,11 @@ export default function AgreementCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        post('/agreement') 
+        post(store().url)
     }
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs('Crear Convenio', index().url)}>
             <div className="p-6 space-y-6">
                 <form id="form" method="post" onSubmit={handleSubmit} className="space-y-4">
                     {/* Fila 1: Nombres */}
@@ -159,21 +154,21 @@ export default function AgreementCreate() {
                             />
                             {errors.end_date && <p className="text-red-500 text-sm mt-1">{errors.end_date}</p>}
                         </div>
-                   <div>
-                    <label htmlFor="observations" className="block text-sm font-medium text-gray-700">
-                        Observaciones <span className="text-gray-400 font-normal">(Opcional)</span>
-                    </label>
-                    <textarea
-                        id="observations"
-                        name="observations"
-                        value={data.observations}
-                        rows={4}
-                        placeholder="Ingrese notas o detalles adicionales del convenio..."
-                        onChange={e => setData('observations', e.target.value)}
-                        className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
-                    />
-                    {errors.observations && <p className="text-red-500 text-sm mt-1">{errors.observations}</p>}
-                </div>
+                        <div>
+                            <label htmlFor="observations" className="block text-sm font-medium text-gray-700">
+                                Observaciones <span className="text-gray-400 font-normal">(Opcional)</span>
+                            </label>
+                            <textarea
+                                id="observations"
+                                name="observations"
+                                value={data.observations}
+                                rows={4}
+                                placeholder="Ingrese notas o detalles adicionales del convenio..."
+                                onChange={e => setData('observations', e.target.value)}
+                                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
+                            />
+                            {errors.observations && <p className="text-red-500 text-sm mt-1">{errors.observations}</p>}
+                        </div>
                     </div>
                 </form>
 

@@ -44,11 +44,11 @@ const mainNavItems: NavItem[] = [
         href: agreement().url,
         icon: Handshake,
     }
-    , {
-        title: 'Panel de control',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
+    // , {
+    //     title: 'Panel de control',
+    //     href: dashboard(),
+    //     icon: LayoutGrid,
+    // },
 
 ];
 
