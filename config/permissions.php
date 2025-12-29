@@ -3,14 +3,15 @@
 return [
 
     'permissions' => [
-        'users.view',
+
+        'users.list',
+        'users.show',
         'users.create',
-        'users.edit',
+        'users.update',
         'users.delete',
 
-        'tokens.view',
+        'tokens.list',
         'tokens.create',
-        'tokens.edit',
         'tokens.delete',
 
         'campaigns.list',
@@ -38,23 +39,11 @@ return [
         'admin' => '*',
 
         'publicidad' => [
-            'campaigns.list',
-            'campaigns.show',
-            'campaigns.create',
-            'campaigns.update',
-            'campaigns.delete',
+            'campaigns.*',
 
-            'agreements.list',
-            'agreements.show',
-            'agreements.create',
-            'agreements.update',
-            'agreements.delete',
+            'agreements.*',
 
-            'medias.list',
-            'medias.show',
-            'medias.create',
-            'medias.update',
-            'medias.delete',
+            'medias.*',
 
             'reports.view',
         ],
