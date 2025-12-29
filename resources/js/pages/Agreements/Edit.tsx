@@ -22,7 +22,6 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
         e.preventDefault()
         put(update({ id: agreement.id }).url)
     }
-    console.log(data,agreement)
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar Convenio', index().url)}>
             <div className="p-6 space-y-6">

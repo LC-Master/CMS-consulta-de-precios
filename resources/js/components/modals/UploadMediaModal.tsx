@@ -177,7 +177,7 @@ export default function UploadMediaModal({ closeModal }: { closeModal: () => voi
                     />
 
                     <div className="flex gap-3">
-                        <Button type="button" onClick={openFilePicker}>
+                        <Button type="button" className='bg-locatel-medio hover:bg-locatel-oscuro' onClick={openFilePicker}>
                             Seleccionar archivos
                         </Button>
 
@@ -226,7 +226,7 @@ export default function UploadMediaModal({ closeModal }: { closeModal: () => voi
                         )}
                     </div>
                     <div className="flex gap-2">
-                        <Button type="submit" className="w-1/2" disabled={selectedFiles.length === 0 || processing}>
+                        <Button type="submit" className="w-1/2 bg-locatel-medio hover:bg-locatel-oscuro" disabled={selectedFiles.length === 0 || processing}>
                             Enviar
                         </Button>
                         <Button

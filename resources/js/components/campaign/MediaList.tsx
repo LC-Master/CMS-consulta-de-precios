@@ -14,14 +14,14 @@ export default function MediaList({ value, onSearch, mediaList, onMoveToAm, onMo
                 type="search"
                 value={value}
                 placeholder="Buscar multimedia..."
-                className="mb-2 mt-2"
+                className="mb-4 mt-4"
                 onChange={onSearch}
                 aria-label="Buscar multimedia"
                 aria-describedby="media-search-help"
                 aria-controls="media"
                 autoComplete="off"
             />
-            <div id='media' className="min-h-40 max-h-60 overflow-y-auto border-2 border-gray-300 rounded-sm p-2">
+            <div id='media' className="min-h-40 max-h-80 overflow-y-auto border-2 bg-white border-gray-300 rounded-sm p-2">
                 {mediaList.length !== 0 ? mediaList.map((item) => (
                     <MediaItemCard
                         key={item.id}
@@ -30,7 +30,7 @@ export default function MediaList({ value, onSearch, mediaList, onMoveToAm, onMo
                             <>
                                 <Button
                                     type="button"
-                                    className="px-3 py-1 text-sm"
+                                    className="px-3 py-1 text-sm bg-locatel-medio hover:bg-locatel-oscuro"
                                     onClick={(e) => { e.preventDefault(); onMoveToAm(item) }}
                                     aria-label={`Mover ${item.name} a AM`}
                                 >
@@ -39,7 +39,7 @@ export default function MediaList({ value, onSearch, mediaList, onMoveToAm, onMo
 
                                 <Button
                                     type="button"
-                                    className="px-3 py-1 text-sm"
+                                    className="px-3 py-1 text-sm bg-locatel-medio hover:bg-locatel-oscuro"
                                     onClick={(e) => { e.preventDefault(); onMoveToPm(item) }}
                                     aria-label={`Mover ${item.name} a PM`}
                                 >
