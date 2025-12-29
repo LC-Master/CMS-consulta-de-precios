@@ -8,23 +8,55 @@ return [
         'users.edit',
         'users.delete',
 
-        'reports.view',
+        'tokens.view',
+        'tokens.create',
+        'tokens.edit',
+        'tokens.delete',
 
-        'campaigns.view',
+        'campaigns.list',
+        'campaigns.show',
         'campaigns.create',
-        'campaigns.edit',
+        'campaigns.update',
         'campaigns.delete',
+
+        'agreements.list',
+        'agreements.show',
+        'agreements.create',
+        'agreements.update',
+        'agreements.delete',
+
+        'medias.list',
+        'medias.show',
+        'medias.create',
+        'medias.update',
+        'medias.delete',
+
+        'reports.view',
     ],
+
     'roles' => [
         'admin' => '*',
 
-        'mercadeo' => [
-            'users.view',
-            'reports.view',
-            'campaigns.view',
+        'publicidad' => [
+            'campaigns.list',
+            'campaigns.show',
             'campaigns.create',
-            'campaigns.edit',
-        ],
+            'campaigns.update',
+            'campaigns.delete',
 
+            'agreements.list',
+            'agreements.show',
+            'agreements.create',
+            'agreements.update',
+            'agreements.delete',
+
+            'medias.list',
+            'medias.show',
+            'medias.create',
+            'medias.update',
+            'medias.delete',
+
+            'reports.view',
+        ],
     ],
 ];
