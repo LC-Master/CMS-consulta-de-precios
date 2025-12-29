@@ -13,6 +13,7 @@ export type Agreement = {
 };
 
 export type Props = {
+    flash?: { success?: string; error?: string };
     agreements: { data: Agreement[] };
     filters: { search?: string; status?: string };
     statuses: string[];

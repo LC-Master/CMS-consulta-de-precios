@@ -9,10 +9,12 @@ import { Filter } from '@/components/Filter';
 import AnchorIcon from '@/components/ui/AnchorIcon';
 import { breadcrumbs } from '../../tools/breadcrumbs'
 import { index, show, edit } from '@/routes/agreement';
+import useToast from '@/hooks/use-toast';
 
-export default function AgreementsIndex({ agreements, filters = {}, statuses }: Props) {
+export default function AgreementsIndex({ agreements, filters = {}, statuses, flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
+    const { ToastContainer } = useToast(flash);
 
     const columns: Column<Agreement>[] = [
         {
@@ -77,6 +79,7 @@ export default function AgreementsIndex({ agreements, filters = {}, statuses }: 
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Listado de Convenios', index().url)}>
+            {ToastContainer()}
             <div className="space-y-4 px-4 pb-4">
                 <Filter
                     filters={[

@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout'
 import { useForm } from '@inertiajs/react'
 import Select from 'react-select'
-import { Center, Department, Option, Agreement, MediaItem, } from '@/types/campaign/index.types'
+import { Center, Department, Option, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
 import React from 'react'
 import { Button } from '@/components/ui/button'
@@ -16,6 +16,7 @@ import MediaList from '@/components/campaign/MediaList'
 import { breadcrumbs } from '@/tools/breadcrumbs'
 import useSearch from '@/hooks/use-search'
 import { useMediaActions } from '@/hooks/use-media-actions'
+import { Agreement } from '@/types/agreement/index.types'
 
 export default function CampaignCreate({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
     const { isOpen, openModal, closeModal } = useModal(false)
