@@ -38,7 +38,7 @@ return [
     'roles' => [
         'admin' => '*',
 
-        'publicidad' => [
+        'publicity' => [
             'campaigns.*',
 
             'agreements.*',
