@@ -39,11 +39,23 @@ return [
         'admin' => '*',
 
         'publicity' => [
-            'campaigns.*',
+            'campaigns.list',
+            'campaigns.show',
+            'campaigns.create',
+            'campaigns.update',
+            'campaigns.delete',
 
-            'agreements.*',
+            'agreements.list',
+            'agreements.show',
+            'agreements.create',
+            'agreements.update',
+            'agreements.delete',
 
-            'medias.*',
+            'medias.list',
+            'medias.show',
+            'medias.create',
+            'medias.update',
+            'medias.delete',
 
             'reports.view',
         ],
