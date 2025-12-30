@@ -1,5 +1,4 @@
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem } from '@/types';
 import { useForm } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -9,14 +8,10 @@ import { Spinner } from '@/components/ui/spinner';
 import { PropsCreatePage } from '@/types/user/index.types';
 import { store } from '@/routes/user';
 import Select from 'react-select';
+import { breadcrumbs } from '@/helpers/breadcrumbs';
+import { index } from '@/routes/user';
 
 export default function UserCreate({ roles }: PropsCreatePage) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Crear usuario',
-            href: '/user/create',
-        },
-    ];
     const optionsRoles = roles.map((role) => ({ value: role.name, label: role.name }))
     const { data, setData, processing, errors, post } = useForm({
         name: '',
@@ -34,57 +29,92 @@ export default function UserCreate({ roles }: PropsCreatePage) {
     const selectedRole = roles.find(role => role.name === data.role);
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <div className="flex flex-col items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
-                <div className="w-full max-w-2xl space-y-8 bg-white p-8 border-locatel-claro border-2 rounded-lg">
+        <AppLayout breadcrumbs={breadcrumbs('Crear Usuario', index().url)}>
+            <div className="grid place-items-center py-6 px-4 sm:px-6 lg:px-8">
+                <div className="grid gap-2">
+                    <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+                        Registrar un nuevo usuario
+                    </h2>
+                    <p className="mt-2 text-sm text-gray-600">
+                        Complete los campos a continuación para registrar un nuevo miembro al equipo y asignar un nuevo miembro.
+                    </p>
+                </div>
 
-                    <div className="text-center">
-                        <h2 className="text-2xl font-bold tracking-tight text-gray-900">
-                            Registrar nuevo usuario
-                        </h2>
-                        <p className="mt-2 text-sm text-gray-600">
-                            Completa la información para dar de alta un usuario
-                        </p>
-                    </div>
-
+                <div className="w-full max-w-2xl shadow-2xl border border-gray-100 mt-2 space-y-8 bg-white p-8 rounded-lg">
                     <form onSubmit={handleSubmit} className="mt-8 space-y-6" autoComplete="off">
                         <input type="text" style={{ display: 'none' }} />
                         <input type="password" style={{ display: 'none' }} />
 
-                        {/* Nombre */}
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">Nombre</Label>
-                            <Input
-                                id="name"
-                                type="text"
-                                value={data.name}
-                                required
-                                autoFocus
-                                placeholder="Nombre completo"
-                                autoComplete="off"
-                                onChange={(e) => setData('name', e.target.value)}
-                            />
-                            <InputError message={errors.name} />
+                        {/* Row 1: Email (left) + Name (right) */}
+                        <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
+                            <div className="flex-1 flex flex-col gap-2">
+                                <Label htmlFor="email">Correo electrónico</Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    value={data.email}
+                                    required
+                                    placeholder="email@ejemplo.com"
+                                    autoComplete="new-email"
+                                    name="new-email-field"
+                                    readOnly={true}
+                                    onFocus={(e) => e.target.readOnly = false}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                />
+                                <InputError message={errors.email} />
+                            </div>
+
+                            <div className="flex-1 flex flex-col gap-2">
+                                <Label htmlFor="name">Nombre</Label>
+                                <Input
+                                    id="name"
+                                    type="text"
+                                    value={data.name}
+                                    required
+                                    autoFocus
+                                    placeholder="Nombre completo"
+                                    autoComplete="off"
+                                    onChange={(e) => setData('name', e.target.value)}
+                                />
+                                <InputError message={errors.name} />
+                            </div>
                         </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Correo electrónico</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                value={data.email}
-                                required
-                                placeholder="email@ejemplo.com"
-                                autoComplete="new-email"
-                                name="new-email-field"
-                                readOnly={true}
-                                onFocus={(e) => e.target.readOnly = false}
-                                onChange={(e) => setData('email', e.target.value)}
-                            />
-                            <InputError message={errors.email} />
+                        {/* Row 2: Password + Confirm Password (side-by-side) */}
+                        <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
+                            <div className="flex-1 flex flex-col gap-2">
+                                <Label htmlFor="password">Contraseña</Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={data.password}
+                                    required
+                                    placeholder="********"
+                                    autoComplete="new-password"
+                                    name="new-password-field"
+                                    readOnly={true}
+                                    onFocus={(e) => e.target.readOnly = false}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                />
+                                <InputError message={errors.password} />
+                            </div>
+
+                            <div className="flex-1 flex flex-col gap-2">
+                                <Label htmlFor="password_confirmation">Confirmar Contraseña</Label>
+                                <Input
+                                    id="password_confirmation"
+                                    type="password"
+                                    value={data.password_confirmation}
+                                    required
+                                    placeholder="********"
+                                    autoComplete="new-password"
+                                    onChange={(e) => setData('password_confirmation', e.target.value)}
+                                />
+                            </div>
                         </div>
 
-                        <div className="grid gap-2">
+                        {/* Row 3: Roles (full width) */}
+                        <div className="flex flex-col gap-2">
                             <Label htmlFor="role">Rol de Usuario</Label>
                             <Select
                                 value={optionsRoles.find(option => option.value === data.role)}
@@ -112,6 +142,7 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                             />
                             <InputError message={errors.role} />
 
+                            {/* Permisos asociados */}
                             {data.role && (
                                 <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-100 animate-in fade-in slide-in-from-top-1 duration-300">
                                     <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
@@ -136,37 +167,7 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                             )}
                         </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Contraseña</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={data.password}
-                                required
-                                placeholder="********"
-                                autoComplete="new-password"
-                                name="new-password-field"
-                                readOnly={true}
-                                onFocus={(e) => e.target.readOnly = false}
-                                onChange={(e) => setData('password', e.target.value)}
-                            />
-                            <InputError message={errors.password} />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">Confirmar Contraseña</Label>
-                            <Input
-                                id="password_confirmation"
-                                type="password"
-                                value={data.password_confirmation}
-                                required
-                                placeholder="********"
-                                autoComplete="new-password"
-                                onChange={(e) => setData('password_confirmation', e.target.value)}
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-3 pt-4">
+                        <div className="grid gap-3 pt-4">
                             <Button
                                 type="submit"
                                 className="w-full bg-locatel-oscuro text-white hover:bg-locatel-oscuro cursor-pointer"
@@ -184,7 +185,6 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                                 Cancelar
                             </Button>
                         </div>
-
                     </form>
                 </div>
             </div>
