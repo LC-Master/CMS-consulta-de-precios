@@ -1,6 +1,6 @@
 import AppLayout from "@/layouts/app-layout"
 import { update, index } from "@/routes/agreement"
-import { breadcrumbs } from "@/tools/breadcrumbs"
+import { breadcrumbs } from "@/helpers/breadcrumbs"
 import { type Agreement } from "@/types/agreement/index.types"
 import { useForm } from "@inertiajs/react"
 import { Label } from "@radix-ui/react-dropdown-menu"

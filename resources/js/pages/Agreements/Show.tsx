@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout'
 import { index } from '@/routes/agreement'
-import { breadcrumbs } from '@/tools/breadcrumbs'
+import { breadcrumbs } from '@/helpers/breadcrumbs'
 import { Agreement } from '@/types/agreement/index.types'
 import { ArrowLeft, CircleAlert, FileText } from 'lucide-react'
 

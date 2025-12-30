@@ -1,7 +1,7 @@
 import { DataTable } from "@/components/DataTable";
 import AppLayout from "@/layouts/app-layout";
 import { index } from "@/routes/centertokens";
-import { breadcrumbs } from "@/tools/breadcrumbs";
+import { breadcrumbs } from "@/helpers/breadcrumbs";
 import { Column } from "@/types/datatable.types";
 import { CenterToken, Props } from "@/types/centertokens/index.types";
 import useToast from '@/hooks/use-toast';

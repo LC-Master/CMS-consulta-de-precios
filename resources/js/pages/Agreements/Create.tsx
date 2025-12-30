@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout'
 import { index, store } from '@/routes/agreement'
-import { breadcrumbs } from '@/tools/breadcrumbs'
+import { breadcrumbs } from '@/helpers/breadcrumbs'
 import { useForm } from '@inertiajs/react'
 
 export default function AgreementCreate() {

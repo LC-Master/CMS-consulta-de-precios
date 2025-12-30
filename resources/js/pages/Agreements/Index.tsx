@@ -7,7 +7,7 @@ import { Column, DataTable } from '@/components/DataTable';
 import { Agreement, Props } from '@/types/agreement/index.types';
 import { Filter } from '@/components/Filter';
 import AnchorIcon from '@/components/ui/AnchorIcon';
-import { breadcrumbs } from '../../tools/breadcrumbs'
+import { breadcrumbs } from '../../helpers/breadcrumbs'
 import { index, show, edit } from '@/routes/agreement';
 import useToast from '@/hooks/use-toast';
 

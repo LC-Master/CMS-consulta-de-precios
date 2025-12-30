@@ -1,10 +1,10 @@
 import { PillStatus } from "@/components/ui/PillStatus";
 import AppLayout from "@/layouts/app-layout";
 import { index } from "@/routes/campaign";
-import { breadcrumbs } from "@/tools/breadcrumbs";
+import { breadcrumbs } from "@/helpers/breadcrumbs";
 import { CampaignExtended } from "@/types/campaign/index.types";
 import { Link } from "@inertiajs/react";
-import { Building, CalendarDays, CalendarX, Handshake, Server, Store, X } from "lucide-react";
+import { Building, CalendarDays, CalendarX, Handshake, Server, SquareLibrary, Store, Sun, X,Moon } from "lucide-react";
 function formatDate(date?: string) {
     if (!date) return "-";
     return new Date(date).toLocaleString();
@@ -18,7 +18,7 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
     const mediaAM = campaign.media
         .filter(m => m.pivot.slot === "am")
         .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));
-
+    console.log(campaign)
     const mediaPM = campaign.media
         .filter(m => m.pivot.slot === "pm")
         .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));
@@ -147,75 +147,120 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                         </div>
                     </div>
                     {/* Media AM */}
-                    <div className="bg-white rounded-xl p-6 shadow shadow-stone-400 m-2">
+                    <div className="py-6 pl-2">
 
-                        <h2 className="text-lg font-semibold mb-4">Media AM</h2>
+                        <div className="flex items-center mb-4 justify-between px-2">
+                            <div className="flex items-center gap-2">
+                                <Sun className="text-blue-400" />
+                                <h2 className="text-lg font-semibold">Media AM</h2>
+                            </div>
+                            <span className="text-sm text-gray-500 rounded-lg px-3 py-1">
+                                Total: {mediaAM.length}
+                            </span>
+                        </div>
 
                         {mediaAM.length === 0 ? (
-                            <p className="text-gray-500 text-sm">No hay contenido AM</p>
-                        ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {mediaAM.map(item => {
-                                    console.log(item);
-                                    return (
+                            <div className="bg-white rounded-xl p-6 shadow shadow-stone-400 m-2">
+                                <div className="w-full flex flex-col items-center justify-center py-8 px-6 text-center space-y-3">
+                                    <div className="relative">
                                         <div
-                                            key={item.id}
-                                            className="border rounded-lg overflow-hidden"
+                                            title="Sin contenido AM"
+                                            aria-hidden="true"
+                                            className="bg-linear-to-br from-blue-50 to-white text-blue-600 rounded-full p-4 inline-flex items-center justify-center shadow-md ring-1 ring-blue-100"
                                         >
-                                            {isVideo(item.mime_type) ? (
-                                                <video
-                                                    src={`/media/cdn/${item.id}`}
-                                                    controls
-                                                    className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
-                                                />
-                                            ) : (
-                                                <img
-                                                    src={`/media/cdn/${item.id}`}
-                                                    className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
-                                                />
-                                            )}
-
-                                            <div className="p-2 text-xs space-y-1">
-                                                <p className="font-medium truncate">{item.name}</p>
-                                                <p className="text-gray-500">
-                                                    Posición: {item.pivot.position}
-                                                </p>
-                                                {item.duration_seconds && (
-                                                    <p className="text-gray-500">
-                                                        Duración: {item.duration_seconds}s
-                                                    </p>
-                                                )}
-                                            </div>
+                                            <SquareLibrary className="w-8 h-8" />
                                         </div>
-                                    )
-                                })}
+                                        <div className="absolute -right-1 -bottom-1 bg-blue-600 text-white rounded-full p-1.5 flex items-center justify-center shadow text-xs ring-2 ring-white">
+                                            <Sun className="w-3 h-3" />
+                                        </div>
+                                    </div>
+                                    <h3 className="text-lg font-semibold">No hay contenido AM</h3>
+                                </div>
                             </div>
-                        )}
-                    </div>
-
-                    {/* Media PM */}
-                    <div className="bg-white rounded-xl p-6 shadow shadow-stone-400 m-2">
-                        <h2 className="text-lg font-semibold mb-4">Media PM</h2>
-
-                        {mediaPM.length === 0 ? (
-                            <p className="text-gray-500 text-sm">No hay contenido PM</p>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {mediaPM.map(item => (
+                            <div className="ml-2 flex flex-wrap gap-4">
+                                {mediaAM.map(item => (
                                     <div
                                         key={item.id}
-                                        className="border rounded-lg overflow-hidden"
+                                        className="flex-none w-1/2 md:w-1/4 border rounded-lg overflow-hidden"
                                     >
                                         {isVideo(item.mime_type) ? (
                                             <video
                                                 src={`/media/cdn/${item.id}`}
                                                 controls
-                                                className="w-full h-40 object-cover"
+                                                className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
                                             />
                                         ) : (
                                             <img
                                                 src={`/media/cdn/${item.id}`}
-                                                className="w-full h-40 object-cover"
+                                                className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
+                                            />
+                                        )}
+
+                                        <div className="p-2 text-xs space-y-1">
+                                            <p className="font-medium truncate">{item.name}</p>
+                                            <p className="text-gray-500">
+                                                Posición: {item.pivot.position}
+                                            </p>
+                                            {item.duration_seconds && (
+                                                <p className="text-gray-500">
+                                                    Duración: {item.duration_seconds}s
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Media PM */}
+                    <div className="py-6 pl-2">
+                        <div className="flex items-center mb-4 justify-between px-2">
+                            <div className="flex items-center gap-2">
+                                <Moon className="text-blue-400" />
+                                <h2 className="text-lg font-semibold">Media PM</h2>
+                            </div>
+                            <span className="text-sm text-gray-500 rounded-lg px-3 py-1">
+                                Total: {mediaPM.length}
+                            </span>
+                        </div>
+
+                        {mediaPM.length === 0 ? (
+                            <div className="bg-white rounded-xl p-6 shadow shadow-stone-400 m-2">
+                                <div className="w-full flex flex-col items-center justify-center py-8 px-6 text-center space-y-3">
+                                    <div className="relative">
+                                        <div
+                                            title="Sin contenido PM"
+                                            aria-hidden="true"
+                                            className="bg-linear-to-br from-blue-50 to-white text-blue-600 rounded-full p-4 inline-flex items-center justify-center shadow-md ring-1 ring-blue-100"
+                                        >
+                                            <SquareLibrary className="w-8 h-8" />
+                                        </div>
+                                        <div className="absolute -right-1 -bottom-1 bg-blue-600 text-white rounded-full p-1.5 flex items-center justify-center shadow text-xs ring-2 ring-white">
+                                            <Moon className="w-3 h-3" />
+                                        </div>
+                                    </div>
+                                    <h3 className="text-lg font-semibold">No hay contenido PM</h3>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="ml-2 flex flex-wrap gap-4">
+                                {mediaPM.map(item => (
+                                    <div
+                                        key={item.id}
+                                        className="flex-none w-1/2 md:w-1/4 border rounded-lg overflow-hidden"
+                                    >
+                                        {isVideo(item.mime_type) ? (
+                                            <video
+                                                src={`/media/cdn/${item.id}`}
+                                                controls
+                                                className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
+                                            />
+                                        ) : (
+                                            <img
+                                                src={`/media/cdn/${item.id}`}
+                                                className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
                                             />
                                         )}
 

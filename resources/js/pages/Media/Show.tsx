@@ -1,7 +1,7 @@
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/media';
-import { breadcrumbs } from '@/tools/breadcrumbs';
+import { breadcrumbs } from '@/helpers/breadcrumbs';
 import { MediaItem } from '@/types/campaign/index.types';
 import { Link } from '@inertiajs/react';
 export default function MediaShow({ media }: { media: MediaItem }) {

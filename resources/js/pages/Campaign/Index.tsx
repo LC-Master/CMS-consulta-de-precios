@@ -14,7 +14,7 @@ import { Check, X } from 'lucide-react'
 import { index } from '@/routes/campaign';
 import Modal from '@/components/Modal';
 import useModal from '@/hooks/use-modal';
-import { breadcrumbs } from '@/tools/breadcrumbs';
+import { breadcrumbs } from '@/helpers/breadcrumbs';
 
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [], flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')

@@ -9,18 +9,11 @@ import Select from 'react-select';
 import { Campaign, MediaItem, Props } from '@/types/campaign/index.types';
 import { Button } from '@/components/ui/button';
 import useToast from '@/hooks/use-toast';
-import { breadcrumbs } from '@/tools/breadcrumbs';
+import { breadcrumbs } from '@/helpers/breadcrumbs';
 import { index } from '@/routes/media';
+import { formatBytes } from '@/helpers/mediaTools';
 
-const formatBytes = (bytes: number | string, decimals = 2) => {
-    const value = Number(bytes);
-    if (!value) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(value) / Math.log(k));
-    return `${parseFloat((value / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
+
 const ExpandableCampaignList = ({ campaigns }: { campaigns?: Campaign[] }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const maxVisible = 2;

@@ -19,7 +19,7 @@ export default function CreateCenterToken({ centers, closeModal }: { closeModal:
         e.preventDefault();
 
         post(store().url, {
-            onSuccess: (page: any) => {
+            onSuccess: (page) => {
                 if (page?.props?.flash?.error) {
                     setTokenValue(null);
                     closeModal();

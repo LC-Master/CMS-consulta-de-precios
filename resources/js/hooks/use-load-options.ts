@@ -1,4 +1,4 @@
-import { makeOptions } from '@/tools/makeOptions';
+import { makeOptions } from '@/helpers/makeOptions';
 import {
     Agreement,
     Center,

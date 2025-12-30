@@ -10,7 +10,7 @@ import { update } from '@/routes/user';
 import Select from 'react-select'
 import { Link } from '@inertiajs/react';
 import { edit, index } from '@/routes/user';
-import { breadcrumbs } from '@/tools/breadcrumbs';
+import { breadcrumbs } from '@/helpers/breadcrumbs';
 
 export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
     const { data, setData, processing, errors, put } = useForm({
