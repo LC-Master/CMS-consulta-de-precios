@@ -1,3 +1,6 @@
+import { StatusCampaignEnum } from "@/enums/statusCampaignEnum";
+import { Agreement } from "../agreement/index.types";
+
 export interface Department {
     id: string;
     name: string;
@@ -88,14 +91,16 @@ export interface Status {
 export type Campaign = {
     id: string;
     title: string;
-    status: Status;
+    status: {
+        status: typeof StatusCampaignEnum[keyof typeof StatusCampaignEnum];
+    };
     created_at: string;
 }
 
 export type CampaignExtended = Campaign & {
     agreement: Agreement;
     department: Department;
-
+    centers: Center[];
     start_at: string;
     end_at: string;
 

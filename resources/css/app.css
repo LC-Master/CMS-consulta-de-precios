@@ -21,7 +21,7 @@
     --color-locatel-morado: #9e28b5;
 
     --color-locatel-guia: #2a5b48;
-
+    --color-separator: #e5e7eb;
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);

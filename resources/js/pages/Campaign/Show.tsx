@@ -1,8 +1,10 @@
+import { PillStatus } from "@/components/ui/PillStatus";
 import AppLayout from "@/layouts/app-layout";
 import { index } from "@/routes/campaign";
-import { BreadcrumbItem } from "@/types";
+import { breadcrumbs } from "@/tools/breadcrumbs";
 import { CampaignExtended } from "@/types/campaign/index.types";
 import { Link } from "@inertiajs/react";
+import { Building, CalendarDays, CalendarX, Handshake, Server, Store, X } from "lucide-react";
 function formatDate(date?: string) {
     if (!date) return "-";
     return new Date(date).toLocaleString();
@@ -13,12 +15,6 @@ function isVideo(mime_type: string) {
 }
 
 export default function CampaignShow({ campaign }: { campaign: CampaignExtended }) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Detalle de campaña',
-            href: index().url,
-        },
-    ];
     const mediaAM = campaign.media
         .filter(m => m.pivot.slot === "am")
         .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));
@@ -28,75 +24,184 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
         .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <div className="max-w-7xl mx-auto mt-2">
-
-                {/* Page header */}
-                <div className="flex items-center justify-between px-2">
-                    <Link
-                        viewTransition
-                        href={index().url}
-                        className="inline-flex items-center gap-2 bg-locatel-claro hover:bg-locatel-medio px-4 py-2 rounded-md text-white text-sm font-medium shadow"
-                    >
-                        ← Volver
-                    </Link>
-
-                    <span className="text-sm text-gray-500">
-                        ID: {campaign.id}
-                    </span>
-                </div>
-
-                {/* Campaign info */}
-                <div className="bg-white rounded-xl p-6 shadow shadow-stone-400 m-2">
-                    <h1 className="text-2xl font-semibold">{campaign.title}</h1>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
-                        <div>
-                            <p className="text-gray-500">Estado</p>
-                            <p className="font-medium">{campaign.status?.status}</p>
-                        </div>
-
-                        <div>
-                            <p className="text-gray-500">Agreement</p>
-                            <p className="font-medium">{campaign.agreement?.name}</p>
-                        </div>
-
-                        <div>
-                            <p className="text-gray-500">Departamento</p>
-                            <p className="font-medium">{campaign.department?.name}</p>
-                        </div>
-
-                        <div>
-                            <p className="text-gray-500">Creado</p>
-                            <p className="font-medium">{formatDate(campaign.created_at)}</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Dates */}
-                <div className="bg-white rounded-xl p-6 grid grid-cols-2 gap-4 text-sm shadow shadow-stone-400 m-2">
-                    <div>
-                        <p className="text-gray-500">Inicio</p>
-                        <p className="font-medium">{formatDate(campaign.start_at)}</p>
+        <AppLayout breadcrumbs={breadcrumbs('Detalles de campaña', index().url)}>
+            <div className="p-6 space-y-6">
+                <div>
+                    <div className="mb-6 ml-2">
+                        <h1 className="text-3xl mb-2 font-bold">
+                            Detalles de la campaña
+                        </h1>
+                        <p className="text-gray-600 text-sm">
+                            Detalles para la campaña "<strong>{campaign.title}</strong>".
+                        </p>
                     </div>
 
-                    <div>
-                        <p className="text-gray-500">Fin</p>
-                        <p className="font-medium">{formatDate(campaign.end_at)}</p>
+                    {/* Campaign info */}
+                    <div className="flex flex-wrap md:flex-nowrap gap-4">
+                        <div className="bg-white rounded-xl shadow shadow-stone-400 m-2 w-full md:w-[65%]">
+                            <div className="flex items-center p-6 justify-between w-full 
+                            border-b border-gray-300">
+                                <h2 className="text-lg  font-semibold">Información general</h2>
+                                <PillStatus status={campaign.status?.status} />
+                            </div>
+                            <div className="flex flex-row py-8 px-10 gap-6 mt-4 text-sm">
+                                <div className="flex flex-col mr-6 space-y-6">
+                                    <div>
+                                        <p className="text-gray-500">Titulo de la campaña</p>
+                                        <p className="font-medium">{campaign.title}</p>
+                                    </div>
+
+                                    <div>
+                                        <p className="text-gray-500">Convenio</p>
+                                        <div className="flex items-center gap-2">
+                                            <Handshake className="w-4 h-4 text-gray-500" />
+                                            <p className="font-medium">{campaign.agreement?.name}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col mb-6 space-y-6">
+                                    <div>
+                                        <p className="text-gray-500">Departamento</p>
+                                        <div className="flex items-center gap-2">
+                                            <Building className="w-4 h-4 text-gray-500" />
+                                            <p className="font-medium">{campaign.department?.name}</p>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <p className="text-gray-500">Creado</p>
+                                        <p className="font-medium">{formatDate(campaign.created_at)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Dates */}
+                        <div className="bg-white rounded-xl flex flex-col text-sm shadow shadow-stone-400 m-2 w-full md:w-[35%]">
+                            <div className="border-b py-6 px-7 border-gray-300 mb-4">
+                                <h2 className="font-bold text-lg">Fechas</h2>
+                            </div>
+
+                            <div className="px-7 pb-6 space-y-6">
+                                <div className="flex items-center pt-4 gap-4 justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center" aria-hidden="true">
+                                            <CalendarDays className="w-6 h-6 text-blue-500" />
+                                        </div>
+                                        <div>
+                                            <p className="text-gray-500 text-xs">Inicio</p>
+                                            <span className="font-semibold text-lg md:text-sm">{formatDate(campaign.start_at)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-4 justify-between border-t pt-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center" aria-hidden="true">
+                                            <CalendarX className="w-6 h-6 text-red-500" />
+                                        </div>
+                                        <div>
+                                            <p className="text-gray-500 text-xs">Fin</p>
+                                            <p className="font-semibold text-lg md:text-sm">{formatDate(campaign.end_at)}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
-                </div>
 
-                {/* Media AM */}
-                <div className="bg-white rounded-xl p-6 shadow shadow-stone-400 m-2">
-                    <h2 className="text-lg font-semibold mb-4">Media AM</h2>
+                    <div className="bg-white rounded-xl shadow shadow-stone-400 m-2">
+                        <div className="flex items-center justify-between border-b border-gray-300 p-6">
+                            <div className="flex items-center gap-4">
+                                <Store />
+                                <h2 className="text-lg font-semibold">Centros asociados</h2>
+                            </div>
+                            <span className="text-sm text-gray-500 bg-gray-300 rounded-lg px-3 py-1">
+                                {campaign.centers.length} centros
+                            </span>
+                        </div>
+                        <div className="py-4 flex flex-row overflow-x-auto">
+                            {campaign.centers ? campaign.centers.map(center => (
+                                <div
+                                    key={center.id}
+                                    className="flex-none w-56 md:w-64 h-24 rounded-lg border border-transparent hover:border-blue-300 px-4 py-3 flex items-center gap-3 mx-3 shadow-lg transition-colors"
+                                >
+                                    <span className="bg-gray-100 w-12 h-12 rounded-full flex items-center justify-center" aria-hidden="true">
+                                        <Server className="w-6 h-6 text-gray-500" />
+                                    </span>
+                                    <div className="overflow-hidden">
+                                        <p className="font-medium text-sm truncate">{center.name}</p>
+                                        <p className="text-xs text-gray-500 truncate">{center.code}</p>
+                                    </div>
+                                </div>
+                            )) : (
+                                <div className="w-full flex flex-col items-center justify-center py-8 px-6 text-center space-y-3">
+                                    <div className="bg-gray-100 text-red-500 rounded-full p-3 inline-flex items-center justify-center">
+                                        <X className="w-6 h-6" />
+                                    </div>
+                                    <h3 className="text-lg font-semibold">No hay centros asociados</h3>
+                                    <p className="text-sm text-gray-500">Esta campaña aún no tiene centros vinculados.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    {/* Media AM */}
+                    <div className="bg-white rounded-xl p-6 shadow shadow-stone-400 m-2">
 
-                    {mediaAM.length === 0 ? (
-                        <p className="text-gray-500 text-sm">No hay contenido AM</p>
-                    ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {mediaAM.map(item => {
-                                console.log(item);
-                                return (
+                        <h2 className="text-lg font-semibold mb-4">Media AM</h2>
+
+                        {mediaAM.length === 0 ? (
+                            <p className="text-gray-500 text-sm">No hay contenido AM</p>
+                        ) : (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {mediaAM.map(item => {
+                                    console.log(item);
+                                    return (
+                                        <div
+                                            key={item.id}
+                                            className="border rounded-lg overflow-hidden"
+                                        >
+                                            {isVideo(item.mime_type) ? (
+                                                <video
+                                                    src={`/media/cdn/${item.id}`}
+                                                    controls
+                                                    className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
+                                                />
+                                            ) : (
+                                                <img
+                                                    src={`/media/cdn/${item.id}`}
+                                                    className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
+                                                />
+                                            )}
+
+                                            <div className="p-2 text-xs space-y-1">
+                                                <p className="font-medium truncate">{item.name}</p>
+                                                <p className="text-gray-500">
+                                                    Posición: {item.pivot.position}
+                                                </p>
+                                                {item.duration_seconds && (
+                                                    <p className="text-gray-500">
+                                                        Duración: {item.duration_seconds}s
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Media PM */}
+                    <div className="bg-white rounded-xl p-6 shadow shadow-stone-400 m-2">
+                        <h2 className="text-lg font-semibold mb-4">Media PM</h2>
+
+                        {mediaPM.length === 0 ? (
+                            <p className="text-gray-500 text-sm">No hay contenido PM</p>
+                        ) : (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {mediaPM.map(item => (
                                     <div
                                         key={item.id}
                                         className="border rounded-lg overflow-hidden"
@@ -105,12 +210,12 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                                             <video
                                                 src={`/media/cdn/${item.id}`}
                                                 controls
-                                                className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
+                                                className="w-full h-40 object-cover"
                                             />
                                         ) : (
                                             <img
                                                 src={`/media/cdn/${item.id}`}
-                                                className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
+                                                className="w-full h-40 object-cover"
                                             />
                                         )}
 
@@ -126,55 +231,25 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                                             )}
                                         </div>
                                     </div>
-                                )
-                            })}
-                        </div>
-                    )}
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    {/* Page header */}
+                    <div className="flex items-center justify-between px-2">
+                        <Link
+                            viewTransition
+                            href={index().url}
+                            className="inline-flex items-center gap-2 bg-locatel-claro hover:bg-locatel-medio px-4 py-2 rounded-md text-white text-sm font-medium shadow"
+                        >
+                            ← Volver
+                        </Link>
+
+                        <span className="text-sm text-gray-500">
+                            ID: {campaign.id}
+                        </span>
+                    </div>
                 </div>
-
-                {/* Media PM */}
-                <div className="bg-white rounded-xl p-6 shadow shadow-stone-400 m-2">
-                    <h2 className="text-lg font-semibold mb-4">Media PM</h2>
-
-                    {mediaPM.length === 0 ? (
-                        <p className="text-gray-500 text-sm">No hay contenido PM</p>
-                    ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {mediaPM.map(item => (
-                                <div
-                                    key={item.id}
-                                    className="border rounded-lg overflow-hidden"
-                                >
-                                    {isVideo(item.mime_type) ? (
-                                        <video
-                                            src={`/media/cdn/${item.id}`}
-                                            controls
-                                            className="w-full h-40 object-cover"
-                                        />
-                                    ) : (
-                                        <img
-                                            src={`/media/cdn/${item.id}`}
-                                            className="w-full h-40 object-cover"
-                                        />
-                                    )}
-
-                                    <div className="p-2 text-xs space-y-1">
-                                        <p className="font-medium truncate">{item.name}</p>
-                                        <p className="text-gray-500">
-                                            Posición: {item.pivot.position}
-                                        </p>
-                                        {item.duration_seconds && (
-                                            <p className="text-gray-500">
-                                                Duración: {item.duration_seconds}s
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
             </div>
         </AppLayout>
     );

@@ -52,7 +52,7 @@ class CampaignController extends Controller
                 ->get(),
             'centers' => Center::select('id', 'code', 'name')->get(),
             'departments' => Department::select('id', 'name')->get(),
-            'agreements' => Agreement::select('id', 'name')->get(),
+            'agreements' => Agreement::where('is_active', true)->select('id', 'name')->get(),
         ]);
     }
 
@@ -79,11 +79,16 @@ class CampaignController extends Controller
             'status',
             'department:id,name',
             'agreement:id,name',
+            'centers:id,code,name',
             'media' => function ($query) {
-                $query->select('media.id', 'media.name', 'media.mime_type', 'media.duration_seconds');
+            $query->select('media.id', 'media.name', 'media.mime_type', 'media.duration_seconds');
             },
         ]);
+
+        $campaign->setRelation('centers', $campaign->centers->map->only(['id', 'code', 'name']));
+
         $campaign->makeHidden(['status_id', 'department_id', 'agreement_id']);
+
         return Inertia::render('Campaign/Show', [
             'campaign' => $campaign
         ]);
