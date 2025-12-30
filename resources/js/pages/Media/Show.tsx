@@ -107,7 +107,8 @@ export default function MediaShow({ media }: { media: MediaItem }) {
                                     <div className="max-h-56 md:max-h-80 overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                                         {media.campaigns && media.campaigns.length > 0 ? (
                                             media.campaigns.map((campaign) => (
-                                                <a
+                                                <Link
+                                                    viewTransition
                                                     href={show({ id: campaign.id }).url}
                                                     key={campaign.id}
                                                     className="flex items-center justify-between gap-3 p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 transition-colors cursor-pointer"
@@ -123,7 +124,7 @@ export default function MediaShow({ media }: { media: MediaItem }) {
                                                     </div>
 
                                                     <ChevronRight className="text-gray-400" />
-                                                </a>
+                                                </Link>
                                             ))
                                         ) : (
                                             <div className="flex items-center justify-center p-6 bg-white border border-dashed border-gray-200 rounded-lg">
@@ -146,10 +147,10 @@ export default function MediaShow({ media }: { media: MediaItem }) {
                         </div>
 
                         <div className="mt-auto flex gap-2 rounded-b-lg p-4 justify-center align-middle border-t border-gray-200 bg-gray-50">
-                            <Link viewTransition href={`/media/cdn/${media.id}`} download className="inline-flex items-center gap-2 text-white rounded-xl px-3 py-2 bg-blue-500 hover:bg-blue-600 text-sm">
+                            <a href={`/media/cdn/${media.id}`} download className="inline-flex items-center gap-2 text-white rounded-xl px-3 py-2 bg-blue-500 hover:bg-blue-600 text-sm">
                                 <DownloadCloud size={16} />
                                 Descargar
-                            </Link>
+                            </a>
 
                             <Link viewTransition href={index().url} className="inline-flex items-center gap-2 bg-locatel-oro text-white rounded-xl px-3 py-2 hover:bg-locatel-naranja text-sm">
                                 <ArrowLeft size={14} />

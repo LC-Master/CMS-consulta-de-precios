@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { router } from '@inertiajs/react'
+import { router, Link } from '@inertiajs/react'
 import { Eye, Trash, Search, ChevronDown, ChevronUp } from 'lucide-react'
 import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
@@ -12,7 +12,7 @@ import useToast from '@/hooks/use-toast';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
 import { index } from '@/routes/media';
 import { formatBytes } from '@/helpers/mediaTools';
-
+import { show } from '@/routes/campaign';
 
 const ExpandableCampaignList = ({ campaigns }: { campaigns?: Campaign[] }) => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -29,14 +29,15 @@ const ExpandableCampaignList = ({ campaigns }: { campaigns?: Campaign[] }) => {
         <div className="flex flex-col items-start gap-1 min-w-37.5">
             <div className="flex flex-wrap items-center gap-1">
                 {visibleCampaigns.map((camp) => (
-                    <a
+                    <Link
+                        viewTransition
                         key={camp.id}
-                        href={`/campaign/${camp.id}`}
+                        href={show({ id: camp.id }).url}
                         className="underline inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100"
                         title={camp.title}
                     >
                         {camp.title}
-                    </a>
+                    </Link>
                 ))}
 
                 {!isExpanded && remainingCount > 0 && (
@@ -141,7 +142,7 @@ export default function MediaIndex({ medias, filters = {}, mimeTypes = [], flash
     }, [search, type])
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs('Lista de multimedia',index().url)}>
+        <AppLayout breadcrumbs={breadcrumbs('Lista de multimedia', index().url)}>
             <div className="space-y-4 px-4 pb-4">
                 {ToastContainer()}
                 <div className="flex flex-col sm:flex-row gap-4 mt-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">

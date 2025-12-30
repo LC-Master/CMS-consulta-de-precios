@@ -1,7 +1,9 @@
 import AppLayout from '@/layouts/app-layout'
 import { index, store } from '@/routes/agreement'
 import { breadcrumbs } from '@/helpers/breadcrumbs'
-import { useForm } from '@inertiajs/react'
+import { useForm, Link } from '@inertiajs/react'
+import { Save } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 export default function AgreementCreate() {
 
@@ -180,21 +182,21 @@ export default function AgreementCreate() {
                     </form>
 
                     <div className="flex flex-wrap justify-center border-t border-gray-200 pt-20 mt-25 gap-3">
-                        <button
+                        <Button
                             form="form"
-                            className="bg-locatel-medio text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
+                            className="bg-locatel-medio flex flex-row h-12 gap-2 items-center text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
                             disabled={processing}
                         >
-                            Guardar
-                        </button>
+                            <Save /> Guardar
+                        </Button>
 
-                        <button
-                            type="button"
-                            onClick={() => (window.location.href = '/agreement')}
+                        <Link
+                            viewTransition
+                            href={index().url}
                             className="bg-red-500 text-white rounded-md px-6 py-3 shadow hover:brightness-95"
                         >
                             Cancelar
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

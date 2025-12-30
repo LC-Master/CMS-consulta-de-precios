@@ -12,3 +12,11 @@ export function mediaNameNormalizer(name: string) {
     
     return cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
 }
+export function formatDate(date?: string) {
+    if (!date) return "-";
+    return new Date(date).toLocaleString();
+}
+
+export function isVideo(mime_type: string) {
+    return mime_type.startsWith("video");
+}

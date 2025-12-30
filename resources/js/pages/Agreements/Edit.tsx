@@ -2,7 +2,7 @@ import AppLayout from "@/layouts/app-layout"
 import { update, index } from "@/routes/agreement"
 import { breadcrumbs } from "@/helpers/breadcrumbs"
 import { type Agreement } from "@/types/agreement/index.types"
-import { useForm } from "@inertiajs/react"
+import { useForm, Link } from "@inertiajs/react"
 import { Label } from "@radix-ui/react-dropdown-menu"
 
 export default function AgreementsEdit({ agreement }: { agreement: Agreement }) {
@@ -206,13 +206,13 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
                             Guardar
                         </button>
 
-                        <button
-                            type="button"
-                            onClick={() => (window.location.href = '/agreement')}
+                        <Link
+                            viewTransition
+                            href={index().url}
                             className="bg-red-500 text-white rounded-md px-6 py-3 shadow hover:brightness-95"
                         >
                             Cancelar
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

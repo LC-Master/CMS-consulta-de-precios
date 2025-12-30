@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout'
-import { useForm } from '@inertiajs/react'
+import { useForm, Link } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
@@ -17,7 +17,7 @@ import { breadcrumbs } from '@/helpers/breadcrumbs'
 import useSearch from '@/hooks/use-search'
 import { useMediaActions } from '@/hooks/use-media-actions'
 import { Agreement } from '@/types/agreement/index.types'
-import { CircleAlert, PlusCircle, SquarePlay } from 'lucide-react'
+import { CircleAlert, PlusCircle, Save, SquarePlay } from 'lucide-react'
 
 export default function CampaignCreate({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
     const { isOpen, openModal, closeModal } = useModal(false)
@@ -262,22 +262,23 @@ export default function CampaignCreate({ centers, departments, agreements, media
                     </form>
 
                     <div className="flex flex-wrap w-full p-6 border-t shadow-t-lg border-gray-200 bg-[#fcfcfc] justify-center gap-3">
-                        <button
+                        <Button
                             type="submit"
                             form="form"
-                            className="bg-locatel-medio text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
+                            className="bg-locatel-medio flex flex-row items-center h-12 text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
                             disabled={processing}
                         >
+                            <Save />
                             Guardar
-                        </button>
+                        </Button>
 
-                        <button
-                            type="button"
-                            onClick={() => (window.location.href = '/campaign')}
+                        <Link
+                            viewTransition
+                            href={index().url}
                             className="bg-red-500 text-white rounded-md px-6 py-3 shadow hover:brightness-95"
                         >
                             Cancelar
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

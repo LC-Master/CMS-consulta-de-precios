@@ -79,7 +79,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="mr-2 h-[34px] w-[34px]"
+                                    className="mr-2 h-8.5 w-8.5"
                                 >
                                     <Menu className="h-5 w-5" />
                                 </Button>
@@ -116,7 +116,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 
                                         <div className="flex flex-col space-y-4">
                                             {rightNavItems.map((item) => (
-                                                <a
+                                                <Link
+                                                    viewTransition
                                                     key={item.title}
                                                     href={resolveUrl(item.href)}
                                                     target="_blank"
@@ -130,7 +131,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                         />
                                                     )}
                                                     <span>{item.title}</span>
-                                                </a>
+                                                </Link>
                                             ))}
                                         </div>
                                     </div>
@@ -201,7 +202,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                     >
                                         <Tooltip>
                                             <TooltipTrigger>
-                                                <a
+                                                <Link
+                                                    viewTransition
                                                     href={resolveUrl(item.href)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
@@ -216,7 +218,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                             className="size-5 opacity-80 group-hover:opacity-100"
                                                         />
                                                     )}
-                                                </a>
+                                                </Link>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>{item.title}</p>

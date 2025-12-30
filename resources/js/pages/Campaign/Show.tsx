@@ -5,14 +5,7 @@ import { breadcrumbs } from "@/helpers/breadcrumbs";
 import { CampaignExtended } from "@/types/campaign/index.types";
 import { Link } from "@inertiajs/react";
 import { Building, CalendarDays, CalendarX, Handshake, Server, SquareLibrary, Store, Sun, X,Moon } from "lucide-react";
-function formatDate(date?: string) {
-    if (!date) return "-";
-    return new Date(date).toLocaleString();
-}
-
-function isVideo(mime_type: string) {
-    return mime_type.startsWith("video");
-}
+import { formatDate, isVideo } from "@/helpers/mediaTools";
 
 export default function CampaignShow({ campaign }: { campaign: CampaignExtended }) {
     const mediaAM = campaign.media

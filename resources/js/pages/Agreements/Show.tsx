@@ -3,6 +3,7 @@ import { index } from '@/routes/agreement'
 import { breadcrumbs } from '@/helpers/breadcrumbs'
 import { Agreement } from '@/types/agreement/index.types'
 import { ArrowLeft, CircleAlert, FileText } from 'lucide-react'
+import { Link } from '@inertiajs/react'
 
 export default function AgreementShow({ agreement }: { agreement: Agreement }) {
     return (
@@ -88,12 +89,13 @@ export default function AgreementShow({ agreement }: { agreement: Agreement }) {
 
                 <div className="flex flex-wrap justify-center gap-3">
 
-                    <a
+                    <Link
+                        viewTransition
                         href={index().url}
                         className="bg-white text-gray-900 shadow-2xl border border-black rounded-md px-6 py-3 hover:brightness-95 inline-flex items-center"
                     >
                         <ArrowLeft className="mr-2" /> Volver
-                    </a>
+                    </Link>
                 </div>
             </div>
         </AppLayout>
