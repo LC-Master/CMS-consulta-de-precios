@@ -36,7 +36,7 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $input['password'],
         ]);
 
-        $user->assignRole('publicity');
+        $user->assignRole('publicidad');
 
         return $user;
     }

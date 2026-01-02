@@ -17,7 +17,7 @@ Route::get('/', function (Request $req) {
     ]);
 })->name('home');
 
-Route::middleware(['auth', 'verified', 'role:admin|publicity'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:admin|publicidad'])->group(function () {
     Route::get('dashboard', action: function () {
         return Inertia::render('dashboard');
     })->name('dashboard');

@@ -38,7 +38,7 @@ return [
     'roles' => [
         'admin' => '*',
 
-        'publicity' => [
+        'publicidad' => [
             'campaigns.list',
             'campaigns.show',
             'campaigns.create',

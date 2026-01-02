@@ -29,7 +29,7 @@ export function AppSidebar() {
 
 
 
-    const mainNavItems: NavItem[] = hasRole('admin|publicity') ? [
+    const mainNavItems: NavItem[] = hasRole('admin|publicidad') ? [
         {
             title: 'Crear campaña',
             href: create().url,
