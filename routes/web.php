@@ -30,10 +30,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('campaign', CampaignController::class);
     Route::resource('timeline', TimeLineController::class);
     Route::resource('agreement', AgreementController::class);
-    Route::resource('user', UserController::class);
     Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
     Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
+});
+Route::middleware(['auth', 'verified','password.confirm'])->group(function () {
+    Route::resource('user', UserController::class);
     Route::resource('centertokens', CenterTokenController::class);
 });
-
 require __DIR__ . '/settings.php';

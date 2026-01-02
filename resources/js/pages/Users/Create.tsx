@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -177,13 +177,12 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                                 Guardar Usuario
                             </Button>
 
-                            <Button
-                                type="button"
-                                className="w-full bg-red-500 text-white hover:bg-red-500 cursor-pointer"
-                                onClick={() => (window.location.href = '/user')}
+                            <Link
+                                href={index().url}
+                                className="w-full bg-red-500 text-white hover:bg-red-500 cursor-pointer inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs tracking-widest disabled:opacity-25 transition ease-in-out duration-150 text-center"
                             >
                                 Cancelar
-                            </Button>
+                            </Link>
                         </div>
                     </form>
                 </div>

@@ -18,7 +18,7 @@ import { index as user } from '@/routes/user';
 import { index as tokens } from '@/routes/centertokens';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Users, KeyRound, LayoutGrid, SquarePlus, List, Handshake, Film } from 'lucide-react';
+import { Users, KeyRound, SquarePlus, List, Handshake, Film } from 'lucide-react';
 import { lazy } from 'react';
 
 const Logo = lazy(() => import('@/components/app-logo'));
@@ -72,7 +72,7 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar  collapsible="icon" variant="inset">
             <SidebarHeader className="bg-locatel-medio rounded-t-lg">
                 <SidebarMenu className='bg-white rounded-lg'>
                     <SidebarMenuItem>
