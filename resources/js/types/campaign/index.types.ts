@@ -10,7 +10,7 @@ export interface Center extends Pick<Department, 'id' | 'name'> {
 }
 export interface MediaItem extends Pick<Department, 'id' | 'name'> {
     size: string;
-    duration_seconds: string;
+    duration_seconds: number | null;
     slot?: 'am' | 'pm';
     campaigns?: Campaign[];
     position?: string;

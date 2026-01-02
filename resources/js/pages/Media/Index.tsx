@@ -104,7 +104,7 @@ export default function MediaIndex({ medias, filters = {}, mimeTypes = [], flash
         {
             key: 'duration_seconds',
             header: 'Duración',
-            render: (a) => a.duration_seconds ? `${a.duration_seconds}s` : '-',
+            render: (a) => a.duration_seconds ? `${Math.round(a.duration_seconds)}s` : '-',
         },
         {
             key: 'campaigns',

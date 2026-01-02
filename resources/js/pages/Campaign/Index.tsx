@@ -15,6 +15,7 @@ import { index } from '@/routes/campaign';
 import Modal from '@/components/Modal';
 import useModal from '@/hooks/use-modal';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
+import { PillStatus } from '@/components/ui/PillStatus';
 
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [], flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
@@ -22,7 +23,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
     const [campaignId, setCampaignId] = useState<string | null>('');
     const [status, setStatus] = useState(filters.status || '')
     const { ToastContainer } = useToast(flash);
-    
+
     const columns: Column<Campaign>[] = [
         {
             key: 'title',
@@ -32,7 +33,9 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
         {
             key: 'status',
             header: 'Estado',
-            render: (a) => a.status.status,
+            render: (a) => (
+                <PillStatus status={a.status.status} />
+            ),
         },
         {
             key: 'created_at',

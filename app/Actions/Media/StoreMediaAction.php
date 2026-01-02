@@ -17,14 +17,17 @@ class StoreMediaAction
             $thumbIndex = 0;
 
             foreach ($files as $file) {
+                $pathTemporal = $file->getRealPath();
+                $getID3 = new \getID3();
+                $mimeType = $file->getMimeType();
                 $path = $file->store('uploads', 'public');
                 $media = Media::create([
                     'name' => $file->getClientOriginalName(),
                     'disk' => 'public',
                     'path' => $path,
-                    'mime_type' => $file->getClientMimeType(),
+                    'mime_type' => $mimeType,
                     'size' => $file->getSize(),
-                    'duration_seconds' => null,
+                    'duration_seconds' => str_starts_with($mimeType, 'video/') ? round($getID3->analyze($pathTemporal)['playtime_seconds']) : null,
                     'checksum' => md5_file($file->getRealPath()),
                     'created_by' => Auth::id(),
                 ]);

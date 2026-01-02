@@ -8,7 +8,7 @@ use App\Http\Controllers\TimeLineController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Fortify\Features;
+// use Laravel\Fortify\Features;
 use App\Http\Controllers\CenterTokenController;
 
 // Route::get('/', function (Request $req) {
