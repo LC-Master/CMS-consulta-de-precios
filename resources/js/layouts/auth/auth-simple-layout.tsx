@@ -1,5 +1,6 @@
 import AppLogoIcon from '@/components/app-logo-icon';
-import { home } from '@/routes';
+import { index } from '@/routes/agreement';
+// import { home } from '@/routes';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
@@ -15,12 +16,12 @@ export default function AuthSimpleLayout({
     description,
 }: PropsWithChildren<AuthLayoutProps>) {
     return (
-        <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-2 md:p-4 ">
-            <div className="w-full max-w-sm">
+        <div className="flex min-h-svh flex-col items-center bg-background justify-center gap-6  p-2 md:p-4 ">
+            <div className="w-full p-5 max-w-sm rounded-lg bg-white dark:bg-slate-800 shadow-[0_0_18px_rgba(0,0,0,0.08)] dark:shadow-[0_0_18px_rgba(0,0,0,0.35)] ring-1 ring-inset ring-gray-100/60 transition-shadow duration-200 ease-in-out hover:shadow-[0_0_28px_rgba(0,0,0,0.12)]">
                 <div className="flex flex-col gap-8">
                     <div className="flex flex-col items-center">
                         <Link
-                            href={home()}
+                            href={index().url}
                             className="flex flex-col items-center font-medium"
                         >
                             <div className="flex h-42 w-98 items-center justify-center">

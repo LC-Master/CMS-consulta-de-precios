@@ -15,8 +15,7 @@ class CreateAgreementAction
 
             $valoresValidos = array_column(AgreementStatus::cases(), 'value');
 
-            // Verificamos si 'Activo' NO ESTÁ y si 'Inactivo' TAMBIÉN NO ESTÁ
-            if (!in_array('Activo', $valoresValidos) && !in_array('Inactivo', $valoresValidos)) {
+            if (!\in_array(AgreementStatus::ACTIVE->value, $valoresValidos) && !\in_array(AgreementStatus::INACTIVE->value, $valoresValidos)) {
                 Log::critical('Integrity Error: Default agreement status missing.', ['required_status' => AgreementStatus::ACTIVE->value]);
                 throw new \RuntimeException('Error de configuración del sistema: Estado inicial no encontrado.');
             }
