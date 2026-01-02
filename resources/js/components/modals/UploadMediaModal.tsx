@@ -127,7 +127,8 @@ export default function UploadMediaModal({ closeModal }: { closeModal: () => voi
         })
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
-
+        e.stopPropagation()
+        
         setData('files', selectedFiles)
 
         const thumbs: File[] = []
@@ -157,7 +158,7 @@ export default function UploadMediaModal({ closeModal }: { closeModal: () => voi
     }
     return createPortal(
         <Modal closeModal={closeModal}>
-            <form onSubmit={handleSubmit}>
+            <form id='uploadFilesForm' onSubmit={handleSubmit}>
                 <h2 className="text-lg font-semibold mb-4">Agregar Multimedia</h2>
 
                 <div
@@ -230,7 +231,8 @@ export default function UploadMediaModal({ closeModal }: { closeModal: () => voi
                             Enviar
                         </Button>
                         <Button
-                            type="button"
+                            type="submit"
+                            form='uploadFilesForm'
                             variant="destructive"
                             className="w-1/2"
                             onClick={closeModal}

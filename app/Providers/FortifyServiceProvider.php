@@ -29,7 +29,7 @@ class FortifyServiceProvider extends ServiceProvider
         $this->app->instance(LoginResponse::class, new class implements LoginResponse {
             public function toResponse($request)
             {
-                return to_route('campaign.index');
+                return redirect()->intended(default: route('campaign.index'));
             }
         });
     }
