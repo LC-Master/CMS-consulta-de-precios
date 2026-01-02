@@ -11,16 +11,14 @@ use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\CenterTokenController;
 
-Route::get('/', function (Request $req) {
-    return Inertia::render('welcome', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]);
-})->name('home');
+// Route::get('/', function (Request $req) {
+//     return Inertia::render('welcome', [
+//         'canRegister' => Features::enabled(Features::registration()),
+//     ]);
+// })->name('home');
 
 Route::middleware(['auth', 'verified', 'role:admin|publicidad'])->group(function () {
-    Route::get('dashboard', action: function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', action: fn() => Inertia::render('dashboard'))->name('dashboard');
     Route::get('/campaign/activate/{campaign}', [CampaignController::class, 'activate'])->name('campaign.activate');
     Route::get('/campaign/finish/{campaign}', [CampaignController::class, 'finish'])->name('campaign.finish');
     Route::resource('media', MediaController::class)->parameters([
