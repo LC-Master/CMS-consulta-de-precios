@@ -20,59 +20,68 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Users, KeyRound, SquarePlus, List, Handshake, Film } from 'lucide-react';
 import { lazy } from 'react';
-
+import useAuth from '@/hooks/useAuth';
 const Logo = lazy(() => import('@/components/app-logo'));
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Crear campaña',
-        href: create().url,
-        icon: SquarePlus,
-    }
-    , {
-        title: 'Campañas',
-        href: index().url,
-        icon: List,
-    }
-    , {
-        title: 'Crear Convenios',
-        href: agreementCreate().url,
-        icon: SquarePlus,
-    }
-    , {
-        title: 'Convenios',
-        href: agreement().url,
-        icon: Handshake,
-    }
-    // , {
-    //     title: 'Panel de control',
-    //     href: dashboard(),
-    //     icon: LayoutGrid,
-    // },
-
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Listado de Videos',
-        href: media().url,
-        icon: Film,
-    },
-    {
-        title: 'Usuarios',
-        href: user().url,
-        icon: Users,
-    },
-    {
-        title: 'Lista de tokens',
-        href: tokens().url,
-        icon: KeyRound,
-    },
-];
-
 export function AppSidebar() {
+
+    const { hasRole } = useAuth();
+
+
+
+    const mainNavItems: NavItem[] = hasRole('admin|publicity') ? [
+        {
+            title: 'Crear campaña',
+            href: create().url,
+            icon: SquarePlus,
+        }
+        , {
+            title: 'Campañas',
+            href: index().url,
+            icon: List,
+        }
+        , {
+            title: 'Crear Convenios',
+            href: agreementCreate().url,
+            icon: SquarePlus,
+        }
+        , {
+            title: 'Convenios',
+            href: agreement().url,
+            icon: Handshake,
+        }
+        // , {
+        //     title: 'Panel de control',
+        //     href: dashboard(),
+        //     icon: LayoutGrid,
+        // },
+
+    ] : [];
+
+    const adminElement = hasRole('admin') ? [
+        {
+            title: 'Usuarios',
+            href: user().url,
+            icon: Users,
+        },
+        {
+            title: 'Lista de tokens',
+            href: tokens().url,
+            icon: KeyRound,
+        },] : [];
+
+    const footerNavItems: NavItem[] = [
+        {
+            title: 'Listado de Videos',
+            href: media().url,
+            icon: Film,
+        },
+        ...adminElement
+    ];
+
+
     return (
-        <Sidebar  collapsible="icon" variant="inset">
+        <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader className="bg-locatel-medio rounded-t-lg">
                 <SidebarMenu className='bg-white rounded-lg'>
                     <SidebarMenuItem>
