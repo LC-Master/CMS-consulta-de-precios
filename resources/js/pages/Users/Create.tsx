@@ -21,11 +21,6 @@ export default function UserCreate({ roles }: PropsCreatePage) {
         password_confirmation: '',
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(store().url);
-    };
-
     const selectedRole = roles.find(role => role.name === data.role);
 
     return (
@@ -41,11 +36,13 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                 </div>
 
                 <div className="w-full max-w-2xl shadow-2xl border border-gray-100 mt-2 space-y-8 bg-white p-8 rounded-lg">
-                    <form onSubmit={handleSubmit} className="mt-8 space-y-6" autoComplete="off">
+                    <form onSubmit={(e: React.FormEvent) => {
+                        e.preventDefault();
+                        post(store().url);
+                    }} className="mt-8 space-y-6" autoComplete="off">
                         <input type="text" style={{ display: 'none' }} />
                         <input type="password" style={{ display: 'none' }} />
 
-                        {/* Row 1: Email (left) + Name (right) */}
                         <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
                             <div className="flex-1 flex flex-col gap-2">
                                 <Label htmlFor="email">Correo electrónico</Label>
@@ -80,7 +77,6 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                             </div>
                         </div>
 
-                        {/* Row 2: Password + Confirm Password (side-by-side) */}
                         <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
                             <div className="flex-1 flex flex-col gap-2">
                                 <Label htmlFor="password">Contraseña</Label>
@@ -113,7 +109,6 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                             </div>
                         </div>
 
-                        {/* Row 3: Roles (full width) */}
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="role">Rol de Usuario</Label>
                             <Select
@@ -142,7 +137,6 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                             />
                             <InputError message={errors.role} />
 
-                            {/* Permisos asociados */}
                             {data.role && (
                                 <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-100 animate-in fade-in slide-in-from-top-1 duration-300">
                                     <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">

@@ -12,11 +12,7 @@ class StoreCampaignRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if (Auth::id()) {
-            return true;
-        }
-
-        return false;
+        return Auth::user()->can('create', \App\Models\Campaign::class);
     }
 
     /**

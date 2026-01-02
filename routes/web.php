@@ -17,7 +17,7 @@ Route::get('/', function (Request $req) {
     ]);
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:admin|publicity'])->group(function () {
     Route::get('dashboard', action: function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
@@ -33,7 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
     Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
 });
-Route::middleware(['auth', 'verified','password.confirm'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:admin', 'password.confirm'])->group(function () {
     Route::resource('user', UserController::class);
     Route::resource('centertokens', CenterTokenController::class);
 });

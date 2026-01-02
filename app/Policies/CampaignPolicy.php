@@ -13,7 +13,7 @@ class CampaignPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasRole('admin|publicity');
     }
 
     /**
@@ -21,7 +21,7 @@ class CampaignPolicy
      */
     public function view(User $user, Campaign $campaign): bool
     {
-        return false;
+        return $user->hasRole('admin|publicity');
     }
 
     /**
@@ -29,7 +29,7 @@ class CampaignPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasRole('admin');
     }
 
     /**
@@ -37,7 +37,7 @@ class CampaignPolicy
      */
     public function update(User $user, Campaign $campaign): bool
     {
-        return false;
+        return $user->hasRole('admin|publicity');
     }
 
     /**
@@ -45,7 +45,7 @@ class CampaignPolicy
      */
     public function delete(User $user, Campaign $campaign): bool
     {
-        return false;
+        return $user->hasRole('admin|publicity');
     }
 
     /**
@@ -53,7 +53,7 @@ class CampaignPolicy
      */
     public function restore(User $user, Campaign $campaign): bool
     {
-        return false;
+        return $user->hasRole('admin|publicity');
     }
 
     /**
@@ -61,6 +61,6 @@ class CampaignPolicy
      */
     public function forceDelete(User $user, Campaign $campaign): bool
     {
-        return false;
+        return $user->hasRole('admin|publicity');
     }
 }
