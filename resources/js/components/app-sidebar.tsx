@@ -10,7 +10,6 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard, } from '@/routes';
 import { create as agreementCreate, index as agreement } from '@/routes/agreement';
 import { index, create } from '@/routes/campaign';
 import { index as media } from '@/routes/media';
@@ -26,8 +25,6 @@ const Logo = lazy(() => import('@/components/app-logo'));
 export function AppSidebar() {
 
     const { hasRole } = useAuth();
-
-
 
     const mainNavItems: NavItem[] = hasRole('admin|publicidad') ? [
         {
@@ -79,14 +76,13 @@ export function AppSidebar() {
         ...adminElement
     ];
 
-
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader className="bg-locatel-medio rounded-t-lg">
                 <SidebarMenu className='bg-white rounded-lg'>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
+                            <Link href={index().url} prefetch>
                                 <Logo />
                             </Link>
                         </SidebarMenuButton>
