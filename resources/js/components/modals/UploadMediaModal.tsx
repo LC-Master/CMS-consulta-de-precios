@@ -12,7 +12,7 @@ import { router, useForm } from '@inertiajs/react'
 import { FormState } from '@/types/modal/index.type'
 
 export default function UploadMediaModal({ closeModal }: { closeModal: () => void }) {
-    const { setData, post, progress, errors, reset, transform, processing } = useForm<FormState>({
+    const { setData, post, progress, errors, reset, transform, processing, cancel } = useForm<FormState>({
         files: [],
         thumbnails: [],
     })
@@ -128,7 +128,7 @@ export default function UploadMediaModal({ closeModal }: { closeModal: () => voi
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         e.stopPropagation()
-        
+
         setData('files', selectedFiles)
 
         const thumbs: File[] = []
@@ -157,7 +157,7 @@ export default function UploadMediaModal({ closeModal }: { closeModal: () => voi
         })
     }
     return createPortal(
-        <Modal closeModal={closeModal}>
+        <Modal actionWhenCloseTouchOutside={cancel} closeModal={closeModal}>
             <form id='uploadFilesForm' onSubmit={handleSubmit}>
                 <h2 className="text-lg font-semibold mb-4">Agregar Multimedia</h2>
 
