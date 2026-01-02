@@ -1,5 +1,6 @@
 import { InfiniteScroll } from '@inertiajs/react'
 import { ReactNode } from 'react'
+import { Spinner } from './ui/spinner'
 
 export type Column<T> = {
     key: string
@@ -25,7 +26,11 @@ export function DataTable<T>({
 }: DataTableProps<T>) {
     return (
         <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-            <InfiniteScroll data={infiniteData}>
+            <InfiniteScroll data={infiniteData} loading={() => (
+                <span className="px-4 py-3 flex justify-center items-center gap-2 text-center text-sm text-black">
+                    <Spinner className='text-blue-400' /> Cargando más registros...
+                </span>
+            )}>
                 <table className="min-w-full bg-white divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
