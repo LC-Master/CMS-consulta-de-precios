@@ -21,6 +21,7 @@ export default function AgreementCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
+
         post(store().url)
     }
 

@@ -29,7 +29,7 @@ class StoreAgreementRequest extends FormRequest
             'tax_id' => 'required|string|max:20|unique:agreements,tax_id',
             'contact_person' => 'required|string|max:255',
             'contact_email' => 'required|string|email:rfc,dns|max:255',
-            'contact_phone' => ['required', 'integer', 'min:10', 'max:20'],
+            'contact_phone' => ['required', 'string', 'digits_between:10,20'],
             'start_date' => 'required|date|before:end_date',
             'end_date'   => 'required|date|after:start_date',
             'observations' => 'nullable|string|max:1000',
