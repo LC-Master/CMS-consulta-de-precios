@@ -45,6 +45,17 @@ export default function CampaignCreate({ centers, departments, agreements, media
     const optionsAgreement: Option[] = agreements.map((agreement: Agreement) => {
         return { value: agreement.id, label: agreement.name }
     })
+    const filteredCenters = (val: Option[] | null): void => {
+        const selected = val ?? []
+        const values = selected.map(v => v.value)
+        const todoValue = optionsCenter.find(o => /\bTodo\b/i.test(o.label))?.value
+
+        if (todoValue && values.includes(todoValue)) {
+            setData('centers', [todoValue])
+        } else {
+            setData('centers', todoValue ? values.filter(v => v !== todoValue) : values)
+        }
+    }
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         transform(data => ({
@@ -165,7 +176,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                     isMulti
                                     className="mt-1 rounded-md"
                                     classNamePrefix="react-select"
-                                    onChange={(val) => setData('centers', (val as Option[]).map(v => v.value))}
+                                    onChange={val => filteredCenters(val as Option[] | null)}
                                     placeholder="Selecciona centros..."
                                     aria-required={true}
                                     aria-invalid={!!errors.centers}
@@ -265,7 +276,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                         <Button
                             type="submit"
                             form="form"
-                            className="bg-locatel-medio flex flex-row items-center h-12 text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
+                            className="bg-locatel-medio hover:bg-locatel-oscuro active:bg-locatel-oscuro flex flex-row items-center h-12 text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
                             disabled={processing}
                         >
                             <Save />

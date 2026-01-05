@@ -39,6 +39,17 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
         am_media: campaign.media.filter(item => item.slot === 'am').map(item => item.id) || [] as string[],
         pm_media: campaign.media.filter(item => item.slot === 'pm').map(item => item.id) || [] as string[],
     })
+    const filteredCenters = (val: Option[] | null): void => {
+        const selected = val ?? []
+        const values = selected.map(v => v.value)
+        const todoValue = optionsCenter.find(o => /\bTodo\b/i.test(o.label))?.value
+
+        if (todoValue && values.includes(todoValue)) {
+            setData('centers', [todoValue])
+        } else {
+            setData('centers', todoValue ? values.filter(v => v !== todoValue) : values)
+        }
+    }
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         transform(data => ({
@@ -48,7 +59,6 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
         }))
         put(update({ id: campaign.id }).url, { preserveScroll: true, })
     }
-    console.log(errors)
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar campaña', index().url)}>
             {ToastComponent.ToastContainer()}
@@ -159,7 +169,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                                     isMulti
                                     className="mt-1 rounded-md"
                                     classNamePrefix="react-select"
-                                    onChange={(val) => setData('centers', (val as Option[]).map(v => v.value))}
+                                    onChange={(val) => filteredCenters(val as Option[] | null)}
                                     placeholder="Selecciona centros..."
                                     aria-required={true}
                                     aria-invalid={!!errors.centers}
