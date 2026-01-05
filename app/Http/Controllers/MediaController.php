@@ -7,6 +7,7 @@ use App\Enums\CampaignStatus;
 use App\Http\Requests\Media\StoreMediaRequest;
 use App\Http\Requests\Media\UpdateMediaRequest;
 use App\Models\Media;
+use App\Enums\MimeTypesEnum;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -19,7 +20,11 @@ class MediaController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Media::query()->with('campaigns');
+        $query = Media::query()->with([
+            'campaigns' => function ($q) {
+                $q->select('campaigns.*')->distinct();
+            }
+        ]);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -36,17 +41,10 @@ class MediaController extends Controller
             $query->where('mime_type', $request->type);
         }
 
-        $mimeTypes = Media::query()
-            ->select('mime_type')
-            ->distinct()
-            ->whereNotNull('mime_type')
-            ->orderBy('mime_type')
-            ->pluck('mime_type');
-
         return Inertia::render('Media/Index', [
-            'medias' => Inertia::scroll(fn() => $query->latest()->paginate(20)->withQueryString()),
+            'medias' => Inertia::scroll(fn() => $query->select('id', 'name', 'duration_seconds', 'mime_type', 'size')->latest()->paginate(20)->withQueryString()),
             'filters' => $request->only(['search', 'type']),
-            'mimeTypes' => $mimeTypes,
+            'mimeTypes' => MimeTypesEnum::values(),
         ]);
     }
 
@@ -185,7 +183,7 @@ class MediaController extends Controller
             logger()->error('Error generating media preview: ' . $e->getMessage(), ['media_id' => $media->id]);
             abort(500, 'Ocurrió un error al generar la vista previa del archivo.');
         }
-    }   
+    }
     public function download(Media $media)
     {
         try {

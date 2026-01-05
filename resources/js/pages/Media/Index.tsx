@@ -13,18 +13,18 @@ import { breadcrumbs } from '@/helpers/breadcrumbs';
 import { index } from '@/routes/media';
 import { formatBytes } from '@/helpers/mediaTools';
 import { show } from '@/routes/campaign';
+import { show as showMedia, destroy } from '@/routes/media';
+
 
 const ExpandableCampaignList = ({ campaigns }: { campaigns?: Campaign[] }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const maxVisible = 2;
-
     if (!campaigns || campaigns.length === 0) {
         return <span className="text-gray-400 italic text-xs">Sin asignar</span>;
     }
 
     const visibleCampaigns = isExpanded ? campaigns : campaigns.slice(0, maxVisible);
     const remainingCount = campaigns.length - maxVisible;
-
     return (
         <div className="flex flex-col items-start gap-1 min-w-37.5">
             <div className="flex flex-wrap items-center gap-1">
@@ -66,6 +66,8 @@ const ExpandableCampaignList = ({ campaigns }: { campaigns?: Campaign[] }) => {
 
 
 export default function MediaIndex({ medias, filters = {}, mimeTypes = [], flash }: Props) {
+    console.log(medias)
+
     const [search, setSearch] = useState(filters.search || '')
     const [type, setType] = useState(filters.type || '')
     const typeOptions = useMemo(() => {
@@ -109,20 +111,22 @@ export default function MediaIndex({ medias, filters = {}, mimeTypes = [], flash
         {
             key: 'campaigns',
             header: 'Campaña',
-            render: (media) => <ExpandableCampaignList campaigns={media.campaigns} />,
+            render: (media) => {
+                return <ExpandableCampaignList campaigns={media.campaigns} />
+            },
         },
         {
             key: 'actions',
             header: 'Acciones',
             render: (a) => (
                 <div className="flex gap-2">
-                    <AnchorIcon href={`/media/${a.id}`} icon={Eye} />
+                    <AnchorIcon href={showMedia({ id: a.id }).url} icon={Eye} />
                     <Button variant="destructive" className='h-8' title="Eliminar media" onClick={() => {
                         if (confirm('¿Estás seguro de que deseas eliminar este media? Esta acción no se puede deshacer.')) {
-                            router.delete(`/media/${a.id}`, {
-                                onSuccess: () => {
-                                    router.reload({ only: ['medias', 'flash'] });
-                                }
+                            router.delete(destroy({ id: a.id }).url, {
+                                only: ['medias', 'flash'],
+                                preserveScroll: true,
+                                reset: ['medias', 'flash'],
                             });
                         }
                     }}>

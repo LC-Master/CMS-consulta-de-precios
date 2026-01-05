@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 class UpdateCampaignRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Determina si el usuario está autorizado para realizar esta solicitud.
      */
     public function authorize(): bool
     {
@@ -20,13 +20,13 @@ class UpdateCampaignRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Obtiene las reglas de validación que se aplican a la solicitud.
      */
     public function rules(): array
     {
         return [
             'title' => 'required|string|max:155',
-            'start_at' => 'required|date|before:end_at',
+            'start_at' => 'required|date|after_or_equal:today|before:end_at',
             'end_at' => 'required|date|after:start_at',
             'centers' => 'required|array|min:1',
             'department_id' => 'required|exists:departments,id',
@@ -51,6 +51,7 @@ class UpdateCampaignRequest extends FormRequest
 
             'start_at.required' => 'La fecha de inicio es obligatoria.',
             'start_at.date' => 'La fecha de inicio no es una fecha válida.',
+            'start_at.after_or_equal' => 'La fecha de inicio debe ser posterior o igual a hoy.',
             'start_at.before' => 'La fecha de inicio debe ser anterior a la fecha de finalización.',
 
             'end_at.required' => 'La fecha de finalización es obligatoria.',

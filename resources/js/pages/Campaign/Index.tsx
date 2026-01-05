@@ -134,7 +134,6 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                 />
 
                 <DataTable
-                    key={JSON.stringify(campaigns.data.map(c => c.id + c.status.status))}
                     data={campaigns.data}
                     columns={columns}
                     rowKey={(a) => a.id}

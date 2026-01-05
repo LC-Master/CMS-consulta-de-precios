@@ -18,7 +18,7 @@ import { useMediaActions } from '@/hooks/use-media-actions'
 import InputError from '@/components/input-error'
 import useLoadOptions from '@/hooks/use-load-options'
 import useLoadEdit from '@/hooks/use-load-edit'
-import { CircleAlert, PlusCircle, SquarePlay } from 'lucide-react'
+import { CircleAlert, PlusCircle, Save, SquarePlay } from 'lucide-react'
 
 export default function CampaignEdit({ centers, departments, agreements, media, flash, campaign }: CampaignEditProps) {
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
@@ -269,9 +269,10 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                         <Button
                             type="submit"
                             form="form"
-                            className="bg-locatel-medio text-white h-12 rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
+                            className="bg-locatel-medio hover:bg-locatel-oscuro active:bg-locatel-oscuro flex flex-row items-center h-12 text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
                             disabled={processing}
                         >
+                            <Save />
                             Guardar
                         </Button>
 

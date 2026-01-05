@@ -2,6 +2,8 @@
 
 namespace App\Actions\Campaign;
 
+use App\Enums\CampaignStatus;
+use App\Models\Status;
 use Illuminate\Http\Request;
 use DB;
 use App\Models\Campaign;
@@ -15,6 +17,7 @@ class UpdateCampaignAction
     public function execute(Request $request, Campaign $campaign): Campaign
     {
         return DB::transaction(function () use ($request, $campaign) {
+
             $campaign->update($request->only([
                 'title',
                 'start_at',
