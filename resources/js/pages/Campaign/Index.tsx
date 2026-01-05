@@ -50,9 +50,8 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                     {a.status.status === 'Borrador' ? (
                         <Button title='Activar campaña' onClick={() => {
                             router.get(`/campaign/activate/${a.id}`, {}, {
-                                onSuccess: () => {
-                                    router.reload({ only: ['campaigns', 'flash'] });
-                                },
+                                only: ['campaigns', 'flash'],
+                                reset: ['campaigns', 'flash'],
                                 preserveScroll: true
                             });
                         }} className='p-2 bg-locatel-claro h-8 text-white rounded-md'>
