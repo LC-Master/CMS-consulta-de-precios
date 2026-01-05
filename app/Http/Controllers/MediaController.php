@@ -79,13 +79,14 @@ class MediaController extends Controller
     {
         try {
             $media->load([
-                'campaigns' => function ($query) {
-                    $query->whereHas('status', function ($q) {
-                        $q->whereIn('status', [
-                            CampaignStatus::ACTIVE->value,
-                            CampaignStatus::DRAFT->value,
-                        ]);
-                    });
+                'campaigns' => function ($q) {
+                    $q->select('campaigns.*')->distinct()
+                        ->whereHas('status', function ($q2) {
+                            $q2->whereIn('status', [
+                                CampaignStatus::ACTIVE->value,
+                                CampaignStatus::DRAFT->value,
+                            ]);
+                        });
                 }
             ]);
 
