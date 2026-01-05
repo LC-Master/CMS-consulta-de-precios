@@ -11,7 +11,7 @@ import { Campaign, Props } from '@/types/campaign/index.types';
 import useToast from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react'
-import { index } from '@/routes/campaign';
+import { edit, index, show } from '@/routes/campaign';
 import Modal from '@/components/Modal';
 import useModal from '@/hooks/use-modal';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
@@ -67,8 +67,8 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                             </Button>
                         )
                     )}
-                    <AnchorIcon title="Ver campaña" href={`/campaign/${a.id}`} icon={Eye} />
-                    <AnchorIcon title="Editar campaña" className='p-2 bg-locatel-claro text-white rounded-md' href={`/campaign/${a.id}/edit`} icon={Pencil} />
+                    <AnchorIcon title="Ver campaña" href={show({ id: a.id }).url} icon={Eye} />
+                    <AnchorIcon title="Editar campaña" className='p-2 bg-locatel-claro text-white rounded-md' href={edit({ id: a.id }).url} icon={Pencil} />
                 </div>
             ),
         },
