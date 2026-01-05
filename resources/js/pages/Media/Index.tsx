@@ -1,73 +1,25 @@
 import { useState, useMemo } from 'react'
-import { router, Link } from '@inertiajs/react'
-import { Eye, Trash, Search, ChevronDown, ChevronUp } from 'lucide-react'
+import { router } from '@inertiajs/react'
+import { Eye, Trash, Search } from 'lucide-react'
 import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Column, DataTable } from '@/components/DataTable';
 import AnchorIcon from '@/components/ui/AnchorIcon';
 import Select from 'react-select';
-import { Campaign, MediaItem, Props } from '@/types/campaign/index.types';
+import { MediaItem, Props } from '@/types/campaign/index.types';
 import { Button } from '@/components/ui/button';
 import useToast from '@/hooks/use-toast';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
 import { index } from '@/routes/media';
 import { formatBytes } from '@/helpers/mediaTools';
-import { show } from '@/routes/campaign';
-import { show as showMedia, destroy } from '@/routes/media';
-
-
-const ExpandableCampaignList = ({ campaigns }: { campaigns?: Campaign[] }) => {
-    const [isExpanded, setIsExpanded] = useState(false);
-    const maxVisible = 2;
-    if (!campaigns || campaigns.length === 0) {
-        return <span className="text-gray-400 italic text-xs">Sin asignar</span>;
-    }
-
-    const visibleCampaigns = isExpanded ? campaigns : campaigns.slice(0, maxVisible);
-    const remainingCount = campaigns.length - maxVisible;
-    return (
-        <div className="flex flex-col items-start gap-1 min-w-37.5">
-            <div className="flex flex-wrap items-center gap-1">
-                {visibleCampaigns.map((camp) => (
-                    <Link
-                        viewTransition
-                        key={camp.id}
-                        href={show({ id: camp.id }).url}
-                        className="underline inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100"
-                        title={camp.title}
-                    >
-                        {camp.title}
-                    </Link>
-                ))}
-
-                {!isExpanded && remainingCount > 0 && (
-                    <button
-                        onClick={() => setIsExpanded(true)}
-                        className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-300"
-                        title="Clic para ver todas"
-                    >
-                        +{remainingCount}
-                        <ChevronDown className="w-3 h-3" />
-                    </button>
-                )}
-            </div>
-
-            {isExpanded && remainingCount > 0 && (
-                <button
-                    onClick={() => setIsExpanded(false)}
-                    className="text-xs text-gray-500 hover:text-gray-700 underline inline-flex items-center gap-0.5 mt-0.5 focus:outline-none"
-                >
-                    Ver menos <ChevronUp className="w-3 h-3" />
-                </button>
-            )}
-        </div>
-    );
-};
-
+import { show as showMedia } from '@/routes/media';
+import useModal from '@/hooks/use-modal';
+import ExpandableCampaignList from '@/components/ui/ExpandableCampaignList';
+import DeleteMedia from '@/components/modals/DeleteMedia';
 
 export default function MediaIndex({ medias, filters = {}, mimeTypes = [], flash }: Props) {
-    console.log(medias)
-
+    const { isOpen, closeModal, openModal } = useModal(false)
+    const [mediaId, setMediaId] = useState<string>('');
     const [search, setSearch] = useState(filters.search || '')
     const [type, setType] = useState(filters.type || '')
     const typeOptions = useMemo(() => {
@@ -122,13 +74,8 @@ export default function MediaIndex({ medias, filters = {}, mimeTypes = [], flash
                 <div className="flex gap-2">
                     <AnchorIcon href={showMedia({ id: a.id }).url} icon={Eye} />
                     <Button variant="destructive" className='h-8' title="Eliminar media" onClick={() => {
-                        if (confirm('¿Estás seguro de que deseas eliminar este media? Esta acción no se puede deshacer.')) {
-                            router.delete(destroy({ id: a.id }).url, {
-                                only: ['medias', 'flash'],
-                                preserveScroll: true,
-                                reset: ['medias', 'flash'],
-                            });
-                        }
+                        openModal()
+                        setMediaId(a.id);
                     }}>
                         <Trash className='w-4 h-4' />
                     </Button>
@@ -147,6 +94,7 @@ export default function MediaIndex({ medias, filters = {}, mimeTypes = [], flash
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Lista de multimedia', index().url)}>
+            {isOpen && (<DeleteMedia closeModal={closeModal} mediaId={mediaId} setMediaId={setMediaId} />)}
             <div className="space-y-4 px-4 pb-4">
                 {ToastContainer()}
                 <div className="flex flex-col sm:flex-row gap-4 mt-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
