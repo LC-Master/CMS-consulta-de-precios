@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Actions\Media\DeleteMediaAction;
 
 class MediaController extends Controller
 {
@@ -143,25 +144,10 @@ class MediaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Media $media)
+    public function destroy(Media $media, DeleteMediaAction $deleteMediaAction)
     {
         try {
-            $isInUse = $media->campaigns()->whereHas('status', function ($query) {
-                $query->whereIn('status', [
-                    CampaignStatus::ACTIVE->value,
-                    CampaignStatus::DRAFT->value
-                ]);
-            })->exists();
-
-            if ($isInUse) {
-                return back()->with('error', 'La imagen está siendo utilizada en una campaña en borrador o activa.');
-            }
-
-            if (Storage::disk($media->disk)->exists($media->path)) {
-                Storage::disk($media->disk)->delete($media->path);
-            }
-
-            $media->delete();
+            $deleteMediaAction->execute($media);
 
             return back()->with('success', 'Archivo eliminado correctamente.');
         } catch (\Throwable $e) {
