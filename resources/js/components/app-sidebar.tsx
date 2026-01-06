@@ -69,7 +69,7 @@ export function AppSidebar() {
 
     const footerNavItems: NavItem[] = [
         {
-            title: 'Listado de Videos',
+            title: 'Listado de Medios',
             href: media().url,
             icon: Film,
         },
