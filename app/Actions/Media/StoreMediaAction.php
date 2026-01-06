@@ -21,7 +21,7 @@ class StoreMediaAction
                 $getID3 = new \getID3();
                 $mimeType = $file->getMimeType();
                 $finalFileName = uniqid().'_'.$file->getClientOriginalName();
-                $finalPath = 'uploads/'.$finalFileName;
+                $finalPath = "uploads/{$finalFileName}";
 
                 $tempPath = $file->storeAs('uploads_tmp', $finalFileName, 'local');
 
@@ -44,7 +44,7 @@ class StoreMediaAction
                     $thumbFile = $thumbnails[$thumbIndex];
                     $thumbPath = $thumbFile->store('thumbnails', 'public');
 
-                    $media->thumbnails()->create([
+                    $media->thumbnail()->create([
                         'path' => $thumbPath,
                         'name' => $thumbFile->getClientOriginalName(),
                         'size' => $thumbFile->getSize(),
