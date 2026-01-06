@@ -15,14 +15,13 @@ class CreateCampaignAction
 {
     public function execute(array $data): Campaign
     {
-        return DB::transaction(function () use ($data) {
+        $draftStatus = Status::where('status', CampaignStatus::DRAFT->value)->first();
+        if (!$draftStatus) {
+            Log::critical('Integrity Error: Default campaign status (DRAFT) missing.', ['required_status' => CampaignStatus::DRAFT->value]);
+            throw new \RuntimeException('Error de configuración del sistema: Estado inicial no encontrado.');
+        }
 
-            $draftStatus = Status::where('status', CampaignStatus::DRAFT->value)->first();
-
-            if (!$draftStatus) {
-                Log::critical('Integrity Error: Default campaign status (DRAFT) missing.', ['required_status' => CampaignStatus::DRAFT->value]);
-                throw new \RuntimeException('Error de configuración del sistema: Estado inicial no encontrado.');
-            }
+        return DB::transaction(function () use ($data, $draftStatus) {
 
             $campaign = Campaign::create(attributes: [
                 ...$data,

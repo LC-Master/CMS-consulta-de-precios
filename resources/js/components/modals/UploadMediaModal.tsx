@@ -7,15 +7,21 @@ import {
     ChangeEvent,
     DragEvent,
     FormEvent,
+    useEffect,
 } from 'react'
-import { router, useForm } from '@inertiajs/react'
+import { useForm } from '@inertiajs/react'
 import { FormState } from '@/types/modal/index.type'
+import { Send } from 'lucide-react'
 
 export default function UploadMediaModal({ closeModal }: { closeModal: () => void }) {
-    const { setData, post, progress, errors, reset, transform, processing, cancel } = useForm<FormState>({
+    const { data, setData, post, progress, errors, reset, transform, processing, cancel } = useForm<FormState>({
         files: [],
         thumbnails: [],
     })
+    useEffect(() => {
+        console.log(data)
+
+    }, [data])
     const [selectedFiles, setSelectedFiles] = useState<File[]>([])
     const [isDragging, setIsDragging] = useState(false)
     const inputRef = useRef<HTMLInputElement | null>(null)
@@ -144,14 +150,12 @@ export default function UploadMediaModal({ closeModal }: { closeModal: () => voi
             ...data,
             thumbnails: thumbs,
         }))
-
         post('/media/upload', {
             forceFormData: true,
+            only: ['media', 'flash'],
+            reset: ['media', 'flash'],
             onSuccess: () => {
                 clearFiles()
-                router.reload({
-                    only: ['media', 'flash'],
-                })
                 closeModal()
             },
         })
@@ -178,11 +182,11 @@ export default function UploadMediaModal({ closeModal }: { closeModal: () => voi
                     />
 
                     <div className="flex gap-3">
-                        <Button type="button" className='bg-locatel-medio hover:bg-locatel-oscuro' onClick={openFilePicker}>
+                        <Button type="button" disabled={processing} className='bg-locatel-medio hover:bg-locatel-oscuro' onClick={openFilePicker}>
                             Seleccionar archivos
                         </Button>
 
-                        <Button type="button" variant="secondary" onClick={clearFiles}>
+                        <Button type="button" disabled={processing} variant="secondary" onClick={clearFiles}>
                             Limpiar
                         </Button>
                     </div>
@@ -229,6 +233,7 @@ export default function UploadMediaModal({ closeModal }: { closeModal: () => voi
                     <div className="flex gap-2">
                         <Button type="submit" className="w-1/2 bg-locatel-medio hover:bg-locatel-oscuro" disabled={selectedFiles.length === 0 || processing}>
                             Enviar
+                            <Send />
                         </Button>
                         <Button
                             type="submit"
