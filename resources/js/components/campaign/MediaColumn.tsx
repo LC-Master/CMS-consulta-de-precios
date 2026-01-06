@@ -22,7 +22,7 @@ export default function MediaColumn({ title, items, onMoveToOther, onMoveUp, onM
                 )}
                 {items.map((item) => (
                     <MediaItemCard
-                        key={item.id}
+                        key={`${type ? 'am' : 'pm'}-${item.id}`}
                         item={item}
                         controls={
                             <>

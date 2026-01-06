@@ -110,8 +110,8 @@ class CampaignController extends Controller
             'duration_seconds' => $item->duration_seconds,
             'slot' => $item->pivot->slot,
             'position' => $item->pivot->position,
-            'thumbnails' => [
-                'id' => $item->thumbnails?->id,
+            'thumbnail' => [
+                'id' => $item->thumbnail?->id,
             ],
         ]));
 

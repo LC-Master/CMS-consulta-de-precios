@@ -38,9 +38,9 @@ class ThumbnailController extends Controller
      */
     public function show(Thumbnail $thumbnail)
     {
-        $path = Storage::disk('public')->path($thumbnail->path);
+        $path = Storage::disk('public')->path($thumbnail->getRawOriginal('path'));
 
-        if (! Storage::disk('public')->exists($thumbnail->path)) {
+        if (!Storage::disk('public')->exists($thumbnail->getRawOriginal('path'))) {
             abort(404, 'El archivo físico no existe en el servidor.');
         }
 
