@@ -9,11 +9,21 @@ use App\Http\Requests\Media\StoreMediaRequest;
 use App\Http\Requests\Media\UpdateMediaRequest;
 use App\Models\Media;
 use App\Enums\MimeTypesEnum;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Actions\Media\DeleteMediaAction;
 use App\Actions\Media\IndexMediaAction;
+
+
+/**
+ * MediaController
+ * @package App\Http\Controllers
+ * @author  Francisco Rojas / Ben Pulido
+ * @version 1.0
+ * Controlador para la gestión de archivos multimedia.
+ */
 class MediaController extends Controller
 {
     /**
@@ -138,7 +148,7 @@ class MediaController extends Controller
      */
     public function destroy(Media $media, DeleteMediaAction $deleteMediaAction)
     {
-        MediaSafeAction::SafeAction(function () use ($media, $deleteMediaAction) {
+        return MediaSafeAction::SafeAction(function () use ($media, $deleteMediaAction) {
             $deleteMediaAction->execute($media);
             logger()->info('Media file deleted successfully.', ['media_id' => $media->getKey()]);
             return back()->with('success', 'Archivo eliminado correctamente.');
@@ -147,34 +157,30 @@ class MediaController extends Controller
 
     public function preview(Media $media)
     {
-        try {
+        return MediaSafeAction::SafeAction(function () use ($media) {
             $path = Storage::disk($media->disk)->path($media->path);
 
             if (!Storage::disk($media->disk)->exists($media->path)) {
                 logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->getKey()]);
-                abort(404, 'El archivo físico no existe en el servidor.');
+                throw new FileNotFoundException('El archivo físico no existe en el servidor.');
             }
 
             return response()->file($path);
-        } catch (\Throwable $e) {
-            logger()->error('Error generating media preview: ' . $e->getMessage(), ['media_id' => $media->getKey()]);
-            abort(500, 'Ocurrió un error al generar la vista previa del archivo.');
-        }
+        }, 'Ocurrió un error al previsualizar el archivo.');
+
     }
     public function download(Media $media)
     {
-        try {
+        return MediaSafeAction::SafeAction(function () use ($media) {
             $path = Storage::disk($media->disk)->path($media->path);
 
             if (!Storage::disk($media->disk)->exists($media->path)) {
                 logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->getKey()]);
-                abort(404, 'El archivo físico no existe en el servidor.');
+                throw new FileNotFoundException('El archivo físico no existe en el servidor.');
             }
 
             return response()->download($path, $media->name);
-        } catch (\Throwable $e) {
-            logger()->error('Error downloading media file: ' . $e->getMessage(), ['media_id' => $media->getKey()]);
-            abort(500, 'Ocurrió un error al descargar el archivo.');
-        }
+        }, 'Ocurrió un error al descargar el archivo.');
+
     }
 }
