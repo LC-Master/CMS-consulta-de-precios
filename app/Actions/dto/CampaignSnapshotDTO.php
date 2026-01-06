@@ -13,29 +13,33 @@ class CampaignSnapshotDTO
      */
     public static function execute(Center $center)
     {
-        $campaigns = Campaign::whereHas('centers', function ($q) use ($center) {
-            $q->where('centers.id', $center->id);
-        })
-            ->whereHas('status', function ($q) {
-                $q->where('status', CampaignStatus::ACTIVE->value);
-            })
+        $campaigns = Campaign::whereHas(
+            'centers',
+            fn($q) =>
+            $q->where('centers.id', $center->getKey())
+        )
+            ->whereHas(
+                'status',
+                fn($q) =>
+                $q->where('status', CampaignStatus::ACTIVE->value)
+            )
             ->with(['status', 'department', 'agreement', 'media'])
             ->get();
         $snapshot = [
-            'center_id' => $center->id,
+            'center_id' => $center->getKey(),
             'campaigns' => [],
         ];
 
         foreach ($campaigns as $c) {
             $snapshot['campaigns'][] = [
-                'id' => $c->id,
+                'id' => $c->getKey(),
                 'title' => $c->title,
                 'status' => $c->status?->status,
                 'department' => $c->department?->name,
                 'agreement' => $c->agreement?->name,
                 'start_at' => $c->start_at?->toIso8601String(),
                 'end_at' => $c->end_at?->toIso8601String(),
-                'media' => $c->media
+                'media' => $c->getRelation('media')
                     ->map(fn($m) => [
                         'id' => $m->id,
                         'name' => $m->name,
