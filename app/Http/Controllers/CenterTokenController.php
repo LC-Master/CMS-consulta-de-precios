@@ -48,7 +48,7 @@ class CenterTokenController extends Controller
                     : null,
             ])),
             'filters' => $request->only(['search', 'center']),
-            'centers' => Center::select('id', 'name', 'code')->get(),
+            'centers' => Center::get(['id', 'name', 'code']),
         ]);
     }
 

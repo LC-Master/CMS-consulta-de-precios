@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CampaignContent;
-use App\Models\Campaign; 
+use App\Models\Campaign;
 use App\Http\Requests\CampaignContent\StoreCampaignContentRequest;
 use App\Http\Requests\CampaignContent\UpdateCampaignContentRequest;
 use Illuminate\Http\Request;
@@ -17,8 +17,8 @@ class CampaignContentController extends Controller
      */
     public function index()
     {
-         return Inertia::render('CampaignContents/Index', [
-            'campaigncontent' => Inertia::scroll(fn () => CampaignContent::with(['campaign'])->paginate()),
+        return Inertia::render('CampaignContents/Index', [
+            'campaigncontent' => Inertia::scroll(CampaignContent::with(['campaign'])->paginate()),
         ]);
     }
 

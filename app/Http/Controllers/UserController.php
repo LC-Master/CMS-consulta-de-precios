@@ -22,7 +22,7 @@ class UserController extends Controller
         $query = User::query();
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
@@ -30,7 +30,7 @@ class UserController extends Controller
         }
 
         return Inertia::render('Users/Index', [
-            'users' => Inertia::scroll(fn() => $query->latest()->paginate()),
+            'users' => Inertia::scroll($query->latest()->paginate()),
             'filters' => $request->only(['search']),
         ]);
     }
@@ -100,7 +100,7 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        if ($user->id === Auth::id()) {
+        if ($user->getKey() === Auth::id()) {
             return back()->withErrors('name', 'No puedes eliminar tu propia cuenta.');
         }
 

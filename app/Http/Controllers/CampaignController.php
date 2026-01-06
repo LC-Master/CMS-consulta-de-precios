@@ -34,7 +34,7 @@ class CampaignController extends Controller
         }
 
         return Inertia::render('Campaign/Index', [
-            'campaigns' => Inertia::scroll(fn() => $query->latest()->paginate()),
+            'campaigns' => Inertia::scroll($query->latest()->paginate()),
             'filters' => $request->only(['search', 'status']),
             'statuses' => Status::all(),
         ]);
@@ -43,16 +43,15 @@ class CampaignController extends Controller
     public function create()
     {
         return Inertia::render('Campaign/Create', [
-            'media' => Media::select('id', 'name', 'mime_type')
-                ->with([
-                    'thumbnail' => function ($query) {
-                        $query->select('id', 'media_id');
-                    }
-                ])
-                ->get(),
-            'centers' => Center::select('id', 'code', 'name')->get(),
-            'departments' => Department::select('id', 'name')->get(),
-            'agreements' => Agreement::where('is_active', true)->select('id', 'name')->get(),
+            'media' => Media::with([
+                'thumbnail' => function ($query) {
+                    $query->select('id', 'media_id');
+                }
+            ])
+                ->get(['id', 'name', 'mime_type']),
+            'centers' => Center::get(['id', 'code', 'name']),
+            'departments' => Department::get(['id', 'name']),
+            'agreements' => Agreement::where('is_active', true)->get(['id', 'name']),
         ]);
     }
 
@@ -81,11 +80,11 @@ class CampaignController extends Controller
             'agreement:id,name',
             'centers:id,code,name',
             'media' => function ($query) {
-            $query->select('media.id', 'media.name', 'media.mime_type', 'media.duration_seconds');
+                $query->select('media.id', 'media.name', 'media.mime_type', 'media.duration_seconds');
             },
         ]);
 
-        $campaign->setRelation('centers', $campaign->centers->map->only(['id', 'code', 'name']));
+        $campaign->setRelation('centers', $campaign->getRelation('centers')->map->only(['id', 'code', 'name']));
 
         $campaign->makeHidden(['status_id', 'department_id', 'agreement_id']);
 
@@ -102,9 +101,9 @@ class CampaignController extends Controller
             'centers:id,code,name'
         ]);
 
-        $campaign->setRelation('centers', $campaign->centers->map->only(['id', 'code', 'name']));
+        $campaign->setRelation('centers', $campaign->getRelation('centers')->map->only(['id', 'code', 'name']));
 
-        $campaign->setRelation('media', $campaign->media->map(fn($item) => [
+        $campaign->setRelation('media', $campaign->getRelation('media')->map(fn($item) => [
             'id' => $item->id,
             'name' => $item->name,
             'mime_type' => $item->mime_type,
@@ -122,7 +121,7 @@ class CampaignController extends Controller
             'campaign' => $campaign,
             'statuses' => Status::all(['id', 'status']),
             'departments' => Department::all(['id', 'name']),
-            'agreements' => Agreement::where('is_active', true)->select('id', 'name')->get(),
+            'agreements' => Agreement::where('is_active', true)->get(['id', 'name']),
             'media' => Media::with('thumbnails:id,media_id')->get(['id', 'name', 'mime_type']),
             'centers' => Center::all(['id', 'code', 'name']),
         ]);

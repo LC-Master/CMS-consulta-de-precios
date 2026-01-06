@@ -40,9 +40,9 @@ class CheckCampaignStatus extends Command
 
         $now = Carbon::now();
 
-        $affectedRows = Campaign::where('status_id', $statusActiva->id)
+        $affectedRows = Campaign::where('status_id', $statusActiva->getKey())
             ->where('end_at', '<=', $now)
-            ->update(['status_id' => $statusFinalizada->id]);
+            ->update(['status_id' => $statusFinalizada->getKey()]);
 
         if ($affectedRows > 0) {
             $this->info("¡Éxito! Se han finalizado {$affectedRows} campañas.");

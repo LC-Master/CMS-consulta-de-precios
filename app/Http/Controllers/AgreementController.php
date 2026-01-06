@@ -21,7 +21,7 @@ class AgreementController extends Controller
         $query = Agreement::query();
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('tax_id', 'like', "%{$search}%");
@@ -33,7 +33,7 @@ class AgreementController extends Controller
         }
 
         return Inertia::render('Agreements/Index', [
-            'agreements' => Inertia::scroll(fn() => $query->latest()->paginate()),
+            'agreements' => Inertia::scroll($query->latest()->paginate()),
             'filters' => $request->only(['search', 'status']),
             'statuses' => array_reverse(AgreementStatus::cases(), false),
         ]);
@@ -68,7 +68,7 @@ class AgreementController extends Controller
     public function show(Agreement $agreement)
     {
         $agreement = [
-            'id' => $agreement->id,
+            'id' => $agreement->getKey(),
             'name' => $agreement->name,
             'legal_name' => $agreement->legal_name,
             'tax_id' => $agreement->tax_id,

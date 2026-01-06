@@ -24,14 +24,15 @@ class CreateCampaignAction
                 throw new \RuntimeException('Error de configuración del sistema: Estado inicial no encontrado.');
             }
 
-            $campaign = Campaign::create(array_merge($data, [
+            $campaign = Campaign::create(attributes: [
+                ...$data,
                 'created_by' => Auth::id(),
-                'status_id' => $draftStatus->id,
-            ]));
+                'status_id' => $draftStatus->getKey(),
+            ]);
 
             if (!empty($data['centers'])) {
                 $special = Center::where('code', 'CTR-0001')->first();
-                $centerIds = ($special && in_array($special->id, $data['centers'], true))
+                $centerIds = ($special && \in_array($special->getKey(), $data['centers'], true))
                     ? Center::pluck('id')->toArray()
                     : $data['centers'];
 

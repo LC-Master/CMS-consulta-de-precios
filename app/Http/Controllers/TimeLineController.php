@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TimeLineItem;
 use App\Models\Campaign;
-use App\Models\Media;    
+use App\Models\Media;
 use App\Http\Requests\Timeline\StoreTimeLineItemRequest;
 use App\Http\Requests\Timeline\UpdateTimeLineItemRequest;
 use Inertia\Inertia;
@@ -17,8 +17,8 @@ class TimeLineController extends Controller
      */
     public function index()
     {
-         return Inertia::render('TimeLine/Index', [
-            'timelineitem' => Inertia::scroll(fn () => TimeLineItem::with(['campaign','media'])->paginate()),
+        return Inertia::render('TimeLine/Index', [
+            'timelineitem' => Inertia::scroll(TimeLineItem::with(['campaign', 'media'])->paginate()),
         ]);
     }
 
@@ -28,8 +28,8 @@ class TimeLineController extends Controller
     public function create()
     {
         return Inertia::render('TimeLine/Create', [
-            'campaigns' => Campaign::orderBy('title')->get(['id', 'title']), 
-            'media' => Media::orderBy('id', 'desc')->get(['id', 'path', 'mime_type']),
+            'campaigns' => Campaign::query()->orderBy('title')->get(['id', 'title']),
+            'media' => Media::query()->orderBy('id', 'desc')->get(['id', 'path', 'mime_type']),
         ]);
     }
 
@@ -63,8 +63,8 @@ class TimeLineController extends Controller
     {
         return Inertia::render('TimeLine/Edit', [
             'timeLineItem' => $timeLineItem,
-            'campaigns' => Campaign::orderBy('name')->get(['id', 'name']),
-            'media' => Media::orderBy('id', 'desc')->get(['id', 'path', 'mime_type']),
+            'campaigns' => Campaign::query()->orderBy('name')->get(['id', 'name']),
+            'media' => Media::query()->orderBy('id', 'desc')->get(['id', 'path', 'mime_type']),
         ]);
     }
 

@@ -36,12 +36,12 @@ class IndexMediaAction
             }
         }
 
-        $medias = Inertia::scroll(function () use ($query) {
-            return $query->select('id', 'name', 'duration_seconds', 'mime_type', 'size')
+        $medias = Inertia::scroll(
+            $query->select('id', 'name', 'duration_seconds', 'mime_type', 'size')
                 ->latest()
                 ->paginate(20)
-                ->withQueryString();
-        });
+                ->withQueryString()
+        );
 
         return $medias;
     }

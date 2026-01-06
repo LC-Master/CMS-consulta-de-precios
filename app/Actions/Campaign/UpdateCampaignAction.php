@@ -2,8 +2,6 @@
 
 namespace App\Actions\Campaign;
 
-use App\Enums\CampaignStatus;
-use App\Models\Status;
 use Illuminate\Http\Request;
 use DB;
 use App\Models\Campaign;
@@ -48,14 +46,12 @@ class UpdateCampaignAction
 
         $items = collect($mediaIds)
             ->values()
-            ->map(function ($mediaId, $index) use ($slot, $campaign) {
-                return [
-                    'media_id' => $mediaId,
-                    'slot' => $slot->value,
-                    'position' => $index + 1,
-                    'campaign_id' => $campaign->id,
-                ];
-            })->toArray();
+            ->map(fn($mediaId, $index) => [
+                'media_id' => $mediaId,
+                'slot' => $slot->value,
+                'position' => $index + 1,
+                'campaign_id' => $campaign->getKey(),
+            ])->toArray();
 
         $campaign->timeLineItems()->createMany($items);
     }

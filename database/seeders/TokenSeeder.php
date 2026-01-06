@@ -24,7 +24,7 @@ class TokenSeeder extends Seeder
         foreach ($centers as $center) {
             $center->tokens()->delete();
 
-            $tokenResult = $center->createToken('api-token-' . $center->code);
+            $tokenResult = $center->createToken("api-token-{$center->code}");
 
             $this->command->line("Centro: <info>{$center->name}</info> | Token: <comment>{$tokenResult->plainTextToken}</comment>");
         }

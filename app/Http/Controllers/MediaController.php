@@ -31,7 +31,7 @@ class MediaController extends Controller
      */
     public function index(Request $request, IndexMediaAction $indexMediaAction)
     {
-        try {
+        return MediaSafeAction::SafeAction(function () use ($request, $indexMediaAction) {
             $medias = $indexMediaAction->list($request);
             logger()->info('Media index loaded successfully.', ['user_id' => $request->user()?->id ?? null]);
             return Inertia::render('Media/Index', [
@@ -39,10 +39,7 @@ class MediaController extends Controller
                 'filters' => $request->only(['search', 'type']),
                 'mimeTypes' => MimeTypesEnum::values(),
             ]);
-        } catch (\Throwable $e) {
-            logger()->critical('Error loading media index: ' . $e->getMessage());
-            return back()->with('error', 'Ocurrió un error al cargar los archivos.');
-        }
+        }, 'Ocurrió un error al listar los archivos.');
     }
 
 
@@ -59,15 +56,12 @@ class MediaController extends Controller
      */
     public function store(StoreMediaRequest $request, StoreMediaAction $storeMediaAction)
     {
-        try {
+        return MediaSafeAction::SafeAction(function () use ($request, $storeMediaAction) {
             $request->validated();
             $storeMediaAction->execute($request);
             logger()->info('Media files uploaded successfully.', ['user_id' => $request->user()->id]);
             return back()->with('success', 'Archivos subidos correctamente.');
-        } catch (\Throwable $e) {
-            logger()->error('Error uploading media files: ' . $e->getMessage());
-            return back()->with('error', 'Error al subir los archivos.');
-        }
+        }, 'Error al subir los archivos.');
     }
 
     /**
@@ -75,27 +69,26 @@ class MediaController extends Controller
      */
     public function show(Media $media)
     {
-        try {
+        return MediaSafeAction::SafeAction(function () use ($media) {
             $media->load([
-                'campaigns' => function ($q) {
-                    $q->select('campaigns.*')->distinct()
-                        ->whereHas('status', function ($q2) {
-                            $q2->whereIn('status', [
-                                CampaignStatus::ACTIVE->value,
-                                CampaignStatus::DRAFT->value,
-                            ]);
-                        });
-                }
+                'campaigns' => function ($query) {
+                    $query->whereHas('status', function ($subQuery) {
+                        $subQuery->whereIn('status', [
+                            CampaignStatus::ACTIVE->value,
+                            CampaignStatus::DRAFT->value,
+                        ]);
+                    });
+                },
+                'thumbnail',
+                'timeLineItems'
             ]);
 
-            logger()->info('Media details loaded successfully.', ['media_id' => $media->getKey()]);
+            logger()->info('Media details loaded.', ['id' => $media->id]);
+
             return Inertia::render('Media/Show', [
                 'media' => $media,
             ]);
-        } catch (\Throwable $e) {
-            logger()->error('Error loading media details: ' . $e->getMessage(), ['media_id' => $media->getKey()]);
-            return back()->with('error', 'Ocurrió un error al cargar el archivo.');
-        }
+        }, 'No se pudieron cargar los detalles del archivo.');
     }
 
     /**
@@ -114,33 +107,7 @@ class MediaController extends Controller
      */
     public function update(UpdateMediaRequest $request, Media $media)
     {
-        try {
-            if ($request->hasFile('file')) {
-                $file = $request->file('file');
-
-                if (Storage::disk($media->disk)->exists($media->path)) {
-                    Storage::disk($media->disk)->delete($media->path);
-                }
-
-                $path = $file->store('uploads', 'public');
-
-                $media->update([
-                    'path' => $path,
-                    'mime_type' => $file->getClientMimeType(),
-                    'size' => $file->getSize(),
-                    'checksum' => md5_file($file->getRealPath()),
-                ]);
-
-                return to_route('media.index')
-                    ->with('success', 'Archivo reemplazado correctamente.');
-            }
-
-            return to_route('media.index')
-                ->with('info', 'No se realizaron cambios.');
-        } catch (\Throwable $e) {
-            logger()->error('Error updating media file: ' . $e->getMessage(), ['media_id' => $media->getKey()]);
-            return back()->with('error', 'Ocurrió un error al actualizar el archivo.');
-        }
+        //
     }
 
     /**
