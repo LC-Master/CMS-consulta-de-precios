@@ -8,7 +8,6 @@ use App\Http\Requests\Media\StoreMediaRequest;
 use App\Http\Requests\Media\UpdateMediaRequest;
 use App\Models\Media;
 use App\Enums\MimeTypesEnum;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
@@ -116,29 +115,33 @@ class MediaController extends Controller
      */
     public function update(UpdateMediaRequest $request, Media $media)
     {
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
+        try {
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
 
-            if (Storage::disk($media->disk)->exists($media->path)) {
-                Storage::disk($media->disk)->delete($media->path);
+                if (Storage::disk($media->disk)->exists($media->path)) {
+                    Storage::disk($media->disk)->delete($media->path);
+                }
+
+                $path = $file->store('uploads', 'public');
+
+                $media->update([
+                    'path' => $path,
+                    'mime_type' => $file->getClientMimeType(),
+                    'size' => $file->getSize(),
+                    'checksum' => md5_file($file->getRealPath()),
+                ]);
+
+                return to_route('media.index')
+                    ->with('success', 'Archivo reemplazado correctamente.');
             }
 
-            $path = $file->store('uploads', 'public');
-            $checksum = md5_file($file->getRealPath());
-
-            $media->update([
-                'path' => $path,
-                'mime_type' => $file->getClientMimeType(),
-                'size' => $file->getSize(),
-                'checksum' => $checksum,
-            ]);
-
-            return Redirect::route('media.index')
-                ->with('success', 'Archivo reemplazado correctamente.');
+            return to_route('media.index')
+                ->with('info', 'No se realizaron cambios.');
+        } catch (\Throwable $e) {
+            logger()->error('Error updating media file: ' . $e->getMessage(), ['media_id' => $media->id]);
+            return back()->with('error', 'Ocurrió un error al actualizar el archivo.');
         }
-
-        return Redirect::route('media.index')
-            ->with('info', 'No se realizaron cambios.');
     }
 
     /**
@@ -148,19 +151,20 @@ class MediaController extends Controller
     {
         try {
             $deleteMediaAction->execute($media);
-
+            logger()->info('Media file deleted successfully.', ['media_id' => $media->id]);
             return back()->with('success', 'Archivo eliminado correctamente.');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Ocurrió un error al eliminar el archivo.');
+            logger()->error('Error deleting media file: ' . $e->getMessage(), ['media_id' => $media->id]);
+            return back()->with('error', 'Ocurrió un error al eliminar el archivo. ' . $e->getMessage());
         }
     }
 
     public function preview(Media $media)
     {
         try {
-            $path = Storage::disk('public')->path($media->path);
+            $path = Storage::disk($media->disk)->path($media->path);
 
-            if (!Storage::disk('public')->exists($media->path)) {
+            if (!Storage::disk($media->disk)->exists($media->path)) {
                 logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->id]);
                 abort(404, 'El archivo físico no existe en el servidor.');
             }
@@ -174,9 +178,9 @@ class MediaController extends Controller
     public function download(Media $media)
     {
         try {
-            $path = Storage::disk('public')->path($media->path);
+            $path = Storage::disk($media->disk)->path($media->path);
 
-            if (!Storage::disk('public')->exists($media->path)) {
+            if (!Storage::disk($media->disk)->exists($media->path)) {
                 logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->id]);
                 abort(404, 'El archivo físico no existe en el servidor.');
             }

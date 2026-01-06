@@ -15,9 +15,9 @@ export default function DeleteMedia({ closeModal, mediaId, setMediaId }: { close
                 className="bg-red-600 text-white hover:bg-red-700"
                 onClick={() => {
                     router.delete(destroy({ id: mediaId }).url, {
+                        reset: ['medias', 'flash'],
                         only: ['medias', 'flash'],
                         preserveScroll: true,
-                        reset: ['medias', 'flash'],
                         onSuccess: () => {
                             closeModal();
                             setMediaId('');

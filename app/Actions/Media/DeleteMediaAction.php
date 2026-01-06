@@ -22,7 +22,7 @@ class DeleteMediaAction
             })->exists();
 
             if ($isInUse) {
-                return back()->with('error', 'La imagen está siendo utilizada en una campaña en borrador o activa.');
+                throw new \Exception('no se puede eliminar el media porque está en uso en campañas activas o en borrador.');
             }
 
             $media->thumbnails()->each(function ($thumbnail) {
