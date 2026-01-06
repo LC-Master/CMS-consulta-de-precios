@@ -122,7 +122,7 @@ class CampaignController extends Controller
             'statuses' => Status::all(['id', 'status']),
             'departments' => Department::all(['id', 'name']),
             'agreements' => Agreement::where('is_active', true)->get(['id', 'name']),
-            'media' => Media::with('thumbnails:id,media_id')->get(['id', 'name', 'mime_type']),
+            'media' => Media::with('thumbnail:id,media_id')->get(['id', 'name', 'mime_type']),
             'centers' => Center::all(['id', 'code', 'name']),
         ]);
     }
