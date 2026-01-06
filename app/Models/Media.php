@@ -23,8 +23,11 @@ class Media extends Model
         'checksum',
         'created_by',
     ];
-
-    public function thumbnails()
+    public function timeLineItems()
+    {
+        return $this->hasMany(TimeLineItem::class);
+    }
+    public function thumbnail()
     {
         return $this->hasOne(Thumbnail::class);
     }

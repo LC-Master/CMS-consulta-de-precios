@@ -11,32 +11,33 @@ class DeleteMediaAction
     /**
      * Create a new class instance.
      */
-    public static function execute(Media $media)
+    public function execute(Media $media)
     {
+        $isInUse = $media->campaigns()->whereHas('status', function ($query) {
+            $query->whereIn('status', [
+                CampaignStatus::ACTIVE->value,
+                CampaignStatus::DRAFT->value
+            ]);
+        })->exists();
+
+        if ($isInUse) {
+            throw new \App\Exceptions\MediaInUseException();
+        }
+
         DB::transaction(function () use ($media) {
-            $isInUse = $media->campaigns()->whereHas('status', function ($query) {
-                $query->whereIn('status', [
-                    CampaignStatus::ACTIVE->value,
-                    CampaignStatus::DRAFT->value
-                ]);
-            })->exists();
+            $thumbnail = $media->thumbnail();
+            $thumbnailPath = $thumbnail?->path;
+            $mediaPath = $media->path;
+            $mediaDisk = $media->disk;
 
-            if ($isInUse) {
-                throw new \Exception('no se puede eliminar el media porque está en uso en campañas activas o en borrador.');
-            }
-
-            $media->thumbnails()->each(function ($thumbnail) {
-                if (Storage::disk('public')->exists($thumbnail->path)) {
-                    Storage::disk('public')->delete($thumbnail->path);
-                }
-                $thumbnail->delete();
-            });
-
-            if (Storage::disk($media->disk)->exists($media->path)) {
-                Storage::disk($media->disk)->delete($media->path);
-            }
-
+            $media->timeLineItems()->delete();
+            $thumbnail?->delete();
             $media->delete();
+
+            if ($thumbnailPath) {
+                Storage::disk('public')->delete($thumbnailPath);
+            }
+            Storage::disk($mediaDisk)->delete($mediaPath);
         });
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Media\StoreMediaAction;
 use App\Enums\CampaignStatus;
+use App\Handler\Media\MediaSafeAction;
 use App\Http\Requests\Media\StoreMediaRequest;
 use App\Http\Requests\Media\UpdateMediaRequest;
 use App\Models\Media;
@@ -12,40 +13,26 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Actions\Media\DeleteMediaAction;
-
+use App\Actions\Media\IndexMediaAction;
 class MediaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, IndexMediaAction $indexMediaAction)
     {
-        $query = Media::query()->with([
-            'campaigns' => function ($q) {
-                $q->select('campaigns.*')->distinct();
-            }
-        ]);
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhereHas('campaigns', function ($qCamp) use ($search) {
-                        $qCamp->where('title', 'like', "%{$search}%");
-                    });
-            });
+        try {
+            $medias = $indexMediaAction->list($request);
+            logger()->info('Media index loaded successfully.', ['user_id' => $request->user()?->id ?? null]);
+            return Inertia::render('Media/Index', [
+                'medias' => $medias,
+                'filters' => $request->only(['search', 'type']),
+                'mimeTypes' => MimeTypesEnum::values(),
+            ]);
+        } catch (\Throwable $e) {
+            logger()->critical('Error loading media index: ' . $e->getMessage());
+            return back()->with('error', 'Ocurrió un error al cargar los archivos.');
         }
-
-        if ($request->filled('type')) {
-            $query->where('mime_type', $request->type);
-        }
-
-        return Inertia::render('Media/Index', [
-            'medias' => Inertia::scroll(fn() => $query->select('id', 'name', 'duration_seconds', 'mime_type', 'size')->latest()->paginate(20)->withQueryString()),
-            'filters' => $request->only(['search', 'type']),
-            'mimeTypes' => MimeTypesEnum::values(),
-        ]);
     }
 
 
@@ -65,9 +52,10 @@ class MediaController extends Controller
         try {
             $request->validated();
             $storeMediaAction->execute($request);
-
+            logger()->info('Media files uploaded successfully.', ['user_id' => $request->user()->id]);
             return back()->with('success', 'Archivos subidos correctamente.');
         } catch (\Throwable $e) {
+            logger()->error('Error uploading media files: ' . $e->getMessage());
             return back()->with('error', 'Error al subir los archivos.');
         }
     }
@@ -90,6 +78,7 @@ class MediaController extends Controller
                 }
             ]);
 
+            logger()->info('Media details loaded successfully.', ['media_id' => $media->id]);
             return Inertia::render('Media/Show', [
                 'media' => $media,
             ]);
@@ -149,14 +138,11 @@ class MediaController extends Controller
      */
     public function destroy(Media $media, DeleteMediaAction $deleteMediaAction)
     {
-        try {
+        MediaSafeAction::MediaSafeAction(function () use ($media, $deleteMediaAction) {
             $deleteMediaAction->execute($media);
             logger()->info('Media file deleted successfully.', ['media_id' => $media->id]);
             return back()->with('success', 'Archivo eliminado correctamente.');
-        } catch (\Throwable $e) {
-            logger()->error('Error deleting media file: ' . $e->getMessage(), ['media_id' => $media->id]);
-            return back()->with('error', 'Ocurrió un error al eliminar el archivo. ' . $e->getMessage());
-        }
+        });
     }
 
     public function preview(Media $media)

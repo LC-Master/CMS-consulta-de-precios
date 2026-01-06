@@ -31,4 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (\Spatie\Permission\Exceptions\UnauthorizedException $e, $request) {
             return to_route('campaign.index')->with('error', 'No tienes permisos para acceder a esta acción.');
         });
+        $exceptions->render(function (\App\Exceptions\MediaInUseException $e, $request) {
+            return back()->with('error', $e->getMessage());
+        });
     })->create();
