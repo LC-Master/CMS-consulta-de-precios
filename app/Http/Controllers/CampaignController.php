@@ -45,7 +45,7 @@ class CampaignController extends Controller
         return Inertia::render('Campaign/Create', [
             'media' => Media::select('id', 'name', 'mime_type')
                 ->with([
-                    'thumbnails' => function ($query) {
+                    'thumbnail' => function ($query) {
                         $query->select('id', 'media_id');
                     }
                 ])
@@ -98,7 +98,7 @@ class CampaignController extends Controller
     {
         $campaign->load([
             'media:id,name,mime_type,duration_seconds',
-            'media.thumbnails:id,path,media_id',
+            'media.thumbnail:id,path,media_id',
             'centers:id,code,name'
         ]);
 
@@ -157,7 +157,7 @@ class CampaignController extends Controller
     {
         try {
             $activeStatus = Status::where('status', 'Activa')->first();
-            $campaign->status_id = $activeStatus->id;
+            $campaign->status_id = $activeStatus->getKey();
             $campaign->save();
 
             return back()
@@ -172,8 +172,8 @@ class CampaignController extends Controller
     }
     public function finish(Campaign $campaign)
     {
-        $finishedStatus = Status::where('status', CampaignStatus::FINISHED->value)->first();
-        $campaign->update(['status_id' => $finishedStatus->id]);
+        $finishedStatus = Status::where('status', CampaignStatus::FINISHED->value)->firstOrFail();
+        $campaign->update(['status_id' => $finishedStatus->getKey()]);
 
         return redirect()->route('campaign.index')->with('success', 'Campaña finalizada.');
     }
