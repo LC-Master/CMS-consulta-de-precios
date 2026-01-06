@@ -10,7 +10,7 @@ class MediaSafeAction
     /**
      * Create a new class instance.
      */
-    public static function MediaSafeAction(callable $callback)
+    public static function SafeAction(callable $callback,string $message = 'Ocurrió un error inesperado.')
     {
         try {
             return $callback();
@@ -21,7 +21,7 @@ class MediaSafeAction
             return back()->with('error', 'Error de integridad: No se pudo completar la operación en la base de datos.');
         } catch (\Throwable $e) {
             Log::critical("Fallo inesperado en Media: " . $e->getMessage());
-            return back()->with('error', 'Ocurrió un error inesperado al procesar los archivos.');
+            return back()->with('error', $message);
         }
     }
 }

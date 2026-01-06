@@ -138,11 +138,12 @@ class MediaController extends Controller
      */
     public function destroy(Media $media, DeleteMediaAction $deleteMediaAction)
     {
-        MediaSafeAction::MediaSafeAction(function () use ($media, $deleteMediaAction) {
+        dd(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3));
+        MediaSafeAction::SafeAction(function () use ($media, $deleteMediaAction) {
             $deleteMediaAction->execute($media);
             logger()->info('Media file deleted successfully.', ['media_id' => $media->id]);
             return back()->with('success', 'Archivo eliminado correctamente.');
-        });
+        }, 'Ocurrió un error al eliminar el archivo.');
     }
 
     public function preview(Media $media)
