@@ -25,7 +25,7 @@ class DeleteMediaAction
         }
 
         DB::transaction(function () use ($media) {
-            $thumbnail = $media->thumbnail();
+            $thumbnail = $media->thumbnail;
             $thumbnailPath = $thumbnail?->path;
             $mediaPath = $media->path;
             $mediaDisk = $media->disk;
