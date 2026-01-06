@@ -15,7 +15,7 @@ export interface MediaItem extends Pick<Department, 'id' | 'name'> {
     campaigns?: Campaign[];
     position?: string;
     mime_type: 'image/jpeg' | 'video/mp4';
-    thumbnails?: {
+    thumbnail?: {
         id: string;
         media_id: string;
     } | null;

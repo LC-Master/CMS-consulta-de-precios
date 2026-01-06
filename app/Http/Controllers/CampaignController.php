@@ -26,17 +26,17 @@ class CampaignController extends Controller
         $query = Campaign::with(['status', 'department', 'agreement']);
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
+            $query->where('title', 'like', "%{$request->input('search')}%");
         }
 
         if ($request->filled('status')) {
-            $query->where('status_id', $request->status);
+            $query->where('status_id', $request->input('status'));
         }
 
         return Inertia::render('Campaign/Index', [
             'campaigns' => Inertia::scroll(fn() => $query->latest()->paginate()),
             'filters' => $request->only(['search', 'status']),
-            'statuses' => fn() => Status::all(),
+            'statuses' => Status::all(),
         ]);
     }
 

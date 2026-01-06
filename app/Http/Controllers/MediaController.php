@@ -78,12 +78,12 @@ class MediaController extends Controller
                 }
             ]);
 
-            logger()->info('Media details loaded successfully.', ['media_id' => $media->id]);
+            logger()->info('Media details loaded successfully.', ['media_id' => $media->getKey()]);
             return Inertia::render('Media/Show', [
                 'media' => $media,
             ]);
         } catch (\Throwable $e) {
-            logger()->error('Error loading media details: ' . $e->getMessage(), ['media_id' => $media->id]);
+            logger()->error('Error loading media details: ' . $e->getMessage(), ['media_id' => $media->getKey()]);
             return back()->with('error', 'Ocurrió un error al cargar el archivo.');
         }
     }
@@ -128,7 +128,7 @@ class MediaController extends Controller
             return to_route('media.index')
                 ->with('info', 'No se realizaron cambios.');
         } catch (\Throwable $e) {
-            logger()->error('Error updating media file: ' . $e->getMessage(), ['media_id' => $media->id]);
+            logger()->error('Error updating media file: ' . $e->getMessage(), ['media_id' => $media->getKey()]);
             return back()->with('error', 'Ocurrió un error al actualizar el archivo.');
         }
     }
@@ -140,7 +140,7 @@ class MediaController extends Controller
     {
         MediaSafeAction::SafeAction(function () use ($media, $deleteMediaAction) {
             $deleteMediaAction->execute($media);
-            logger()->info('Media file deleted successfully.', ['media_id' => $media->id]);
+            logger()->info('Media file deleted successfully.', ['media_id' => $media->getKey()]);
             return back()->with('success', 'Archivo eliminado correctamente.');
         }, 'Ocurrió un error al eliminar el archivo.');
     }
@@ -151,13 +151,13 @@ class MediaController extends Controller
             $path = Storage::disk($media->disk)->path($media->path);
 
             if (!Storage::disk($media->disk)->exists($media->path)) {
-                logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->id]);
+                logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->getKey()]);
                 abort(404, 'El archivo físico no existe en el servidor.');
             }
 
             return response()->file($path);
         } catch (\Throwable $e) {
-            logger()->error('Error generating media preview: ' . $e->getMessage(), ['media_id' => $media->id]);
+            logger()->error('Error generating media preview: ' . $e->getMessage(), ['media_id' => $media->getKey()]);
             abort(500, 'Ocurrió un error al generar la vista previa del archivo.');
         }
     }
@@ -167,13 +167,13 @@ class MediaController extends Controller
             $path = Storage::disk($media->disk)->path($media->path);
 
             if (!Storage::disk($media->disk)->exists($media->path)) {
-                logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->id]);
+                logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->getKey()]);
                 abort(404, 'El archivo físico no existe en el servidor.');
             }
 
             return response()->download($path, $media->name);
         } catch (\Throwable $e) {
-            logger()->error('Error downloading media file: ' . $e->getMessage(), ['media_id' => $media->id]);
+            logger()->error('Error downloading media file: ' . $e->getMessage(), ['media_id' => $media->getKey()]);
             abort(500, 'Ocurrió un error al descargar el archivo.');
         }
     }

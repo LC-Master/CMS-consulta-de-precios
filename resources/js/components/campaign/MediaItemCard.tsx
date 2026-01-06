@@ -11,9 +11,9 @@ export default function MediaItemCard({ item, controls }: { item: MediaItem; con
                         alt={item.name}
                         className="w-24 h-14 object-cover rounded-md shrink-0" loading='lazy'
                     />
-                ) : item.thumbnails ? (
+                ) : item.thumbnail ? (
                     <img
-                        src={`/thumbnail/cdn/${item.thumbnails.id}`}
+                        src={`/thumbnail/cdn/${item.thumbnail.id}`}
                         alt={`Thumbnail ${item.name}`}
                         className="w-24 h-14 object-cover rounded-md shrink-0" loading='lazy'
                     />

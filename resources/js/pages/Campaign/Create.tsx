@@ -25,7 +25,6 @@ export default function CampaignCreate({ centers, departments, agreements, media
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { handlerSearch, search, filteredItems } = useSearch(mediaList);
     const { moveUp, moveDown, transfer } = useMediaActions<MediaItem>();
-
     const { data, setData, processing, errors, post, transform } = useForm({
         title: '',
         start_at: '',
