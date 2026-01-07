@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,11 +15,12 @@ return new class extends Migration
             $table->string('title');
             $table->dateTime('start_at');
             $table->dateTime('end_at');
-            $table->foreignUuid('status_id')->nullable(false)->constrained();
-            $table->foreignUuid('department_id')->nullable()->constrained();
+            $table->foreignUuid('status_id')->constrained();
+            $table->foreignUuid('department_id')->constrained();
             $table->foreignUuid('agreement_id')->nullable()->constrained();
-            $table->integer('created_by')->nullable(true);
-            $table->integer('updated_by')->nullable(true);
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

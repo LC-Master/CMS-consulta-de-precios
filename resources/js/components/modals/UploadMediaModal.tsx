@@ -12,6 +12,7 @@ import {
 import { useForm } from '@inertiajs/react'
 import { FormState } from '@/types/modal/index.type'
 import { Send } from 'lucide-react'
+import { Spinner } from '../ui/spinner'
 
 export default function UploadMediaModal({ closeModal }: { closeModal: () => void }) {
     const { data, setData, post, progress, errors, reset, transform, processing, cancel } = useForm<FormState>({
@@ -232,8 +233,7 @@ export default function UploadMediaModal({ closeModal }: { closeModal: () => voi
                     </div>
                     <div className="flex gap-2">
                         <Button type="submit" className="w-1/2 bg-locatel-medio hover:bg-locatel-oscuro" disabled={selectedFiles.length === 0 || processing}>
-                            Enviar
-                            <Send />
+                            {processing ? (<><Spinner/> Procesando...</>) : <>Guardar <Send /></>}
                         </Button>
                         <Button
                             type="submit"

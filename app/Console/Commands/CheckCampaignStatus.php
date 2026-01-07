@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\CampaignStatus;
 use App\Models\Campaign;
 use App\Models\Status;
 use Illuminate\Console\Command;
-use Carbon\Carbon;
 
 class CheckCampaignStatus extends Command
 {
@@ -27,22 +27,32 @@ class CheckCampaignStatus extends Command
     {
         $this->info('Comprobando campañas...');
 
-        $statusActiva = Status::where('status', 'Activa')->first();
-        $statusFinalizada = Status::where('status', 'Finalizada')->first();
+        $statusActiva = Status::where('status', CampaignStatus::ACTIVE->value)->first();
+        $statusFinalizada = Status::where('status', CampaignStatus::FINISHED->value)->first();
 
         if (!$statusActiva) {
-            $this->error('Error: No se encontró el estatus con nombre "Activa" en la tabla statuses.');
+            $this->error(string: 'Error: No se encontró el estatus con nombre "' . CampaignStatus::ACTIVE->value . '" en la tabla statuses.');
         }
 
         if (!$statusFinalizada) {
-            $this->error('Error: No se encontró el estatus con nombre "Finalizada" en la tabla statuses.');
+            $this->error('Error: No se encontró el estatus con nombre "' . CampaignStatus::FINISHED->value . '" en la tabla statuses.');
         }
 
-        $now = Carbon::now();
-
-        $affectedRows = Campaign::where('status_id', $statusActiva->getKey())
+        $now = now();
+        $campaigns = Campaign::where('status_id', $statusActiva->getKey())
             ->where('end_at', '<=', $now)
-            ->update(['status_id' => $statusFinalizada->getKey()]);
+            ->get();
+
+        $affectedRows = $campaigns->count();
+
+        foreach ($campaigns as $campaign) {
+            $campaign->status_id = $statusFinalizada->getKey();
+            $campaign->save();
+
+            if (method_exists($campaign, 'user')) {
+                $campaign->user->notify(new \App\Notifications\Campaigns\CampaignFinishedNotification($campaign));
+            }
+        }
 
         if ($affectedRows > 0) {
             $this->info("¡Éxito! Se han finalizado {$affectedRows} campañas.");

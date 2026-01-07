@@ -8,6 +8,7 @@ use App\Http\Controllers\TimeLineController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\CampaignHistoryController;
 // use Laravel\Fortify\Features;
 use App\Http\Controllers\CenterTokenController;
 
@@ -30,6 +31,12 @@ Route::middleware(['auth', 'verified', 'role:admin|publicidad'])->group(function
     Route::resource('agreement', AgreementController::class);
     Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
     Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
+
+    Route::prefix('history/campaigns')->group(function () {
+        Route::get('/', [CampaignHistoryController::class, 'index'])->name('campaigns.history');
+        Route::post('{id}/restore', [CampaignHistoryController::class, 'restore'])->name('campaigns.restore');
+        Route::post('{id}/clone', [CampaignHistoryController::class, 'clone'])->name('campaigns.clone');
+    });
 });
 Route::middleware(['auth', 'verified', 'role:admin', 'password.confirm'])->group(function () {
     Route::resource('user', UserController::class);

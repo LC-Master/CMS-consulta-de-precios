@@ -36,7 +36,7 @@ class CampaignSeeder extends Seeder
         $updatedAt = fake()->dateTimeBetween($createdAt, 'now');
 
         return [
-            $center->id => [
+            $center->getKey() => [
                 'created_at' => $createdAt,
                 'updated_at' => $updatedAt,
             ]

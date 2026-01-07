@@ -8,10 +8,11 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { store } from "@/routes/centertokens";
 import { useState } from "react";
+import { Spinner } from "../ui/spinner";
 
 export default function CreateCenterToken({ centers, closeModal }: { closeModal: () => void, centers: Center[] }) {
     const [tokenValue, setTokenValue] = useState<string | null>(null);
-    const { post, setData, processing, errors } = useForm({
+    const { post, setData, processing, errors, cancel } = useForm({
         name: '',
         center_id: ''
     });
@@ -34,7 +35,7 @@ export default function CreateCenterToken({ centers, closeModal }: { closeModal:
         });
     }
     return (
-        <Modal className="border-locatel-claro border-2 bg-white" closeModal={closeModal} blur={false} >
+        <Modal actionWhenCloseTouchOutside={cancel} className="border-locatel-claro border-2 bg-white" closeModal={closeModal} blur={false} >
             <form onSubmit={handleSubmit} method="post" action={store().url} className="w-full">
                 <div className="p-6 space-y-6">
                     <header className="border-b pb-3 mb-4">
@@ -104,11 +105,14 @@ export default function CreateCenterToken({ centers, closeModal }: { closeModal:
                             </Button>
                         ) : (
                             <>
-                                <Button type="button" onClick={closeModal} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                                <Button type="button" onClick={() => {
+                                    cancel()
+                                    closeModal()
+                                }} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
                                     Cancelar
                                 </Button>
                                 <Button type="submit" disabled={processing} className="bg-locatel-oscuro text-white px-4 py-2 rounded hover:bg-green-800">
-                                    Crear token
+                                    {processing ? <><Spinner /> Procesando...</> : <>Crear token</>}
                                 </Button>
                             </>
                         )}

@@ -9,12 +9,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\TimeLineItem;
 use App\Models\Media;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property-read \App\Models\User $user
+ */
 class Campaign extends Model
 {
     /** @use HasFactory<\Database\Factories\CampaignFactory> */
     use HasFactory;
-
+    use SoftDeletes;
     use HasUuids;
 
     protected $fillable = [
@@ -24,7 +28,7 @@ class Campaign extends Model
         'status_id',
         'department_id',
         'agreement_id',
-        'created_by',
+        'user_id',
         'updated_by',
     ];
 
@@ -37,6 +41,17 @@ class Campaign extends Model
      * MUTADOR para start_at
      * Se ejecuta automáticamente al hacer $model->start_at = 'valor';
      */
+    protected static function booted()
+    {
+        static::creating(function ($campaign) {
+            if (auth()->check() && empty($campaign->user_id)) {
+                $campaign->user_id = auth()->id();
+            }
+        });
+    }
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
     protected function startAt(): Attribute
     {
         return Attribute::make(

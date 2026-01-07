@@ -5,13 +5,13 @@ import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Filter } from '@/components/Filter';
 import { Column } from '@/types/datatable.types';
 import AnchorIcon from '@/components/ui/AnchorIcon';
-import { Eye, Pencil } from 'lucide-react';
+import { Eye, Pencil, Trash } from 'lucide-react';
 import { DataTable } from '@/components/DataTable';
 import { Campaign, Props } from '@/types/campaign/index.types';
 import useToast from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react'
-import { edit, index, show } from '@/routes/campaign';
+import { destroy, edit, index, show } from '@/routes/campaign';
 import Modal from '@/components/Modal';
 import useModal from '@/hooks/use-modal';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
@@ -20,6 +20,7 @@ import { PillStatus } from '@/components/ui/PillStatus';
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [], flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
     const { isOpen, closeModal, openModal } = useModal(false)
+    const { isOpen: isOpenDelete, closeModal: closeDeleteModal, openModal: openModalDelete } = useModal(false)
     const [campaignId, setCampaignId] = useState<string | null>('');
     const [status, setStatus] = useState(filters.status || '')
     const { ToastContainer } = useToast(flash);
@@ -38,9 +39,14 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
             ),
         },
         {
-            key: 'created_at',
-            header: 'Creada',
-            render: (a) => new Date(a.created_at).toLocaleString(),
+            key: 'start_at',
+            header: 'Inicio',
+            render: (a) => new Date(a.start_at).toLocaleDateString(),
+        },
+        {
+            key: 'end_at',
+            header: 'Fin',
+            render: (a) => new Date(a.end_at).toLocaleDateString(),
         },
         {
             key: 'actions',
@@ -69,6 +75,12 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                     )}
                     <AnchorIcon title="Ver campaña" href={show({ id: a.id }).url} icon={Eye} />
                     <AnchorIcon title="Editar campaña" className='p-2 bg-locatel-claro text-white rounded-md' href={edit({ id: a.id }).url} icon={Pencil} />
+                    <Button title='Eliminar Campaña' onClick={() => {
+                        setCampaignId(a.id);
+                        openModalDelete();
+                    }} className='p-2 bg-red-600 h-8 text-white rounded-md'>
+                        <Trash className='w-4 h-4' />
+                    </Button>
                 </div>
             ),
         },
@@ -106,6 +118,33 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                     </Button>
                 </div>
             </Modal>)}
+            {isOpenDelete && (
+                <Modal className="w-96 bg-white p-6 rounded-lg" closeModal={closeDeleteModal}>
+                    <div className="flex items-start gap-4">
+                        <div className="shrink-0">
+                            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                                <Trash className="w-6 h-6 text-red-600" />
+                            </div>
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-semibold mb-1">Eliminar campaña</h2>
+                            <p className="text-sm text-gray-600 mb-2">¿Estás seguro de que deseas eliminar esta campaña? Esta acción es irreversible y no podrá deshacerse desde la interfaz.</p>
+                            <p className="text-xs text-gray-500">La campaña dejará de aparecer en las listas activas, pero permanecerá en el histórico para auditoría.</p>
+                        </div>
+                    </div>
+                    <div className="mt-6 flex justify-end gap-3">
+                        <Button variant="outline" onClick={closeDeleteModal}>Cancelar</Button>
+                        <Button className="bg-red-600 text-white hover:bg-red-700" onClick={() => {
+                            router.delete(destroy({ id: campaignId! }).url, {
+                                only: ['campaigns', 'flash'],
+                                reset: ['campaigns', 'flash'],
+                                preserveScroll: true
+                            });
+                            closeDeleteModal();
+                        }}>Eliminar</Button>
+                    </div>
+                </Modal>
+            )}
             <div className="space-y-4 px-4 pb-4">
                 <Filter
                     filters={[

@@ -10,6 +10,7 @@ use App\Enums\CampaignStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class CreateCampaignAction
 {
@@ -21,35 +22,50 @@ class CreateCampaignAction
             throw new \RuntimeException('Error de configuración del sistema: Estado inicial no encontrado.');
         }
 
-        return DB::transaction(function () use ($data, $draftStatus) {
+        $inputCenterIds = $data['centers'] ?? [];
+        $finalCenterIds = $inputCenterIds;
 
-            $campaign = Campaign::create(attributes: [
+        if (!empty($inputCenterIds)) {
+            $specialCenterId = Center::where('code', 'CTR-0001')->value('id');
+
+            if ($specialCenterId && \in_array($specialCenterId, $inputCenterIds)) {
+                $finalCenterIds = Center::pluck('id')->toArray();
+            }
+        }
+
+        return DB::transaction(function () use ($data, $draftStatus, $finalCenterIds) {
+
+            $campaign = Campaign::create([
                 ...$data,
-                'created_by' => Auth::id(),
                 'status_id' => $draftStatus->getKey(),
             ]);
 
-            if (!empty($data['centers'])) {
-                $special = Center::where('code', 'CTR-0001')->first();
-                $centerIds = ($special && \in_array($special->getKey(), $data['centers'], true))
-                    ? Center::pluck('id')->toArray()
-                    : $data['centers'];
-
-                $campaign->centers()->attach($centerIds);
+            if (!empty($finalCenterIds)) {
+                $campaign->centers()->attach($finalCenterIds);
             }
+
+            $timelineItems = [];
+            $now = now();
 
             foreach (['am_media' => Schedules::AM, 'pm_media' => Schedules::PM] as $key => $schedule) {
                 if (!empty($data[$key])) {
-                    $items = collect($data[$key])->map(fn($id, $pos) => [
-                        'media_id' => $id,
-                        'slot' => $schedule->value,
-                        'position' => $pos + 1,
-                    ])->all();
-
-                    $campaign->timeLineItems()->createMany($items);
+                    foreach ($data[$key] as $position => $mediaId) {
+                        $timelineItems[] = [
+                            'id' => Str::uuid()->toString(),
+                            'campaign_id' => $campaign->getKey(),
+                            'media_id' => $mediaId,
+                            'slot' => $schedule->value,
+                            'position' => $position + 1,
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ];
+                    }
                 }
             }
 
+            if (!empty($timelineItems)) {
+                DB::table('time_line_items')->insert($timelineItems);
+            }
             return $campaign;
         });
     }

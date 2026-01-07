@@ -25,6 +25,10 @@ class CampaignController extends Controller
     {
         $query = Campaign::with(['status', 'department', 'agreement']);
 
+        $query->whereHas('status', function ($q) {
+            $q->where('status', '!=', CampaignStatus::FINISHED->value);
+        });
+
         if ($request->filled('search')) {
             $query->where('title', 'like', "%{$request->input('search')}%");
         }
@@ -33,10 +37,11 @@ class CampaignController extends Controller
             $query->where('status_id', $request->input('status'));
         }
 
+        $statuses = Status::where('status', '!=', CampaignStatus::FINISHED->value)->get(['id', 'status']);
         return Inertia::render('Campaign/Index', [
-            'campaigns' => Inertia::scroll($query->latest()->paginate()),
+            'campaigns' => Inertia::scroll($query->latest()->paginate(10)->withQueryString()),
             'filters' => $request->only(['search', 'status']),
-            'statuses' => Status::all(),
+            'statuses' => $statuses
         ]);
     }
 
@@ -59,7 +64,8 @@ class CampaignController extends Controller
     {
         try {
 
-            $createCampaignAction->execute($request->validated());
+            $campaign = $createCampaignAction->execute($request->validated());
+            Auth::user()?->notify(new \App\Notifications\Campaigns\CampaignCreatedNotification(campaign: $campaign));
             return to_route('campaign.index')
                 ->with('success', 'Campaña creada correctamente.');
 
@@ -77,14 +83,12 @@ class CampaignController extends Controller
         $campaign->load([
             'status',
             'department:id,name',
-            'agreement:id,name',
-            'centers:id,code,name',
-            'media' => function ($query) {
-                $query->select('media.id', 'media.name', 'media.mime_type', 'media.duration_seconds');
+            'agreement' => function ($query) {
+                $query->withTrashed()->select('id', 'name');
             },
+            'centers:id,code,name',
+            'media:id,name,mime_type,duration_seconds',
         ]);
-
-        $campaign->setRelation('centers', $campaign->getRelation('centers')->map->only(['id', 'code', 'name']));
 
         $campaign->makeHidden(['status_id', 'department_id', 'agreement_id']);
 
@@ -147,18 +151,25 @@ class CampaignController extends Controller
 
     public function destroy(Campaign $campaign)
     {
-        $campaign->delete();
+        try {
+            $campaign->delete();
 
-        return to_route('campaign.index')
-            ->with('success', 'Campaña eliminada.');
+            return to_route('campaign.index')
+                ->with('success', 'Campaña eliminada.');
+        } catch (\Throwable $e) {
+            Log::error('Error deleting campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+
+            return back()
+                ->with('error', 'Ocurrió un error inesperado al eliminar la campaña. Por favor, intente nuevamente.');
+        }
     }
     public function activate(Campaign $campaign)
     {
         try {
-            $activeStatus = Status::where('status', 'Activa')->first();
-            $campaign->status_id = $activeStatus->getKey();
+            $activeStatus = Status::where('status', CampaignStatus::ACTIVE->value)->first();
+            $campaign->setAttribute('status_id', $activeStatus->getKey());
             $campaign->save();
-
+            $campaign->user->notify(new \App\Notifications\Campaigns\CampaignPublishedNotification(campaign: $campaign));
             return back()
                 ->with('success', 'Campaña activada correctamente.');
         } catch (\Throwable $e) {
@@ -171,9 +182,22 @@ class CampaignController extends Controller
     }
     public function finish(Campaign $campaign)
     {
-        $finishedStatus = Status::where('status', CampaignStatus::FINISHED->value)->firstOrFail();
-        $campaign->update(['status_id' => $finishedStatus->getKey()]);
+        try {
+            $finishedStatus = Status::where('status', CampaignStatus::FINISHED->value)->firstOrFail();
 
-        return redirect()->route('campaign.index')->with('success', 'Campaña finalizada.');
+            if (!$finishedStatus->getKey() === $campaign->getAttribute('status_id')) {
+                return back()->with('success', "Estatus de " . CampaignStatus::FINISHED->value . " ya asignado a la campaña.");
+            }
+
+            $campaign->update(['status_id' => $finishedStatus->getKey()]);
+            $campaign->user->notify(new \App\Notifications\Campaigns\CampaignFinishedNotification(campaign: $campaign));
+
+            return redirect()->route('campaign.index')->with('success', 'Campaña finalizada.');
+        } catch (\Throwable $e) {
+            Log::error('Error finishing campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+
+            return back()
+                ->with('error', 'Ocurrió un error inesperado al finalizar la campaña. Por favor, intente nuevamente.');
+        }
     }
 }

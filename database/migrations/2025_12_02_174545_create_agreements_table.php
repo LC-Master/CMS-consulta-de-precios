@@ -22,6 +22,7 @@ return new class extends Migration {
             $table->date('end_date')->nullable();
             $table->boolean('is_active')->default(true);
             $table->text('observations')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

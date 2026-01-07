@@ -89,6 +89,8 @@ export interface Status {
 }
 
 export type Campaign = {
+    start_at: string | number | Date;
+    end_at: string | number | Date;
     id: string;
     title: string;
     status: {

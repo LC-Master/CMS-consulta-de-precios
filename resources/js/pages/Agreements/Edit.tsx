@@ -4,9 +4,11 @@ import { breadcrumbs } from "@/helpers/breadcrumbs"
 import { type Agreement } from "@/types/agreement/index.types"
 import { useForm, Link } from "@inertiajs/react"
 import { Label } from "@radix-ui/react-dropdown-menu"
+import { Spinner } from "@/components/ui/spinner"
+import { Save } from "lucide-react"
 
 export default function AgreementsEdit({ agreement }: { agreement: Agreement }) {
-    const { data, setData, processing, errors, put } = useForm({
+    const { data, setData, processing, errors, put, cancel } = useForm({
         name: agreement.name ?? '',
         legal_name: agreement.legal_name ?? '',
         tax_id: agreement.tax_id ?? '',
@@ -203,12 +205,15 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
                             className="bg-locatel-medio text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
                             disabled={processing}
                         >
-                            Guardar
+                            {processing ? (<><Spinner /> Guardando....</>) : <><Save /> Guardar</>}
                         </button>
 
                         <Link
                             viewTransition
                             href={index().url}
+                            onClick={() => {
+                                if (processing) cancel()
+                            }}
                             className="bg-red-500 text-white rounded-md px-6 py-3 shadow hover:brightness-95"
                         >
                             Cancelar

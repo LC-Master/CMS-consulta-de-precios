@@ -4,10 +4,11 @@ import { breadcrumbs } from '@/helpers/breadcrumbs'
 import { useForm, Link } from '@inertiajs/react'
 import { Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 
 export default function AgreementCreate() {
 
-    const { data, setData, processing, errors, post } = useForm({
+    const { data, setData, processing, errors, post, cancel } = useForm({
         name: '',
         legal_name: '',
         tax_id: '',
@@ -188,12 +189,15 @@ export default function AgreementCreate() {
                             className="bg-locatel-medio flex flex-row h-12 gap-2 items-center text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
                             disabled={processing}
                         >
-                            <Save /> Guardar
+                            {processing ? (<><Spinner /> Guardando....</>) : <><Save /> Guardar</>}
                         </Button>
 
                         <Link
                             viewTransition
                             href={index().url}
+                            onClick={() => {
+                                if (processing) cancel()
+                            }}
                             className="bg-red-500 text-white rounded-md px-6 py-3 shadow hover:brightness-95"
                         >
                             Cancelar
@@ -201,6 +205,6 @@ export default function AgreementCreate() {
                     </div>
                 </div>
             </div>
-        </AppLayout>
+        </AppLayout >
     )
 }

@@ -11,7 +11,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
 class AgreementController extends Controller
@@ -116,9 +115,16 @@ class AgreementController extends Controller
 
     public function destroy(Agreement $agreement)
     {
-        $agreement->delete();
+        try {
+            $agreement->delete();
 
-        return Redirect::route('agreements.index')
-            ->with('success', 'Acuerdo eliminado correctamente.');
+            return to_route('agreement.index')
+                ->with('success', 'Convenio eliminado correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error deleting agreement: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+
+            return back()
+                ->with('error', 'Ocurrió un error inesperado al eliminar el convenio. Por favor, intente nuevamente.');
+        }
     }
 }

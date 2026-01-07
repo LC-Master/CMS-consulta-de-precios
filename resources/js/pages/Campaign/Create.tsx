@@ -18,6 +18,7 @@ import useSearch from '@/hooks/use-search'
 import { useMediaActions } from '@/hooks/use-media-actions'
 import { Agreement } from '@/types/agreement/index.types'
 import { CircleAlert, PlusCircle, Save, SquarePlay } from 'lucide-react'
+import { Spinner } from '@/components/ui/spinner'
 
 export default function CampaignCreate({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
     const { isOpen, openModal, closeModal } = useModal(false)
@@ -25,7 +26,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { handlerSearch, search, filteredItems } = useSearch(mediaList);
     const { moveUp, moveDown, transfer } = useMediaActions<MediaItem>();
-    const { data, setData, processing, errors, post, transform } = useForm({
+    const { data, setData, processing, errors, post, transform, cancel } = useForm({
         title: '',
         start_at: '',
         end_at: '',
@@ -278,13 +279,13 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             className="bg-locatel-medio hover:bg-locatel-oscuro active:bg-locatel-oscuro flex flex-row items-center h-12 text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
                             disabled={processing}
                         >
-                            <Save />
-                            Guardar
+                            {processing ? (<><Spinner /> Guardando....</>) : <><Save /> Guardar</>}
                         </Button>
 
                         <Link
                             viewTransition
                             href={index().url}
+                            onClick={() => { if (processing) cancel() }}
                             className="bg-red-500 text-white rounded-md px-6 py-3 shadow hover:brightness-95"
                         >
                             Cancelar

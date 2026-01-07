@@ -19,6 +19,7 @@ import InputError from '@/components/input-error'
 import useLoadOptions from '@/hooks/use-load-options'
 import useLoadEdit from '@/hooks/use-load-edit'
 import { CircleAlert, PlusCircle, Save, SquarePlay } from 'lucide-react'
+import { Spinner } from '@/components/ui/spinner'
 
 export default function CampaignEdit({ centers, departments, agreements, media, flash, campaign }: CampaignEditProps) {
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
@@ -29,7 +30,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
     const { moveDown, moveUp, transfer } = useMediaActions<MediaItem>()
     const { handlerSearch, search, filteredItems } = useSearch<MediaItem>(mediaList)
 
-    const { data, setData, processing, errors, put, transform } = useForm({
+    const { data, setData, processing, errors, put, transform, cancel } = useForm({
         title: campaign.title || '',
         start_at: campaign.start_at ? new Date(campaign.start_at).toISOString().slice(0, 16) : '',
         end_at: campaign.end_at ? new Date(campaign.end_at).toISOString().slice(0, 16) : '',
@@ -272,12 +273,13 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                             className="bg-locatel-medio hover:bg-locatel-oscuro active:bg-locatel-oscuro flex flex-row items-center h-12 text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
                             disabled={processing}
                         >
-                            <Save />
-                            Guardar
+                            {processing ? (<><Spinner /> Guardando....</>) : <><Save /> Guardar</>}
                         </Button>
 
                         <Link
+                            viewTransition
                             href={index().url}
+                            onClick={() => { if (processing) cancel() }}
                             className="bg-red-500 text-white rounded-md px-6 py-3 shadow hover:brightness-95"
                         >
                             Cancelar

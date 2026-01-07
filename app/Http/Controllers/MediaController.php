@@ -124,8 +124,8 @@ class MediaController extends Controller
 
     public function preview(Media $media)
     {
-        return MediaSafeAction::SafeAction(function () use ($media) {
-            $path = Storage::disk($media->disk)->path($media->path);
+            try{
+                $path = Storage::disk($media->disk)->path($media->path);
 
             if (!Storage::disk($media->disk)->exists($media->path)) {
                 logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->getKey()]);
@@ -133,7 +133,10 @@ class MediaController extends Controller
             }
 
             return response()->file($path);
-        }, 'Ocurrió un error al previsualizar el archivo.');
+            }catch(\Throwable $e){
+                logger()->error('Error al previsualizar el archivo.', ['media_id' => $media->getKey(), 'error' => $e->getMessage()]);
+                return null;
+            }
 
     }
     public function download(Media $media)

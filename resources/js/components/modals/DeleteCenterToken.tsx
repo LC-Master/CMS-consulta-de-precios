@@ -1,6 +1,6 @@
 import Modal from "@/components/Modal";
 import { useState, useEffect } from "react";
-import { useForm, router } from "@inertiajs/react";
+import { useForm } from "@inertiajs/react";
 import { Button } from "../ui/button";
 import { destroy } from "@/routes/centertokens";
 
@@ -20,10 +20,9 @@ export default function DeleteCenterToken({ closeModal, tokenId }: { closeModal:
                 onSubmit={(e) => {
                     e.preventDefault();
                     deleteToken(destroy({ centertoken: tokenId }).url, {
+                        only: ['centerTokens', 'flash'],
+                        reset: ['centerTokens'],
                         onSuccess: () => {
-                            router.reload({
-                                only: ['centerTokens', 'flash'], reset: ['centerTokens']
-                            });
                             closeModal();
                         },
                         preserveScroll: true

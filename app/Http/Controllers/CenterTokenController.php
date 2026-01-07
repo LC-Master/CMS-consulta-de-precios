@@ -25,7 +25,7 @@ class CenterTokenController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhereHas('tokenable', function ($q2) use ($search) {
+                    ->orWhereHas('tokenable', function ($q2) use ($search): void {
                         $q2->where('name', 'like', "%{$search}%")
                             ->orWhere('code', 'like', "%{$search}%");
                     });
@@ -64,9 +64,13 @@ class CenterTokenController extends Controller
     {
         try {
             $request->validated();
-            $center = Center::findOrFail($request->center_id);
-
-            $token = $center->createToken($request->name)->plainTextToken;
+            $center = Center::findOrFail($request->input('center_id'));
+            $token = $center->createToken($request->input('name'))->plainTextToken;
+            event(new \App\Events\CenterToken\CenterTokenEvent(
+                center: $center,
+                type: 'create',
+                tokenName: $request->input('name')
+            ));
 
             return back()->with([
                 'success' => ['success' => 'Token creado correctamente', 'token' => $token],
@@ -99,17 +103,21 @@ class CenterTokenController extends Controller
      */
     public function update(UpdateCenterTokenRequest $request, PersonalAccessToken $centerToken)
     {
-        $centerToken->update($request->validated());
-
-        return to_route('centerTokens.index')
-            ->with('success', 'Token actualizado correctamente.');
+        // $centerToken->update($request->validated());
+        // return to_route('centerTokens.index')
+        //     ->with('success', 'Token actualizado correctamente.');
     }
 
     public function destroy(PersonalAccessToken $centertoken)
     {
         try {
+            $center = $centertoken->getAttribute('tokenable');
             $centertoken->delete();
-
+            event(new \App\Events\CenterToken\CenterTokenEvent(
+                center: $center,
+                type: 'delete',
+                tokenName: $centertoken->getAttribute('name')
+            ));
             return back()
                 ->with('success', 'Token eliminado correctamente.');
         } catch (\Throwable $e) {
