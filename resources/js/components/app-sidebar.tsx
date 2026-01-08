@@ -20,9 +20,10 @@ import { index as user } from '@/routes/user';
 import { index as tokens } from '@/routes/centertokens';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Users, KeyRound, History,SquarePlus, List,Calendar, Handshake, Film } from 'lucide-react';
+import { Users, KeyRound, History,SquarePlus, List,Calendar, Handshake, Film, ChartBar } from 'lucide-react';
 import { lazy } from 'react';
 import useAuth from '@/hooks/useAuth';
+import { dashboard } from '@/routes';
 const Logo = lazy(() => import('@/components/app-logo'));
 
 export function AppSidebar() {
@@ -60,6 +61,11 @@ export function AppSidebar() {
             href: calendar().url,
             icon: Calendar,
         },
+        {
+            title: 'Panel de estadísticas',
+            href: dashboard().url,
+            icon: ChartBar,
+        }
 
     ] : [];
 

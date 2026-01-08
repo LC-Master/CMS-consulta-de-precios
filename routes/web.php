@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CampaignHistoryController;
+use App\Http\Controllers\DashboardController;
 // use Laravel\Fortify\Features;
 use App\Http\Controllers\CenterTokenController;
 
@@ -19,7 +20,7 @@ use App\Http\Controllers\CenterTokenController;
 // })->name('home');
 
 Route::middleware(['auth', 'verified', 'role:admin|publicidad'])->group(function () {
-    Route::get('dashboard', action: fn() => Inertia::render('dashboard'))->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/campaign/activate/{campaign}', [CampaignController::class, 'activate'])->name('campaign.activate');
     Route::get('/campaign/finish/{campaign}', [CampaignController::class, 'finish'])->name('campaign.finish');
     Route::resource('media', MediaController::class)->parameters([
