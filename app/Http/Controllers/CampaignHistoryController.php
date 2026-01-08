@@ -6,6 +6,7 @@ use App\Models\Status;
 use App\Enums\CampaignStatus;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class CampaignHistoryController extends Controller
 {
@@ -86,5 +87,47 @@ class CampaignHistoryController extends Controller
 
         return to_route("campaign.edit", ['campaign' => $newCampaign->getKey()])
             ->with('success', 'Campaña clonada. Revisa las fechas.');
+    }
+
+    public function calendar()
+    {
+        try {
+            $now = now();
+
+            $campaigns = Campaign::with([
+                'status:id,status',
+                'department:id,name',
+                'agreement' => fn($query) => $query->withTrashed()->select('id', 'name', 'deleted_at'),
+            ])
+                ->whereYear('start_at', $now->year)
+                ->whereHas('status', function ($sq) {
+                    $sq->where('status', CampaignStatus::ACTIVE->value);
+                })
+                ->get()
+                ->map(function ($c) {
+                    $start = $c->start_at instanceof Carbon ? $c->start_at : Carbon::parse($c->start_at);
+                    $end = $c->end_at instanceof Carbon ? $c->end_at : Carbon::parse($c->end_at ?? $c->start_at);
+
+                    return [
+                        'id' => $c->id,
+                        'title' => $c->title,
+                        'start' => $start->toIso8601String(),
+                        'end' => $end->addDay()->toIso8601String(),
+                        'color' => '#3B82F6',
+                        'extendedProps' => [
+                            'department' => $c->department->name ?? 'N/A',
+                            'agreement' => $c->agreement->name ?? 'N/A',
+                        ]
+                    ];
+                });
+
+            return Inertia::render('CampaignHistory/Calendar', [
+                'campaigns' => $campaigns
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error("Error en Calendario: " . $e->getMessage());
+            return back()->with('error', 'Error interno: ' . $e->getMessage());
+        }
     }
 }

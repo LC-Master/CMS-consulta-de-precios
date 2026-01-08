@@ -12,13 +12,15 @@ import {
 } from '@/components/ui/sidebar';
 import { create as agreementCreate, index as agreement } from '@/routes/agreement';
 import { index, create } from '@/routes/campaign';
-import { history as indexHistory } from '@/routes/campaignsHistory';
+import { history as indexHistory,
+ } from '@/routes/campaignsHistory';
+import { show as calendar } from '@/routes/calendar';
 import { index as media } from '@/routes/media';
 import { index as user } from '@/routes/user';
 import { index as tokens } from '@/routes/centertokens';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Users, KeyRound, History,SquarePlus, List, Handshake, Film } from 'lucide-react';
+import { Users, KeyRound, History,SquarePlus, List,Calendar, Handshake, Film } from 'lucide-react';
 import { lazy } from 'react';
 import useAuth from '@/hooks/useAuth';
 const Logo = lazy(() => import('@/components/app-logo'));
@@ -52,6 +54,11 @@ export function AppSidebar() {
             title: 'Historial de campañas',
             href: indexHistory().url,
             icon: History,
+        },
+        {
+            title: 'Calendario',
+            href: calendar().url,
+            icon: Calendar,
         },
 
     ] : [];

@@ -39,12 +39,14 @@ Route::middleware(['auth', 'verified', 'role:admin|publicidad'])->group(function
     Route::resource('agreement', AgreementController::class);
     Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
     Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
+    Route::get('/calendar',[CampaignHistoryController::class,'calendar'])->name('calendar.show');
 
     Route::prefix('/history/campaigns')->group(function () {
         Route::get('/', [CampaignHistoryController::class, 'index'])->name('campaignsHistory.history');
         Route::get('{campaign}', [CampaignHistoryController::class, 'show'])->name('campaignsHistory.show')->withTrashed();
         Route::post('{campaign}/restore', [CampaignHistoryController::class, 'restore'])->name('campaignsHistory.restore')->withTrashed();
         Route::post('{campaign}/clone', [CampaignHistoryController::class, 'clone'])->name('campaignsHistory.clone')->withTrashed();
+        
     });
 });
 Route::middleware(['auth', 'verified', 'role:admin', 'password.confirm'])->group(function () {
