@@ -74,8 +74,8 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
                                     key={name}
                                     onClick={() => setSelectedCenter(name)}
                                     className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${selectedCenter === name
-                                            ? 'bg-[#008a4f] text-white shadow-lg'
-                                            : 'bg-white text-gray-700 border border-gray-200 hover:border-[#008a4f]'
+                                        ? 'bg-[#008a4f] text-white shadow-lg'
+                                        : 'bg-white text-gray-700 border border-gray-200 hover:border-[#008a4f]'
                                         }`}
                                 >
                                     {name === 'all' ? 'TODOS LOS CENTROS' : name.toUpperCase()}
@@ -119,7 +119,7 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
                 </div>
             </div>
 
-            <style jsx global>{`
+            <style >{`
                 /* NAVEGACIÓN CON ESPACIADO REAL */
                 .fc-header-toolbar {
                     background: #f8fafc;
