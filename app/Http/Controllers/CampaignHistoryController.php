@@ -97,6 +97,7 @@ class CampaignHistoryController extends Controller
             $campaigns = Campaign::with([
                 'status:id,status',
                 'department:id,name',
+                'centers:id,name',
                 'agreement' => fn($query) => $query->withTrashed()->select('id', 'name', 'deleted_at'),
             ])
                 ->whereYear('start_at', $now->year)
@@ -105,18 +106,19 @@ class CampaignHistoryController extends Controller
                 })
                 ->get()
                 ->map(function ($c) {
-                    $start = $c->start_at instanceof Carbon ? $c->start_at : Carbon::parse($c->start_at);
-                    $end = $c->end_at instanceof Carbon ? $c->end_at : Carbon::parse($c->end_at ?? $c->start_at);
+                    $start = $c->getAttribute('start_at') instanceof Carbon ? $c->getAttribute('start_at') : Carbon::parse($c->getAttribute('start_at'));
+                    $end = $c->getAttribute('end_at') instanceof Carbon ? $c->getAttribute('end_at') : Carbon::parse($c->getAttribute('end_at') ?? $c->getAttribute('start_at'));
 
                     return [
-                        'id' => $c->id,
-                        'title' => $c->title,
+                        'id' => $c->getKey(),
+                        'title' => $c->getAttribute('title'),
                         'start' => $start->toIso8601String(),
                         'end' => $end->addDay()->toIso8601String(),
                         'color' => '#3B82F6',
                         'extendedProps' => [
                             'department' => $c->department->name ?? 'N/A',
                             'agreement' => $c->agreement->name ?? 'N/A',
+                            'centers' => $c->centers->pluck('name')->toArray(),
                         ]
                     ];
                 });
