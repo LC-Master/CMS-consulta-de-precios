@@ -91,6 +91,7 @@ export interface Status {
 export type Campaign = {
     start_at: string | number | Date;
     end_at: string | number | Date;
+    deleted_at?: string | null;
     id: string;
     title: string;
     status: {
@@ -116,7 +117,7 @@ export type CampaignExtended = Campaign & {
 export type Props = {
     flash?: { success?: string; error?: string };
     campaigns: { data: Campaign[] };
-    filters: { search?: string; status?: string; type?: string };
+    filters: { search?: string; status?: string; type?: string, ended_at?: string,started_at?: string };
     statuses: Status[];
     medias?: { data: MediaItem[] };
     mimeTypes?: string[];

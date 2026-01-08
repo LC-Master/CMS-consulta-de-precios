@@ -11,11 +11,13 @@ import { Campaign, Props } from '@/types/campaign/index.types';
 import useToast from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react'
-import { destroy, edit, index, show } from '@/routes/campaign';
+import { edit, index, show, activate, finish } from '@/routes/campaign';
 import Modal from '@/components/Modal';
 import useModal from '@/hooks/use-modal';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
 import { PillStatus } from '@/components/ui/PillStatus';
+import { StatusCampaignEnum } from '@/enums/statusCampaignEnum';
+import DeleteCampaignModal from '@/components/modals/DeleteCampaignModal';
 
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [], flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
@@ -53,9 +55,9 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
             header: 'Acciones',
             render: (a) => (
                 <div className="flex gap-2">
-                    {a.status.status === 'Borrador' ? (
+                    {a.status.status === StatusCampaignEnum.DRAFT ? (
                         <Button title='Activar campaña' onClick={() => {
-                            router.get(`/campaign/activate/${a.id}`, {}, {
+                            router.get(activate({ id: a.id }).url, {}, {
                                 only: ['campaigns', 'flash'],
                                 reset: ['campaigns', 'flash'],
                                 preserveScroll: true
@@ -64,7 +66,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                             <Check className='w-4 h-4' />
                         </Button>
                     ) : (
-                        a.status.status === 'Activa' && (
+                        a.status.status === StatusCampaignEnum.ACTIVE && (
                             <Button title='Finalizar campaña' onClick={() => {
                                 setCampaignId(a.id);
                                 openModal();
@@ -103,7 +105,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                     <Button
                         className="bg-red-600 text-white hover:bg-red-700"
                         onClick={() => {
-                            router.visit(`/campaign/finish/${campaignId}`, {
+                            router.visit(finish({ id: campaignId! }).url, {
                                 method: 'get',
                                 preserveState: false,
                                 preserveScroll: true,
@@ -119,31 +121,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                 </div>
             </Modal>)}
             {isOpenDelete && (
-                <Modal className="w-96 bg-white p-6 rounded-lg" closeModal={closeDeleteModal}>
-                    <div className="flex items-start gap-4">
-                        <div className="shrink-0">
-                            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                                <Trash className="w-6 h-6 text-red-600" />
-                            </div>
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-semibold mb-1">Eliminar campaña</h2>
-                            <p className="text-sm text-gray-600 mb-2">¿Estás seguro de que deseas eliminar esta campaña? Esta acción es irreversible y no podrá deshacerse desde la interfaz.</p>
-                            <p className="text-xs text-gray-500">La campaña dejará de aparecer en las listas activas, pero permanecerá en el histórico para auditoría.</p>
-                        </div>
-                    </div>
-                    <div className="mt-6 flex justify-end gap-3">
-                        <Button variant="outline" onClick={closeDeleteModal}>Cancelar</Button>
-                        <Button className="bg-red-600 text-white hover:bg-red-700" onClick={() => {
-                            router.delete(destroy({ id: campaignId! }).url, {
-                                only: ['campaigns', 'flash'],
-                                reset: ['campaigns', 'flash'],
-                                preserveScroll: true
-                            });
-                            closeDeleteModal();
-                        }}>Eliminar</Button>
-                    </div>
-                </Modal>
+                <DeleteCampaignModal campaignId={campaignId} closeDeleteModal={closeDeleteModal} />
             )}
             <div className="space-y-4 px-4 pb-4">
                 <Filter
@@ -152,6 +130,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                             type: 'search',
                             key: 'search',
                             value: search,
+                            label: 'Buscar por título',
                             placeholder: 'Buscar por título...',
                             onChange: setSearch,
                         },
@@ -159,6 +138,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                             type: 'select',
                             key: 'status',
                             value: status,
+                            label: 'Estatus',
                             placeholder: 'Filtrar por estado',
                             options: [
                                 { value: '', label: 'Todos' },
@@ -169,6 +149,14 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                             ],
                             onChange: setStatus,
                         },
+                        {
+                            type: 'reset',
+                            onReset: () => {
+                                setSearch('');
+                                setStatus('');
+                            },
+                            key: 'reset',
+                        }
                     ]}
                 />
 

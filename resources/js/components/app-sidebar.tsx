@@ -12,12 +12,13 @@ import {
 } from '@/components/ui/sidebar';
 import { create as agreementCreate, index as agreement } from '@/routes/agreement';
 import { index, create } from '@/routes/campaign';
+import { history as indexHistory } from '@/routes/campaignsHistory';
 import { index as media } from '@/routes/media';
 import { index as user } from '@/routes/user';
 import { index as tokens } from '@/routes/centertokens';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Users, KeyRound, SquarePlus, List, Handshake, Film } from 'lucide-react';
+import { Users, KeyRound, History,SquarePlus, List, Handshake, Film } from 'lucide-react';
 import { lazy } from 'react';
 import useAuth from '@/hooks/useAuth';
 const Logo = lazy(() => import('@/components/app-logo'));
@@ -47,11 +48,11 @@ export function AppSidebar() {
             href: agreement().url,
             icon: Handshake,
         }
-        // , {
-        //     title: 'Panel de control',
-        //     href: dashboard(),
-        //     icon: LayoutGrid,
-        // },
+        , {
+            title: 'Historial de campañas',
+            href: indexHistory().url,
+            icon: History,
+        },
 
     ] : [];
 

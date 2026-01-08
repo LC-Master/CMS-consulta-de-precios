@@ -111,6 +111,7 @@ export default function AgreementsIndex({ agreements, filters = {}, statuses, fl
                         {
                             type: 'search',
                             key: 'search',
+                            label: 'Buscar por nombre o RIF',
                             value: search,
                             placeholder: 'Buscar por nombre o RIF...',
                             onChange: setSearch,
@@ -118,6 +119,7 @@ export default function AgreementsIndex({ agreements, filters = {}, statuses, fl
                         {
                             type: 'select',
                             key: 'status',
+                            label: 'Estatus',
                             value: status,
                             placeholder: 'Filtrar por estado',
                             options: [
@@ -129,7 +131,14 @@ export default function AgreementsIndex({ agreements, filters = {}, statuses, fl
                             ],
                             onChange: setStatus,
                         },
-
+                        {
+                            type: 'reset',
+                            onReset: () => {
+                                setSearch('');
+                                setStatus('');
+                            },
+                            key: 'reset',
+                        }
                     ]}
                 />
 

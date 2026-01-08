@@ -26,16 +26,25 @@ Route::middleware(['auth', 'verified', 'role:admin|publicidad'])->group(function
         'media' => 'media'
     ]);
     Route::get('/media/cdn/{media}', [MediaController::class, 'preview']);
-    Route::resource('campaign', CampaignController::class);
+    Route::resource('campaign', CampaignController::class)->names([
+        'index' => 'campaign.index',
+        'create' => 'campaign.create',
+        'store' => 'campaign.store',
+        'show' => 'campaign.show',
+        'edit' => 'campaign.edit',
+        'update' => 'campaign.update',
+        'destroy' => 'campaign.destroy',
+    ]);
     Route::resource('timeline', TimeLineController::class);
     Route::resource('agreement', AgreementController::class);
     Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
     Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
 
-    Route::prefix('history/campaigns')->group(function () {
-        Route::get('/', [CampaignHistoryController::class, 'index'])->name('campaigns.history');
-        Route::post('{id}/restore', [CampaignHistoryController::class, 'restore'])->name('campaigns.restore');
-        Route::post('{id}/clone', [CampaignHistoryController::class, 'clone'])->name('campaigns.clone');
+    Route::prefix('/history/campaigns')->group(function () {
+        Route::get('/', [CampaignHistoryController::class, 'index'])->name('campaignsHistory.history');
+        Route::get('{campaign}', [CampaignHistoryController::class, 'show'])->name('campaignsHistory.show')->withTrashed();
+        Route::post('{campaign}/restore', [CampaignHistoryController::class, 'restore'])->name('campaignsHistory.restore')->withTrashed();
+        Route::post('{campaign}/clone', [CampaignHistoryController::class, 'clone'])->name('campaignsHistory.clone')->withTrashed();
     });
 });
 Route::middleware(['auth', 'verified', 'role:admin', 'password.confirm'])->group(function () {

@@ -6,6 +6,7 @@ export type FilterConfig =
     | {
           type: 'search';
           key: string;
+          label: string;
           placeholder?: string;
           value: string;
           onChange: (value: string) => void;
@@ -13,8 +14,23 @@ export type FilterConfig =
     | {
           type: 'select';
           key: string;
+          label: string;
           placeholder?: string;
           value: string | number;
           options: { value: string | number; label: string }[];
           onChange: (value: string) => void;
+      }
+    | {
+          type: 'date';
+          key: string;
+          label: string;
+          placeholder?: string;
+          value: string;
+          onChange: (value: string) => void;
+      }
+    | {
+          type: 'reset';
+          key: string;
+          label?: string;
+          onReset: () => void;
       };

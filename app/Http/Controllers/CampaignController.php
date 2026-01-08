@@ -13,6 +13,7 @@ use App\Models\Center;
 use App\Models\Department;
 use App\Models\Media;
 use App\Models\Status;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +38,7 @@ class CampaignController extends Controller
             $query->where('status_id', $request->input('status'));
         }
 
-        $statuses = Status::where('status', '!=', CampaignStatus::FINISHED->value)->get(['id', 'status']);
+        $statuses = Status::where('status', '!=', value: CampaignStatus::FINISHED->value)->get(['id', 'status']);
         return Inertia::render('Campaign/Index', [
             'campaigns' => Inertia::scroll($query->latest()->paginate(10)->withQueryString()),
             'filters' => $request->only(['search', 'status']),
@@ -63,7 +64,6 @@ class CampaignController extends Controller
     public function store(StoreCampaignRequest $request, CreateCampaignAction $createCampaignAction): RedirectResponse
     {
         try {
-
             $campaign = $createCampaignAction->execute($request->validated());
             Auth::user()?->notify(new \App\Notifications\Campaigns\CampaignCreatedNotification(campaign: $campaign));
             return to_route('campaign.index')
@@ -83,9 +83,7 @@ class CampaignController extends Controller
         $campaign->load([
             'status',
             'department:id,name',
-            'agreement' => function ($query) {
-                $query->withTrashed()->select('id', 'name');
-            },
+            'agreement' => fn($query) => $query->withTrashed()->select('id', 'name'),
             'centers:id,code,name',
             'media:id,name,mime_type,duration_seconds',
         ]);
@@ -151,8 +149,32 @@ class CampaignController extends Controller
 
     public function destroy(Campaign $campaign)
     {
+        $campaign->delete();
+
+        $campaign->load([
+            'department',
+            'updatedBy',
+            'status',
+            'user',
+            'agreement' => fn($q) => $q->withTrashed()
+
+        ]);
+
         try {
-            $campaign->delete();
+
+            if ($campaign->user) {
+                $campaign->user->notify(new \App\Notifications\Campaigns\CampaignDeletedNotification($campaign));
+            }
+
+            $admins = User::whereHas('roles', fn($q) => $q->where('name', 'admin'))->get();
+            if ($admins->isNotEmpty()) {
+                \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\Campaigns\CampaignDeletedNotification($campaign));
+            }
+
+            $referer = request()->headers->get('referer');
+            if ($referer && str_contains($referer, '/history/campaigns')) {
+                return back()->with('success', 'Campaña eliminada permanentemente.');
+            }
 
             return to_route('campaign.index')
                 ->with('success', 'Campaña eliminada.');

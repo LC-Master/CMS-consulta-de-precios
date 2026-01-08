@@ -48,8 +48,20 @@ class Campaign extends Model
                 $campaign->user_id = auth()->id();
             }
         });
+        static::updating(function ($campaign) {
+            if (auth()->check()) {
+                $campaign->updated_by = auth()->id();
+            }
+        });
+        static::deleting(function ($campaign) {
+            if (auth()->check()) {
+                $campaign->updated_by = auth()->id();
+                $campaign->save();
+            }
+        });
     }
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
     protected function startAt(): Attribute
@@ -85,6 +97,10 @@ class Campaign extends Model
     public function centers()
     {
         return $this->belongsToMany(Center::class, 'campaign_centers')->withTimestamps();
+    }
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 
     public function status()
