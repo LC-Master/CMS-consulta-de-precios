@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/media';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
 import { MediaItem } from '@/types/campaign/index.types';
-import { Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { mediaNameNormalizer, formatBytes } from '@/helpers/mediaTools';
 import { CircleAlert, DownloadCloud, ArrowLeft, Book, ChevronRight } from 'lucide-react';
 import { show } from '@/routes/campaign';
@@ -69,6 +69,7 @@ export default function MediaShow({ media }: { media: MediaItem }) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs(`Detalle de medio - ${media.name}`, index().url)}>
+            <Head title={`Detalle de medio - ${media.name}`} />
             <div className="flex bg-gray-100 flex-col">
                 <div className="space-y-2 ml-2 p-4">
                     <h1 className="text-3xl font-bold">Detalle de medio</h1>

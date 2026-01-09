@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout'
-import { useForm, Link } from '@inertiajs/react'
+import { useForm, Link, Head } from '@inertiajs/react'
 import Select from 'react-select'
 import { Option, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
@@ -63,6 +63,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar campaña', index().url)}>
             {ToastComponent.ToastContainer()}
+            <Head title="Edición de campaña" />
             <div className="p-6 space-y-6">
                 <div className='ml-2'>
                     <h1 className="text-3xl font-bold">Edición de campaña</h1>

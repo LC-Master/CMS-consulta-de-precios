@@ -3,7 +3,7 @@ import AppLayout from "@/layouts/app-layout";
 import { index } from "@/routes/campaign";
 import { breadcrumbs } from "@/helpers/breadcrumbs";
 import { CampaignExtended } from "@/types/campaign/index.types";
-import { Link } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import { Building, CalendarDays, CalendarX, Handshake, Server, SquareLibrary, Store, Sun, X,Moon } from "lucide-react";
 import { formatDate, isVideo } from "@/helpers/mediaTools";
 
@@ -18,6 +18,7 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Detalles de campaña', index().url)}>
+            <Head title="Detalles de campaña" />
             <div className="p-6 space-y-6">
                 <div>
                     <div className="mb-6 ml-2">

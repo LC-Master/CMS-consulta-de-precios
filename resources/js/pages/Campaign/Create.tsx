@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout'
-import { useForm, Link } from '@inertiajs/react'
+import { useForm, Link,Head } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
@@ -69,6 +69,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
     return (
         <AppLayout breadcrumbs={breadcrumbs('Crear Campaña', index().url)}>
             {ToastComponent.ToastContainer()}
+            <Head title="Crear Campaña" />
             <div className="p-6 space-y-6">
                 <div className='ml-2'>
                     <h1 className="text-3xl font-bold">Crea una nueva campaña</h1>

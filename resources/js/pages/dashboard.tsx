@@ -1,7 +1,8 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { breadcrumbs } from '@/helpers/breadcrumbs';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
+import { InitialStats } from '@/types/dashboard/index.type';
 import { Head } from '@inertiajs/react';
 import {
     Chart as ChartJS,
@@ -18,35 +19,10 @@ import { Line, Bar } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Panel de control',
-        href: dashboard().url,
-    },
-];
-
-type InitialStats = {
-    labels: string[];
-    campaigns: number[];
-    media: number[];
-    totals: {
-        campaigns_total: number;
-        campaigns_deleted: number;
-        media_total: number;
-        users_total: number;
-        campaigns_active?: number;
-        campaigns_pending?: number;
-        campaigns_finished?: number;
-        avg_campaign_days?: number;
-    };
-    top_media?: { mime_type: string; count: number }[];
-    recent_campaigns?: Array<{ id: string; title: string; created_at: string; start_at: string | null; end_at: string | null; user?: string }>;
-};
-
 export default function Dashboard({ initialStats }: { initialStats: InitialStats }) {
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs('Panel de control', dashboard().url)}>
             <Head title="Panel de control" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">

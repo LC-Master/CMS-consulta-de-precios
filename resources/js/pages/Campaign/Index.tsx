@@ -98,12 +98,8 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
         <AppLayout breadcrumbs={breadcrumbs('Lista de campañas', index().url)}>
             {ToastContainer()}
             <Head title="Lista de campañas" />
-            {isOpen && (
-                <FinishCampaignModal campaignId={campaignId} closeModal={closeModal} setCampaignId={setCampaignId} />
-            )}
-            {isOpenDelete && (
-                <DeleteCampaignModal campaignId={campaignId} closeDeleteModal={closeDeleteModal} />
-            )}
+            <FinishCampaignModal isOpen={isOpen} campaignId={campaignId} closeModal={closeModal} setCampaignId={setCampaignId} />
+            <DeleteCampaignModal isOpen={isOpenDelete} campaignId={campaignId} closeDeleteModal={closeDeleteModal} />
             <div className="space-y-4 px-4 pb-4">
                 <Filter
                     filters={[

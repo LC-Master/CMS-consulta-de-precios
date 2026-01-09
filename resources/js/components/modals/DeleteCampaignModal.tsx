@@ -5,7 +5,8 @@ import Modal from "../Modal";
 import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
 
-export default function DeleteCampaignModal({ campaignId, closeDeleteModal }: {
+export default function DeleteCampaignModal({ isOpen, campaignId, closeDeleteModal }: {
+    isOpen: boolean,
     campaignId: string | null,
     closeDeleteModal: () => void
 }) {
@@ -15,7 +16,7 @@ export default function DeleteCampaignModal({ campaignId, closeDeleteModal }: {
         const timer = setTimeout(() => setCount(count - 1), 1000);
         return () => clearTimeout(timer);
     }, [count]);
-
+    if (!isOpen) return null
     return (
         <Modal className="w-96 bg-white p-6 rounded-lg" closeModal={closeDeleteModal}>
             <div className="flex items-start gap-4">

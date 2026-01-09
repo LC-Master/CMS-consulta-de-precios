@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { router } from '@inertiajs/react'
+import { router, Head } from '@inertiajs/react'
 import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Filter } from '@/components/Filter';
@@ -68,8 +68,8 @@ export default function CampaignsHistoryIndex({ campaigns, filters = {}, statuse
                             <span>Ver</span>
                         </ActionMenu.ItemLink>
 
-                        <ActionMenu.Item onClick={()=>{
-                            router.post(clone({id:a.id}).url)
+                        <ActionMenu.Item onClick={() => {
+                            router.post(clone({ id: a.id }).url)
                         }}>
                             <Copy className="w-4 h-4" />
                             <span>Duplicar</span>
@@ -116,7 +116,7 @@ export default function CampaignsHistoryIndex({ campaigns, filters = {}, statuse
     return (
         <AppLayout breadcrumbs={breadcrumbs('Lista de campañas', index().url)}>
             {ToastContainer()}
-
+            <Head title="Lista de campañas" />
             <div className="space-y-4 px-4 pb-4">
                 <Filter
                     filters={[

@@ -2,7 +2,7 @@ import AppLayout from "@/layouts/app-layout"
 import { update, index } from "@/routes/agreement"
 import { breadcrumbs } from "@/helpers/breadcrumbs"
 import { type Agreement } from "@/types/agreement/index.types"
-import { useForm, Link } from "@inertiajs/react"
+import { useForm, Link, Head } from "@inertiajs/react"
 import { Label } from "@radix-ui/react-dropdown-menu"
 import { Spinner } from "@/components/ui/spinner"
 import { Save } from "lucide-react"
@@ -26,6 +26,7 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
     }
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar Convenio', index().url)}>
+            <Head title="Edición de convenio" />
             <div className="p-6 space-y-6">
                 <div className="ml-4 mb-4 flex items-center justify-between">
                     <div>

@@ -3,7 +3,9 @@ import { router } from "@inertiajs/react";
 import Modal from "../Modal";
 import { Button } from "../ui/button";
 
-export default function DeleteMedia({ closeModal, mediaId, setMediaId }: { closeModal: () => void; mediaId: string; setMediaId: (id: string) => void }) {
+export default function DeleteMedia({isOpen, closeModal, mediaId, setMediaId }: { isOpen: boolean; closeModal: () => void; mediaId: string; setMediaId: (id: string) => void }) {
+    if (!isOpen) return null;
+
     return (<Modal className='w-90 bg-white p-6 ' closeModal={closeModal}>
         <h2 className="text-lg font-semibold mb-4">Confirmar eliminación de media</h2>
         <p className="mb-6">¿Estás seguro de que deseas eliminar este media? Esta acción no se puede deshacer.</p>

@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +25,7 @@ export default function UserCreate({ roles }: PropsCreatePage) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Crear Usuario', index().url)}>
+            <Head title="Crear Usuario" />
             <div className="grid place-items-center py-6 px-4 sm:px-6 lg:px-8">
                 <div className="grid gap-2">
                     <h2 className="text-2xl font-bold tracking-tight text-gray-900">

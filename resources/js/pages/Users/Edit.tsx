@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { PropsEditPage } from '@/types/user/index.types';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,7 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar usuario', edit({ id: user.id }).url)}>
+            <Head title="Editar usuario" />
             <div className="flex flex-col items-center py-6 px-4 sm:px-6 lg:px-8">
                 <div className="w-full flex justify-start ml-86">
                     <div className="flex flex-col gap-2 items-start">

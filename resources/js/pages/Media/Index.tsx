@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { router } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
 import { Eye, Trash, Search } from 'lucide-react'
 import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
@@ -94,7 +94,8 @@ export default function MediaIndex({ medias, filters = {}, mimeTypes = [], flash
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Lista de multimedia', index().url)}>
-            {isOpen && (<DeleteMedia closeModal={closeModal} mediaId={mediaId} setMediaId={setMediaId} />)}
+            <Head title="Lista de multimedia" />
+            <DeleteMedia isOpen={isOpen} closeModal={closeModal} mediaId={mediaId} setMediaId={setMediaId} />
             <div className="space-y-4 px-4 pb-4">
                 {ToastContainer()}
                 <div className="flex flex-col sm:flex-row gap-4 mt-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">

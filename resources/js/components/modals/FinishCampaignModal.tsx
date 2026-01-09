@@ -3,7 +3,8 @@ import { router } from "@inertiajs/react";
 import Modal from "../Modal";
 import { Button } from "../ui/button";
 
-export default function FinishCampaignModal({ closeModal, campaignId, setCampaignId }: { closeModal: () => void; campaignId: string | null; setCampaignId: React.Dispatch<React.SetStateAction<string | null>> }) {
+export default function FinishCampaignModal({ isOpen, closeModal, campaignId, setCampaignId }: { isOpen: boolean; closeModal: () => void; campaignId: string | null; setCampaignId: React.Dispatch<React.SetStateAction<string | null>> }) {
+    if (!isOpen) return null
     return (
         <Modal className='w-90 bg-white p-6 ' closeModal={closeModal}>
             <h2 className="text-lg font-semibold mb-4">Confirmar finalización de campaña</h2>

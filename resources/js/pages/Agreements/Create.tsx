@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout'
 import { index, store } from '@/routes/agreement'
 import { breadcrumbs } from '@/helpers/breadcrumbs'
-import { useForm, Link } from '@inertiajs/react'
+import { useForm, Link, Head } from '@inertiajs/react'
 import { Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
@@ -28,6 +28,7 @@ export default function AgreementCreate() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Crear Convenio', index().url)}>
+            <Head title="Crear Convenio" />
             <div className="p-6 space-y-6">
                 <div className="ml-4 mb-4">
                     <h1 className="text-4xl font-semibold leading-tight text-gray-800">Crear Convenio</h1>
