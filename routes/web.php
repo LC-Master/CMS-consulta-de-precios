@@ -1,36 +1,29 @@
 <?php
 
-use App\Http\Controllers\CampaignController;
-use App\Http\Controllers\TimeLineController;
 use App\Http\Controllers\AgreementController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\ThumbnailController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
-use Laravel\Fortify\Features; 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ActivityLogController;
 
-Route::get('/', function (Request $req) {
-    return Inertia::render('welcome', [
-        'canRegister' => Features::enabled(Features::registration()),
+Route::middleware(['auth', 'verified', 'role:admin|publicidad'])->group(function () {
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    Route::resource('media', MediaController::class)->parameters([
+        'media' => 'media'
     ]);
-})->name('home');
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-
-    Route::resource('campaign', CampaignController::class);
-    Route::resource('timeline', TimeLineController::class);
+    Route::get('/media/cdn/{media}', [MediaController::class, 'preview']);
+    
+    Route::resource('logs', ActivityLogController::class)->only(['index']);
+    // Route::resource('timeline', TimeLineController::class);
     Route::resource('agreement', AgreementController::class);
+    Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
+    Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
+    
+
 });
 
-Route::get('/video', function () {
-    return Inertia::render('video');
-});
-
-Route::get('/files', function () {
-    return response()->file(Storage::disk('public')->path('1416529-hd_1920_1080_30fps.mp4'));
-});
-
-require __DIR__.'/settings.php';
-
+require __DIR__ . '/campaign.php';
+require __DIR__ . '/admin.php';
+require __DIR__ . '/settings.php';

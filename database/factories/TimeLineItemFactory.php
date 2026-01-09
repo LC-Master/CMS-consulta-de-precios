@@ -13,7 +13,6 @@ class TimeLineItemFactory extends Factory
         return [
             'campaign_id' => Campaign::factory(),
             'media_id' => Media::factory(),
-            'scheduled_at' => $this->faker->time('H:i:s'),
         ];
     }
 }
