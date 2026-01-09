@@ -10,19 +10,26 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('campaign_logs', function (Blueprint $table) {
+        Schema::create('activity_logs', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('campaign_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('action', 100);
-            $table->string('level', 20);
+
+            $table->string('subject_id')->nullable();
+            $table->string('subject_type')->nullable();
+
+            $table->foreignId('user_id')->constrained();
+
+            $table->string('action', 100); 
+            $table->string('level', 20);  
             $table->text('message')->nullable();
-            $table->json('properties')->nullable(); 
+            $table->json('properties')->nullable();
+
             $table->ipAddress('ip_address')->nullable();
             $table->text('user_agent')->nullable();
             $table->text('referer')->nullable();
-            $table->timestamp('created_at')->useCurrent(); 
-            $table->index(['campaign_id', 'user_id']);
+
+            $table->timestamp('created_at')->useCurrent();
+
+            $table->index(['subject_id', 'subject_type']);
             $table->index('action');
             $table->index('created_at');
         });
@@ -33,6 +40,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaign_logs');
+        Schema::dropIfExists('activity_logs');
     }
 };

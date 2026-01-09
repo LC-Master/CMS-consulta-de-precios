@@ -1,0 +1,44 @@
+import { LogActionsEnum, LogLevelEnum } from '@/enums/LogsEnum';
+import { User as UserType } from '../user/index.types';
+
+export type Log = {
+    id: string;
+    subject_id: string;
+    subject_type: string;
+    user_id: string;
+    action: LogActionsEnum;
+    level: LogLevelEnum;
+    message: string;
+    properties: Properties;
+    ip_address: string;
+    user_agent: string;
+    referer: string;
+    created_at: string;
+    user: User;
+};
+
+export type Properties = {
+    title: string;
+    changes: Changes;
+};
+
+export type Changes = {
+    [key: string]: any;
+    status_id: string;
+    updated_by: number;
+    updated_at: string;
+};
+
+export type User = Pick<UserType, 'id' | 'name'>;
+
+export type Props = {
+    flash?: { success?: string; error?: string };
+    logs: { data: Log[] };
+    filters: {
+        search?: string;
+        status?: string;
+        type?: string;
+        ended_at?: string;
+        started_at?: string;
+    };
+};

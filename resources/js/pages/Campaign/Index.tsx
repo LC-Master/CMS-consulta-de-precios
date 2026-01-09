@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { router } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
 import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Filter } from '@/components/Filter';
@@ -11,13 +11,13 @@ import { Campaign, Props } from '@/types/campaign/index.types';
 import useToast from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react'
-import { edit, index, show, activate, finish } from '@/routes/campaign';
-import Modal from '@/components/Modal';
+import { edit, index, show, activate } from '@/routes/campaign';
 import useModal from '@/hooks/use-modal';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
 import { PillStatus } from '@/components/ui/PillStatus';
 import { StatusCampaignEnum } from '@/enums/statusCampaignEnum';
 import DeleteCampaignModal from '@/components/modals/DeleteCampaignModal';
+import FinishCampaignModal from '@/components/modals/FinishCampaignModal';
 
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [], flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
@@ -97,29 +97,10 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
     return (
         <AppLayout breadcrumbs={breadcrumbs('Lista de campañas', index().url)}>
             {ToastContainer()}
-            {isOpen && (<Modal className='w-90 bg-white p-6 ' closeModal={closeModal}>
-                <h2 className="text-lg font-semibold mb-4">Confirmar finalización de campaña</h2>
-                <p className="mb-6">¿Estás seguro de que deseas finalizar esta campaña? Esta acción no se puede deshacer.</p>
-                <div className="flex justify-end w- gap-4">
-                    <Button className='bg-locatel-oscuro text-white hover:bg-green-800' onClick={closeModal}>Cancelar</Button>
-                    <Button
-                        className="bg-red-600 text-white hover:bg-red-700"
-                        onClick={() => {
-                            router.visit(finish({ id: campaignId! }).url, {
-                                method: 'get',
-                                preserveState: false,
-                                preserveScroll: true,
-                                onSuccess: () => {
-                                    closeModal();
-                                    setCampaignId(null);
-                                },
-                            });
-                        }}
-                    >
-                        Finalizar campaña
-                    </Button>
-                </div>
-            </Modal>)}
+            <Head title="Lista de campañas" />
+            {isOpen && (
+                <FinishCampaignModal campaignId={campaignId} closeModal={closeModal} setCampaignId={setCampaignId} />
+            )}
             {isOpenDelete && (
                 <DeleteCampaignModal campaignId={campaignId} closeDeleteModal={closeDeleteModal} />
             )}

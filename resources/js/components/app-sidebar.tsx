@@ -12,15 +12,17 @@ import {
 } from '@/components/ui/sidebar';
 import { create as agreementCreate, index as agreement } from '@/routes/agreement';
 import { index, create } from '@/routes/campaign';
-import { history as indexHistory,
- } from '@/routes/campaignsHistory';
+import { index as indexActivityLog } from '@/routes/logs';
+import {
+    history as indexHistory,
+} from '@/routes/campaignsHistory';
 import { show as calendar } from '@/routes/calendar';
 import { index as media } from '@/routes/media';
 import { index as user } from '@/routes/user';
 import { index as tokens } from '@/routes/centertokens';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Users, KeyRound, History,SquarePlus, List,Calendar, Handshake, Film, ChartBar } from 'lucide-react';
+import { Users, KeyRound, History, SquarePlus, List, Calendar, Handshake, Film, ChartBar, Logs } from 'lucide-react';
 import { lazy } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { dashboard } from '@/routes';
@@ -86,6 +88,11 @@ export function AppSidebar() {
             title: 'Listado de Medios',
             href: media().url,
             icon: Film,
+        },
+        {
+            title: 'Logs de actividad',
+            href: indexActivityLog().url,
+            icon: Logs,
         },
         ...adminElement
     ];
