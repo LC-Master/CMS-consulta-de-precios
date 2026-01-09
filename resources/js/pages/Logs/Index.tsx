@@ -16,9 +16,12 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-export default function LogsIndex({ logs, filters }: Props) {
+export default function LogsIndex({ logs, filters, elements }: Props) {
     const [auditLog, setAuditLog] = useState<Log | null>(null);
+    const [element, setElement] = useState<string>(filters.element || '')
+    const [search, setSearch] = useState(filters.search || '')
     const { isOpen, closeModal, openModal } = useModal(false)
+
     const handleShowAudit = (log: Log) => {
         setAuditLog(log);
         openModal();
@@ -122,15 +125,14 @@ export default function LogsIndex({ logs, filters }: Props) {
             ),
         },
     ];
-    const [search, setSearch] = useState(filters.search || '')
 
     useUpdateEffect(() => {
         router.get(
             window.location.pathname,
-            { search },
+            { search, element },
             { preserveState: true, replace: true, preserveScroll: true }
         )
-    }, [search])
+    }, [search, element])
     return (
         <AppLayout breadcrumbs={breadcrumbs('Logs de actividad', index().url)}>
             <Head title="Logs de actividad" />
@@ -143,11 +145,19 @@ export default function LogsIndex({ logs, filters }: Props) {
                             type: 'search',
                             key: 'search',
                             value: search,
-                            label: 'Buscar por título',
-                            placeholder: 'Buscar por título...',
+                            label: 'Buscar por IP, Usuario o Acción',
+                            placeholder: 'Buscar por IP, Usuario o Acción',
                             onChange: setSearch,
                         },
-
+                        {
+                            type: 'select',
+                            key: 'elements',
+                            value: element,
+                            label: 'Tipo de log',
+                            placeholder: 'Tipo',
+                            options: elements,
+                            onChange: (value: string) => setElement(value),
+                        },
                         {
                             type: 'reset',
                             onReset: () => {

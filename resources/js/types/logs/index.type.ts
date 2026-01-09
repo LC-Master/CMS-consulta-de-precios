@@ -32,9 +32,11 @@ export type Changes = {
 export type User = Pick<UserType, 'id' | 'name'>;
 
 export type Props = {
+    elements: { value: string; label: string }[];
     flash?: { success?: string; error?: string };
     logs: { data: Log[] };
     filters: {
+        element?: string;
         search?: string;
         status?: string;
         type?: string;

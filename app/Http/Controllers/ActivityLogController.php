@@ -32,14 +32,18 @@ class ActivityLogController extends Controller
             }
         }
         $elements = [
-            'campaign' => 'campañas',
+            (object) ['value' => 'campaign', 'label' => 'campañas'],
         ];
+
         if ($user->hasRole('admin')) {
-            $elements['user'] = 'usuarios';
-            $elements['center'] = 'tokens de centro';
+            $elements[] = (object) ['value' => 'user', 'label' => 'usuarios'];
+            $elements[] = (object) ['value' => 'center', 'label' => 'tokens de centro'];
         }
         if ($request->has('search')) {
-            $query->where('message', 'like', "%{$request->input('search')}%");
+            $query->where('message', 'like', "%{$request->input('search')}%")->orWhere('action', 'like', "%{$request->input('search')}%")->orWhereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->input('search')}%");
+            })->orWhere('ip_address', 'like', "%{$request->input('search')}%")
+                ->orWhere('properties->title', 'like', "%{$request->input('search')}%");
         }
 
         return Inertia::render('Logs/Index', [
