@@ -21,6 +21,11 @@ return new class extends Migration
             $table->unsignedBigInteger('duration_seconds')->nullable();
             $table->string('checksum')->nullable();
             $table->foreignId('created_by')->constrained('users');
+
+            $table->index(['disk', 'path']);
+            $table->index('mime_type');
+            $table->index('checksum');
+
             $table->timestamps();
         });
     }

@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string('type');
             $table->text('description');
             $table->boolean('is_active')->default(true);
+
+            $table->index(['center_id', 'is_active']);
+            $table->index('type');
+
             $table->timestamps();
         });
     }

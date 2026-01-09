@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->unsignedInteger('status')->default(1)->nullable(false);
+
+            $table->index('status');
+
             $table->timestamps();
         });
 

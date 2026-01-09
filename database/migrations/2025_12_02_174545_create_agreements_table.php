@@ -23,6 +23,12 @@ return new class extends Migration {
             $table->boolean('is_active')->default(true);
             $table->text('observations')->nullable();
             $table->softDeletes();
+
+            $table->index('is_active');
+            $table->index(['start_date', 'end_date']);
+            $table->index('tax_id');
+            $table->index('deleted_at');
+
             $table->timestamps();
         });
     }

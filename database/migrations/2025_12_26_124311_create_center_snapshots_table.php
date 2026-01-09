@@ -15,6 +15,10 @@ return new class extends Migration {
             $table->foreignUuid('center_id')->constrained()->onDelete('cascade');
             $table->jsonb('snapshot_json');
             $table->string('version_hash', 64);
+
+            $table->index(['center_id', 'created_at']);
+            $table->index('version_hash');
+
             $table->timestamps();
         });
     }

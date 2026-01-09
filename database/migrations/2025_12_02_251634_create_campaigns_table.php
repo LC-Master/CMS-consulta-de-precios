@@ -21,6 +21,12 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained();
             $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->softDeletes();
+
+            $table->index(['start_at', 'end_at']);
+            $table->index(['status_id', 'start_at']);
+            $table->index(['department_id', 'status_id']);
+            $table->index('deleted_at');
+
             $table->timestamps();
         });
     }

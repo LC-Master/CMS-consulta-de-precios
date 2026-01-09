@@ -19,6 +19,10 @@ return new class extends Migration
                 ->constrained();
             $table->enum('slot', ['am', 'pm']);   
             $table->unsignedInteger('position');  
+
+            $table->index(['campaign_id', 'slot', 'position']);
+            $table->index(['campaign_id', 'media_id']);
+
             $table->timestamps();
         });
     }

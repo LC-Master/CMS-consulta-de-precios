@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string('mime_type');
             $table->unsignedBigInteger('size');
             $table->foreignUuid('media_id')->constrained()->onDelete('cascade');
+
+            $table->index(['media_id', 'created_at']);
+            $table->index('mime_type');
+
             $table->timestamps();
         });
     }
