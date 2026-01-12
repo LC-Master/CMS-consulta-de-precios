@@ -8,31 +8,17 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import esLocale from '@fullcalendar/core/locales/es';
 import { EventInput } from '@fullcalendar/core';
 import { index, show } from "@/routes/campaign";
-
-interface CampaignEvent {
-    id: number;
-    title: string;
-    start: string;
-    end: string;
-    color: string;
-    extendedProps: {
-        department: string;
-        agreement: string;
-        centers: string[]; // Usamos el array de centros que viene del controller
-    }
-}
+import { CampaignEvent } from "@/types/calendar/index.type";
 
 export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) {
     const locatelGreen = "#008a4f";
     const [selectedCenter, setSelectedCenter] = useState<string>('all');
 
-    // 1. Extraer centros únicos del array 'centers'
     const centersList = useMemo(() => {
         const all = campaigns.flatMap(c => c.extendedProps.centers || []);
         return ['all', ...Array.from(new Set(all))].filter(Boolean);
     }, [campaigns]);
 
-    // 2. Filtrar por existencia en el array
     const filteredEvents: EventInput[] = useMemo(() => {
         return campaigns
             .filter(c => selectedCenter === 'all' || c.extendedProps.centers.includes(selectedCenter))
@@ -66,7 +52,7 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
 
                     <div className="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
                         <h3 className="text-sm font-black text-[#008a4f] uppercase tracking-tighter mb-4">
-                            Filtrar por Centro Médico
+                            Filtrar por Centro
                         </h3>
                         <div className="flex flex-wrap gap-3">
                             {centersList.map(name => (
