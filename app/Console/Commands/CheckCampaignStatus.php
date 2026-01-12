@@ -46,7 +46,7 @@ class CheckCampaignStatus extends Command
         $affectedRows = $campaigns->count();
 
         foreach ($campaigns as $campaign) {
-            $campaign->getAttribute('status_id') = $statusFinalizada->getKey();
+            $campaign->setAttribute('status_id', $statusFinalizada->getKey());
             $campaign->save();
 
             if (method_exists($campaign, 'user')) {
