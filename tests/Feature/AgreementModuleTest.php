@@ -65,7 +65,7 @@ test('puede registrar un nuevo convenio correctamente (Store)', function () {
         'legal_name' => 'Soluciones C.A.',
         'tax_id' => 'J-123456789',
         'contact_person' => 'Carlos Gerente',
-        'contact_email' => 'gerencia@soluciones.com',
+        'contact_email' => 'gerencia@gmail.com',
         'contact_phone' => '04141234567',
         'start_date' => '2026-01-01',
         'end_date' => '2026-12-31',
