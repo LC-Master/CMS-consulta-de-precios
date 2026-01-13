@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\User;
 
 class MediaFactory extends Factory
 {
@@ -19,7 +20,7 @@ class MediaFactory extends Factory
             'size' => $this->faker->numberBetween(1024, 50000000),
             'duration_seconds' => $isVideo ? $this->faker->numberBetween(10, 300) : null,
             'checksum' => md5($this->faker->text()),
-            'created_by' => 1,
+            'created_by' => User::factory(),
         ];
     }
 }
