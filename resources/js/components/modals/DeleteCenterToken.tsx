@@ -12,7 +12,7 @@ export default function DeleteCenterToken({ closeModal, tokenId }: { closeModal:
         const timer = setTimeout(() => setCounter(counter - 1), 1000);
         return () => clearTimeout(timer);
     }, [counter]);
-    const { delete: deleteToken } = useForm("delete")
+    const { delete: deleteToken, processing } = useForm("delete")
 
     return (
         <Modal blur={false} className="bg-white" closeModal={closeModal}>
@@ -45,7 +45,7 @@ export default function DeleteCenterToken({ closeModal, tokenId }: { closeModal:
                     </Button>
                     <Button
                         type="submit"
-                        disabled={counter > 0}
+                        disabled={counter > 0 || processing}
                         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
                     >
                         Eliminar {counter > 0 ? `(${counter})` : ''}

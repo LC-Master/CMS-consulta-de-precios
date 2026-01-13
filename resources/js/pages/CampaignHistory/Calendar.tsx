@@ -9,6 +9,7 @@ import esLocale from '@fullcalendar/core/locales/es';
 import { EventInput } from '@fullcalendar/core';
 import { index, show } from "@/routes/campaign";
 import { CampaignEvent } from "@/types/calendar/index.type";
+import { Button } from "@/components/ui/button";
 
 export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) {
     const locatelGreen = "#008a4f";
@@ -56,7 +57,7 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
                         </h3>
                         <div className="flex flex-wrap gap-3">
                             {centersList.map(name => (
-                                <button
+                                <Button
                                     key={name}
                                     onClick={() => setSelectedCenter(name)}
                                     className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${selectedCenter === name
@@ -65,7 +66,7 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
                                         }`}
                                 >
                                     {name === 'all' ? 'TODOS LOS CENTROS' : name.toUpperCase()}
-                                </button>
+                                </Button>
                             ))}
                         </div>
                     </div>

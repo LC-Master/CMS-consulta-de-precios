@@ -10,12 +10,21 @@ export default function DeleteCampaignModal({ isOpen, campaignId, closeDeleteMod
     campaignId: string | null,
     closeDeleteModal: () => void
 }) {
-    const [count, setCount] = useState(5)
+    const [count, setCount] = useState(5);
+
     useEffect(() => {
-        if (count === 0) return;
-        const timer = setTimeout(() => setCount(count - 1), 1000);
+        if (!isOpen) return;
+        const id = setTimeout(() => setCount(5), 0);
+        return () => clearTimeout(id);
+    }, [isOpen]);
+
+    // Run countdown only while modal is open
+    useEffect(() => {
+        if (!isOpen || count === 0) return;
+        const timer = setTimeout(() => setCount(c => c - 1), 1000);
         return () => clearTimeout(timer);
-    }, [count]);
+    }, [isOpen, count]);
+
     if (!isOpen) return null
     return (
         <Modal className="w-96 bg-white p-6 rounded-lg" closeModal={closeDeleteModal}>
