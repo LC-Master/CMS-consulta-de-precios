@@ -135,7 +135,6 @@ class CampaignController extends Controller
             $request->validated();
 
             $updateCampaignAction->execute($request, $campaign);
-
             return to_route('campaign.index')
                 ->with('success', 'Campaña actualizada correctamente.');
         } catch (\Throwable $e) {

@@ -4,20 +4,20 @@ import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Filter } from '@/components/Filter';
 import { Column } from '@/types/datatable.types';
-import AnchorIcon from '@/components/ui/AnchorIcon';
 import { Eye, Pencil, Trash } from 'lucide-react';
 import { DataTable } from '@/components/DataTable';
 import { Campaign, Props } from '@/types/campaign/index.types';
 import useToast from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react'
-import { edit, index, show, activate } from '@/routes/campaign';
+import { edit, index, show, activate, } from '@/routes/campaign';
 import useModal from '@/hooks/use-modal';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
 import { PillStatus } from '@/components/ui/PillStatus';
 import { StatusCampaignEnum } from '@/enums/statusCampaignEnum';
 import DeleteCampaignModal from '@/components/modals/DeleteCampaignModal';
 import FinishCampaignModal from '@/components/modals/FinishCampaignModal';
+import { ActionMenu } from '@/components/ui/ActionMenu';
 
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [], flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
@@ -62,7 +62,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                                 reset: ['campaigns', 'flash'],
                                 preserveScroll: true
                             });
-                        }} className='p-2 bg-locatel-claro h-8 text-white rounded-md'>
+                        }} className='p-2 bg-locatel-claro hover:bg-locatel-medio h-8 text-white rounded-md'>
                             <Check className='w-4 h-4' />
                         </Button>
                     ) : (
@@ -70,19 +70,30 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                             <Button title='Finalizar campaña' onClick={() => {
                                 setCampaignId(a.id);
                                 openModal();
-                            }} className='p-2 bg-red-600 h-8 text-white rounded-md'>
+                            }} className='p-2 bg-red-600 h-8 hover:bg-red-400 text-white rounded-md'>
                                 <X className='w-4 h-4' />
                             </Button>
                         )
                     )}
-                    <AnchorIcon title="Ver campaña" href={show({ id: a.id }).url} icon={Eye} />
-                    <AnchorIcon title="Editar campaña" className='p-2 bg-locatel-claro text-white rounded-md' href={edit({ id: a.id }).url} icon={Pencil} />
-                    <Button title='Eliminar Campaña' onClick={() => {
-                        setCampaignId(a.id);
-                        openModalDelete();
-                    }} className='p-2 bg-red-600 h-8 text-white rounded-md'>
-                        <Trash className='w-4 h-4' />
-                    </Button>
+                    <ActionMenu>
+                        <ActionMenu.ItemLink href={show({ id: a.id }).url}>
+                            <Eye className="w-4 h-4" />
+                            <span>Ver</span>
+                        </ActionMenu.ItemLink>
+                        <ActionMenu.ItemLink href={edit({ id: a.id }).url}>
+                            <Pencil className="w-4 h-4" />
+                            <span>Editar</span>
+                        </ActionMenu.ItemLink>
+                        <ActionMenu.Separator />
+
+                        <ActionMenu.Item variant="danger" onClick={() => {
+                            setCampaignId(a.id);
+                            openModalDelete();
+                        }}>
+                            <Trash className="w-4 h-4" />
+                            <span>Eliminar</span>
+                        </ActionMenu.Item>
+                    </ActionMenu>
                 </div>
             ),
         },

@@ -18,6 +18,7 @@ import { useMediaActions } from '@/hooks/use-media-actions'
 import InputError from '@/components/input-error'
 import useLoadOptions from '@/hooks/use-load-options'
 import useLoadEdit from '@/hooks/use-load-edit'
+import { useEffect } from 'react'
 import { CircleAlert, PlusCircle, Save, SquarePlay } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -51,14 +52,16 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
             setData('centers', todoValue ? values.filter(v => v !== todoValue) : values)
         }
     }
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        transform(data => ({
+    useEffect(() => {
+        transform((data) => ({
             ...data,
             am_media: am.map(item => item.id),
             pm_media: pm.map(item => item.id),
         }))
-        put(update({ id: campaign.id }).url, { preserveScroll: true, })
+    }, [am, pm, transform])
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        put(update({ id: campaign.id }).url)
     }
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar campaña', index().url)}>
@@ -70,7 +73,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                     <p className='text-gray-600 '>Complete el formulario a continuación para editar la campaña.</p>
                 </div>
                 <div className="shadow-[0_0_20px_rgba(0,0,0,0.08)] rounded-lg bg-white">
-                    <form id="form" onSubmit={handleSubmit} method={update({ id: campaign.id }).method} action={update({ id: campaign.id }).url} className="space-y-6" noValidate>
+                    <form id="form" onSubmit={handleSubmit} className="space-y-6" noValidate>
                         <div className='flex items-center gap-2 pl-6 pr-6 mb-4 pt-6 pb-2'>
                             <CircleAlert />
                             <h2 className='text-bold font-bold text-lg text-gray-900'>
