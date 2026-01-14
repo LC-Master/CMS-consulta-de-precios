@@ -149,14 +149,16 @@ describe('Lógica de Actualización', function () {
             'legal_name' => $agreement->legal_name,
             'tax_id' => $agreement->tax_id,
             'contact_person' => $agreement->contact_person,
-            'contact_email' => $agreement->contact_email,
+            
+            'contact_email' => 'gerencia_actualizada@gmail.com', 
+            
             'contact_phone' => $agreement->contact_phone,
     
             'start_date' => $agreement->start_date->format('Y-m-d'),
             'end_date' => $agreement->end_date->format('Y-m-d'),
             
             'observations' => 'Actualizado',
-            'is_active' => false,
+            'is_active' => false, 
         ];
     
         $this->put(route('agreement.update', $agreement), $updateData)
@@ -166,6 +168,7 @@ describe('Lógica de Actualización', function () {
         $this->assertDatabaseHas('agreements', [
             'id' => $agreement->id,
             'name' => 'Nombre Editado',
+            'contact_email' => 'gerencia_actualizada@gmail.com',
             'is_active' => 0,
         ]);
     });
