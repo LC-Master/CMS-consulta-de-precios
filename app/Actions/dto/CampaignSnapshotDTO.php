@@ -17,8 +17,7 @@ class CampaignSnapshotDTO
             'centers',
             fn($q) =>
             $q->where('centers.id', $center->getKey())
-        )
-            ->whereHas(
+        )->whereHas(
                 'status',
                 fn($q) =>
                 $q->where('status', CampaignStatus::ACTIVE->value)
