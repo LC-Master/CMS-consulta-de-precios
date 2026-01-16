@@ -26,14 +26,12 @@ class DashboardController extends Controller
         $now = Carbon::now();
         $start = $now->copy()->subMonths(5)->startOfMonth();
 
-        // labels for last 6 months
         $months = [];
         for ($i = 5; $i >= 0; $i--) {
             $m = $now->copy()->subMonths($i);
             $months[] = $m->format('Y-m');
         }
 
-        // campaigns per month
         $campaignYmExpr = "CONCAT(YEAR(created_at), '-', RIGHT('0' + CAST(MONTH(created_at) AS varchar), 2))";
         $campaignsQuery = Campaign::select(DB::raw("{$campaignYmExpr} as ym"), DB::raw('COUNT(*) as count'))
             ->where('created_at', '>=', $start)
@@ -45,7 +43,6 @@ class DashboardController extends Controller
             return isset($campaignsQuery[$ym]) ? (int) $campaignsQuery[$ym] : 0;
         }, $months);
 
-        // media per month
         $mediaYmExpr = $campaignYmExpr;
         $mediaQuery = Media::select(DB::raw("{$mediaYmExpr} as ym"), DB::raw('COUNT(*) as count'))
             ->where('created_at', '>=', $start)
@@ -57,7 +54,6 @@ class DashboardController extends Controller
             return isset($mediaQuery[$ym]) ? (int) $mediaQuery[$ym] : 0;
         }, $months);
 
-        // invented extra metrics
         $active = Campaign::where('start_at', '<=', $now)->where('end_at', '>=', $now)->count();
         $pending = Campaign::where('start_at', '>', $now)->count();
         $finished = Campaign::where('end_at', '<', $now)->count();
@@ -66,7 +62,6 @@ class DashboardController extends Controller
             ->select(DB::raw('AVG(CAST(DATEDIFF(day, start_at, end_at) AS FLOAT)) as avg_days'))
             ->value('avg_days');
 
-        // top media mimetypes (invented metric)
         $topMedia = Media::select('mime_type', DB::raw('COUNT(*) as count'))
             ->groupBy('mime_type')
             ->orderByDesc('count')
@@ -75,7 +70,6 @@ class DashboardController extends Controller
             ->map(fn($m) => ['mime_type' => $m->mime_type, 'count' => (int) $m->count])
             ->toArray();
 
-        // recent campaigns
         $recent = Campaign::with('user')->orderByDesc('created_at')->limit(5)->get(['id', 'title', 'created_at', 'start_at', 'end_at', 'user_id'])
             ->map(fn($c) => [
                 'id' => $c->id,
@@ -86,7 +80,6 @@ class DashboardController extends Controller
                 'user' => $c->user?->name,
             ])->toArray();
 
-        // totals
         $totals = [
             'campaigns_total' => Campaign::count(),
             'campaigns_deleted' => Campaign::onlyTrashed()->count(),

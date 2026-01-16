@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('code')->unique();
             $table->date('last_sync_at')->nullable();
-
             $table->index('last_sync_at');
 
             $table->timestamps();

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('size');
             $table->unsignedBigInteger('duration_seconds')->nullable();
             $table->string('checksum')->nullable();
+
             $table->foreignId('created_by')->constrained('users');
 
             $table->index(['disk', 'path']);

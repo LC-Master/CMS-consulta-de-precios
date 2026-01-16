@@ -42,6 +42,7 @@ class CampaignSnapshotDTO
                     ->map(fn($m) => [
                         'id' => $m->id,
                         'name' => $m->name,
+                        'checksum' => $m->checksum,
                         'duration_seconds' => $m->duration_seconds,
                         'slot' => $m->pivot->slot,
                         'position' => $m->pivot->position,
