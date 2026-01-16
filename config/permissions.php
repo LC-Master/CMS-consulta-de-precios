@@ -3,28 +3,61 @@
 return [
 
     'permissions' => [
-        'users.view',
+
+        'users.list',
+        'users.show',
         'users.create',
-        'users.edit',
+        'users.update',
         'users.delete',
 
-        'reports.view',
+        'tokens.list',
+        'tokens.create',
+        'tokens.delete',
 
-        'campaigns.view',
+        'campaigns.list',
+        'campaigns.show',
         'campaigns.create',
-        'campaigns.edit',
+        'campaigns.update',
         'campaigns.delete',
+
+        'agreements.list',
+        'agreements.show',
+        'agreements.create',
+        'agreements.update',
+        'agreements.delete',
+
+        'medias.list',
+        'medias.show',
+        'medias.create',
+        'medias.update',
+        'medias.delete',
+
+        'reports.view',
     ],
+
     'roles' => [
         'admin' => '*',
 
-        'mercadeo' => [
-            'users.view',
-            'reports.view',
-            'campaigns.view',
+        'publicidad' => [
+            'campaigns.list',
+            'campaigns.show',
             'campaigns.create',
-            'campaigns.edit',
-        ],
+            'campaigns.update',
+            'campaigns.delete',
 
+            'agreements.list',
+            'agreements.show',
+            'agreements.create',
+            'agreements.update',
+            'agreements.delete',
+
+            'medias.list',
+            'medias.show',
+            'medias.create',
+            'medias.update',
+            'medias.delete',
+
+            'reports.view',
+        ],
     ],
 ];

@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Handler\Media;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
+use App\Exceptions\MediaInUseException;
+
+class MediaSafeAction
+{
+    /**
+     * Create a new class instance.
+     */
+    public static function SafeAction(callable $callback, string $message = 'Ocurrió un error inesperado.')
+    {
+        try {
+            return $callback();
+        } catch (MediaInUseException $e) {
+            throw $e;
+        } catch (FileNotFoundException $e) {
+            Log::error("Archivo no encontrado en Media: " . $e->getMessage());
+            return back()->with('error', 'El archivo solicitado no se encontró en el servidor.');
+        } catch (QueryException $e) {
+            Log::error("Error de base de datos en Media: " . $e->getMessage());
+            return back()->with('error', 'Error de integridad: No se pudo completar la operación en la base de datos.');
+        } catch (\Throwable $e) {
+            $error = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[0];
+            Log::critical("Fallo inesperado en Media: " . $e->getMessage() . " en " . $error['class'] . ' METHOD ' . $error['function'] . ' línea ' . $error['line']);
+            return back()->with('error', $message);
+        }
+    }
+}
