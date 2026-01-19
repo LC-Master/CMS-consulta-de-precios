@@ -60,29 +60,45 @@ class CenterTokenController extends Controller
     /**
      * Store usa StoreCenterTokenRequest
      */
-    public function store(StoreCenterTokenRequest $request)
-    {
-        try {
-            $request->validated();
-            $center = Center::findOrFail($request->input('center_id'));
-            $token = $center->createToken($request->input('name'))->plainTextToken;
-            event(new \App\Events\CenterToken\CenterTokenEvent(
-                center: $center,
-                type: 'create',
-                tokenName: $request->input('name')
-            ));
 
-            return back()->with([
-                'success' => ['success' => 'Token creado correctamente', 'token' => $token],
-            ]);
-        } catch (\Throwable $e) {
-            Log::error('Error creating center token: ' . $e->getMessage(), ['admin_id' => auth()->id()]);
+        public function store(StoreCenterTokenRequest $request)
+        {
+            try {
 
-            return back()
-                ->withInput()
-                ->with('error', 'Ocurrió un error inesperado al crear el token.');
+                $request->validated();
+
+                $exists = PersonalAccessToken::where('tokenable_id', $request->input('center_id'))
+                    ->where('tokenable_type', Center::class)
+                    ->exists();
+
+                if ($exists) {
+                    return back()
+                        ->withInput()
+                        ->with('error', 'Ya existe un token asociado con este centro. Debe revocarlo antes de crear uno nuevo.');
+                }
+
+                $center = Center::findOrFail($request->input('center_id'));
+                
+                $token = $center->createToken($request->input('name'))->plainTextToken;
+                
+                event(new \App\Events\CenterToken\CenterTokenEvent(
+                    center: $center,
+                    type: 'create',
+                    tokenName: $request->input('name')
+                ));
+
+                return back()->with([
+                    'success' => ['success' => 'Token creado correctamente', 'token' => $token],
+                ]);
+
+            } catch (\Throwable $e) {
+                Log::error('Error creating center token: ' . $e->getMessage(), ['admin_id' => auth()->id()]);
+
+                return back()
+                    ->withInput()
+                    ->with('error', 'Ocurrió un error inesperado al crear el token.');
+            }
         }
-    }
 
     public function show(PersonalAccessToken $centerToken)
     {

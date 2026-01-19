@@ -28,8 +28,6 @@ class StoreCenterTokenRequest extends FormRequest
                 'string',
                 'uuid',
                 'exists:centers,id',
-                \Illuminate\Validation\Rule::unique('personal_access_tokens', 'tokenable_id')
-                    ->where(fn ($query) => $query->where('tokenable_type', \App\Models\Center::class)),
             ],
         ];
     }
