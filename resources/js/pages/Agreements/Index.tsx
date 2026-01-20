@@ -69,7 +69,7 @@ export default function AgreementsIndex({ agreements, filters = {}, statuses, fl
                         href={edit(a.id).url}
                         icon={Pencil}
                     />
-                    <Button title='Eliminar Campaña' onClick={() => {
+                    <Button title='Eliminar Convenio' onClick={() => {
                         setAgreementId(a.id);
                         openModal();
                     }} className='p-2 bg-red-600 h-8 text-white rounded-md'>
