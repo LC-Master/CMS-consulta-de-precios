@@ -7,6 +7,7 @@ use App\Enums\CampaignStatus;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class CampaignHistoryController extends Controller
 {
@@ -75,6 +76,7 @@ class CampaignHistoryController extends Controller
 
     public function clone(Campaign $campaign)
     {
+
         $newCampaign = $campaign->replicate();
         $newCampaign->setAttribute('deleted_at', null);
         $newCampaign->setAttribute('title', "Copia de {$campaign->getAttribute('title')}");
@@ -84,6 +86,16 @@ class CampaignHistoryController extends Controller
         $newCampaign->save();
 
         $newCampaign->centers()->attach($campaign->centers->pluck('id'));
+
+        $campaign->load('media');
+
+        foreach ($campaign->media as $mediaItem) {
+            $newCampaign->media()->attach($mediaItem->id, [
+                'id' => (string) Str::uuid(),
+                'slot' => $mediaItem->pivot->slot,
+                'position' => $mediaItem->pivot->position,
+            ]);
+        }
 
         return to_route("campaign.edit", ['campaign' => $newCampaign->getKey()])
             ->with('success', 'Campaña clonada. Revisa las fechas.');
