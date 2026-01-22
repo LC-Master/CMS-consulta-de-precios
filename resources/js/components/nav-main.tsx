@@ -40,7 +40,6 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 {items.map((item) => {
                     const mainUrl = item.url || item.href || "#";
 
-                    // (Es un Dropdown)
                     if (item.items && item.items.length > 0) {
                         return (
                             <Collapsible
@@ -53,23 +52,21 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                     <CollapsibleTrigger asChild>
                                         <SidebarMenuButton
                                             tooltip={item.title}
-                                            // AGREGADO: Clases para hover y estado abierto (blanco con texto negro)
-                                            className="transition-colors hover:bg-white hover:text-black data-[state=open]:bg-white data-[state=open]:text-black active:bg-white active:text-black"
+                                            className="h-10 text-sm transition-colors hover:bg-white hover:text-black data-[state=open]:bg-white data-[state=open]:text-black active:bg-white active:text-black"
                                         >
                                             {item.icon && <item.icon />}
-                                            <span>{item.title}</span>
+                                            <span className="font-medium">{item.title}</span>
                                             <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                         </SidebarMenuButton>
                                     </CollapsibleTrigger>
                                     <CollapsibleContent>
-                                        <SidebarMenuSub>
+                                        <SidebarMenuSub className="mt-2 space-y-1 border-l-white/30">
                                             {item.items.map((subItem) => (
                                                 <SidebarMenuSubItem key={subItem.title}>
                                                     <SidebarMenuSubButton
                                                         asChild
                                                         isActive={page.url === subItem.url}
-                                                        // AGREGADO: Clases para que el hijo también se ponga blanco al pasar el mouse
-                                                        className="transition-colors hover:bg-white hover:text-black text-white data-[active=true]:bg-white data-[active=true]:text-black"
+                                                        className="h-9 text-sm transition-colors hover:bg-white hover:text-black text-white data-[active=true]:bg-white data-[active=true]:text-black rounded-md"
                                                     >
                                                         <Link href={subItem.url} prefetch>
                                                             <span>{subItem.title}</span>
@@ -84,18 +81,17 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                         )
                     }
 
-                    // No es dropdown
                     return (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 asChild
                                 isActive={page.url === mainUrl}
                                 tooltip={{ children: item.title }}
-                                className="transition-colors hover:bg-white hover:text-black data-[active=true]:bg-white data-[active=true]:text-black"
+                                className="h-10 text-sm transition-colors hover:bg-white hover:text-black data-[active=true]:bg-white data-[active=true]:text-black"
                             >
                                 <Link href={mainUrl} prefetch>
                                     {item.icon && <item.icon />}
-                                    <span>{item.title}</span>
+                                    <span className="font-medium">{item.title}</span>
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
