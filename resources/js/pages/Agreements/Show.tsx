@@ -64,17 +64,6 @@ export default function AgreementShow({ agreement }: { agreement: Agreement }) {
                                 <p className="mt-1 text-base text-gray-900">{agreement.tax_id || '—'}</p>
                             </div>
                         </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <p className="text-sm text-gray-500">Fecha inicio</p>
-                                <p className="mt-1 text-base text-gray-900">{agreement.start_date || '—'}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Fecha fin</p>
-                                <p className="mt-1 text-base text-gray-900">{agreement.end_date || '—'}</p>
-                            </div>
-                        </div>
                     </div>
                     <div>
                         <div className="shadow-lg w-full rounded-3xl p-6 bg-white">

@@ -18,14 +18,11 @@ return new class extends Migration {
             $table->string('contact_person')->nullable();
             $table->string('contact_email')->nullable();
             $table->string('contact_phone')->nullable();
-            $table->date('start_date')->nullable();
-            $table->date('end_date')->nullable();
             $table->boolean('is_active')->default(true);
             $table->text('observations')->nullable();
             $table->softDeletes();
 
             $table->index('is_active');
-            $table->index(['start_date', 'end_date']);
             $table->index('tax_id');
             $table->index('deleted_at');
 

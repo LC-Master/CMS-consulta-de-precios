@@ -16,8 +16,6 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
         contact_email: agreement.contact_email ?? '',
         contact_phone: agreement.contact_phone ?? '',
         is_active: agreement.is_active === true || String(agreement.is_active) === '1' ? true : false,
-        start_date: agreement.start_date ?? '',
-        end_date: agreement.end_date ?? '',
         observations: agreement.observations ?? '',
     })
     const handleSubmit = (e: React.FormEvent) => {
@@ -155,33 +153,6 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
 
                         {/* Fila 4: Fechas */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label htmlFor="start_date" className="block text-sm font-bold mb-3 text-gray-700">Fecha Inicio. *</label>
-                                <input
-                                    type="date"
-                                    id="start_date"
-                                    name="start_date"
-                                    value={data.start_date}
-                                    required
-                                    onChange={e => setData('start_date', e.target.value)}
-                                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
-                                />
-                                {errors.start_date && <p className="text-red-500 text-sm mt-1">{errors.start_date}</p>}
-                            </div>
-
-                            <div>
-                                <label htmlFor="end_date" className="block text-sm font-bold mb-3 text-gray-700">Fecha Fin. *</label>
-                                <input
-                                    type="date"
-                                    id="end_date"
-                                    name="end_date"
-                                    value={data.end_date}
-                                    required
-                                    onChange={e => setData('end_date', e.target.value)}
-                                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
-                                />
-                                {errors.end_date && <p className="text-red-500 text-sm mt-1">{errors.end_date}</p>}
-                            </div>
                             <div className="md:col-span-2">
                                 <label htmlFor="observations" className="block text-sm font-bold mb-3 text-gray-700">
                                     Observaciones <span className="text-gray-400 font-normal">(Opcional)</span>

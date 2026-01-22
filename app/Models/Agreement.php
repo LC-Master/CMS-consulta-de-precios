@@ -15,6 +15,5 @@ class Agreement extends Model
     use SoftDeletes;
 
     protected $fillable = ['name','legal_name','tax_id',
-    'contact_person','contact_email','contact_phone','start_date',
-    'end_date','is_active','observations','created_at','updated_at'];
+    'contact_person','contact_email','contact_phone','is_active','observations','created_at','updated_at'];
 }
