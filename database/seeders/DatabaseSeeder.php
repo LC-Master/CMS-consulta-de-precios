@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             DeviceSeeder::class,
             CampaignSeeder::class,
             MediaSeeder::class,
+            CampaignAgreementSeeder::class,
             TimeLineItemSeeder::class,
             TokenSeeder::class,
         ]);

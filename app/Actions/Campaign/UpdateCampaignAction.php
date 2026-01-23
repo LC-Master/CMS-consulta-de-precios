@@ -3,9 +3,9 @@
 namespace App\Actions\Campaign;
 
 use Illuminate\Http\Request;
-use DB;
 use App\Models\Campaign;
 use App\Enums\Schedules;
+use Illuminate\Support\Facades\DB;
 
 class UpdateCampaignAction
 {
@@ -21,9 +21,9 @@ class UpdateCampaignAction
                 'start_at',
                 'end_at',
                 'department_id',
-                'agreement_id',
             ]));
 
+            $campaign->agreements()->sync($request->input('agreements', []));
             $campaign->centers()->sync($request->input('centers', []));
 
             $this->updateTimeline($campaign, $request->input('am_media', []), Schedules::AM);

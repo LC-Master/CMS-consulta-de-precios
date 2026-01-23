@@ -28,7 +28,6 @@ class CampaignFactory extends Factory
             'end_at' => $this->faker->dateTimeBetween($startDate, '+3 months'),
             'status_id' => Status::factory(),
             'department_id' => Department::factory(),
-            'agreement_id' => Agreement::factory(),
             'user_id' => User::factory(), 
             'updated_by' => User::factory(),
         ];

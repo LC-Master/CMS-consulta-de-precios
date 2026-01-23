@@ -33,7 +33,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
         end_at: '',
         centers: [] as string[],
         department_id: '',
-        agreement_id: '',
+        agreements: [] as string[],
         am_media: [] as string[],
         pm_media: [] as string[],
     })
@@ -200,31 +200,32 @@ export default function CampaignCreate({ centers, departments, agreements, media
 
                             <div>
                                 <Label htmlFor="agreement_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Acuerdo</Label>
-                                <Select<Option, false>
+                                <Select<Option, true>
                                     options={optionsAgreement}
                                     inputId="agreement_id"
-                                    value={optionsAgreement.find(o => o.value === data.agreement_id) || null}
-                                    name="agreement_id"
+                                    value={optionsAgreement.filter(o => data.agreements.includes(o.value))}
+                                    name="agreements"
                                     classNamePrefix="react-select"
-                                    onChange={(val) => setData('agreement_id', (val as Option | null)?.value ?? '')}
+                                    onChange={(val) => setData('agreements', (val as Option[]).map(v => v.value))}
                                     placeholder="Selecciona un acuerdo"
                                     isClearable
+                                    isMulti
                                     aria-required={false}
-                                    aria-invalid={!!errors.agreement_id}
-                                    aria-describedby={errors.agreement_id ? 'agreement_id-error' : undefined}
+                                    aria-invalid={!!errors.agreements}
+                                    aria-describedby={errors.agreements ? 'agreements-error' : undefined}
                                     styles={{
                                         control: (provided) => ({
                                             ...provided,
-                                            borderColor: errors.agreement_id ? '#ef4444' : provided.borderColor,
-                                            boxShadow: errors.agreement_id ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
+                                            borderColor: errors.agreements ? '#ef4444' : provided.borderColor,
+                                            boxShadow: errors.agreements ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
                                             '&:hover': {
-                                                borderColor: errors.agreement_id ? '#ef4444' : provided.borderColor,
+                                                borderColor: errors.agreements ? '#ef4444' : provided.borderColor,
                                             },
                                             borderRadius: '0.375rem',
                                         }),
                                     }}
                                 />
-                                {errors.agreement_id && <p id="agreement_id-error" role="alert" className="text-red-500 text-sm mt-1">{errors.agreement_id}</p>}
+                                {errors.agreements && <p id="agreements-error" role="alert" className="text-red-500 text-sm mt-1">{errors.agreements}</p>}
                             </div>
                         </div>
                         <div className='pt-12 border-t-2 border-gray-100 w-full'>

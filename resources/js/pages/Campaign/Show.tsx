@@ -4,10 +4,11 @@ import { index } from "@/routes/campaign";
 import { breadcrumbs } from "@/helpers/breadcrumbs";
 import { CampaignExtended } from "@/types/campaign/index.types";
 import { Head, Link } from "@inertiajs/react";
-import { Building, CalendarDays, CalendarX, Handshake, SquareLibrary, Store, Sun, Moon } from "lucide-react";
+import { Building, CalendarDays, CalendarX, Handshake, SquareLibrary, Store, Sun, Moon, X } from "lucide-react";
 import { formatDate, isVideo } from "@/helpers/mediaTools";
 import CenterCard from "@/components/CenterCard";
 import ErrorBanner from "@/components/ui/ErrorBanner";
+import { show } from "@/routes/agreement";
 
 export default function CampaignShow({ campaign }: { campaign: CampaignExtended }) {
     const mediaAM = campaign.media
@@ -37,39 +38,64 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                         <div className="bg-white rounded-xl shadow shadow-stone-400 m-2 w-full md:w-[65%]">
                             <div className="flex items-center p-6 justify-between w-full 
                             border-b border-gray-300">
-                                <h2 className="text-lg  font-semibold">Información general</h2>
+                                <h2 className="text-lg font-semibold">Información general</h2>
                                 <PillStatus status={campaign.status?.status} />
                             </div>
-                            <div className="flex flex-row py-8 px-10 gap-6 mt-4 text-sm">
-                                <div className="flex flex-col mr-6 space-y-6">
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-8 text-sm">
+                                <div className="flex flex-col space-y-6">
                                     <div>
-                                        <p className="text-gray-500">Titulo de la campaña</p>
-                                        <p className="font-medium">{campaign.title}</p>
+                                        <p className="text-gray-500 mb-1">Titulo de la campaña</p>
+                                        <p className="font-medium text-gray-900">{campaign.title}</p>
                                     </div>
 
                                     <div>
-                                        <p className="text-gray-500">Convenio</p>
-                                        <div className="flex items-center gap-2">
-                                            <Handshake className="w-4 h-4 text-gray-500" />
-                                            <p className="font-medium">{campaign.agreement?.name}</p>
-                                        </div>
+                                        <p className="text-gray-500 mb-1">Creado</p>
+                                        <p className="font-medium text-gray-900">{formatDate(campaign.created_at)}</p>
                                     </div>
                                 </div>
-                                <div className="flex flex-col mb-6 space-y-6">
+                                <div className="flex flex-col space-y-6">
                                     <div>
-                                        <p className="text-gray-500">Departamento</p>
+                                        <p className="text-gray-500 mb-1">Departamento</p>
                                         <div className="flex items-center gap-2">
                                             <Building className="w-4 h-4 text-gray-500" />
-                                            <p className="font-medium">{campaign.department?.name}</p>
+                                            <p className="font-medium text-gray-900">{campaign.department?.name}</p>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <p className="text-gray-500">Creado</p>
-                                        <p className="font-medium">{formatDate(campaign.created_at)}</p>
+                                        <p className="text-gray-500 mb-1">Ultima vez actualizada</p>
+                                        <p className="font-medium text-gray-900">{formatDate(campaign.updated_at)}</p>
+                                    </div>
+                                </div>
+
+                                <div className="border-l-0 lg:border-l lg:pl-6 border-gray-100 flex flex-col h-full">
+                                    <div className="flex items-center gap-2 mb-3 text-gray-700 font-medium shrink-0">
+                                        <Handshake className="w-5 h-5 text-gray-500" />
+                                        <h2>Convenios</h2>
+                                    </div>
+                                    <div className="grow relative">
+                                        <div className="absolute inset-0 overflow-y-auto pr-2 custom-scrollbar space-y-2">
+                                            {campaign.agreements && campaign.agreements.length > 0 ? (
+                                                campaign.agreements.map(agreement => (
+                                                    <Link viewTransition href={show({ id: agreement.id }).url} key={agreement.id} className="bg-gray-50 border hover:text-locatel-claro
+                                                     border-gray-200 rounded px-3 py-2 text-xs font-medium text-gray-700 block text-break-words">
+                                                        {agreement.name}
+                                                    </Link>
+                                                ))
+                                            ) : (
+                                                <div className="flex flex-col items-center justify-center ">
+                                                    <span className="bg-gray-100 rounded-full p-3 h-12 w-12 flex items-center justify-center mb-2" aria-hidden="true">
+                                                        <X className="w-6 h-6 text-red-500" />
+                                                    </span>
+                                                    <p className="text-gray-500 text-sm italic">Sin convenios asociados</p>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
 
                         {/* Dates */}

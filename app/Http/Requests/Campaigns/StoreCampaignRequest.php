@@ -26,12 +26,13 @@ class StoreCampaignRequest extends FormRequest
             'end_at' => 'required|date|after:start_at',
             'centers' => 'required|array|min:1',
             'department_id' => 'required|exists:departments,id',
-            'agreement_id' => 'nullable|exists:agreements,id',
+            'agreements' => ['nullable', 'array', 'min:1'],
+            'agreements.*' => ['string', 'exists:agreements,id'],
             'centers.*' => 'string|exists:centers,id',
             'am_media' => ['required', 'array', 'min:1'],
             'am_media.*' => ['string', 'exists:media,id'],
             'pm_media' => ['required', 'array', 'min:1'],
-            'pm_media.*' => ['string', 'exists:media,id'],        
+            'pm_media.*' => ['string', 'exists:media,id'],
         ];
     }
 
@@ -62,7 +63,10 @@ class StoreCampaignRequest extends FormRequest
             'department_id.required' => 'El departamento es obligatorio.',
             'department_id.exists' => 'El departamento seleccionado no existe.',
 
-            'agreement_id.exists' => 'El convenio seleccionado no existe.',
+            'agreements.array' => 'Los convenios deben enviarse como un arreglo.',
+            'agreements.min' => 'Debe seleccionar al menos :min convenio(s).',
+            'agreements.*.string' => 'Cada convenio debe ser texto.',
+            'agreements.*.exists' => 'El convenio seleccionado no existe.',
 
             'am_media.required' => 'Debe seleccionar al menos un medio AM.',
             'am_media.array' => 'Los medios AM deben enviarse como un arreglo.',
@@ -90,7 +94,8 @@ class StoreCampaignRequest extends FormRequest
             'centers' => 'centros',
             'centers.*' => 'centro',
             'department_id' => 'departamento',
-            'agreement_id' => 'convenio',
+            'agreements' => 'convenios',    
+            'agreements.*' => 'convenio',
             'am_media' => 'medios AM',
             'am_media.*' => 'medio AM',
             'pm_media' => 'medios PM',

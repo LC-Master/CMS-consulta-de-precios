@@ -91,7 +91,7 @@ class Campaign extends Model
 
     public function agreements()
     {
-        return $this->belongsToMany(Agreement::class)->withTimestamps();
+        return $this->belongsToMany(Agreement::class, 'campaign_agreements')->withTimestamps();
     }
 
     public function centers()

@@ -1,5 +1,5 @@
-import { StatusCampaignEnum } from "@/enums/statusCampaignEnum";
-import { Agreement } from "../agreement/index.types";
+import { StatusCampaignEnum } from '@/enums/statusCampaignEnum';
+import { Agreement } from '../agreement/index.types';
 
 export interface Department {
     id: string;
@@ -55,11 +55,10 @@ export type MediaPivot = {
     campaign_id: string;
     media_id: string;
     position: string;
-    slot: "am" | "pm";
+    slot: 'am' | 'pm';
     created_at: string;
     updated_at: string;
 };
-
 
 export type Media = {
     id: string;
@@ -70,7 +69,6 @@ export type Media = {
     updated_at: string;
     pivot: MediaPivot;
 };
-
 
 export interface Department {
     id: string;
@@ -95,13 +93,13 @@ export type Campaign = {
     id: string;
     title: string;
     status: {
-        status: typeof StatusCampaignEnum[keyof typeof StatusCampaignEnum];
+        status: (typeof StatusCampaignEnum)[keyof typeof StatusCampaignEnum];
     };
     created_at: string;
-}
+};
 
 export type CampaignExtended = Campaign & {
-    agreement: Agreement;
+    agreements: Pick<Agreement, 'id' | 'name'>[];
     department: Department;
     centers: Center[];
     start_at: string;
@@ -117,7 +115,13 @@ export type CampaignExtended = Campaign & {
 export type Props = {
     flash?: { success?: string; error?: string };
     campaigns: { data: Campaign[] };
-    filters: { search?: string; status?: string; type?: string, ended_at?: string,started_at?: string };
+    filters: {
+        search?: string;
+        status?: string;
+        type?: string;
+        ended_at?: string;
+        started_at?: string;
+    };
     statuses: Status[];
     medias?: { data: MediaItem[] };
     mimeTypes?: string[];

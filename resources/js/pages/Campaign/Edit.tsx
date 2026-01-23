@@ -35,9 +35,9 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
         title: campaign.title || '',
         start_at: campaign.start_at ? new Date(campaign.start_at).toISOString().slice(0, 16) : '',
         end_at: campaign.end_at ? new Date(campaign.end_at).toISOString().slice(0, 16) : '',
-        centers: campaign.centers ? campaign.centers.map(center => String(center.id)) : [],
+        centers: campaign.centers ? campaign.centers.map(center => center.id) : [],
         department_id: String(campaign.department_id || ''),
-        agreement_id: String(campaign.agreement_id || ''),
+        agreements: campaign.agreements ? campaign.agreements.map(agreement => agreement.id) : [],
         am_media: campaign.media.filter(item => item.slot === 'am').map(item => item.id) || [] as string[],
         pm_media: campaign.media.filter(item => item.slot === 'pm').map(item => item.id) || [] as string[],
     })
@@ -196,31 +196,32 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
 
                             <div>
                                 <label htmlFor="agreement_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Acuerdo</label>
-                                <Select<Option, false>
+                                <Select<Option, true>
                                     options={optionsAgreement}
                                     inputId="agreement_id"
-                                    value={optionsAgreement.find(o => o.value === data.agreement_id) || null}
-                                    name="agreement_id"
+                                    value={optionsAgreement.filter(o => data.agreements.includes(o.value))}
+                                    name="agreements"
                                     classNamePrefix="react-select"
-                                    onChange={(val) => setData('agreement_id', (val as Option | null)?.value ?? '')}
+                                    onChange={(val) => setData('agreements', (val as Option[]).map(v => v.value))}
                                     placeholder="Selecciona un acuerdo"
                                     isClearable
+                                    isMulti
                                     aria-required={false}
-                                    aria-invalid={!!errors.agreement_id}
-                                    aria-describedby={errors.agreement_id ? 'agreement_id-error' : undefined}
+                                    aria-invalid={!!errors.agreements}
+                                    aria-describedby={errors.agreements ? 'agreements-error' : undefined}
                                     styles={{
                                         control: (provided) => ({
                                             ...provided,
-                                            borderColor: errors.agreement_id ? '#ef4444' : provided.borderColor,
-                                            boxShadow: errors.agreement_id ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
+                                            borderColor: errors.agreements ? '#ef4444' : provided.borderColor,
+                                            boxShadow: errors.agreements ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
                                             '&:hover': {
-                                                borderColor: errors.agreement_id ? '#ef4444' : provided.borderColor,
+                                                borderColor: errors.agreements ? '#ef4444' : provided.borderColor,
                                             },
                                             borderRadius: '0.375rem',
                                         }),
                                     }}
                                 />
-                                <InputError message={errors.agreement_id} id="agreement_id-error" />
+                                <InputError message={errors.agreements} id="agreements-error" />
                             </div>
                         </div>
                         <div className='pt-12 border-t-2 border-gray-100 w-full'>
