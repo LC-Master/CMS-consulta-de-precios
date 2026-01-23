@@ -7,6 +7,7 @@ use App\Enums\CampaignStatus;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class CampaignHistoryController extends Controller
 {
@@ -128,7 +129,7 @@ class CampaignHistoryController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error("Error en Calendario: " . $e->getMessage());
+            Log::error("Error en Calendario: " . $e->getMessage());
             return back()->with('error', 'Error interno: ' . $e->getMessage());
         }
     }

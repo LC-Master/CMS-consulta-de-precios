@@ -47,8 +47,6 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
 
                 <div className="w-full max-w-2xl shadow-2xl border border-gray-100 mt-2 space-y-8 bg-white p-8 rounded-lg">
                     <form onSubmit={handleSubmit} className="mt-8 space-y-6" autoComplete="off">
-                        <input type="text" style={{ display: 'none' }} />
-                        <input type="password" style={{ display: 'none' }} />
 
                         <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
                             <div className="flex-1 flex flex-col gap-2">

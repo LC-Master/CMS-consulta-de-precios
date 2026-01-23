@@ -14,8 +14,11 @@ class CenterController extends Controller
      */
     public function index()
     {
+        $query = Center::query();
+        $query->where('name','!=','Todo');
+
         return Inertia::render('Centers/Index', [
-            'centers' => Inertia::scroll(fn () => Center::paginate()),
+            'centers' => Inertia::scroll(fn () => $query->paginate()->withQueryString()),
         ]);
     }
 

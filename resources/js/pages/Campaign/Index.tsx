@@ -91,7 +91,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                             openModalDelete();
                         }}>
                             <Trash className="w-4 h-4" />
-                            <span>Eliminar</span>
+                            <span>Inhabilitar</span>
                         </ActionMenu.Item>
                     </ActionMenu>
                 </div>

@@ -38,9 +38,9 @@ class CampaignController extends Controller
             $query->where('status_id', $request->input('status'));
         }
 
-        $statuses = Status::where('status', '!=', value: CampaignStatus::FINISHED->value)->get(['id', 'status']);
+        $statuses = Status::where('status', '!=', CampaignStatus::FINISHED->value)->get(['id', 'status']);
         return Inertia::render('Campaign/Index', [
-            'campaigns' => Inertia::scroll($query->latest()->paginate(10)->withQueryString()),
+            'campaigns' => Inertia::scroll(value: $query->latest()->paginate(10)->withQueryString()),
             'filters' => $request->only(['search', 'status']),
             'statuses' => $statuses
         ]);
@@ -172,16 +172,16 @@ class CampaignController extends Controller
 
             $referer = request()->headers->get('referer');
             if ($referer && str_contains($referer, '/history/campaigns')) {
-                return back()->with('success', 'Campaña eliminada permanentemente.');
+                return back()->with('success', 'Campaña Inhabilitada permanentemente.');
             }
 
             return to_route('campaign.index')
-                ->with('success', 'Campaña eliminada.');
+                ->with('success', 'Campaña Inhabilitada.');
         } catch (\Throwable $e) {
             Log::error('Error deleting campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
             return back()
-                ->with('error', 'Ocurrió un error inesperado al eliminar la campaña. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error inesperado al Inhabilitar la campaña. Por favor, intente nuevamente.');
         }
     }
     public function activate(Campaign $campaign)

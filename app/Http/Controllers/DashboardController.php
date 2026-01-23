@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Center;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -53,7 +54,7 @@ class DashboardController extends Controller
         $mediaPerMonth = array_map(function ($ym) use ($mediaQuery) {
             return isset($mediaQuery[$ym]) ? (int) $mediaQuery[$ym] : 0;
         }, $months);
-
+        
         $active = Campaign::where('start_at', '<=', $now)->where('end_at', '>=', $now)->count();
         $pending = Campaign::where('start_at', '>', $now)->count();
         $finished = Campaign::where('end_at', '<', $now)->count();
@@ -81,15 +82,16 @@ class DashboardController extends Controller
             ])->toArray();
 
         $totals = [
-            'campaigns_total' => Campaign::count(),
+            'campaigns_total' => Campaign::count('*'),
             'campaigns_deleted' => Campaign::onlyTrashed()->count(),
-            'media_total' => Media::count(),
-            'users_total' => User::count(),
+            'media_total' => Media::count('*'),
+            'users_total' => User::count('*'),
             'campaigns_active' => $active,
             'campaigns_pending' => $pending,
             'campaigns_finished' => $finished,
             'avg_campaign_days' => $avgDuration ? (float) $avgDuration : 0,
         ];
+
 
         return [
             'labels' => $months,
