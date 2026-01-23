@@ -8,7 +8,9 @@ import { Building, CalendarDays, CalendarX, Handshake, SquareLibrary, Store, Sun
 import { formatDate, isVideo } from "@/helpers/mediaTools";
 import CenterCard from "@/components/CenterCard";
 import ErrorBanner from "@/components/ui/ErrorBanner";
+import { InfoCard } from "@/components/ui/InfoCard";
 import { show } from "@/routes/agreement";
+import { cdn } from "@/routes/media";
 
 export default function CampaignShow({ campaign }: { campaign: CampaignExtended }) {
     const mediaAM = campaign.media
@@ -18,7 +20,6 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
     const mediaPM = campaign.media
         .filter(m => m.pivot.slot === "pm")
         .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));
-
     return (
         <AppLayout breadcrumbs={breadcrumbs('Detalles de campaña', index().url)}>
             <Head title="Detalles de campaña" />
@@ -35,122 +36,115 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
 
                     {/* Campaign info */}
                     <div className="flex flex-wrap md:flex-nowrap gap-4">
-                        <div className="bg-white rounded-xl shadow shadow-stone-400 m-2 w-full md:w-[65%]">
-                            <div className="flex items-center p-6 justify-between w-full 
-                            border-b border-gray-300">
-                                <h2 className="text-lg font-semibold">Información general</h2>
-                                <PillStatus status={campaign.status?.status} />
+                        <InfoCard
+                            className="w-full md:w-[65%]"
+                            title="Información general"
+                            headerEnd={<PillStatus status={campaign.status?.status} />}
+                            contentClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-8 text-sm"
+                        >
+                            <div className="flex flex-col space-y-6">
+                                <div>
+                                    <p className="text-gray-500 mb-1">Titulo de la campaña</p>
+                                    <p className="font-medium text-gray-900">{campaign.title}</p>
+                                </div>
+
+                                <div>
+                                    <p className="text-gray-500 mb-1">Creado</p>
+                                    <p className="font-medium text-gray-900">{formatDate(campaign.created_at)}</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col space-y-6">
+                                <div>
+                                    <p className="text-gray-500 mb-1">Departamento</p>
+                                    <div className="flex items-center gap-2">
+                                        <Building className="w-4 h-4 text-gray-500" />
+                                        <p className="font-medium text-gray-900">{campaign.department?.name}</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p className="text-gray-500 mb-1">Ultima vez actualizada</p>
+                                    <p className="font-medium text-gray-900">{formatDate(campaign.updated_at)}</p>
+                                </div>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-8 text-sm">
-                                <div className="flex flex-col space-y-6">
-                                    <div>
-                                        <p className="text-gray-500 mb-1">Titulo de la campaña</p>
-                                        <p className="font-medium text-gray-900">{campaign.title}</p>
-                                    </div>
-
-                                    <div>
-                                        <p className="text-gray-500 mb-1">Creado</p>
-                                        <p className="font-medium text-gray-900">{formatDate(campaign.created_at)}</p>
-                                    </div>
+                            <div className="border-l-0 lg:border-l lg:pl-6 border-gray-100 flex flex-col h-full">
+                                <div className="flex items-center gap-2 mb-3 text-gray-700 font-medium shrink-0">
+                                    <Handshake className="w-5 h-5 text-gray-500" />
+                                    <h2>Convenios</h2>
                                 </div>
-                                <div className="flex flex-col space-y-6">
-                                    <div>
-                                        <p className="text-gray-500 mb-1">Departamento</p>
-                                        <div className="flex items-center gap-2">
-                                            <Building className="w-4 h-4 text-gray-500" />
-                                            <p className="font-medium text-gray-900">{campaign.department?.name}</p>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <p className="text-gray-500 mb-1">Ultima vez actualizada</p>
-                                        <p className="font-medium text-gray-900">{formatDate(campaign.updated_at)}</p>
-                                    </div>
-                                </div>
-
-                                <div className="border-l-0 lg:border-l lg:pl-6 border-gray-100 flex flex-col h-full">
-                                    <div className="flex items-center gap-2 mb-3 text-gray-700 font-medium shrink-0">
-                                        <Handshake className="w-5 h-5 text-gray-500" />
-                                        <h2>Convenios</h2>
-                                    </div>
-                                    <div className="grow relative">
-                                        <div className="absolute inset-0 overflow-y-auto pr-2 custom-scrollbar space-y-2">
-                                            {campaign.agreements && campaign.agreements.length > 0 ? (
-                                                campaign.agreements.map(agreement => (
-                                                    <Link viewTransition href={show({ id: agreement.id }).url} key={agreement.id} className="bg-gray-50 border hover:text-locatel-claro
+                                <div className="grow relative">
+                                    <div className="absolute inset-0 overflow-y-auto pr-2 custom-scrollbar space-y-2">
+                                        {campaign.agreements && campaign.agreements.length > 0 ? (
+                                            campaign.agreements.map(agreement => (
+                                                <Link viewTransition href={show({ id: agreement.id }).url} key={agreement.id} className="bg-gray-50 border hover:text-locatel-claro
                                                      border-gray-200 rounded px-3 py-2 text-xs font-medium text-gray-700 block text-break-words">
-                                                        {agreement.name}
-                                                    </Link>
-                                                ))
-                                            ) : (
-                                                <div className="flex flex-col items-center justify-center ">
-                                                    <span className="bg-gray-100 rounded-full p-3 h-12 w-12 flex items-center justify-center mb-2" aria-hidden="true">
-                                                        <X className="w-6 h-6 text-red-500" />
-                                                    </span>
-                                                    <p className="text-gray-500 text-sm italic">Sin convenios asociados</p>
-                                                </div>
-                                            )}
-                                        </div>
+                                                    {agreement.name}
+                                                </Link>
+                                            ))
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center ">
+                                                <span className="bg-gray-100 rounded-full p-3 h-12 w-12 flex items-center justify-center mb-2" aria-hidden="true">
+                                                    <X className="w-6 h-6 text-red-500" />
+                                                </span>
+                                                <p className="text-gray-500 text-sm italic">Sin convenios asociados</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
-
-                        </div>
+                        </InfoCard>
 
                         {/* Dates */}
-                        <div className="bg-white rounded-xl flex flex-col text-sm shadow shadow-stone-400 m-2 w-full md:w-[35%]">
-                            <div className="border-b py-6 px-7 border-gray-300 mb-4">
-                                <h2 className="font-bold text-lg">Fechas</h2>
-                            </div>
-
-                            <div className="px-7 pb-6 space-y-6">
-                                <div className="flex items-center pt-4 gap-4 justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center" aria-hidden="true">
-                                            <CalendarDays className="w-6 h-6 text-blue-500" />
-                                        </div>
-                                        <div>
-                                            <p className="text-gray-500 text-xs">Inicio</p>
-                                            <span className="font-semibold text-lg md:text-sm">{formatDate(campaign.start_at)}</span>
-                                        </div>
+                        <InfoCard
+                            className="flex flex-col text-sm w-full md:w-[35%]"
+                            title={<h2 className="font-bold text-lg">Fechas</h2>}
+                            headerClassName="px-7 py-6 mb-4"
+                            contentClassName="px-7 pb-6 space-y-6"
+                        >
+                            <div className="flex items-center pt-4 gap-4 justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center" aria-hidden="true">
+                                        <CalendarDays className="w-6 h-6 text-blue-500" />
                                     </div>
-                                </div>
-
-                                <div className="flex items-center gap-4 justify-between border-t pt-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center" aria-hidden="true">
-                                            <CalendarX className="w-6 h-6 text-red-500" />
-                                        </div>
-                                        <div>
-                                            <p className="text-gray-500 text-xs">Fin</p>
-                                            <p className="font-semibold text-lg md:text-sm">{formatDate(campaign.end_at)}</p>
-                                        </div>
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Inicio</p>
+                                        <span className="font-semibold text-lg md:text-sm">{formatDate(campaign.start_at)}</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+
+                            <div className="flex items-center gap-4 justify-between border-t pt-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center" aria-hidden="true">
+                                        <CalendarX className="w-6 h-6 text-red-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Fin</p>
+                                        <p className="font-semibold text-lg md:text-sm">{formatDate(campaign.end_at)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </InfoCard>
 
                     </div>
 
-                    <div className="bg-white rounded-xl shadow shadow-stone-400 m-2">
-                        <div className="flex items-center justify-between border-b border-gray-300 p-6">
-                            <div className="flex items-center gap-4">
-                                <Store />
-                                <h2 className="text-lg font-semibold">Centros asociados</h2>
-                            </div>
+                    <InfoCard
+                        title="Centros asociados"
+                        icon={<Store />}
+                        headerEnd={
                             <span className="text-sm text-gray-500 bg-gray-300 rounded-lg px-3 py-1">
                                 {campaign.centers.length} centros
                             </span>
-                        </div>
-                        <div className="py-4 flex flex-row overflow-x-auto">
-                            {campaign.centers ? campaign.centers.map(center => (
-                                <CenterCard key={center.id} id={center.id} name={center.name} code={center.code} />
-                            )) : (
-                                <ErrorBanner message="No hay centros asociados" description="Esta campaña aún no tiene centros vinculados." />
-                            )}
-                        </div>
-                    </div>
+                        }
+                        contentClassName="py-4 flex flex-row overflow-x-auto"
+                    >
+                        {campaign.centers ? campaign.centers.map(center => (
+                            <CenterCard key={center.id} id={center.id} name={center.name} code={center.code} />
+                        )) : (
+                            <ErrorBanner message="No hay centros asociados" description="Esta campaña aún no tiene centros vinculados." />
+                        )}
+                    </InfoCard>
                     {/* Media AM */}
                     <div className="py-6 pl-2">
 
@@ -191,13 +185,13 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                                     >
                                         {isVideo(item.mime_type) ? (
                                             <video
-                                                src={`/media/cdn/${item.id}`}
+                                                src={cdn({ id: item.id }).url}
                                                 controls
                                                 className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
                                             />
                                         ) : (
                                             <img
-                                                src={`/media/cdn/${item.id}`}
+                                                src={cdn({ id: item.id }).url}
                                                 className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
                                             />
                                         )}
@@ -258,13 +252,13 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                                     >
                                         {isVideo(item.mime_type) ? (
                                             <video
-                                                src={`/media/cdn/${item.id}`}
+                                                src={cdn({ id: item.id }).url}
                                                 controls
                                                 className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
                                             />
                                         ) : (
                                             <img
-                                                src={`/media/cdn/${item.id}`}
+                                                src={cdn({ id: item.id }).url}
                                                 className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
                                             />
                                         )}

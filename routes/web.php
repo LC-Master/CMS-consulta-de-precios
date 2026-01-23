@@ -19,7 +19,7 @@ Route::middleware(['auth', 'verified', 'role:admin|publicidad'])->group(function
     Route::resource('media', MediaController::class)->parameters([
         'media' => 'media'
     ]);
-    Route::get('/media/cdn/{media}', [MediaController::class, 'preview']);
+    Route::get('/media/cdn/{media}', [MediaController::class, 'preview'])->name('media.cdn');
 
     Route::resource('logs', ActivityLogController::class)->only(['index']);
     Route::resource('agreement', AgreementController::class);
