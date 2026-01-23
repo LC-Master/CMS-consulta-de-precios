@@ -18,7 +18,6 @@ import { show as calendar } from '@/routes/calendar';
 import { index as media } from '@/routes/media';
 import { index as user } from '@/routes/user';
 import { index as tokens } from '@/routes/centertokens';
-import { type NavItem } from '@/types'; // Asegúrate de que esto apunte a tu index.d.ts o types.ts
 import { Link } from '@inertiajs/react';
 import { Users, KeyRound, History, SquarePlus, List, Calendar, Handshake, Film, ChartBar, Logs, Megaphone } from 'lucide-react';
 import { lazy } from 'react';
@@ -29,89 +28,91 @@ const Logo = lazy(() => import('@/components/app-logo'));
 
 export function AppSidebar() {
 
-    const { hasRole } = useAuth();
-    
+    const { hasRole, can } = useAuth();
+
     const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
 
-    // MainNav usa 'url' porque actualizamos NavMain para soportarlo
-    const mainNavItems = hasRole('admin|publicidad') ? [
-        {
+    const mainNavItems = hasRole('admin|publicidad|supervisor|consultor') ? [
+        can('dashboard.view') ? {
             title: 'Panel de estadísticas',
             url: dashboard().url,
             icon: ChartBar,
-        },
+        } : undefined,
         {
             title: 'Campañas',
-            icon: Megaphone, 
-            isActive: currentPath.includes('/campaign') || currentPath.includes('/calendar'), 
+            icon: Megaphone,
+            isActive: currentPath.includes('/campaign') || currentPath.includes('/calendar'),
             items: [
-                {
+                can('campaigns.create') ? {
                     title: 'Crear campaña',
                     url: create().url,
                     icon: SquarePlus,
-                },
-                {
+                } : undefined,
+                can('campaigns.list') ? {
                     title: 'Listado de campañas',
                     url: index().url,
                     icon: List,
-                },
-                {
+                } : undefined,
+                can('campaigns.history') ? {
                     title: 'Historial',
                     url: indexHistory().url,
                     icon: History,
-                },
-                {
+                } : undefined,
+                can('campaigns.history.calendar') ? {
                     title: 'Calendario',
                     url: calendar().url,
                     icon: Calendar,
-                }
-            ]
+                } : undefined,
+            ].filter((item) => item !== undefined)
         },
         {
             title: 'Convenios',
             icon: Handshake,
             isActive: currentPath.includes('/agreement'),
             items: [
-                {
+                can('agreements.create') ? {
                     title: 'Crear Convenios',
                     url: agreementCreate().url,
                     icon: SquarePlus,
-                },
-                {
+                } : undefined,
+                can('agreements.list') ? {
                     title: 'Listado de Convenios',
                     url: agreement().url,
                     icon: Handshake,
-                }
-            ]
+                } : undefined,
+            ].filter((item) => item !== undefined)
         }
+    ].filter(item => item !== undefined) : [];
+
+    const adminElement = hasRole('admin|supervisor') ? [
+        can('users.list') ? {
+            title: 'Usuarios',
+            href: user().url,
+            icon: Users,
+        } : undefined,
+        can('tokens.list') ? {
+            title: 'Lista de tokens',
+            href: tokens().url,
+            icon: KeyRound,
+        } : undefined,
     ] : [];
 
-    const adminElement = hasRole('admin') ? [
-        {
-            title: 'Usuarios',
-            href: user().url, 
-            icon: Users,
-        },
-        {
-            title: 'Lista de tokens',
-            href: tokens().url, 
-            icon: KeyRound,
-        },
-    ] : [];
+
+
 
     const footerNavItems = [
-        {
+        can('medias.list') ? {
             title: 'Listado de Medios',
             href: media().url,
             icon: Film,
-        },
-        {
+        } : undefined,
+        can('logs.list') ? {
             title: 'Logs de actividad',
             href: indexActivityLog().url,
             icon: Logs,
-        },
-        ...adminElement
-    ];
+        } : undefined,
+        ...adminElement.filter(item => item !== undefined)
+    ].filter((item) => item !== undefined);
 
     return (
         <Sidebar collapsible="icon" variant="inset">

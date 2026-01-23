@@ -35,49 +35,14 @@ export type Pivot = {
 
 export default function useAuth() {
     const { auth } = usePage().props as unknown as { auth: AuthProps };
-
-    const Permissions = {
-        USER: {
-            LIST: 'users.list',
-            SHOW: 'users.show',
-            CREATE: 'users.create',
-            UPDATE: 'users.update',
-            DELETE: 'users.delete',
-        },
-        TOKEN: {
-            LIST: 'tokens.list',
-            CREATE: 'tokens.create',
-            DELETE: 'tokens.delete',
-        },
-        CAMPAIGN: {
-            LIST: 'campaigns.list',
-            SHOW: 'campaigns.show',
-            CREATE: 'campaigns.create',
-            UPDATE: 'campaigns.update',
-            DELETE: 'campaigns.delete',
-        },
-        AGREEMENT: {
-            LIST: 'agreements.list',
-            SHOW: 'agreements.show',
-            CREATE: 'agreements.create',
-            UPDATE: 'agreements.update',
-            DELETE: 'agreements.delete',
-        },
-        MEDIA: {
-            LIST: 'medias.list',
-            SHOW: 'medias.show',
-            CREATE: 'medias.create',
-            UPDATE: 'medias.update',
-            DELETE: 'medias.delete',
-        },
-        REPORT: {
-            VIEW: 'reports.view',
-        },
-    } as const;
+    console.log(auth.permissions);
 
     const hasRole = (role: string): boolean => {
-       if (!role.includes('|')) return auth?.roles?.includes(role) ?? false;
-       return role.split('|').map(r => auth?.roles?.includes(r) ?? false).includes(true);
+        if (!role.includes('|')) return auth?.roles?.includes(role) ?? false;
+        return role
+            .split('|')
+            .map((r) => auth?.roles?.includes(r) ?? false)
+            .includes(true);
     };
 
     const can = (permission: string): boolean => {

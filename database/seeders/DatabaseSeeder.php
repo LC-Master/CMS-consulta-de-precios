@@ -40,6 +40,6 @@ class DatabaseSeeder extends Seeder
                 'status' => 1,
                 'email_verified_at' => now(),
             ]
-        )->assignRole('admin');
+        )->assignRole('supervisor');
     }
 }
