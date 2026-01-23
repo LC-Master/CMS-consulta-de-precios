@@ -27,7 +27,7 @@ class CampaignController extends Controller
         $query = Campaign::with(['status', 'department', 'agreement']);
 
         $query->whereHas('status', function ($q) {
-            $q->where('status', '!=', CampaignStatus::FINISHED->value);
+            $q->where('status', '!=', CampaignStatus::FINISHED->value)->where('status', '!=', CampaignStatus::CANCELLED->value);
         });
 
         if ($request->filled('search')) {
@@ -38,7 +38,7 @@ class CampaignController extends Controller
             $query->where('status_id', $request->input('status'));
         }
 
-        $statuses = Status::where('status', '!=', CampaignStatus::FINISHED->value)->get(['id', 'status']);
+        $statuses = Status::where('status', '!=', CampaignStatus::FINISHED->value)->where('status', '!=', CampaignStatus::CANCELLED->value)->get(['id', 'status']);
         return Inertia::render('Campaign/Index', [
             'campaigns' => Inertia::scroll(value: $query->latest()->paginate(10)->withQueryString()),
             'filters' => $request->only(['search', 'status']),
@@ -68,7 +68,6 @@ class CampaignController extends Controller
             Auth::user()?->notify(new \App\Notifications\Campaigns\CampaignCreatedNotification(campaign: $campaign));
             return to_route('campaign.index')
                 ->with('success', 'Campaña creada correctamente.');
-
         } catch (\Throwable $e) {
             Log::error('Error creating campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 

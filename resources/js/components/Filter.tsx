@@ -3,7 +3,7 @@ import { RefreshCcw, Search } from 'lucide-react'
 import Select from 'react-select'
 import { Button } from './ui/button'
 import { Label } from './ui/label'
-
+import { Input } from './ui/input'
 
 export function Filter({ filters, className }: FiltersProps) {
   return (
@@ -22,13 +22,13 @@ export function Filter({ filters, className }: FiltersProps) {
               </Label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-                <input
+                <Input
                   id={`search-${filter.key}`}
                   type="text"
                   placeholder={filter.placeholder ?? 'Buscar...'}
                   value={filter.value}
                   onChange={(e) => filter.onChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-locatel-oscuro focus:border-locatel-oscuro outline-none transition-all"
+                  className="w-full h-10 pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-locatel-oscuro focus:border-locatel-oscuro outline-none transition-all"
                 />
               </div>
             </div>
@@ -112,12 +112,12 @@ export function Filter({ filters, className }: FiltersProps) {
               <Label htmlFor={`date-${filter.key}`} className="block text-sm font-medium text-gray-700 mb-1">
                 {filter.label ?? 'Fecha'}
               </Label>
-              <input
+              <Input
                 id={`date-${filter.key}`}
                 type="date"
                 value={filter.value}
                 onChange={(e) => filter.onChange(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-locatel-oscuro focus:border-locatel-oscuro outline-none transition-all"
+                className="w-full px-4 h-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-locatel-oscuro focus:border-locatel-oscuro outline-none transition-all"
               />
             </div>
           )

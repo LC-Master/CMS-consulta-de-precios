@@ -12,6 +12,7 @@ const pillVariants = cva(
                 "Finalizada": "text-blue-600 bg-blue-200 border-blue-400",
                 "Borrador": "text-yellow-600 bg-yellow-200 border-yellow-400",
                 "Inhabilitada": "text-red-600 bg-red-200 border-red-400",
+                "Cancelada": "text-red-700 bg-red-100 border-red-300",
                 "default": "text-gray-600 bg-gray-200 border-gray-400",
             },
         },

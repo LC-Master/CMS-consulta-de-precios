@@ -3,4 +3,5 @@ export enum StatusCampaignEnum {
     ACTIVE = 'Activa',
     FINISHED = 'Finalizada',
     DELETED = 'Inhabilitada',
+    CANCELLED = 'Cancelada',
 }

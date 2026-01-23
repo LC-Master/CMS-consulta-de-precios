@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Campaign;
@@ -21,7 +22,8 @@ class CampaignHistoryController extends Controller
         ]);
 
         $query->where(function ($q) {
-            $q->whereHas('status', fn($sq) => $sq->where('status', CampaignStatus::FINISHED->value))
+            $q->whereHas('status', fn($sq) =>
+            $sq->where('status', CampaignStatus::FINISHED->value)->orWhere('status', CampaignStatus::CANCELLED->value))
                 ->orWhereNotNull('deleted_at');
         });
 
@@ -139,7 +141,6 @@ class CampaignHistoryController extends Controller
             return Inertia::render('CampaignHistory/Calendar', [
                 'campaigns' => $campaigns
             ]);
-
         } catch (\Exception $e) {
             Log::error("Error en Calendario: " . $e->getMessage());
             return back()->with('error', 'Error interno: ' . $e->getMessage());
