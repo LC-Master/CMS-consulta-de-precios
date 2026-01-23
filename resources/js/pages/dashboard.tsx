@@ -42,6 +42,24 @@ export default function Dashboard({ initialStats }: { initialStats: InitialStats
                         <div className="text-xs text-muted-foreground">Cuentas de usuario registradas</div>
                     </div>
                 </div>
+                
+                <div className="grid gap-4 md:grid-cols-3">
+                    <div className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
+                        <div className="text-sm text-muted-foreground">Campañas activas</div>
+                        <div className="mt-2 text-2xl font-semibold">{initialStats ? initialStats.totals.campaigns_active ?? '—' : '—'}</div>
+                        <div className="text-xs text-muted-foreground">En curso ahora mismo</div>
+                    </div>
+                    <div className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
+                        <div className="text-sm text-muted-foreground">Campañas pendientes</div>
+                        <div className="mt-2 text-2xl font-semibold">{initialStats ? initialStats.totals.campaigns_pending ?? '—' : '—'}</div>
+                        <div className="text-xs text-muted-foreground">Por iniciar</div>
+                    </div>
+                    <div className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
+                        <div className="text-sm text-muted-foreground">Duración media (días)</div>
+                        <div className="mt-2 text-2xl font-semibold">{initialStats ? (initialStats.totals.avg_campaign_days ?? '—') : '—'}</div>
+                        <div className="text-xs text-muted-foreground">Promedio de duración de campañas finalizadas</div>
+                    </div>
+                </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
@@ -66,24 +84,6 @@ export default function Dashboard({ initialStats }: { initialStats: InitialStats
                         ) : (
                             <div className="min-h-50 flex items-center justify-center text-muted-foreground">Cargando...</div>
                         )}
-                    </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-3">
-                    <div className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
-                        <div className="text-sm text-muted-foreground">Campañas activas</div>
-                        <div className="mt-2 text-2xl font-semibold">{initialStats ? initialStats.totals.campaigns_active ?? '—' : '—'}</div>
-                        <div className="text-xs text-muted-foreground">En curso ahora mismo</div>
-                    </div>
-                    <div className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
-                        <div className="text-sm text-muted-foreground">Campañas pendientes</div>
-                        <div className="mt-2 text-2xl font-semibold">{initialStats ? initialStats.totals.campaigns_pending ?? '—' : '—'}</div>
-                        <div className="text-xs text-muted-foreground">Por iniciar</div>
-                    </div>
-                    <div className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
-                        <div className="text-sm text-muted-foreground">Duración media (días)</div>
-                        <div className="mt-2 text-2xl font-semibold">{initialStats ? (initialStats.totals.avg_campaign_days ?? '—') : '—'}</div>
-                        <div className="text-xs text-muted-foreground">Promedio de duración de campañas finalizadas</div>
                     </div>
                 </div>
 

@@ -43,12 +43,28 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
         {
             key: 'start_at',
             header: 'Inicio',
-            render: (a) => new Date(a.start_at).toLocaleDateString(),
+            // CAMBIO AQUÍ: Formato fecha y hora
+            render: (a) => new Date(a.start_at).toLocaleString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }),
         },
         {
             key: 'end_at',
             header: 'Fin',
-            render: (a) => new Date(a.end_at).toLocaleDateString(),
+            // CAMBIO AQUÍ: Formato fecha y hora
+            render: (a) => new Date(a.end_at).toLocaleString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }),
         },
         {
             key: 'actions',
@@ -98,6 +114,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
             ),
         },
     ]
+
     useUpdateEffect(() => {
         router.get(
             window.location.pathname,
@@ -105,6 +122,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
             { preserveState: true, replace: true, preserveScroll: true }
         )
     }, [search, status])
+
     return (
         <AppLayout breadcrumbs={breadcrumbs('Lista de campañas', index().url)}>
             {ToastContainer()}

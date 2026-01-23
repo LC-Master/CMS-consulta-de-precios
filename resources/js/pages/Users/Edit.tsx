@@ -55,11 +55,10 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
                                     id="email"
                                     type="email"
                                     value={data.email}
-                                    required
                                     placeholder="email@ejemplo.com"
                                     autoComplete="new-email"
                                     name="new-email-field"
-                                    readOnly={true}
+                                    disabled={true}
                                     onFocus={(e) => (e.target.readOnly = false)}
                                     onChange={(e) => setData('email', e.target.value)}
                                 />

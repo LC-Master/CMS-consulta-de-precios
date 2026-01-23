@@ -30,8 +30,6 @@ class StoreAgreementRequest extends FormRequest
             'contact_person' => 'required|string|max:255',
             'contact_email' => 'required|string|email:rfc,dns|max:255',
             'contact_phone' => ['required', 'string', 'digits_between:10,20'],
-            'start_date' => 'required|date|before:end_date',
-            'end_date'   => 'required|date|after:start_date',
             'observations' => 'nullable|string|max:1000',
         ];
     }
@@ -72,16 +70,6 @@ class StoreAgreementRequest extends FormRequest
             'contact_phone.integer'  => 'El teléfono solo debe contener números, sin espacios ni guiones.',
             'contact_phone.min'      => 'El teléfono debe tener al menos 10 dígitos.',
             'contact_phone.max'      => 'El teléfono no debe exceder los 20 dígitos.',
-
-            // start_date
-            'start_date.required' => 'La fecha de inicio es obligatoria.',
-            'start_date.date'     => 'La fecha de inicio debe ser una fecha válida.',
-            'start_date.before'   => 'La fecha de inicio debe ser anterior a la fecha de finalización.',
-
-            // end_date
-            'end_date.required' => 'La fecha de finalización es obligatoria.',
-            'end_date.date'     => 'La fecha de finalización debe ser una fecha válida.',
-            'end_date.after'    => 'La fecha de finalización debe ser posterior a la fecha de inicio.',
 
             // observations
             'observations.string' => 'Las observaciones deben ser texto.',

@@ -14,7 +14,6 @@ class UpdateUserAction
         return DB::transaction(function () use ($user, $data) {
             $updateData = [
                 'name' => $data->input('name'),
-                'email' => $data->input('email'),
                 'status' => $data->input('status'),
             ];
 

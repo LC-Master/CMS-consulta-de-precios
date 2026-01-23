@@ -54,7 +54,10 @@ class CampaignController extends Controller
                     $query->select('id', 'media_id');
                 }
             ])
-                ->get(['id', 'name', 'mime_type']),
+            ->orderBy('created_at', 'desc')
+            ->limit(30)
+            ->get(['id', 'name', 'mime_type']),
+            
             'centers' => Center::get(['id', 'code', 'name']),
             'departments' => Department::get(['id', 'name']),
             'agreements' => Agreement::where('is_active', true)->get(['id', 'name']),
@@ -123,7 +126,10 @@ class CampaignController extends Controller
             'statuses' => Status::all(['id', 'status']),
             'departments' => Department::all(['id', 'name']),
             'agreements' => Agreement::where('is_active', true)->get(['id', 'name']),
-            'media' => Media::with('thumbnail:id,media_id')->get(['id', 'name', 'mime_type']),
+            'media' => Media::with('thumbnail:id,media_id')
+                ->orderBy('created_at', 'desc')
+                ->limit(30)
+                ->get(['id', 'name', 'mime_type']),
             'centers' => Center::all(['id', 'code', 'name']),
         ]);
     }

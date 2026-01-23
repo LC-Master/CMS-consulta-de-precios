@@ -39,7 +39,15 @@ export default function UsersIndex({ users, filters = {} }: Props) {
         {
             key: 'created_at',
             header: 'Fecha Registro',
-            render: (u) => new Date(u.created_at).toLocaleDateString(),
+            // CAMBIO: Formato de fecha con hora
+            render: (u) => new Date(u.created_at).toLocaleString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }),
         },
         {
             key: 'actions',
