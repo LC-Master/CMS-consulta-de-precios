@@ -17,6 +17,7 @@ export interface DataTableProps<T> {
     infiniteData: string
 }
 
+
 export function DataTable<T>({
     data,
     columns,
@@ -26,7 +27,7 @@ export function DataTable<T>({
 }: DataTableProps<T>) {
     return (
         <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-            <InfiniteScroll data={infiniteData} loading={() => (
+            <InfiniteScroll data={infiniteData} buffer={10} loading={() => (
                 <span className="px-4 py-3 flex justify-center items-center gap-2 text-center text-sm text-black">
                     <Spinner className='text-blue-400' /> Cargando más registros...
                 </span>

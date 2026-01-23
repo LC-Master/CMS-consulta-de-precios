@@ -7,18 +7,11 @@ import { Column, DataTable } from '@/components/DataTable';
 import { User, Props } from '@/types/user/index.types';
 import { Filter } from '@/components/Filter';
 import AnchorIcon from '@/components/ui/AnchorIcon';
-import { BreadcrumbItem } from '@/types';
-
+import { index } from '@/routes/user';
+import { breadcrumbs } from '@/helpers/breadcrumbs';
 
 export default function UsersIndex({ users, filters = {} }: Props) {
     const [search, setSearch] = useState(filters.search || '')
-
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Lista de usuarios',
-            href: '/user',
-        },
-    ];
 
     const columns: Column<User>[] = [
         {
@@ -71,7 +64,7 @@ export default function UsersIndex({ users, filters = {} }: Props) {
     }, [search])
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs('Lista de usuarios', index().url)}>
             <div className="space-y-4 px-4 pb-4">
 
                 {/* Contenedor Flex para alinear Filtro y Botón */}

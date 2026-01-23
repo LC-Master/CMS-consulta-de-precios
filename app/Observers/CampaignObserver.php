@@ -6,7 +6,6 @@ use App\Enums\Log\LogLevelEnum;
 use App\Enums\Log\LogActionEnum;
 use App\Models\Campaign;
 use App\Jobs\RecordCampaignActivityJob;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CampaignObserver
@@ -31,10 +30,10 @@ class CampaignObserver
     public function created(Campaign $campaign): void
     {
         RecordCampaignActivityJob::dispatch(
-            Auth::id() ?? 0,
+            Auth::user(),
             $campaign,
             LogActionEnum::CREATED,
-            LogLevelEnum::INFO, 
+            LogLevelEnum::INFO,
             "Se creó la campaña: {$campaign->title}",
             [
                 'title' => $campaign->title,
@@ -50,14 +49,14 @@ class CampaignObserver
         if (empty($changes)) return;
 
         RecordCampaignActivityJob::dispatch(
-            Auth::id() ?? 0,
+            Auth::user(),
             $campaign,
             LogActionEnum::UPDATED,
             LogLevelEnum::INFO,
             "Se actualizó la campaña: {$campaign->title}",
             [
                 'title' => $campaign->title,
-                'changes' => $changes 
+                'changes' => $changes
             ]
         );
     }
@@ -65,7 +64,7 @@ class CampaignObserver
     public function deleted(Campaign $campaign): void
     {
         RecordCampaignActivityJob::dispatch(
-            Auth::id() ?? 0,
+            Auth::user(),
             $campaign,
             LogActionEnum::DELETED,
             LogLevelEnum::DANGER,
@@ -77,9 +76,9 @@ class CampaignObserver
     public function restored(Campaign $campaign): void
     {
         RecordCampaignActivityJob::dispatch(
-            Auth::id() ?? 0,
+            Auth::user(),
             $campaign,
-            LogActionEnum::UPDATED, 
+            LogActionEnum::UPDATED,
             LogLevelEnum::INFO,
             "Campaña '{$campaign->title}' restaurada.",
             ['title' => $campaign->title]

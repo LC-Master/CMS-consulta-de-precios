@@ -48,7 +48,8 @@ class CampaignHistoryController extends Controller
             }
         }
 
-        $statuses = Status::where('status', '=', value: CampaignStatus::FINISHED->value)->get(['id', 'status']);
+        $statuses = Status::where('status', '=', value: CampaignStatus::FINISHED->value)
+            ->orWhere('status', '=', value: CampaignStatus::CANCELLED->value)->get(['id', 'status']);
 
         return Inertia::render('CampaignHistory/Index', [
             'campaigns' => Inertia::scroll($query->latest()->paginate(10)->withQueryString()),

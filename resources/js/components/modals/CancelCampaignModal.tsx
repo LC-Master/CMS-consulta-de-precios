@@ -1,9 +1,9 @@
-import { finish } from "@/routes/campaign";
+import { cancel } from "@/routes/campaign";
 import { router } from "@inertiajs/react";
 import Modal from "../Modal";
 import { Button } from "../ui/button";
 
-export default function FinishCampaignModal({ isOpen, closeModal, campaignId, setCampaignId }: { isOpen: boolean; closeModal: () => void; campaignId: string | null; setCampaignId: React.Dispatch<React.SetStateAction<string | null>> }) {
+export default function CancelCampaignModal({ isOpen, closeModal, campaignId, setCampaignId }: { isOpen: boolean; closeModal: () => void; campaignId: string | null; setCampaignId: React.Dispatch<React.SetStateAction<string | null>> }) {
     if (!isOpen) return null
     return (
         <Modal className='w-90 bg-white p-6 ' closeModal={closeModal}>
@@ -14,7 +14,7 @@ export default function FinishCampaignModal({ isOpen, closeModal, campaignId, se
                 <Button
                     className="bg-red-600 text-white hover:bg-red-700"
                     onClick={() => {
-                        router.visit(finish({ id: campaignId! }).url, {
+                        router.visit(cancel({ id: campaignId! }).url, {
                             method: 'get',
                             preserveState: false,
                             preserveScroll: true,

@@ -7,14 +7,15 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Models\ActivityLog; 
+use App\Models\ActivityLog;
+use App\Models\User;
 
 class RecordCampaignActivityJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
-        protected int $userId,
+        protected ?User $causer,
         protected $subject,
         protected $action,
         protected $level,
@@ -25,9 +26,11 @@ class RecordCampaignActivityJob implements ShouldQueue
     public function handle(): void
     {
         ActivityLog::create([
-            'user_id'      => $this->userId ?: null,
-            'subject_id'   => $this->subject->getKey(),
-            'subject_type' => \get_class($this->subject),
+            'causer_id'      => $this->causer ? (string)$this->causer->id : 'system',
+            'user_name'    => $this->causer?->name ?? 'System',
+            'user_email'   => $this->causer?->email ?? 'system@cms.local',
+            'subject_id'   => $this->subject?->id,
+            'subject_type' => $this->subject ? get_class($this->subject) : null,
             'action'       => $this->action,
             'level'        => $this->level,
             'message'      => $this->message,

@@ -26,6 +26,7 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
         setAuditLog(log);
         openModal();
     };
+    console.log(logs)
     const columns: Column<Log>[] = [
         {
             key: 'level',
@@ -86,7 +87,7 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
             render: (log) => (
                 <div className="flex items-center gap-2.5">
                     <div className="flex flex-col">
-                        <span className="text-sm font-bold text-gray-800">{log.user?.name || 'Automático'}</span>
+                        <span className="text-sm font-bold text-gray-800">{log.user_email || 'Automático'}</span>
                         <div className="flex items-center gap-1 text-[10px] text-gray-400 font-mono">
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -145,8 +146,8 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
                             type: 'search',
                             key: 'search',
                             value: search,
-                            label: 'Buscar por IP, Usuario o Acción',
-                            placeholder: 'Buscar por IP, Usuario o Acción',
+                            label: 'Buscar por IP, Usuario, Email o Acción',
+                            placeholder: 'Buscar ...',
                             onChange: setSearch,
                         },
                         {

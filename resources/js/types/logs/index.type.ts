@@ -1,5 +1,4 @@
 import { LogActionsEnum, LogLevelEnum } from '@/enums/LogsEnum';
-import { User as UserType } from '../user/index.types';
 
 export type Log = {
     id: string;
@@ -14,7 +13,9 @@ export type Log = {
     user_agent: string;
     referer: string;
     created_at: string;
-    user: User;
+    causer_id?: string;
+    user_name?: string;
+    user_email?: string;
 };
 
 export type Properties = {
@@ -23,13 +24,11 @@ export type Properties = {
 };
 
 export type Changes = {
-    [key: string]: any;
     status_id: string;
     updated_by: number;
     updated_at: string;
 };
 
-export type User = Pick<UserType, 'id' | 'name'>;
 
 export type Props = {
     elements: { value: string; label: string }[];
