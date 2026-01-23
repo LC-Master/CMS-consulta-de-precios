@@ -86,30 +86,28 @@ export function AppSidebar() {
         }
     ] : [];
 
-    // CORRECCIÓN AQUÍ: adminElement va al footer, así que debe usar 'href'
     const adminElement = hasRole('admin') ? [
         {
             title: 'Usuarios',
-            href: user().url, // CAMBIO: url -> href
+            href: user().url, 
             icon: Users,
         },
         {
             title: 'Lista de tokens',
-            href: tokens().url, // CAMBIO: url -> href
+            href: tokens().url, 
             icon: KeyRound,
         },
     ] : [];
 
-    // CORRECCIÓN AQUÍ: footerNavItems usa 'href' para que NavFooter no falle
     const footerNavItems = [
         {
             title: 'Listado de Medios',
-            href: media().url, // CAMBIO: url -> href
+            href: media().url,
             icon: Film,
         },
         {
             title: 'Logs de actividad',
-            href: indexActivityLog().url, // CAMBIO: url -> href
+            href: indexActivityLog().url,
             icon: Logs,
         },
         ...adminElement

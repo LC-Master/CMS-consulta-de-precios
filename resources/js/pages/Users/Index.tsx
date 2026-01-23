@@ -4,7 +4,6 @@ import { Pencil, Trash, Plus } from 'lucide-react'
 import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Column, DataTable } from '@/components/DataTable';
-// Asegúrate de que tu tipo User en @/types/user/index.types tenga el campo 'status'
 import { User as BaseUser, Props as BaseProps } from '@/types/user/index.types';
 import { Filter } from '@/components/Filter';
 import AnchorIcon from '@/components/ui/AnchorIcon';
@@ -41,7 +40,6 @@ export default function UsersIndex({ users, filters = {} }: Props) {
             header: 'Correo Electrónico',
             render: (u) => u.email,
         },
-        // --- NUEVA COLUMNA DE ESTATUS ---
         {
             key: 'status',
             header: 'Estatus',
@@ -55,11 +53,18 @@ export default function UsersIndex({ users, filters = {} }: Props) {
                 </span>
             ),
         },
-        // -------------------------------
         {
             key: 'created_at',
             header: 'Fecha Registro',
-            render: (u) => new Date(u.created_at).toLocaleDateString(),
+            // CAMBIO: Formato de fecha con hora
+            render: (u) => new Date(u.created_at).toLocaleString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }),
         },
         {
             key: 'actions',
