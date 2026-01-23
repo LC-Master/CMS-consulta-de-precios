@@ -19,6 +19,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use App\Exports\CampaignsExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class CampaignController extends Controller
 {
@@ -27,7 +30,7 @@ class CampaignController extends Controller
         $query = Campaign::with(['status', 'department', 'agreement']);
 
         $query->whereHas('status', function ($q) {
-            $q->where('status', '!=', CampaignStatus::FINISHED->value)->where('status', '!=', CampaignStatus::CANCELLED->value);
+            $q->where('status', '!=', CampaignStatus::FINISHED->value);
         });
 
         if ($request->filled('search')) {
@@ -38,9 +41,9 @@ class CampaignController extends Controller
             $query->where('status_id', $request->input('status'));
         }
 
-        $statuses = Status::where('status', '!=', CampaignStatus::FINISHED->value)->where('status', '!=', CampaignStatus::CANCELLED->value)->get(['id', 'status']);
+        $statuses = Status::where('status', '!=', value: CampaignStatus::FINISHED->value)->get(['id', 'status']);
         return Inertia::render('Campaign/Index', [
-            'campaigns' => Inertia::scroll(value: $query->latest()->paginate(10)->withQueryString()),
+            'campaigns' => Inertia::scroll($query->latest()->paginate(10)->withQueryString()),
             'filters' => $request->only(['search', 'status']),
             'statuses' => $statuses
         ]);
@@ -71,6 +74,7 @@ class CampaignController extends Controller
             Auth::user()?->notify(new \App\Notifications\Campaigns\CampaignCreatedNotification(campaign: $campaign));
             return to_route('campaign.index')
                 ->with('success', 'Campaña creada correctamente.');
+
         } catch (\Throwable $e) {
             Log::error('Error creating campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
@@ -177,16 +181,16 @@ class CampaignController extends Controller
 
             $referer = request()->headers->get('referer');
             if ($referer && str_contains($referer, '/history/campaigns')) {
-                return back()->with('success', 'Campaña Inhabilitada permanentemente.');
+                return back()->with('success', 'Campaña eliminada permanentemente.');
             }
 
             return to_route('campaign.index')
-                ->with('success', 'Campaña Inhabilitada.');
+                ->with('success', 'Campaña eliminada.');
         } catch (\Throwable $e) {
             Log::error('Error deleting campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
             return back()
-                ->with('error', 'Ocurrió un error inesperado al Inhabilitar la campaña. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error inesperado al eliminar la campaña. Por favor, intente nuevamente.');
         }
     }
     public function activate(Campaign $campaign)
@@ -206,24 +210,61 @@ class CampaignController extends Controller
                 ->with('error', 'Ocurrió un error inesperado al activar la campaña. Por favor, intente nuevamente.');
         }
     }
-    public function cancel(Campaign $campaign)
+    public function finish(Campaign $campaign)
     {
         try {
-            $cancelledStatus = Status::where('status', CampaignStatus::CANCELLED->value)->firstOrFail();
+            $finishedStatus = Status::where('status', CampaignStatus::FINISHED->value)->firstOrFail();
 
-            if (!$cancelledStatus->getKey() === $campaign->getAttribute('status_id')) {
+            if (!$finishedStatus->getKey() === $campaign->getAttribute('status_id')) {
                 return back()->with('success', "Estatus de " . CampaignStatus::FINISHED->value . " ya asignado a la campaña.");
             }
 
-            $campaign->update(['status_id' => $cancelledStatus->getKey()]);
-            $campaign->user->notify(new \App\Notifications\Campaigns\CampaignCancelledNotification(campaign: $campaign));
+            $campaign->update(['status_id' => $finishedStatus->getKey()]);
+            $campaign->user->notify(new \App\Notifications\Campaigns\CampaignFinishedNotification(campaign: $campaign));
 
-            return redirect()->route('campaign.index')->with('success', 'Campaña cancelada.');
+            return redirect()->route('campaign.index')->with('success', 'Campaña finalizada.');
         } catch (\Throwable $e) {
-            Log::error('Error cancelling campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+            Log::error('Error finishing campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
             return back()
-                ->with('error', 'Ocurrió un error inesperado al cancelar la campaña. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error inesperado al finalizar la campaña. Por favor, intente nuevamente.');
         }
+    }
+
+    public function report()
+    {
+        return Inertia::render('Campaign/Report', [
+            'departments' => Department::select('id', 'name')->orderBy('name')->get(),
+            'agreements' => Agreement::where('is_active', true)->select('id', 'name')->orderBy('name')->get(),
+            'statuses' => Status::select('id', 'status')->get(),
+        ]);
+    }
+
+    public function export(Request $request)
+    {
+        $request->validate([
+            'start_at' => 'required|date',
+            'end_at' => 'required|date|after_or_equal:start_at',
+            'department_id' => 'nullable|uuid', // Opcional
+            'agreement_id' => 'nullable|uuid',  // Opcional
+            'status_id' => 'nullable|uuid',     // Opcional
+        ]);
+
+        $filters = [
+            'startDate' => $request->input('start_at'),
+            'endDate' => $request->input('end_at'),
+            'departmentId' => $request->input('department_id'),
+            'agreementId' => $request->input('agreement_id'),
+            'statusId' => $request->input('status_id'),
+        ];
+
+        $startFormatted = Carbon::parse($filters['startDate'])->format('d-m-Y');
+        $endFormatted = Carbon::parse($filters['endDate'])->format('d-m-Y');
+        $fileName = "campañas_desde_{$startFormatted}_hasta_{$endFormatted}.xlsx";
+
+        return Excel::download(
+            new CampaignsExport($filters), 
+            $fileName
+        );
     }
 }

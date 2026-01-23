@@ -6,7 +6,10 @@ use App\Http\Controllers\CampaignHistoryController;
 
 Route::middleware(['auth', 'verified', 'role:admin|publicidad'])->group(function () {
     Route::get('/campaign/activate/{campaign}', [CampaignController::class, 'activate'])->name('campaign.activate');
-    Route::get('/campaign/cancel/{campaign}', [CampaignController::class, 'cancel'])->name('campaign.cancel');
+    Route::get('/campaign/finish/{campaign}', [CampaignController::class, 'finish'])->name('campaign.finish');
+
+    Route::get('/campaigns/report', [CampaignController::class, 'report'])->name('campaign.report');
+    Route::get('/campaigns/export', [CampaignController::class, 'export'])->name('campaign.export');
 
     Route::resource('campaign', CampaignController::class);
     Route::get('/calendar', [CampaignHistoryController::class, 'calendar'])->name('calendar.show');
