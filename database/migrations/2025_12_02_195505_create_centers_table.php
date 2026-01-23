@@ -15,6 +15,8 @@ return new class extends Migration {
             $table->string('name')->unique();
             $table->string('code')->unique();
             $table->date('last_sync_at')->nullable();
+            $table->boolean('is_syncing')->default(false);
+            $table->string('sync_status')->nullable();
             $table->foreignUuid('placeholder_id')->nullable()->constrained('media');
             $table->index('last_sync_at');
             $table->timestamps();
