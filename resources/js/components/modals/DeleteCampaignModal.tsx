@@ -35,8 +35,8 @@ export default function DeleteCampaignModal({ isOpen, campaignId, closeDeleteMod
                     </div>
                 </div>
                 <div>
-                    <h2 className="text-lg font-semibold mb-1">Eliminar campaña</h2>
-                    <p className="text-sm text-gray-600 mb-2">¿Estás seguro de que deseas eliminar esta campaña? Esta acción es irreversible y no podrá deshacerse desde la interfaz.</p>
+                    <h2 className="text-lg font-semibold mb-1">Inhabilitar campaña</h2>
+                    <p className="text-sm text-gray-600 mb-2">¿Estás seguro de que deseas inhabilitar esta campaña? Esta acción es irreversible y no podrá deshacerse desde la interfaz.</p>
                     <p className="text-xs text-gray-500">La campaña dejará de aparecer en las listas activas, pero permanecerá en el histórico para auditoría.</p>
                 </div>
             </div>
@@ -49,7 +49,7 @@ export default function DeleteCampaignModal({ isOpen, campaignId, closeDeleteMod
                         preserveScroll: true
                     });
                     closeDeleteModal();
-                }}>Eliminar {count > 0 && `(${count})`}</Button>
+                }}>Inhabilitar {count > 0 && `(${count})`}</Button>
             </div>
         </Modal>
     )

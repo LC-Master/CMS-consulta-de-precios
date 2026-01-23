@@ -114,7 +114,7 @@ export default function CampaignsHistoryIndex({ campaigns, filters = {}, statuse
                                 });
                             }}>
                                 <Trash className="w-4 h-4" />
-                                <span>Eliminar</span>
+                                <span>Inhabilitar</span>
                             </ActionMenu.Item>
                         )}
                     </ActionMenu>

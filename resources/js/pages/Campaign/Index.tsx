@@ -16,7 +16,7 @@ import { breadcrumbs } from '@/helpers/breadcrumbs';
 import { PillStatus } from '@/components/ui/PillStatus';
 import { StatusCampaignEnum } from '@/enums/statusCampaignEnum';
 import DeleteCampaignModal from '@/components/modals/DeleteCampaignModal';
-import FinishCampaignModal from '@/components/modals/FinishCampaignModal';
+import CancelCampaignModal from '@/components/modals/CancelCampaignModal';
 import { ActionMenu } from '@/components/ui/ActionMenu';
 
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [], flash }: Props) {
@@ -83,7 +83,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                         </Button>
                     ) : (
                         a.status.status === StatusCampaignEnum.ACTIVE && (
-                            <Button title='Finalizar campaña' onClick={() => {
+                            <Button title='Cancelar campaña' onClick={() => {
                                 setCampaignId(a.id);
                                 openModal();
                             }} className='p-2 bg-red-600 h-8 hover:bg-red-400 text-white rounded-md'>
@@ -107,7 +107,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                             openModalDelete();
                         }}>
                             <Trash className="w-4 h-4" />
-                            <span>Eliminar</span>
+                            <span>Inhabilitar</span>
                         </ActionMenu.Item>
                     </ActionMenu>
                 </div>
@@ -127,7 +127,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
         <AppLayout breadcrumbs={breadcrumbs('Lista de campañas', index().url)}>
             {ToastContainer()}
             <Head title="Lista de campañas" />
-            <FinishCampaignModal isOpen={isOpen} campaignId={campaignId} closeModal={closeModal} setCampaignId={setCampaignId} />
+            <CancelCampaignModal isOpen={isOpen} campaignId={campaignId} closeModal={closeModal} setCampaignId={setCampaignId} />
             <DeleteCampaignModal isOpen={isOpenDelete} campaignId={campaignId} closeDeleteModal={closeDeleteModal} />
             <div className="space-y-4 px-4 pb-4">
                 <Filter

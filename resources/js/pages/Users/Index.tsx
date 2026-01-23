@@ -1,33 +1,17 @@
 import { useState } from 'react'
 import { router, Link } from '@inertiajs/react'
-import { Pencil, Trash, Plus } from 'lucide-react'
+import { Pencil, Plus } from 'lucide-react'
 import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Column, DataTable } from '@/components/DataTable';
-import { User as BaseUser, Props as BaseProps } from '@/types/user/index.types';
+import { User, Props } from '@/types/user/index.types';
 import { Filter } from '@/components/Filter';
 import AnchorIcon from '@/components/ui/AnchorIcon';
-import DeleteIcon from '@/components/ui/DeleteIcon';
-import { BreadcrumbItem } from '@/types';
-
-// Extendemos la interfaz localmente por si no la has actualizado en el archivo de tipos
-interface User extends BaseUser {
-    status: number; // 0 o 1
-}
-
-interface Props extends BaseProps {
-    users: { data: User[] };
-}
+import { index } from '@/routes/user';
+import { breadcrumbs } from '@/helpers/breadcrumbs';
 
 export default function UsersIndex({ users, filters = {} }: Props) {
     const [search, setSearch] = useState(filters.search || '')
-    
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Lista de usuarios',
-            href: '/user',
-        },
-    ];
 
     const columns: Column<User>[] = [
         {
@@ -44,11 +28,10 @@ export default function UsersIndex({ users, filters = {} }: Props) {
             key: 'status',
             header: 'Estatus',
             render: (u) => (
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    Number(u.status) === 1 
-                    ? 'bg-green-100 text-green-800 border border-green-200' 
+                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${Number(u.status) === 1
+                    ? 'bg-green-100 text-green-800 border border-green-200'
                     : 'bg-red-100 text-red-800 border border-red-200'
-                }`}>
+                    }`}>
                     {Number(u.status) === 1 ? 'Activo' : 'Inactivo'}
                 </span>
             ),
@@ -72,7 +55,7 @@ export default function UsersIndex({ users, filters = {} }: Props) {
             render: (u) => (
                 <div className="flex gap-2">
                     <AnchorIcon
-                        href={`/user/${u.id}/edit`} 
+                        href={`/user/${u.id}/edit`}
                         icon={Pencil}
                     />
                 </div>
@@ -89,12 +72,12 @@ export default function UsersIndex({ users, filters = {} }: Props) {
     }, [search])
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs('Lista de usuarios', index().url)}>
             <div className="space-y-4 px-4 pb-4">
-                
+
                 {/* Contenedor Flex para alinear Filtro y Botón */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    
+
                     {/* El Filtro ocupa el espacio disponible */}
                     <div className="w-full sm:flex-1">
                         <Filter
@@ -103,6 +86,7 @@ export default function UsersIndex({ users, filters = {} }: Props) {
                                     type: 'search',
                                     key: 'search',
                                     value: search,
+                                    label: 'Buscar por nombre o email',
                                     placeholder: 'Buscar por nombre o email...',
                                     onChange: setSearch,
                                 },

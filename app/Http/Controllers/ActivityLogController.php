@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+
 class ActivityLogController extends Controller
 {
     public function index(Request $request)
     {
         $user = $request->user();
 
-        $query = ActivityLog::with('user:id,name')
-            ->orderBy('created_at', 'desc');
+        $query = ActivityLog::orderBy('created_at', 'desc');
 
         if ($user->hasRole('publicidad')) {
             $query->where('subject_type', \App\Models\Campaign::class);
@@ -41,7 +41,7 @@ class ActivityLogController extends Controller
         }
         if ($request->has('search')) {
             $query->where('message', 'like', "%{$request->input('search')}%")->orWhere('action', 'like', "%{$request->input('search')}%")->orWhereHas('user', function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->input('search')}%");
+                $q->where('name', 'like', "%{$request->input('search')}%")->orWhere('email', 'like', "%{$request->input('search')}%");
             })->orWhere('ip_address', 'like', "%{$request->input('search')}%")
                 ->orWhere('properties->title', 'like', "%{$request->input('search')}%");
         }
@@ -53,12 +53,14 @@ class ActivityLogController extends Controller
                     'id' => $log->id,
                     'action' => $log->action,
                     'level' => $log->level,
+                    'causer_id' => $log->causer_id,
+                    'user_name' => $log->user_name,
+                    'user_email' => $log->user_email,
                     'message' => $log->message,
                     'user_agent' => $log->user_agent,
                     'properties' => $log->properties,
                     'ip_address' => $log->ip_address,
                     'created_at' => $log->created_at,
-                    'user' => $log->user?->only(['id', 'name']),
                     'subject_type' => class_basename($log->subject_type),
                     'subject_id' => $log->subject_id,
                 ])

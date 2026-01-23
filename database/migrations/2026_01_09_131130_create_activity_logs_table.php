@@ -16,10 +16,12 @@ return new class extends Migration {
             $table->string('subject_id')->nullable();
             $table->string('subject_type')->nullable();
 
-            $table->foreignId('user_id')->constrained();
+            $table->string('causer_id');
+            $table->string('user_name');
+            $table->string('user_email');
 
-            $table->string('action', 100); 
-            $table->string('level', 20);  
+            $table->string('action', 100);
+            $table->string('level', 20);
             $table->text('message')->nullable();
             $table->json('properties')->nullable();
 

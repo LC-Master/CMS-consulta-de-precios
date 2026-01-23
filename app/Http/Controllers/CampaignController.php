@@ -27,7 +27,7 @@ class CampaignController extends Controller
         $query = Campaign::with(['status', 'department', 'agreement']);
 
         $query->whereHas('status', function ($q) {
-            $q->where('status', '!=', CampaignStatus::FINISHED->value);
+            $q->where('status', '!=', CampaignStatus::FINISHED->value)->where('status', '!=', CampaignStatus::CANCELLED->value);
         });
 
         if ($request->filled('search')) {
@@ -38,9 +38,9 @@ class CampaignController extends Controller
             $query->where('status_id', $request->input('status'));
         }
 
-        $statuses = Status::where('status', '!=', value: CampaignStatus::FINISHED->value)->get(['id', 'status']);
+        $statuses = Status::where('status', '!=', CampaignStatus::FINISHED->value)->where('status', '!=', CampaignStatus::CANCELLED->value)->get(['id', 'status']);
         return Inertia::render('Campaign/Index', [
-            'campaigns' => Inertia::scroll($query->latest()->paginate(10)->withQueryString()),
+            'campaigns' => Inertia::scroll(value: $query->latest()->paginate(10)->withQueryString()),
             'filters' => $request->only(['search', 'status']),
             'statuses' => $statuses
         ]);
@@ -71,7 +71,6 @@ class CampaignController extends Controller
             Auth::user()?->notify(new \App\Notifications\Campaigns\CampaignCreatedNotification(campaign: $campaign));
             return to_route('campaign.index')
                 ->with('success', 'Campaña creada correctamente.');
-
         } catch (\Throwable $e) {
             Log::error('Error creating campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
@@ -178,16 +177,16 @@ class CampaignController extends Controller
 
             $referer = request()->headers->get('referer');
             if ($referer && str_contains($referer, '/history/campaigns')) {
-                return back()->with('success', 'Campaña eliminada permanentemente.');
+                return back()->with('success', 'Campaña Inhabilitada permanentemente.');
             }
 
             return to_route('campaign.index')
-                ->with('success', 'Campaña eliminada.');
+                ->with('success', 'Campaña Inhabilitada.');
         } catch (\Throwable $e) {
             Log::error('Error deleting campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
             return back()
-                ->with('error', 'Ocurrió un error inesperado al eliminar la campaña. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error inesperado al Inhabilitar la campaña. Por favor, intente nuevamente.');
         }
     }
     public function activate(Campaign $campaign)
@@ -207,24 +206,24 @@ class CampaignController extends Controller
                 ->with('error', 'Ocurrió un error inesperado al activar la campaña. Por favor, intente nuevamente.');
         }
     }
-    public function finish(Campaign $campaign)
+    public function cancel(Campaign $campaign)
     {
         try {
-            $finishedStatus = Status::where('status', CampaignStatus::FINISHED->value)->firstOrFail();
+            $cancelledStatus = Status::where('status', CampaignStatus::CANCELLED->value)->firstOrFail();
 
-            if (!$finishedStatus->getKey() === $campaign->getAttribute('status_id')) {
+            if (!$cancelledStatus->getKey() === $campaign->getAttribute('status_id')) {
                 return back()->with('success', "Estatus de " . CampaignStatus::FINISHED->value . " ya asignado a la campaña.");
             }
 
-            $campaign->update(['status_id' => $finishedStatus->getKey()]);
-            $campaign->user->notify(new \App\Notifications\Campaigns\CampaignFinishedNotification(campaign: $campaign));
+            $campaign->update(['status_id' => $cancelledStatus->getKey()]);
+            $campaign->user->notify(new \App\Notifications\Campaigns\CampaignCancelledNotification(campaign: $campaign));
 
-            return redirect()->route('campaign.index')->with('success', 'Campaña finalizada.');
+            return redirect()->route('campaign.index')->with('success', 'Campaña cancelada.');
         } catch (\Throwable $e) {
-            Log::error('Error finishing campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+            Log::error('Error cancelling campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
             return back()
-                ->with('error', 'Ocurrió un error inesperado al finalizar la campaña. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error inesperado al cancelar la campaña. Por favor, intente nuevamente.');
         }
     }
 }

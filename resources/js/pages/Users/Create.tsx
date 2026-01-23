@@ -41,8 +41,6 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                         e.preventDefault();
                         post(store().url);
                     }} className="mt-8 space-y-6" autoComplete="off">
-                        <input type="text" style={{ display: 'none' }} />
-                        <input type="password" style={{ display: 'none' }} />
 
                         <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
                             <div className="flex-1 flex flex-col gap-2">
