@@ -4,14 +4,16 @@ import { index } from "@/routes/campaign";
 import { breadcrumbs } from "@/helpers/breadcrumbs";
 import { CampaignExtended } from "@/types/campaign/index.types";
 import { Head, Link } from "@inertiajs/react";
-import { Building, CalendarDays, CalendarX, Handshake, Server, SquareLibrary, Store, Sun, X,Moon } from "lucide-react";
+import { Building, CalendarDays, CalendarX, Handshake, SquareLibrary, Store, Sun, Moon } from "lucide-react";
 import { formatDate, isVideo } from "@/helpers/mediaTools";
+import CenterCard from "@/components/CenterCard";
+import ErrorBanner from "@/components/ui/ErrorBanner";
 
 export default function CampaignShow({ campaign }: { campaign: CampaignExtended }) {
     const mediaAM = campaign.media
         .filter(m => m.pivot.slot === "am")
         .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));
-    console.log(campaign)
+
     const mediaPM = campaign.media
         .filter(m => m.pivot.slot === "pm")
         .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));
@@ -117,26 +119,9 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                         </div>
                         <div className="py-4 flex flex-row overflow-x-auto">
                             {campaign.centers ? campaign.centers.map(center => (
-                                <div
-                                    key={center.id}
-                                    className="flex-none w-56 md:w-64 h-24 rounded-lg border border-transparent hover:border-blue-300 px-4 py-3 flex items-center gap-3 mx-3 shadow-lg transition-colors"
-                                >
-                                    <span className="bg-gray-100 w-12 h-12 rounded-full flex items-center justify-center" aria-hidden="true">
-                                        <Server className="w-6 h-6 text-gray-500" />
-                                    </span>
-                                    <div className="overflow-hidden">
-                                        <p className="font-medium text-sm truncate">{center.name}</p>
-                                        <p className="text-xs text-gray-500 truncate">{center.code}</p>
-                                    </div>
-                                </div>
+                                <CenterCard key={center.id} id={center.id} name={center.name} code={center.code} />
                             )) : (
-                                <div className="w-full flex flex-col items-center justify-center py-8 px-6 text-center space-y-3">
-                                    <div className="bg-gray-100 text-red-500 rounded-full p-3 inline-flex items-center justify-center">
-                                        <X className="w-6 h-6" />
-                                    </div>
-                                    <h3 className="text-lg font-semibold">No hay centros asociados</h3>
-                                    <p className="text-sm text-gray-500">Esta campaña aún no tiene centros vinculados.</p>
-                                </div>
+                                <ErrorBanner message="No hay centros asociados" description="Esta campaña aún no tiene centros vinculados." />
                             )}
                         </div>
                     </div>

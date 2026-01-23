@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout'
-import { useForm, Link,Head } from '@inertiajs/react'
+import { useForm, Link, Head } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
@@ -19,6 +19,7 @@ import { useMediaActions } from '@/hooks/use-media-actions'
 import { Agreement } from '@/types/agreement/index.types'
 import { CircleAlert, PlusCircle, Save, SquarePlay } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
+import { Label } from '@/components/ui/label'
 
 export default function CampaignCreate({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
     const { isOpen, openModal, closeModal } = useModal(false)
@@ -85,7 +86,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
                             <div>
-                                <label htmlFor="title" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Título. *</label>
+                                <Label htmlFor="title" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Título. *</Label>
                                 <Input
                                     type="text"
                                     id="title"
@@ -103,7 +104,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             </div>
 
                             <div>
-                                <label htmlFor="department_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Departamento. *</label>
+                                <Label htmlFor="department_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Departamento. *</Label>
                                 <Select<Option, false>
                                     options={optionsDepartment}
                                     inputId="department_id"
@@ -134,7 +135,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
 
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
                             <div>
-                                <label htmlFor="start_at" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Fecha y hora (inicio). *</label>
+                                <Label htmlFor="start_at" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Fecha y hora (inicio). *</Label>
                                 <Input
                                     type="datetime-local"
                                     id="start_at"
@@ -150,7 +151,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             </div>
 
                             <div>
-                                <label htmlFor="end_at" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Fecha y hora (fin). *</label>
+                                <Label htmlFor="end_at" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Fecha y hora (fin). *</Label>
                                 <Input
                                     type="datetime-local"
                                     id="end_at"
@@ -167,7 +168,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
                             <div>
-                                <label htmlFor="centers" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Centros. *</label>
+                                <Label htmlFor="centers" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Centros. *</Label>
                                 <Select<Option, true>
                                     options={optionsCenter}
                                     inputId="centers"
@@ -198,7 +199,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             </div>
 
                             <div>
-                                <label htmlFor="agreement_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Acuerdo</label>
+                                <Label htmlFor="agreement_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Acuerdo</Label>
                                 <Select<Option, false>
                                     options={optionsAgreement}
                                     inputId="agreement_id"
@@ -230,11 +231,12 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             <div className='flex flex-row pl-6 pr-6 justify-between items-center'>
                                 <div className='flex items-center gap-2 mb-2'>
                                     <SquarePlay />
-                                    <label className="block text-xl font-bold ">Programación Multimedia</label>
+                                    <Label className="block text-xl font-bold ">Programación Multimedia</Label>
                                 </div>
                                 <Button type='button' className='bg-locatel-medio hover:bg-locatel-oscuro' onClick={openModal}>
                                     <PlusCircle />
-                                    Agregar Multimedia</Button>
+                                    Agregar Multimedia
+                                </Button>
                                 {isOpen && <UploadMediaModal closeModal={closeModal} />}
                             </div>
 
