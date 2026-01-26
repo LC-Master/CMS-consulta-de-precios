@@ -15,7 +15,6 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
     const mediaAM = campaign.media
         .filter(m => m.pivot.slot === "am")
         .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));
-    console.log(campaign)
     const mediaPM = campaign.media
         .filter(m => m.pivot.slot === "pm")
         .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));

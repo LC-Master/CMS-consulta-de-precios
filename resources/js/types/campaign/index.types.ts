@@ -1,6 +1,7 @@
 import { StatusCampaignEnum } from '@/enums/statusCampaignEnum';
 import { Agreement } from '../agreement/index.types';
-
+import { Status } from '../status/status.type';
+import { Flash } from '../flash/flash.type';
 export interface Department {
     id: string;
     name: string;
@@ -70,20 +71,12 @@ export type Media = {
     pivot: MediaPivot;
 };
 
-export interface Department {
-    id: string;
-    name: string;
-}
 export interface Center extends Pick<Department, 'id' | 'name'> {
     code: string;
 }
 export interface Option {
     value: string;
     label: string;
-}
-export interface Status {
-    id: string;
-    status: string;
 }
 
 export type Campaign = {
@@ -113,7 +106,7 @@ export type CampaignExtended = Campaign & {
     media: Media[];
 };
 export type Props = {
-    flash?: { success?: string; error?: string };
+    flash?: Flash;
     campaigns: { data: Campaign[] };
     filters: {
         search?: string;

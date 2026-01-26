@@ -1,8 +1,10 @@
 import { Center } from '@/types/campaign/index.types';
+import { Flash } from '../flash/flash.type';
+
 export type Props = {
     centerTokens: { data: CenterToken[] };
     centers: Center[];
-    flash?: { success?: string; error?: string };
+    flash?: Flash;
     filters: { search?: string; center?: string };
 };
 

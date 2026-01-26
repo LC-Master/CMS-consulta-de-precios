@@ -23,6 +23,7 @@ import { Users, KeyRound, History, SquarePlus, List, Calendar, Handshake, Film, 
 import { lazy } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { dashboard } from '@/routes';
+import { list as reportList } from '@/routes/campaign/report';
 
 const Logo = lazy(() => import('@/components/app-logo'));
 
@@ -66,7 +67,7 @@ export function AppSidebar() {
                 can('reports.view') ?
                     {
                         title: 'Reportes',
-                        url: '/campaigns/report',
+                        url: reportList().url,
                         icon: Calendar,
                     } : undefined,
 

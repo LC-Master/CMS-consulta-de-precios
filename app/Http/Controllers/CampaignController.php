@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use App\Exports\CampaignsExport;
+use App\Http\Requests\ExportCampaignListRequest;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 
@@ -30,7 +31,7 @@ class CampaignController extends Controller
         $query = Campaign::with(['status']);
 
         $query->whereHas('status', function ($q) {
-            $q->where('status', '!=', CampaignStatus::FINISHED->value);
+            $q->where('status', '!=', CampaignStatus::FINISHED->value)->where('status', '!=', CampaignStatus::CANCELLED->value);
         });
 
         if ($request->filled('search')) {
@@ -41,7 +42,7 @@ class CampaignController extends Controller
             $query->where('status_id', $request->input('status'));
         }
 
-        $statuses = Status::where('status', '!=', value: CampaignStatus::FINISHED->value)->get(['id', 'status']);
+        $statuses = Status::where('status', '!=', value: CampaignStatus::FINISHED->value)->where('status', '!=', CampaignStatus::CANCELLED->value)->get(['id', 'status']);
         return Inertia::render('Campaign/Index', [
             'campaigns' => Inertia::scroll($query->latest()->paginate(10)->withQueryString()),
             'filters' => $request->only(['search', 'status']),
@@ -75,7 +76,6 @@ class CampaignController extends Controller
             Auth::user()?->notify(new \App\Notifications\Campaigns\CampaignCreatedNotification(campaign: $campaign));
             return to_route('campaign.index')
                 ->with('success', 'Campaña creada correctamente.');
-
         } catch (\Throwable $e) {
             Log::error('Error creating campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
@@ -90,7 +90,7 @@ class CampaignController extends Controller
         $campaign->load([
             'status',
             'department:id,name',
-            // 'agreements' => fn($query) => $query->withTrashed()->select('id', 'name'),
+            'agreements' => fn($query) => $query->withTrashed()->select('id', 'name'),
             'centers:id,code,name',
             'media:id,name,mime_type,duration_seconds',
         ]);
@@ -211,24 +211,24 @@ class CampaignController extends Controller
                 ->with('error', 'Ocurrió un error inesperado al activar la campaña. Por favor, intente nuevamente.');
         }
     }
-    public function finish(Campaign $campaign)
+    public function cancel(Campaign $campaign)
     {
         try {
-            $finishedStatus = Status::where('status', CampaignStatus::FINISHED->value)->firstOrFail();
+            $finishedStatus = Status::where('status', CampaignStatus::CANCELLED->value)->firstOrFail();
 
             if (!$finishedStatus->getKey() === $campaign->getAttribute('status_id')) {
-                return back()->with('success', "Estatus de " . CampaignStatus::FINISHED->value . " ya asignado a la campaña.");
+                return back()->with('success', "Estatus de " . CampaignStatus::CANCELLED->value . " ya asignado a la campaña.");
             }
 
             $campaign->update(['status_id' => $finishedStatus->getKey()]);
-            $campaign->user->notify(new \App\Notifications\Campaigns\CampaignFinishedNotification(campaign: $campaign));
+            $campaign->user->notify(new \App\Notifications\Campaigns\CampaignCancelledNotification(campaign: $campaign));
 
-            return redirect()->route('campaign.index')->with('success', 'Campaña finalizada.');
+            return redirect()->route('campaign.index')->with('success', 'Campaña cancelada.');
         } catch (\Throwable $e) {
-            Log::error('Error finishing campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+            Log::error('Error cancelling campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
             return back()
-                ->with('error', 'Ocurrió un error inesperado al finalizar la campaña. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error inesperado al cancelar la campaña. Por favor, intente nuevamente.');
         }
     }
 
@@ -241,15 +241,9 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function export(Request $request)
+    public function export(ExportCampaignListRequest $request)
     {
-        $request->validate([
-            'start_at' => 'required|date',
-            'end_at' => 'required|date|after_or_equal:start_at',
-            'department_id' => 'nullable|uuid', // Opcional
-            'agreement_id' => 'nullable|uuid',  // Opcional
-            'status_id' => 'nullable|uuid',     // Opcional
-        ]);
+        $request->validated();
 
         $filters = [
             'startDate' => $request->input('start_at'),
@@ -264,7 +258,7 @@ class CampaignController extends Controller
         $fileName = "campañas_desde_{$startFormatted}_hasta_{$endFormatted}.xlsx";
 
         return Excel::download(
-            new CampaignsExport($filters), 
+            new CampaignsExport($filters),
             $fileName
         );
     }

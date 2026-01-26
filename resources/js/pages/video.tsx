@@ -4,7 +4,6 @@ import { useBear } from "@/context/bearer";
 
 export default function Video() {
     const {bears,increasePopulation,removeAllBears,updateBears} = useBear();
-    console.log(bears)
     return (
         <>
         <Link href="http://127.0.0.1/dashboard">ir a video</Link>

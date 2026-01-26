@@ -26,7 +26,6 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
         setAuditLog(log);
         openModal();
     };
-    console.log(logs)
     const columns: Column<Log>[] = [
         {
             key: 'level',

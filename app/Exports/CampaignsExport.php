@@ -30,7 +30,7 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
     public function query()
     {
         $query = Campaign::query()
-            ->with(['user', 'status', 'department', 'agreement'])
+            ->with(['user', 'status', 'department', 'agreements'])
             ->whereDate('start_at', '>=', $this->filters['startDate'])
             ->whereDate('start_at', '<=', $this->filters['endDate']);
 

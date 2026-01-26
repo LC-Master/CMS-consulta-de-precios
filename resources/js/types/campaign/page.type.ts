@@ -1,21 +1,30 @@
 import { Agreement } from '../agreement/index.types';
+import { Flash } from '../flash/flash.type';
+import { Status } from '../status/status.type';
 import { Center, Department, MediaItem } from './index.types';
+
+export type CampaignReportProps = {
+    flash?: Flash;
+    departments: Department[];
+    agreements: Agreement[];
+    statuses: Status[];
+};
 
 export type CampaignCreateProps = {
     centers: Center[];
     departments: Department[];
     agreements: Agreement[];
     media: MediaItem[];
-    flash: { success?: string; error?: string };
+    flash: Flash;
 };
 export type CampaignEditProps = {
     campaign: CampaignFormValues;
-    statuses: { id: number; status: string }[];
+    statuses: Status[];
     departments: Department[];
     agreements: Agreement[];
     media: MediaItem[];
     centers: Center[];
-    flash: { success?: string; error?: string };
+    flash: Flash;
 };
 export type CampaignFormValues = {
     id: string;

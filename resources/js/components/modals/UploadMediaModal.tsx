@@ -7,7 +7,6 @@ import {
     ChangeEvent,
     DragEvent,
     FormEvent,
-    useEffect,
 } from 'react'
 import { useForm } from '@inertiajs/react'
 import { FormState } from '@/types/modal/index.type'
@@ -15,14 +14,11 @@ import { Send } from 'lucide-react'
 import { Spinner } from '../ui/spinner'
 
 export default function UploadMediaModal({ closeModal }: { closeModal: () => void }) {
-    const { data, setData, post, progress, errors, reset, transform, processing, cancel } = useForm<FormState>({
+    const {  setData, post, progress, errors, reset, transform, processing, cancel } = useForm<FormState>({
         files: [],
         thumbnails: [],
     })
-    useEffect(() => {
-        console.log(data)
 
-    }, [data])
     const [selectedFiles, setSelectedFiles] = useState<File[]>([])
     const [isDragging, setIsDragging] = useState(false)
     const inputRef = useRef<HTMLInputElement | null>(null)

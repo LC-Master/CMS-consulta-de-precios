@@ -20,6 +20,7 @@ import { Agreement } from '@/types/agreement/index.types'
 import { CircleAlert, PlusCircle, Save, SquarePlay } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { Label } from '@/components/ui/label'
+import InputError from '@/components/input-error'
 
 export default function CampaignCreate({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
     const { isOpen, openModal, closeModal } = useModal(false)
@@ -100,7 +101,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('title', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.title && <p id="title-error" role="alert" className="text-red-500 text-sm mt-1">{errors.title}</p>}
+                                <InputError message={errors.title} id="title-error" />
                             </div>
 
                             <div>
@@ -129,7 +130,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                         }),
                                     }}
                                 />
-                                {errors.department_id && <p id="department_id-error" role="alert" className="text-red-500 text-sm mt-1">{errors.department_id}</p>}
+                                <InputError message={errors.department_id} id="department_id-error" />
                             </div>
                         </div>
 
@@ -147,7 +148,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                     aria-describedby={errors.start_at ? 'start_at-error' : undefined}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.start_at && <p id="start_at-error" role="alert" className="text-red-500 text-sm mt-1">{errors.start_at}</p>}
+                                 <InputError message={errors.start_at} id="start_at-error" />
                             </div>
 
                             <div>
@@ -163,7 +164,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                     aria-describedby={errors.end_at ? 'end_at-error' : undefined}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.end_at && <p id="end_at-error" role="alert" className="text-red-500 text-sm mt-1">{errors.end_at}</p>}
+                                <InputError message={errors.end_at} id="end_at-error" />
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
@@ -195,7 +196,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                         }),
                                     }}
                                 />
-                                {errors.centers && <p id="centers-error" role="alert" className="text-red-500 text-sm mt-1">{errors.centers}</p>}
+                                <InputError message={errors.centers} id="centers-error" />
                             </div>
 
                             <div>
@@ -225,7 +226,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                         }),
                                     }}
                                 />
-                                {errors.agreements && <p id="agreements-error" role="alert" className="text-red-500 text-sm mt-1">{errors.agreements}</p>}
+                                <InputError message={errors.agreements} id="agreements-error" />
                             </div>
                         </div>
                         <div className='pt-12 border-t-2 border-gray-100 w-full'>

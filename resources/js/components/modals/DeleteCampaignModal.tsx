@@ -4,6 +4,7 @@ import { Trash } from "lucide-react";
 import Modal from "../Modal";
 import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
+import ms from "ms";
 
 export default function DeleteCampaignModal({ isOpen, campaignId, closeDeleteModal }: {
     isOpen: boolean,
@@ -21,7 +22,7 @@ export default function DeleteCampaignModal({ isOpen, campaignId, closeDeleteMod
     // Run countdown only while modal is open
     useEffect(() => {
         if (!isOpen || count === 0) return;
-        const timer = setTimeout(() => setCount(c => c - 1), 1000);
+        const timer = setTimeout(() => setCount(c => c - 1), ms('1s'));
         return () => clearTimeout(timer);
     }, [isOpen, count]);
 

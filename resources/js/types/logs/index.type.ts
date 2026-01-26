@@ -1,4 +1,5 @@
 import { LogActionsEnum, LogLevelEnum } from '@/enums/LogsEnum';
+import { Flash } from '../flash/flash.type';
 
 export type Log = {
     id: string;
@@ -29,10 +30,9 @@ export type Changes = {
     updated_at: string;
 };
 
-
 export type Props = {
     elements: { value: string; label: string }[];
-    flash?: { success?: string; error?: string };
+    flash?: Flash;
     logs: { data: Log[] };
     filters: {
         element?: string;
