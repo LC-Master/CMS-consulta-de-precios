@@ -161,7 +161,7 @@ class CampaignController extends Controller
             'updatedBy',
             'status',
             'user',
-            'agreement' => fn($q) => $q->withTrashed()
+            'agreements' => fn($q) => $q->withTrashed()
 
         ]);
 
