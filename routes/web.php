@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\AgreementController;
-use App\Http\Controllers\CenterController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ThumbnailController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityLogController;
+use Inertia\Inertia;
 
 Route::middleware(['auth', 'verified', 'role:admin|publicidad|supervisor|consultor'])->group(function () {
 

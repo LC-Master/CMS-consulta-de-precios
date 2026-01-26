@@ -18,6 +18,7 @@ import { show as calendar } from '@/routes/calendar';
 import { index as media } from '@/routes/media';
 import { index as user } from '@/routes/user';
 import { index as tokens } from '@/routes/centertokens';
+import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Users, KeyRound, History, SquarePlus, List, Calendar, Handshake, Film, ChartBar, Logs, Megaphone } from 'lucide-react';
 import { lazy } from 'react';
@@ -62,6 +63,13 @@ export function AppSidebar() {
                     title: 'Calendario',
                     url: calendar().url,
                     icon: Calendar,
+                }, 
+                {
+                    title: 'Reportes',
+                    url: '/campaigns/report',
+                    icon: Calendar,
+                }, 
+            ]
                 } : undefined,
             ].filter((item) => item !== undefined)
         },
