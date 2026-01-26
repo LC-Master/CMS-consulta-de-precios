@@ -17,7 +17,6 @@ return new class extends Migration {
             $table->dateTime('end_at');
             $table->foreignUuid('status_id')->constrained();
             $table->foreignUuid('department_id')->constrained();
-            $table->foreignUuid('agreement_id')->nullable()->constrained();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->softDeletes();

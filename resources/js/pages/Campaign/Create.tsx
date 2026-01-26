@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout'
-import { useForm, Link,Head } from '@inertiajs/react'
+import { useForm, Link, Head } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
@@ -19,6 +19,7 @@ import { useMediaActions } from '@/hooks/use-media-actions'
 import { Agreement } from '@/types/agreement/index.types'
 import { CircleAlert, PlusCircle, Save, SquarePlay } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
+import { Label } from '@/components/ui/label'
 
 export default function CampaignCreate({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
     const { isOpen, openModal, closeModal } = useModal(false)
@@ -32,7 +33,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
         end_at: '',
         centers: [] as string[],
         department_id: '',
-        agreement_id: '',
+        agreements: [] as string[],
         am_media: [] as string[],
         pm_media: [] as string[],
     })
@@ -85,7 +86,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
                             <div>
-                                <label htmlFor="title" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Título. *</label>
+                                <Label htmlFor="title" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Título. *</Label>
                                 <Input
                                     type="text"
                                     id="title"
@@ -103,7 +104,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             </div>
 
                             <div>
-                                <label htmlFor="department_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Departamento. *</label>
+                                <Label htmlFor="department_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Departamento. *</Label>
                                 <Select<Option, false>
                                     options={optionsDepartment}
                                     inputId="department_id"
@@ -134,7 +135,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
 
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
                             <div>
-                                <label htmlFor="start_at" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Fecha y hora (inicio). *</label>
+                                <Label htmlFor="start_at" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Fecha y hora (inicio). *</Label>
                                 <Input
                                     type="datetime-local"
                                     id="start_at"
@@ -150,7 +151,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             </div>
 
                             <div>
-                                <label htmlFor="end_at" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Fecha y hora (fin). *</label>
+                                <Label htmlFor="end_at" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Fecha y hora (fin). *</Label>
                                 <Input
                                     type="datetime-local"
                                     id="end_at"
@@ -167,7 +168,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
                             <div>
-                                <label htmlFor="centers" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Centros. *</label>
+                                <Label htmlFor="centers" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Centros. *</Label>
                                 <Select<Option, true>
                                     options={optionsCenter}
                                     inputId="centers"
@@ -198,43 +199,45 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             </div>
 
                             <div>
-                                <label htmlFor="agreement_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Acuerdo</label>
-                                <Select<Option, false>
+                                <Label htmlFor="agreement_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Acuerdo</Label>
+                                <Select<Option, true>
                                     options={optionsAgreement}
                                     inputId="agreement_id"
-                                    value={optionsAgreement.find(o => o.value === data.agreement_id) || null}
-                                    name="agreement_id"
+                                    value={optionsAgreement.filter(o => data.agreements.includes(o.value))}
+                                    name="agreements"
                                     classNamePrefix="react-select"
-                                    onChange={(val) => setData('agreement_id', (val as Option | null)?.value ?? '')}
+                                    onChange={(val) => setData('agreements', (val as Option[]).map(v => v.value))}
                                     placeholder="Selecciona un acuerdo"
                                     isClearable
+                                    isMulti
                                     aria-required={false}
-                                    aria-invalid={!!errors.agreement_id}
-                                    aria-describedby={errors.agreement_id ? 'agreement_id-error' : undefined}
+                                    aria-invalid={!!errors.agreements}
+                                    aria-describedby={errors.agreements ? 'agreements-error' : undefined}
                                     styles={{
                                         control: (provided) => ({
                                             ...provided,
-                                            borderColor: errors.agreement_id ? '#ef4444' : provided.borderColor,
-                                            boxShadow: errors.agreement_id ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
+                                            borderColor: errors.agreements ? '#ef4444' : provided.borderColor,
+                                            boxShadow: errors.agreements ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
                                             '&:hover': {
-                                                borderColor: errors.agreement_id ? '#ef4444' : provided.borderColor,
+                                                borderColor: errors.agreements ? '#ef4444' : provided.borderColor,
                                             },
                                             borderRadius: '0.375rem',
                                         }),
                                     }}
                                 />
-                                {errors.agreement_id && <p id="agreement_id-error" role="alert" className="text-red-500 text-sm mt-1">{errors.agreement_id}</p>}
+                                {errors.agreements && <p id="agreements-error" role="alert" className="text-red-500 text-sm mt-1">{errors.agreements}</p>}
                             </div>
                         </div>
                         <div className='pt-12 border-t-2 border-gray-100 w-full'>
                             <div className='flex flex-row pl-6 pr-6 justify-between items-center'>
                                 <div className='flex items-center gap-2 mb-2'>
                                     <SquarePlay />
-                                    <label className="block text-xl font-bold ">Programación Multimedia</label>
+                                    <Label className="block text-xl font-bold ">Programación Multimedia</Label>
                                 </div>
                                 <Button type='button' className='bg-locatel-medio hover:bg-locatel-oscuro' onClick={openModal}>
                                     <PlusCircle />
-                                    Agregar Multimedia</Button>
+                                    Agregar Multimedia
+                                </Button>
                                 {isOpen && <UploadMediaModal closeModal={closeModal} />}
                             </div>
 

@@ -24,7 +24,7 @@ export type CampaignFormValues = {
     end_at: string;
     status_id: string;
     department_id: string;
-    agreement_id: string;
+    agreements: Pick<Agreement, 'id' | 'name'>[];
     media: MediaItem[];
     created_at: string;
     updated_at: string;

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\TimeLineItem;
 use App\Models\Media;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @property-read \App\Models\User $user
@@ -27,7 +28,6 @@ class Campaign extends Model
         'end_at',
         'status_id',
         'department_id',
-        'agreement_id',
         'user_id',
         'updated_by',
     ];
@@ -44,18 +44,18 @@ class Campaign extends Model
     protected static function booted()
     {
         static::creating(function ($campaign) {
-            if (auth()->check() && empty($campaign->user_id)) {
-                $campaign->user_id = auth()->id();
+            if (Auth::check() && empty($campaign->user_id)) {
+                $campaign->user_id = Auth::id();
             }
         });
         static::updating(function ($campaign) {
-            if (auth()->check()) {
-                $campaign->updated_by = auth()->id();
+            if (Auth::check()) {
+                $campaign->updated_by = Auth::id();
             }
         });
         static::deleting(function ($campaign) {
-            if (auth()->check()) {
-                $campaign->updated_by = auth()->id();
+            if (Auth::check()) {
+                $campaign->updated_by = Auth::id();
                 $campaign->save();
             }
         });
@@ -89,9 +89,9 @@ class Campaign extends Model
         return $this->belongsTo(Department::class);
     }
 
-    public function agreement()
+    public function agreements()
     {
-        return $this->belongsTo(Agreement::class);
+        return $this->belongsToMany(Agreement::class, 'campaign_agreements')->withTimestamps();
     }
 
     public function centers()

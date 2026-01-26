@@ -8,19 +8,23 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityLogController;
 use Inertia\Inertia;
 
-Route::middleware(['auth', 'verified', 'role:admin|publicidad'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:admin|publicidad|supervisor|consultor'])->group(function () {
 
     Route::get('/', fn() => redirect()->route('campaign.index'));
+
+    Route::get('/centers', [CenterController::class, 'index'])->name('centers.index');
 
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('media', MediaController::class)->parameters([
         'media' => 'media'
     ]);
-    Route::get('/media/cdn/{media}', [MediaController::class, 'preview']);
+    Route::get('/media/cdn/{media}', [MediaController::class, 'preview'])->name('media.cdn');
 
     Route::resource('logs', ActivityLogController::class)->only(['index']);
+
     Route::resource('agreement', AgreementController::class);
+
     Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
     Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
 });

@@ -14,6 +14,21 @@ class Agreement extends Model
     use HasUuids;
     use SoftDeletes;
 
-    protected $fillable = ['name','legal_name','tax_id',
-    'contact_person','contact_email','contact_phone','is_active','observations','created_at','updated_at'];
+    protected $fillable = [
+        'name',
+        'legal_name',
+        'tax_id',
+        'contact_person',
+        'contact_email',
+        'contact_phone',
+        'is_active',
+        'observations',
+        'created_at',
+        'updated_at'
+    ];
+
+    public function campaigns()
+    {
+        return $this->hasMany(Campaign::class);
+    }
 }

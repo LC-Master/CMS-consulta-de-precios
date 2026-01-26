@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             DeviceSeeder::class,
             CampaignSeeder::class,
             MediaSeeder::class,
+            CampaignAgreementSeeder::class,
             TimeLineItemSeeder::class,
             TokenSeeder::class,
         ]);
@@ -39,6 +40,6 @@ class DatabaseSeeder extends Seeder
                 'status' => 1,
                 'email_verified_at' => now(),
             ]
-        )->assignRole('admin');
+        )->assignRole('supervisor');
     }
 }

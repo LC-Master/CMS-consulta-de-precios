@@ -7,13 +7,14 @@ use App\Models\Campaign;
 use App\Models\Status;
 use App\Models\Center;
 use App\Enums\CampaignStatus;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class CreateCampaignAction
 {
-    public function execute(array $data): Campaign
+    public function execute(Request $data): Campaign
     {
         $draftStatus = Status::where('status', CampaignStatus::DRAFT->value)->first();
         if (!$draftStatus) {
@@ -21,7 +22,7 @@ class CreateCampaignAction
             throw new \RuntimeException('Error de configuración del sistema: Estado inicial no encontrado.');
         }
 
-        $inputCenterIds = $data['centers'] ?? [];
+        $inputCenterIds = $data->input('centers') ?? [];
         $finalCenterIds = $inputCenterIds;
 
         if (!empty($inputCenterIds)) {
@@ -35,9 +36,14 @@ class CreateCampaignAction
         return DB::transaction(function () use ($data, $draftStatus, $finalCenterIds) {
 
             $campaign = Campaign::create([
-                ...$data,
+                ...$data->all(),
                 'status_id' => $draftStatus->getKey(),
             ]);
+
+            if (!empty($data->input('agreements'))) {
+                $campaign->agreements()->attach($data->input('agreements'));
+            }
+
 
             if (!empty($finalCenterIds)) {
                 $campaign->centers()->attach($finalCenterIds);
@@ -47,8 +53,8 @@ class CreateCampaignAction
             $now = now();
 
             foreach (['am_media' => Schedules::AM, 'pm_media' => Schedules::PM] as $key => $schedule) {
-                if (!empty($data[$key])) {
-                    foreach ($data[$key] as $position => $mediaId) {
+                if (!empty($data->input($key))) {
+                    foreach ($data->input($key) as $position => $mediaId) {
                         $timelineItems[] = [
                             'id' => Str::uuid()->toString(),
                             'campaign_id' => $campaign->getKey(),

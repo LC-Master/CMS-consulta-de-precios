@@ -27,7 +27,7 @@ class CampaignController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Campaign::with(['status', 'department', 'agreement']);
+        $query = Campaign::with(['status']);
 
         $query->whereHas('status', function ($q) {
             $q->where('status', '!=', CampaignStatus::FINISHED->value);
@@ -57,10 +57,10 @@ class CampaignController extends Controller
                     $query->select('id', 'media_id');
                 }
             ])
-            ->orderBy('created_at', 'desc')
-            ->limit(30)
-            ->get(['id', 'name', 'mime_type']),
-            
+                ->orderBy('created_at', 'desc')
+                ->limit(30)
+                ->get(['id', 'name', 'mime_type']),
+
             'centers' => Center::get(['id', 'code', 'name']),
             'departments' => Department::get(['id', 'name']),
             'agreements' => Agreement::where('is_active', true)->get(['id', 'name']),
@@ -70,7 +70,8 @@ class CampaignController extends Controller
     public function store(StoreCampaignRequest $request, CreateCampaignAction $createCampaignAction): RedirectResponse
     {
         try {
-            $campaign = $createCampaignAction->execute($request->validated());
+            $request->validated();
+            $campaign = $createCampaignAction->execute($request);
             Auth::user()?->notify(new \App\Notifications\Campaigns\CampaignCreatedNotification(campaign: $campaign));
             return to_route('campaign.index')
                 ->with('success', 'Campaña creada correctamente.');
@@ -89,7 +90,7 @@ class CampaignController extends Controller
         $campaign->load([
             'status',
             'department:id,name',
-            'agreement' => fn($query) => $query->withTrashed()->select('id', 'name'),
+            // 'agreements' => fn($query) => $query->withTrashed()->select('id', 'name'),
             'centers:id,code,name',
             'media:id,name,mime_type,duration_seconds',
         ]);
@@ -106,10 +107,9 @@ class CampaignController extends Controller
         $campaign->load([
             'media:id,name,mime_type,duration_seconds',
             'media.thumbnail:id,path,media_id',
-            'centers:id,code,name'
+            'centers:id,code,name',
+            'agreements' => fn($query) => $query->withTrashed()->select('id', 'name'),
         ]);
-
-        $campaign->setRelation('centers', $campaign->getRelation('centers')->map->only(['id', 'code', 'name']));
 
         $campaign->setRelation('media', $campaign->getRelation('media')->map(fn($item) => [
             'id' => $item->id,
@@ -144,6 +144,7 @@ class CampaignController extends Controller
             $request->validated();
 
             $updateCampaignAction->execute($request, $campaign);
+
             return to_route('campaign.index')
                 ->with('success', 'Campaña actualizada correctamente.');
         } catch (\Throwable $e) {
@@ -164,7 +165,7 @@ class CampaignController extends Controller
             'updatedBy',
             'status',
             'user',
-            'agreement' => fn($q) => $q->withTrashed()
+            'agreements' => fn($q) => $q->withTrashed()
 
         ]);
 

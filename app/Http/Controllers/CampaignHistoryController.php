@@ -18,7 +18,7 @@ class CampaignHistoryController extends Controller
         $query = Campaign::withTrashed()->with([
             'status:id,status',
             'department:id,name',
-            'agreement:id,name'
+            'agreements:id,name'
         ]);
 
         $query->where(function ($q) {
@@ -62,7 +62,7 @@ class CampaignHistoryController extends Controller
         $campaign->load([
             'status:id,status',
             'department:id,name',
-            'agreement' => fn($query) => $query->withTrashed()->select('id', 'name', 'deleted_at'),
+            'agreements' => fn($query) => $query->withTrashed()->select('id', 'name', 'deleted_at'),
             'centers:id,name,code',
             'media:id,name,mime_type,duration_seconds',
         ])->makeHidden(['status_id', 'department_id', 'agreement_id', 'updated_by', 'user_id', 'updated_at']);
@@ -89,6 +89,7 @@ class CampaignHistoryController extends Controller
         $newCampaign->setAttribute('end_at', now()->addDays(8)->endOfDay());
         $newCampaign->save();
 
+        $newCampaign->agreements()->attach($campaign->agreements->pluck('id'));
         $newCampaign->centers()->attach($campaign->centers->pluck('id'));
 
         $campaign->load('media');
@@ -114,7 +115,7 @@ class CampaignHistoryController extends Controller
                 'status:id,status',
                 'department:id,name',
                 'centers:id,name',
-                'agreement' => fn($query) => $query->withTrashed()->select('id', 'name', 'deleted_at'),
+                'agreements' => fn($query) => $query->withTrashed()->select('id', 'name', 'deleted_at'),
             ])
                 ->whereYear('start_at', $now->year)
                 ->whereHas('status', function ($sq) {
@@ -133,7 +134,7 @@ class CampaignHistoryController extends Controller
                         'color' => '#3B82F6',
                         'extendedProps' => [
                             'department' => $c->department->name ?? 'N/A',
-                            'agreement' => $c->agreement->name ?? 'N/A',
+                            'agreements' => $c->agreements->pluck('name')->toArray(),
                             'centers' => $c->centers->pluck('name')->toArray(),
                         ]
                     ];

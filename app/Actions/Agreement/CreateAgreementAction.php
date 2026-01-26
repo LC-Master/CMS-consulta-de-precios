@@ -2,7 +2,6 @@
 
 namespace App\Actions\Agreement;
 use App\Enums\AgreementStatus;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log; 
 use App\Models\Agreement;

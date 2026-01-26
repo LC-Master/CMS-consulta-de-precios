@@ -4,7 +4,7 @@ use App\Http\Controllers\CampaignController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CampaignHistoryController;
 
-Route::middleware(['auth', 'verified', 'role:admin|publicidad'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:admin|publicidad|supervisor|consultor'])->group(function () {
     Route::get('/campaign/activate/{campaign}', [CampaignController::class, 'activate'])->name('campaign.activate');
     Route::get('/campaign/finish/{campaign}', [CampaignController::class, 'finish'])->name('campaign.finish');
 
@@ -18,6 +18,5 @@ Route::middleware(['auth', 'verified', 'role:admin|publicidad'])->group(function
         Route::get('{campaign}', [CampaignHistoryController::class, 'show'])->name('campaignsHistory.show')->withTrashed();
         Route::post('{campaign}/restore', [CampaignHistoryController::class, 'restore'])->name('campaignsHistory.restore')->withTrashed();
         Route::post('{campaign}/clone', [CampaignHistoryController::class, 'clone'])->name('campaignsHistory.clone')->withTrashed();
-
     });
 });

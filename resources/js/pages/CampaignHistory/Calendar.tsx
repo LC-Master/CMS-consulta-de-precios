@@ -2,7 +2,7 @@ import { breadcrumbs } from "@/helpers/breadcrumbs";
 import AppLayout from "@/layouts/app-layout";
 import { show as calendar } from "@/routes/calendar";
 import { Head, Link, router } from "@inertiajs/react";
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react'; 
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import esLocale from '@fullcalendar/core/locales/es';
@@ -20,24 +20,50 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
         return ['all', ...Array.from(new Set(all))].filter(Boolean);
     }, [campaigns]);
 
+    const centerColors = useMemo(() => {
+        const palette = [
+            '#dc2626', // Red
+            '#ea580c', // Orange
+            '#d97706', // Amber
+            '#65a30d', // Lime
+            '#059669', // Emerald
+            '#7c3aed', // Violet
+            '#c026d3', // Fuchsia
+            '#db2777', // Pink
+            '#e11d48', // Rose
+            '#854d0e', // Yellow-Brown
+        ];
+        
+        const uniqueCenters = centersList.filter(c => c !== 'all');
+        return uniqueCenters.reduce((acc, center, i) => {
+            acc[center] = palette[i % palette.length];
+            return acc;
+        }, {} as Record<string, string>);
+    }, [centersList]);
+
     const filteredEvents: EventInput[] = useMemo(() => {
         return campaigns
             .filter(c => selectedCenter === 'all' || c.extendedProps.centers.includes(selectedCenter))
-            .map((c) => ({
-                id: String(c.id),
-                title: c.title,
-                start: c.start,
-                end: c.end,
-                allDay: true,
-                backgroundColor: locatelGreen,
-                borderColor: 'transparent',
-                extendedProps: {
-                    department: c.extendedProps.department,
-                    agreement: c.extendedProps.agreement,
-                    centers: c.extendedProps.centers
-                },
-            }));
-    }, [campaigns, selectedCenter]);
+            .map((c) => {
+                const targetCenter = selectedCenter === 'all' ? (c.extendedProps.centers[0] || '') : selectedCenter;
+                const bgColor = centerColors[targetCenter] || locatelGreen;
+
+                return {
+                    id: String(c.id),
+                    title: c.title,
+                    start: c.start,
+                    end: c.end,
+                    allDay: true,
+                    backgroundColor: bgColor,
+                    borderColor: 'transparent',
+                    extendedProps: {
+                        department: c.extendedProps.department,
+                        agreement: c.extendedProps.agreement,
+                        centers: c.extendedProps.centers
+                    },
+                };
+            });
+    }, [campaigns, selectedCenter, centerColors]);
 
     const handleEventClick = ({ event }: { event: { id: string } }) => {
         router.get(show(event.id).url);
@@ -56,18 +82,31 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
                             Filtrar por Centro
                         </h3>
                         <div className="flex flex-wrap gap-3">
-                            {centersList.map(name => (
-                                <Button
-                                    key={name}
-                                    onClick={() => setSelectedCenter(name)}
-                                    className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${selectedCenter === name
-                                        ? 'bg-[#008a4f] text-white shadow-lg'
-                                        : 'bg-white text-gray-700 border border-gray-200 hover:border-[#008a4f]'
+                            {centersList.map(name => {
+                                if(name === 'Todo') return null;
+
+                                const isSelected = selectedCenter === name;
+                                const btnColor = name === 'all' ? locatelGreen : (centerColors[name] || locatelGreen);
+
+                                return (
+                                    <Button
+                                        key={name}
+                                        onClick={() => setSelectedCenter(name)}
+                                        style={{
+                                            backgroundColor: isSelected ? btnColor : 'white',
+                                            borderColor: isSelected ? btnColor : '#e5e7eb',
+                                            color: isSelected ? 'white' : '#374151'
+                                        }}
+                                        className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all border shadow-sm ${
+                                            isSelected 
+                                                ? 'shadow-lg' 
+                                                : 'hover:bg-gray-50'
                                         }`}
-                                >
-                                    {name === 'all' ? 'TODOS LOS CENTROS' : name.toUpperCase()}
-                                </Button>
-                            ))}
+                                    >
+                                        {name === 'all' ? 'TODOS LOS CENTROS' : name.toUpperCase()}
+                                    </Button>
+                                );
+                            })}
                         </div>
                     </div>
 
