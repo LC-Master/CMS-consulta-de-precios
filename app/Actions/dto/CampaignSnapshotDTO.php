@@ -22,7 +22,7 @@ class CampaignSnapshotDTO
                 fn($q) =>
                 $q->where('status', CampaignStatus::ACTIVE->value)
             )
-            ->with(['status', 'department', 'agreement', 'media'])
+            ->with(['status', 'department', 'agreements', 'media'])
             ->get();
         $snapshot = [
             'center_id' => $center->getKey(),
@@ -35,7 +35,7 @@ class CampaignSnapshotDTO
                 'title' => $c->title,
                 'status' => $c->status?->status,
                 'department' => $c->department?->name,
-                'agreement' => $c->agreement?->name,
+                'agreements' => $c->agreements?->map(fn($a) => $a->name)->all(),
                 'start_at' => $c->start_at?->toIso8601String(),
                 'end_at' => $c->end_at?->toIso8601String(),
                 'media' => $c->getRelation('media')

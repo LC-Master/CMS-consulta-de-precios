@@ -42,7 +42,7 @@ class CampaignDeletedNotification extends Notification implements ShouldQueue
             ->line('Periodo: ' . ($this->campaign->getAttribute('start_at')?->format('Y-m-d H:i') ?? (string) $this->campaign->getAttribute('start_at') ?? 'N/A') . ' → ' . ($this->campaign->getAttribute('end_at')?->format('Y-m-d H:i') ?? (string) $this->campaign->getAttribute('end_at') ?? 'N/A'))
             ->line('Departamento: ' . ($this->campaign->department->name ?? 'N/A'))
             ->line('Estado: ' . ($this->campaign->status->status ?? 'N/A'))
-            ->line('Convenio: ' . ($this->campaign->agreement->name ?? 'N/A'))
+            ->line('Convenios: ' . ($this->campaign->agreements?->map(fn($a) => $a->name)->join(', ') ?? 'N/A'))
             ->line('Creada por : ' . ($this->campaign->user->name ?? 'N/A'))
             ->line('Eliminada por : ' . ($this->campaign->updatedBy->name ?? 'N/A'))
             ->line('Fecha de eliminación: ' . ($this->campaign->getAttribute('deleted_at')?->format('Y-m-d H:i') ?? 'N/A'))
@@ -64,7 +64,7 @@ class CampaignDeletedNotification extends Notification implements ShouldQueue
             'end_at' => $this->campaign->getAttribute('end_at'),
             'status' => $this->campaign->status->status ?? null,
             'department' => $this->campaign->department->name ?? null,
-            'agreement' => $this->campaign->agreement->name ?? null,
+            'agreements' => $this->campaign->agreements?->map(fn($a) => $a->name)->all() ?? null,
             'deleted_by' => $this->campaign->updatedBy->name ?? null,
             'deleted_at' => $this->campaign->getAttribute('deleted_at'),
         ];

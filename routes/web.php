@@ -6,6 +6,7 @@ use App\Http\Controllers\ThumbnailController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\CenterController;
 use Inertia\Inertia;
 
 Route::middleware(['auth', 'verified', 'role:admin|publicidad|supervisor|consultor'])->group(function () {

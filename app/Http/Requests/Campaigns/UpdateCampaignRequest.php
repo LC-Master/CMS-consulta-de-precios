@@ -12,11 +12,7 @@ class UpdateCampaignRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if (Auth::id()) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
