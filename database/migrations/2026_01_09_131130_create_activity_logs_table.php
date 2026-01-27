@@ -21,7 +21,7 @@ return new class extends Migration {
             $table->string('user_email');
 
             $table->string('action', 100);
-            $table->string('level', 20);
+            $table->string('level', length: 20);
             $table->text('message')->nullable();
             $table->json('properties')->nullable();
 

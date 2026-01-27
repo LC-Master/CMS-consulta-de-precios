@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Campaign;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,5 +22,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Campaign::observe(\App\Observers\CampaignObserver::class);
+        PersonalAccessToken::observe(\App\Observers\Token\SanctumTokenObserver::class);
     }
 }
