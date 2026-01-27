@@ -32,7 +32,7 @@ export function DataTable<T>({
                     <Spinner className='text-blue-400' /> Cargando más registros...
                 </span>
             )}>
-                <table className="min-w-full bg-white divide-y divide-gray-200">
+                <table className="caret-transparent min-w-full bg-white divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
                             {columns.map(col => (

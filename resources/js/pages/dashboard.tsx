@@ -42,7 +42,7 @@ export default function Dashboard({ initialStats }: { initialStats: InitialStats
                         <div className="text-xs text-muted-foreground">Cuentas de usuario registradas</div>
                     </div>
                 </div>
-                
+
                 <div className="grid gap-4 md:grid-cols-3">
                     <div className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
                         <div className="text-sm text-muted-foreground">Campañas activas</div>
@@ -56,7 +56,7 @@ export default function Dashboard({ initialStats }: { initialStats: InitialStats
                     </div>
                     <div className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
                         <div className="text-sm text-muted-foreground">Duración media (días)</div>
-                        <div className="mt-2 text-2xl font-semibold">{initialStats ? (initialStats.totals.avg_campaign_days ?? '—') : '—'}</div>
+                        <div className="mt-2 text-2xl font-semibold">{initialStats ? (Math.round(Number(initialStats.totals.avg_campaign_days)) ?? '—') : '—'}</div>
                         <div className="text-xs text-muted-foreground">Promedio de duración de campañas finalizadas</div>
                     </div>
                 </div>
