@@ -17,11 +17,12 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email:rfc,dns|max:255|unique:users,email',
+            'email' => 'required|string|email:rfc,dns|max:255|unique:users,email|confirmed',
             'role' => 'required|string|exists:roles,name',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
     }
+    
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
@@ -38,8 +39,9 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'email.unique' => 'Este correo electrónico ya está registrado.',
-            'password.confirmed' => 'las contraseñas no coinciden.',
-            'role' => 'required|string|exists:roles,name',
+            'email.confirmed' => 'Los correos electrónicos no coinciden.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
+            'role.exists' => 'El rol seleccionado no es válido.',
         ];
     }
 }
