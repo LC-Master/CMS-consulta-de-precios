@@ -1,3 +1,5 @@
+import { cdn } from "@/routes/media";
+import { cdn as thumbnailCDN } from "@/routes/thumbnail"
 import { MediaItem } from "@/types/campaign/index.types";
 import { ReactNode } from "react";
 import { useState } from "react";
@@ -10,8 +12,8 @@ export default function MediaItemCard({ item, controls }: { item: MediaItem; con
                 {!error ? (
                     <img
                         src={item.mime_type.startsWith('image')
-                            ? `/media/cdn/${item.id}`
-                            : `/thumbnail/cdn/${item.thumbnail?.id}`
+                            ? cdn({ id: item.id }).url
+                            : thumbnailCDN({ thumbnail: item.thumbnail! }).url
                         }
                         alt={item.name}
                         className="w-24 h-14 object-cover rounded-md shrink-0 bg-gray-50"

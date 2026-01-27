@@ -26,8 +26,8 @@ Route::middleware(['auth', 'verified', 'role:admin|publicidad|supervisor|consult
 
     Route::resource('agreement', AgreementController::class);
 
-    Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
-    Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
+    Route::post('/media/upload', [MediaController::class, 'store'])->name('media.upload');
+    Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show'])->name('thumbnail.cdn');
 });
 
 Route::get(
