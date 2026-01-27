@@ -11,6 +11,9 @@ Route::middleware(['auth', 'verified', 'role:admin|publicidad|supervisor|consult
     Route::get('/campaigns/report', [CampaignController::class, 'report'])->name('campaign.report.list');
     Route::get('/campaigns/export', [CampaignController::class, 'export'])->name('campaign.export.list');
 
+    Route::get('/campaigns/{campaign}/export-detail', [CampaignController::class, 'exportDetail'])
+    ->name('campaign.export-detail');
+
     Route::resource('campaign', CampaignController::class);
     Route::get('/calendar', [CampaignHistoryController::class, 'calendar'])->name('calendar.show');
     Route::prefix('/history/campaigns')->group(function () {
