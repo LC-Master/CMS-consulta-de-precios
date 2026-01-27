@@ -30,6 +30,11 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
 
     const selectedRole = roles.find(role => role.name === data.role);
 
+    // Función auxiliar para bloquear copiar y pegar
+    const preventCopyPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar usuario', edit({ id: user.id }).url)}>
             <Head title="Editar usuario" />
@@ -112,6 +117,9 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
                                     placeholder="email@ejemplo.com"
                                     disabled={true} 
                                     className="bg-gray-100 text-gray-500 cursor-not-allowed"
+                                    // Aunque está deshabilitado, es buena práctica bloquearlo explícitamente también
+                                    onPaste={preventCopyPaste}
+                                    onCopy={preventCopyPaste}
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -146,6 +154,8 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
                                         placeholder="********"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password', e.target.value)}
+                                        onPaste={preventCopyPaste} // Bloquea pegar
+                                        onCopy={preventCopyPaste}  // Bloquea copiar
                                     />
                                     <InputError message={errors.password} />
                                 </div>
@@ -159,6 +169,7 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
                                         placeholder="********"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password_confirmation', e.target.value)}
+                                        onPaste={preventCopyPaste} // Bloquea pegar
                                     />
                                 </div>
                             </div>

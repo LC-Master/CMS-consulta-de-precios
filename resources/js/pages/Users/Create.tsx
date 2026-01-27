@@ -18,12 +18,17 @@ export default function UserCreate({ roles }: PropsCreatePage) {
         name: '',
         role: '',
         email: '',
-        email_confirmation: '', // Nuevo campo
+        email_confirmation: '',
         password: '',
         password_confirmation: '',
     });
 
     const selectedRole = roles.find(role => role.name === data.role);
+
+    // Función auxiliar para bloquear copiar y pegar
+    const preventCopyPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Crear Usuario', index().url)}>
@@ -117,6 +122,8 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                                     autoComplete="new-email"
                                     name="new-email-field"
                                     onChange={(e) => setData('email', e.target.value)}
+                                    onPaste={preventCopyPaste} // Bloquea pegar
+                                    onCopy={preventCopyPaste}  // Bloquea copiar
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -131,7 +138,7 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                                     placeholder="Repita el correo"
                                     autoComplete="off"
                                     onChange={(e) => setData('email_confirmation', e.target.value)}
-                                    // Validación visual simple: borde rojo si no coinciden y hay texto
+                                    onPaste={preventCopyPaste} // Bloquea pegar
                                     className={data.email && data.email_confirmation && data.email !== data.email_confirmation ? "border-red-500 focus-visible:ring-red-500" : ""}
                                 />
                             </div>
@@ -150,6 +157,8 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                                     autoComplete="new-password"
                                     name="new-password-field"
                                     onChange={(e) => setData('password', e.target.value)}
+                                    onPaste={preventCopyPaste} // Bloquea pegar
+                                    onCopy={preventCopyPaste}  // Bloquea copiar
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -164,6 +173,7 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                                     placeholder="********"
                                     autoComplete="new-password"
                                     onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    onPaste={preventCopyPaste} // Bloquea pegar
                                 />
                             </div>
                         </div>
