@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             RolesPermissionsSeeder::class,
             StatusSeeder::class,
             DepartmentSeeder::class,
+            ProviderSeeder::class,
             AgreementSeeder::class,
             DeviceSeeder::class,
             CampaignSeeder::class,

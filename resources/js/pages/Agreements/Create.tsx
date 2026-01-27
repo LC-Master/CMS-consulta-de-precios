@@ -31,8 +31,8 @@ export default function AgreementCreate() {
             <Head title="Crear Convenio" />
             <div className="p-6 space-y-6">
                 <div className="ml-4 mb-4">
-                    <h1 className="text-4xl font-semibold leading-tight text-gray-800">Crear Acuerdo</h1>
-                    <p className="text-gray-600 mt-1">Complete los datos del nuevo acuerdo.</p>
+                    <h1 className="text-4xl font-semibold leading-tight text-gray-800">Crear Acuerdo Comercial</h1>
+                    <p className="text-gray-600 mt-1">Complete los datos del nuevo acuerdo comercial.</p>
                 </div>
 
                 <div className="space-y-4 w-full pt-10 rounded-3xl p-6 bg-white shadow-[0_0_20px_rgba(0,0,0,0.08)]">
@@ -140,7 +140,7 @@ export default function AgreementCreate() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="md:col-span-2">
                                 <label htmlFor="observations" className="block text-sm font-bold mb-3 text-gray-700">
-                                    Detalles del Acuerdo
+                                    Detalles del Acuerdo Comercial
                                 </label>
                                 <textarea
                                     id="observations"
@@ -148,7 +148,7 @@ export default function AgreementCreate() {
                                     value={data.observations}
                                     rows={4}
                                     required
-                                    placeholder="Ingrese los detalles del acuerdo..."
+                                    placeholder="Ingrese los detalles del acuerdo comercial..."
                                     onChange={e => setData('observations', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />

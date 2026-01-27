@@ -6,6 +6,7 @@ import { useForm, Link, Head } from "@inertiajs/react"
 import { Label } from "@radix-ui/react-dropdown-menu"
 import { Spinner } from "@/components/ui/spinner"
 import { Save } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function AgreementsEdit({ agreement }: { agreement: Agreement }) {
     const { data, setData, processing, errors, put, cancel } = useForm({
@@ -18,18 +19,20 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
         is_active: agreement.is_active === true || String(agreement.is_active) === '1' ? true : false,
         observations: agreement.observations ?? '',
     })
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         put(update({ id: agreement.id }).url)
     }
+
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar Acuerdo', index().url)}>
             <Head title="Edición de convenio" />
             <div className="p-6 space-y-6">
                 <div className="ml-4 mb-4 flex items-center justify-between">
                     <div>
-                        <h1 className="text-4xl font-semibold leading-tight text-gray-800">Editar Acuerdo</h1>
-                        <p className="text-gray-600 mt-1">Modifique los detalles del acuerdo según sea necesario.</p>
+                        <h1 className="text-4xl font-semibold leading-tight text-gray-800">Editar Acuerdo Comercial</h1>
+                        <p className="text-gray-600 mt-1">Modifique los detalles del acuerdo comercial según sea necesario.</p>
                     </div>
                     <div className="flex bg-gray-50 shadow-sm mr-6 w-auto rounded-2xl items-center gap-2 p-1">
                         <Label className="pl-3 text-gray-600 font-medium text-sm">Estado:</Label>
@@ -151,11 +154,11 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
                             </div>
                         </div>
 
-                        {/* Fila 4: Fechas */}
+                        {/* Fila 4: Observaciones */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="md:col-span-2">
                                 <label htmlFor="observations" className="block text-sm font-bold mb-3 text-gray-700">
-                                    Detalles del Acuerdo
+                                    Detalles del Acuerdo Comercial
                                 </label>
                                 <textarea
                                     id="observations"
@@ -163,7 +166,7 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
                                     value={data.observations}
                                     rows={4}
                                     required
-                                    placeholder="Ingrese los detalles del acuerdo..."
+                                    placeholder="Ingrese los detalles del acuerdo comercial..."
                                     onChange={e => setData('observations', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
@@ -173,13 +176,13 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
                     </form>
 
                     <div className="flex flex-wrap justify-center border-t border-gray-200 pt-20 mt-25 gap-3">
-                        <button
+                        <Button
                             form="form"
-                            className="bg-locatel-medio text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
+                            className="bg-locatel-medio flex flex-row h-12 gap-2 items-center text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
                             disabled={processing}
                         >
                             {processing ? (<><Spinner /> Guardando....</>) : <><Save /> Guardar</>}
-                        </button>
+                        </Button>
 
                         <Link
                             viewTransition
