@@ -3,7 +3,6 @@ import { useForm, Link, Head } from '@inertiajs/react'
 import Select from 'react-select'
 import { Center, Department, Option, MediaItem, } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
-import React from 'react'
 import { Button } from '@/components/ui/button'
 import useModal from '@/hooks/use-modal'
 import { CampaignCreateProps } from '@/types/campaign/page.type'
@@ -21,13 +20,14 @@ import { CircleAlert, PlusCircle, Save, SquarePlay } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { Label } from '@/components/ui/label'
 import InputError from '@/components/input-error'
+import { makeOptions } from '@/helpers/reactSelect'
 
 export default function CampaignCreate({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
     const { isOpen, openModal, closeModal } = useModal(false)
     const ToastComponent = useToast(flash)
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { handlerSearch, search, filteredItems } = useSearch(mediaList);
-    const { moveUp, moveDown, transfer } = useMediaActions<MediaItem>();
+    const { moveUp, moveDown, transfer, removeItem } = useMediaActions<MediaItem>();
     const { data, setData, processing, errors, post, transform, cancel } = useForm({
         title: '',
         start_at: '',
@@ -38,15 +38,12 @@ export default function CampaignCreate({ centers, departments, agreements, media
         am_media: [] as string[],
         pm_media: [] as string[],
     })
-    const optionsCenter: Option[] = centers.map((center: Center) => {
-        return { value: center.id, label: center.name + " - " + center.code }
-    })
-    const optionsDepartment: Option[] = departments.map((department: Department) => {
-        return { value: department.id, label: department.name }
-    })
-    const optionsAgreement: Option[] = agreements.map((agreement: Agreement) => {
-        return { value: agreement.id, label: agreement.name }
-    })
+    const optionsCenter: Option[] = makeOptions<Center>(centers, c => c.id, c => c.name + " - " + c.code)
+
+    const optionsDepartment: Option[] = makeOptions<Department>(departments, d => d.id, d => d.name)
+
+    const optionsAgreement: Option[] = makeOptions<Agreement>(agreements, a => a.id, a => a.name)
+
     const filteredCenters = (val: Option[] | null): void => {
         const selected = val ?? []
         const values = selected.map(v => v.value)
@@ -148,7 +145,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                     aria-describedby={errors.start_at ? 'start_at-error' : undefined}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                 <InputError message={errors.start_at} id="start_at-error" />
+                                <InputError message={errors.start_at} id="start_at-error" />
                             </div>
 
                             <div>
@@ -243,14 +240,14 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             </div>
 
                             <div>
-                                <div className="flex w-full pl-6 pr-6 gap-4 mt-8 mb-4">
+                                <div className="flex w-full pl-6 pr-6 gap-4 mt-8 mb-4 flex-wrap md:flex-nowrap">
                                     <MediaColumn
                                         title="AM"
                                         items={am}
                                         onMoveToOther={(item) => transfer(item, setAm, setPm)}
                                         onMoveUp={(id) => moveUp(id, setAm)}
                                         onMoveDown={(id) => moveDown(id, setAm)}
-                                        onRemove={(item) => transfer(item, setAm, setMediaList)}
+                                        onRemove={(item) => removeItem(item, setAm)}
                                         errors={errors.am_media}
                                     />
                                     <MediaColumn
@@ -259,7 +256,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                         onMoveToOther={(item) => transfer(item, setPm, setAm)}
                                         onMoveUp={(id) => moveUp(id, setPm)}
                                         onMoveDown={(id) => moveDown(id, setPm)}
-                                        onRemove={(item) => transfer(item, setPm, setMediaList)}
+                                        onRemove={(item) => removeItem(item, setPm)}
                                         errors={errors.pm_media}
                                     />
                                 </div>
