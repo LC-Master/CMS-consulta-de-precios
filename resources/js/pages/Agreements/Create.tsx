@@ -27,12 +27,12 @@ export default function AgreementCreate() {
     }
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs('Crear Convenio', index().url)}>
+        <AppLayout breadcrumbs={breadcrumbs('Crear Acuerdo', index().url)}>
             <Head title="Crear Convenio" />
             <div className="p-6 space-y-6">
                 <div className="ml-4 mb-4">
-                    <h1 className="text-4xl font-semibold leading-tight text-gray-800">Crear Convenio</h1>
-                    <p className="text-gray-600 mt-1">Complete los datos del nuevo convenio.</p>
+                    <h1 className="text-4xl font-semibold leading-tight text-gray-800">Crear Acuerdo</h1>
+                    <p className="text-gray-600 mt-1">Complete los datos del nuevo acuerdo.</p>
                 </div>
 
                 <div className="space-y-4 w-full pt-10 rounded-3xl p-6 bg-white shadow-[0_0_20px_rgba(0,0,0,0.08)]">
@@ -140,14 +140,15 @@ export default function AgreementCreate() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="md:col-span-2">
                                 <label htmlFor="observations" className="block text-sm font-bold mb-3 text-gray-700">
-                                    Observaciones <span className="text-gray-400 font-normal">(Opcional)</span>
+                                    Detalles del Acuerdo
                                 </label>
                                 <textarea
                                     id="observations"
                                     name="observations"
                                     value={data.observations}
                                     rows={4}
-                                    placeholder="Ingrese notas o detalles adicionales del convenio..."
+                                    required
+                                    placeholder="Ingrese los detalles del acuerdo..."
                                     onChange={e => setData('observations', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />

@@ -74,17 +74,17 @@ export function AppSidebar() {
             ].filter((item) => item !== undefined)
         },
         {
-            title: 'Convenios',
+            title: 'Acuerdos',
             icon: Handshake,
             isActive: currentPath.includes('/agreement'),
             items: [
                 can('agreements.create') ? {
-                    title: 'Crear Convenios',
+                    title: 'Crear Acuerdo',
                     url: agreementCreate().url,
                     icon: SquarePlus,
                 } : undefined,
                 can('agreements.list') ? {
-                    title: 'Listado de Convenios',
+                    title: 'Listado de Acuerdos',
                     url: agreement().url,
                     icon: Handshake,
                 } : undefined,

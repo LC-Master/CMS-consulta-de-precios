@@ -42,7 +42,7 @@ class UpdateAgreementRequest extends FormRequest
             'contact_email' => ['required', 'string', 'email:rfc,dns', 'max:255'],
             'contact_phone' => ['required', 'string', 'digits_between:10,20'],
             'is_active' => ['required', 'boolean'],
-            'observations' => ['nullable', 'string', 'max:1000'],
+            'observations' => ['required', 'string', 'max:1000'],
         ];
     }
 
@@ -80,8 +80,10 @@ class UpdateAgreementRequest extends FormRequest
             'contact_phone.min' => 'El teléfono debe tener al menos 10 dígitos.',
             'contact_phone.max' => 'El teléfono no debe exceder los 20 dígitos.',
 
-            'observations.string' => 'Las observaciones deben ser texto.',
-            'observations.max' => 'Las observaciones no deben exceder los 1000 caracteres.',
+            // observations
+            'observations.required' => 'Los detalles del acuerdo son obligatorios',
+            'observations.string' => 'Los detalles del acuerdo deben ser texto.',
+            'observations.max'    => 'Los detalles del acuerdo no deben exceder los 1000 caracteres.',
         ];
     }
     public function attributes(): array
@@ -94,7 +96,7 @@ class UpdateAgreementRequest extends FormRequest
             'contact_email' => 'correo de contacto',
             'contact_phone' => 'teléfono de contacto',
             'is_active' => 'estado',
-            'observations' => 'observaciones',
+            'observations' => 'Detalles del acuerdo',
         ];
     }
 }

@@ -36,17 +36,17 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
 
         // --- FILTROS OPCIONALES ---
         
-        // Si seleccionó departamento
         if (!empty($this->filters['departmentId'])) {
             $query->where('department_id', $this->filters['departmentId']);
         }
 
-        // Si seleccionó acuerdo
+        // Filtro por acuerdo
         if (!empty($this->filters['agreementId'])) {
-            $query->where('agreement_id', $this->filters['agreementId']);
+            $query->whereHas('agreements', function($q) {
+                $q->where('agreements.id', $this->filters['agreementId']);
+            });
         }
 
-        // Si seleccionó estatus
         if (!empty($this->filters['statusId'])) {
             $query->where('status_id', $this->filters['statusId']);
         }
@@ -62,24 +62,28 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
                 'Título de la Campaña',
                 'Fecha Inicio',
                 'Fecha Fin',
-                'Departamento', 
-                // 'Acuerdo',      
+                'Departamento / Categoria',
                 'Estatus',
                 'Usuario Creador',
+                'Acuerdos Asociados',
             ]
         ];
     }
 
     public function map($campaign): array
     {
+        $agreementsList = $campaign->agreements->isNotEmpty() 
+            ? $campaign->agreements->pluck('name')->implode(', ') 
+            : 'Sin Acuerdos';
+
         return [
             $campaign->title,
             Carbon::parse($campaign->start_at)->format('d/m/Y H:i'),
             Carbon::parse($campaign->end_at)->format('d/m/Y H:i'),
             $campaign->department?->name ?? 'N/A', 
-            //$campaign->agreement?->name ?? 'N/A',
             $campaign->status?->status ?? 'Sin Estatus',
             $campaign->user?->name ?? 'Sistema',
+            $agreementsList, // Aquí mostramos la lista de acuerdos
         ];
     }
 
@@ -88,14 +92,15 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
         $drawing = new Drawing();
         $drawing->setName('Logo');
         $drawing->setDescription('Logo Corporativo');
-        $logoPath = public_path('Logo.webp'); 
+        $drawing->setPath(public_path('Logo.webp'));
 
-        if (file_exists($logoPath)) {
-            $drawing->setPath($logoPath);
+        if (file_exists(public_path('Logo.webp'))) {
             $drawing->setHeight(50);
             $drawing->setCoordinates('A1');
             $drawing->setOffsetX(15);
             $drawing->setOffsetY(10);
+        } else {
+            return [];
         }
 
         return $drawing;
@@ -103,7 +108,9 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
 
     public function styles(Worksheet $sheet)
     {
-        // Título Principal (Combinado hasta la columna G)
+        // el rango hasta la columna G (7 columnas en total)
+        
+        // Título Principal
         $sheet->mergeCells('A1:G1'); 
         $sheet->getRowDimension(1)->setRowHeight(60);
         
@@ -112,7 +119,7 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
         ]);
 
-        // Cabecera de la Tabla (Fila 2, hasta columna G)
+        // Cabecera de la Tabla
         $sheet->getStyle('A2:G2')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['argb' => Color::COLOR_WHITE]],
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF00A650']],
@@ -128,6 +135,8 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
             'borders' => [
                 'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']],
             ],
+            // Alineación superior para celdas con múltiples líneas (como los acuerdos)
+            'alignment' => ['vertical' => Alignment::VERTICAL_TOP, 'wrapText' => true],
         ]);
 
         return [];
