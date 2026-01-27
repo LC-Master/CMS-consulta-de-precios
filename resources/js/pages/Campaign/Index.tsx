@@ -43,7 +43,6 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
         {
             key: 'start_at',
             header: 'Inicio',
-            // CAMBIO AQUÍ: Formato fecha y hora
             render: (a) => new Date(a.start_at).toLocaleString('es-ES', {
                 day: '2-digit',
                 month: '2-digit',
@@ -56,7 +55,6 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
         {
             key: 'end_at',
             header: 'Fin',
-            // CAMBIO AQUÍ: Formato fecha y hora
             render: (a) => new Date(a.end_at).toLocaleString('es-ES', {
                 day: '2-digit',
                 month: '2-digit',
@@ -78,8 +76,8 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                                 reset: ['campaigns', 'flash'],
                                 preserveScroll: true
                             });
-                        }} className='p-2 bg-locatel-claro hover:bg-locatel-medio h-8 text-white rounded-md'>
-                            <Check className='w-4 h-4' />
+                        }} className='p-2 bg-yellow-300 hover:bg-yellow-400 h-8 text-white rounded-md'>
+                            <Check className='w-4 text-black h-4' />
                         </Button>
                     ) : (
                         a.status.status === StatusCampaignEnum.ACTIVE && (

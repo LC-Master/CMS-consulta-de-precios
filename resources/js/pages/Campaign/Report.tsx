@@ -79,9 +79,9 @@ export default function CampaignReport({ flash, departments, agreements, statuse
         }
     }
 
-    const optionsStatuses: Option[] = makeOptions<Status>(statuses, s => s.status, s => s.status)
-    const optionsDepartment: Option[] = makeOptions<Department>(departments, d => d.name, d => d.name)
-    const optionsAgreement: Option[] = makeOptions<Agreement>(agreements, a => a.name, a => a.name)
+    const optionsStatuses: Option[] = makeOptions<Status>(statuses, s => s.id, s => s.status)
+    const optionsDepartment: Option[] = makeOptions<Department>(departments, d => d.id, d => d.name)
+    const optionsAgreement: Option[] = makeOptions<Agreement>(agreements, a => a.id, a => a.name)
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Generar Reporte', index().url)}>

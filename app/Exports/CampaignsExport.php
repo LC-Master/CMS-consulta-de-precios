@@ -63,7 +63,7 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
                 'Fecha Inicio',
                 'Fecha Fin',
                 'Departamento', 
-                // 'Acuerdo',      
+                'Acuerdo',      
                 'Estatus',
                 'Usuario Creador',
             ]
