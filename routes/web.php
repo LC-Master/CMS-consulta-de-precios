@@ -11,7 +11,7 @@ use Inertia\Inertia;
 
 Route::middleware(['auth', 'verified', 'role:admin|publicidad|supervisor|consultor'])->group(function () {
 
-    Route::get('/', fn() => redirect()->route('campaign.index'));
+    Route::get('/', fn() => redirect()->route('campaign.index'))->name('home');
 
     Route::get('/centers', [CenterController::class, 'index'])->name('centers.index');
 
