@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Agreement;
 use App\Models\Campaign;
 use App\Models\Media;
 use App\Models\User;
@@ -23,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Agreement::observe(\App\Observers\Agreement\AgreementObserver::class);
         User::observe(\App\Observers\User\UserObserver::class);
         Campaign::observe(\App\Observers\CampaignObserver::class);
         PersonalAccessToken::observe(\App\Observers\Token\SanctumTokenObserver::class);

@@ -20,19 +20,26 @@ class UserObserver
 
         $this->dispatchLog($dto, LogActionEnum::CREATED, 'El usuario ha sido creado');
     }
+    
+    
     public function updated(\App\Models\User $user): void
     {
         if ($user->wasChanged()) {
+            $excludedKeys = ['password', 'remember_token', 'status', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at'];
+
             $changes = [
-                'before' => array_intersect_key($user->getOriginal(), $user->getChanges()),
-                'after' => $user->getChanges(),
+                'before' => array_intersect_key(
+                    array_diff_key($user->getOriginal(), array_flip($excludedKeys)),
+                    $user->getChanges()
+                ),
+                'after' => array_diff_key($user->getChanges(), array_flip($excludedKeys)),
             ];
 
             $dto = new UserJobDTO(
                 id: $user->getKey(),
                 name: $user->name,
                 email: $user->email,
-                payload: $user->getOriginal(),
+                payload: array_diff_key($user->getOriginal(), array_flip($excludedKeys)),
                 changes: $changes
             );
 
