@@ -7,11 +7,13 @@ export interface User {
     updated_at: string;
     status: number;
     roles: Role[];
+    deleted_at?: string | null;
 }
 
 export interface Props {
     users: { data: User[] };
     filters: { search?: string };
+    flash: any;
 }
 
 export interface Permission {
@@ -29,6 +31,7 @@ export type PropsEditPage = {
     user: User;
     statuses: { name: string; value: number }[];
     roles: Role[];
+    flash?: any;
 };
 
-export type PropsCreatePage = Pick<PropsEditPage, 'roles'>;
+export type PropsCreatePage = Pick<PropsEditPage, 'roles'> & { flash?: any };

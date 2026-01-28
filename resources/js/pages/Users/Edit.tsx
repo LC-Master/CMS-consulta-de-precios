@@ -10,14 +10,13 @@ import { update, index, edit } from '@/routes/user';
 import Select from 'react-select';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
 
-export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
+export default function UserEdit({ user, roles }: PropsEditPage) {
     const optionsRoles = roles.map((role) => ({ value: role.name, label: role.name }));
-    const optionsStatuses = statuses.map((status) => ({ value: status.value, label: status.name }));
 
     const { data, setData, processing, errors, put } = useForm({
         name: user.name,
         email: user.email,
-        status: user.status ? Number(user.status) : 1,
+        // ELIMINADO: status (ya no se maneja aquí)
         role: user.roles && user.roles.length > 0 ? user.roles[0].name : '',
         password: '',
         password_confirmation: '',
@@ -25,12 +24,12 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        // Asegúrate de que esta ruta 'update' genere la URL correcta (ej: /user/123)
         put(update({ id: user.id }).url);
     };
 
     const selectedRole = roles.find(role => role.name === data.role);
 
-    // Función auxiliar para bloquear copiar y pegar
     const preventCopyPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
         e.preventDefault();
     };
@@ -90,7 +89,7 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
                             </div>
                         </div>
 
-                        {/* Mostrar Permisos (Opcional, ayuda visual) */}
+                        {/* Mostrar Permisos */}
                         {data.role && selectedRole?.permissions && (
                             <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                                 <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
@@ -106,42 +105,23 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
                             </div>
                         )}
 
-                        {/* Fila 2: Email y Estatus */}
-                        <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
-                            <div className="flex-1 flex flex-col gap-2">
-                                <Label htmlFor="email">Correo electrónico</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    value={data.email}
-                                    placeholder="email@ejemplo.com"
-                                    disabled={true} 
-                                    className="bg-gray-100 text-gray-500 cursor-not-allowed"
-                                    // Aunque está deshabilitado, es buena práctica bloquearlo explícitamente también
-                                    onPaste={preventCopyPaste}
-                                    onCopy={preventCopyPaste}
-                                />
-                                <InputError message={errors.email} />
-                            </div>
-
-                            <div className="flex-1 flex flex-col gap-2">
-                                <Label htmlFor="status">Estatus</Label>
-                                <Select
-                                    id="status"
-                                    value={optionsStatuses.find(option => option.value === data.status)}
-                                    onChange={(val) => setData('status', val ? Number(val.value) : 1)}
-                                    options={optionsStatuses}
-                                    styles={{
-                                        control: (provided) => ({
-                                            ...provided,
-                                            borderRadius: '0.375rem',
-                                        }),
-                                    }}
-                                />
-                            </div>
+                        {/* Fila 2: Email (Solo Lectura) */}
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor="email">Correo electrónico</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={data.email}
+                                placeholder="email@ejemplo.com"
+                                disabled={true} 
+                                className="bg-gray-100 text-gray-500 cursor-not-allowed w-full"
+                                onPaste={preventCopyPaste}
+                                onCopy={preventCopyPaste}
+                            />
+                            <InputError message={errors.email} />
                         </div>
 
-                        {/* Fila 3: Contraseñas (Opcional) */}
+                        {/* Fila 3: Contraseñas */}
                         <div className="border-t border-gray-100 pt-4">
                             <p className="text-sm text-gray-500 mb-4">Cambiar contraseña (dejar en blanco para mantener la actual)</p>
                             <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
@@ -154,8 +134,8 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
                                         placeholder="********"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password', e.target.value)}
-                                        onPaste={preventCopyPaste} // Bloquea pegar
-                                        onCopy={preventCopyPaste}  // Bloquea copiar
+                                        onPaste={preventCopyPaste}
+                                        onCopy={preventCopyPaste}
                                     />
                                     <InputError message={errors.password} />
                                 </div>
@@ -169,7 +149,7 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
                                         placeholder="********"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password_confirmation', e.target.value)}
-                                        onPaste={preventCopyPaste} // Bloquea pegar
+                                        onPaste={preventCopyPaste}
                                     />
                                 </div>
                             </div>

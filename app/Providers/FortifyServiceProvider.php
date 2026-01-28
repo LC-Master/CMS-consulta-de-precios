@@ -21,9 +21,6 @@ use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
 
 class FortifyServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         $this->app->instance(LoginResponse::class, new class implements LoginResponse {
@@ -34,9 +31,6 @@ class FortifyServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         $this->app->instance(LogoutResponseContract::class, new LogoutResponse);
@@ -45,40 +39,29 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureViews();
         $this->configureRateLimiting();
 
-
         Fortify::authenticateUsing(function (Request $request) {
-
-            $user = User::where('email', $request->email)->first();
-
+            $user = User::withTrashed()->where('email', $request->email)->first();
 
             if ($user && Hash::check($request->password, $user->password)) {
-
-
-                if ($user->status == 1) {
-                    return $user;
+                if ($user->trashed()) {
+                    throw ValidationException::withMessages([
+                        Fortify::username() => ['Tu cuenta está inactiva. Por favor contacta al soporte.'],
+                    ]);
                 }
 
-                throw ValidationException::withMessages([
-                    Fortify::username() => ['Tu cuenta está inactiva. Por favor contacta al soporte.'],
-                ]);
+                return $user;
             }
 
             return null;
         });
     }
 
-    /**
-     * Configure Fortify actions.
-     */
     private function configureActions(): void
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::createUsersUsing(CreateNewUser::class);
     }
 
-    /**
-     * Configure Fortify views.
-     */
     private function configureViews(): void
     {
         Fortify::loginView(fn(Request $request) => Inertia::render('auth/login', [
@@ -107,9 +90,6 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::confirmPasswordView(fn() => Inertia::render('auth/confirm-password'));
     }
 
-    /**
-     * Configure rate limiting.
-     */
     private function configureRateLimiting(): void
     {
         RateLimiter::for('two-factor', function (Request $request) {
