@@ -80,7 +80,15 @@ class CampaignObserver
         $this->dispatchLog($dto, LogActionEnum::RESTORED, "Campaña restaurada desde papelera");
     }
     /**
-     * Método privado para no repetir el dispatch
+     * Despacha un trabajo de registro de actividad.
+     * 
+     * Método privado que centraliza el dispatch del RecordActivityJob
+     * para evitar repetición de código en los métodos del observador.
+     * 
+     * @param CampaignJobDTO $dto Datos de la campaña a registrar
+     * @param LogActionEnum $action Acción realizada (CREATED, UPDATED, DELETED, RESTORED)
+     * @param string $message Mensaje descriptivo de la acción
+     * @return void
      */
     private function dispatchLog(CampaignJobDTO $dto, LogActionEnum $action, string $message): void
     {

@@ -59,7 +59,15 @@ class AgreementObserver
         $this->dispatchLog($dto, LogActionEnum::DELETED, "Acuerdo comercial eliminado");
     }
     /**
-     * Método privado para no repetir el dispatch
+     * Despacha un trabajo de registro de actividad.
+     * 
+     * Método privado que centraliza el dispatch del RecordActivityJob
+     * para evitar repetición de código en los métodos del observador.
+     * 
+     * @param AgreementJobDTO $dto Datos del acuerdo a registrar
+     * @param LogActionEnum $action Acción realizada (CREATED, UPDATED, DELETED)
+     * @param string $message Mensaje descriptivo de la acción
+     * @return void
      */
     private function dispatchLog(AgreementJobDTO $dto, LogActionEnum $action, string $message): void
     {
