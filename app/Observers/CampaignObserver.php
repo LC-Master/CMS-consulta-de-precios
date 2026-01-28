@@ -2,86 +2,76 @@
 
 namespace App\Observers;
 
-use App\Enums\Log\LogLevelEnum;
-use App\Enums\Log\LogActionEnum;
 use App\Models\Campaign;
-use App\Jobs\RecordCampaignActivityJob;
-use Illuminate\Support\Facades\Auth;
+use App\DTOs\RecordActivityLogs\CampaignJobDTO;
+use App\Jobs\RecordActivityJob;
+use App\Enums\Log\LogActionEnum;
+use App\Enums\Log\LogLevelEnum;
 
 class CampaignObserver
 {
     /**
-     * Procesa los cambios para el formato OLD/NEW
+     * Escucha el evento de creación.
      */
-    private function getFormattedChanges(Campaign $campaign): array
-    {
-        $changes = [];
-        foreach ($campaign->getChanges() as $key => $newValue) {
-            if (\in_array($key, ['updated_at', 'created_at', 'deleted_at'])) continue;
-
-            $changes[$key] = [
-                'old' => $campaign->getOriginal($key),
-                'new' => $newValue
-            ];
-        }
-        return $changes;
-    }
-
     public function created(Campaign $campaign): void
     {
-        RecordCampaignActivityJob::dispatch(
-            Auth::user(),
-            $campaign,
-            LogActionEnum::CREATED,
-            LogLevelEnum::INFO,
-            "Se creó la campaña: {$campaign->title}",
-            [
-                'title' => $campaign->title,
-                'changes' => $campaign->getAttributes()
-            ]
+        $dto = new CampaignJobDTO(
+            (string) $campaign->getKey(),
+            $campaign->getAttribute('title'),
+            $campaign->toArray(),
         );
+
+        $this->dispatchLog($dto, LogActionEnum::CREATED, "Campaña creada: {$campaign->getAttribute('title')}");
     }
 
+    /**
+     * Escucha el evento de actualización.
+     */
     public function updated(Campaign $campaign): void
     {
-        $changes = $this->getFormattedChanges($campaign);
+        if ($campaign->wasChanged()) {
+            $changes = [
+                'before' => array_intersect_key($campaign->getOriginal(), $campaign->getChanges()),
+                'after' => $campaign->getChanges(),
+            ];
 
-        if (empty($changes)) return;
+            $dto = new CampaignJobDTO(
+                (string) $campaign->getKey(),
+                $campaign->getAttribute('title'),
+                $changes
+            );
 
-        RecordCampaignActivityJob::dispatch(
-            Auth::user(),
-            $campaign,
-            LogActionEnum::UPDATED,
-            LogLevelEnum::INFO,
-            "Se actualizó la campaña: {$campaign->title}",
-            [
-                'title' => $campaign->title,
-                'changes' => $changes
-            ]
-        );
+            $this->dispatchLog($dto, LogActionEnum::UPDATED, "Campaña actualizada");
+        }
     }
 
+    /**
+     * Escucha el evento de eliminación (SoftDelete).
+     */
     public function deleted(Campaign $campaign): void
     {
-        RecordCampaignActivityJob::dispatch(
-            Auth::user(),
-            $campaign,
-            LogActionEnum::DELETED,
-            LogLevelEnum::DANGER,
-            "Campaña '{$campaign->title}' eliminada.",
-            ['title' => $campaign->title]
+        $dto = new CampaignJobDTO(
+            (string) $campaign->getKey(),
+            $campaign->getAttribute('title'),
+            ['deleted_at' => $campaign->getAttribute('deleted_at')->toDateTimeString()]
         );
+
+        $this->dispatchLog($dto, LogActionEnum::DELETED, "Campaña enviada a papelera");
     }
 
-    public function restored(Campaign $campaign): void
+    /**
+     * Método privado para no repetir el dispatch
+     */
+    private function dispatchLog(CampaignJobDTO $dto, LogActionEnum $action, string $message): void
     {
-        RecordCampaignActivityJob::dispatch(
-            Auth::user(),
-            $campaign,
-            LogActionEnum::UPDATED,
-            LogLevelEnum::INFO,
-            "Campaña '{$campaign->title}' restaurada.",
-            ['title' => $campaign->title]
+        RecordActivityJob::dispatch(
+            dto: $dto,
+            action: $action,
+            level: LogLevelEnum::INFO,
+            message: $message,
+            ipAddress: request()->ip(),
+            userAgent: request()->userAgent(),
+            causer: auth()->user()
         );
     }
 }

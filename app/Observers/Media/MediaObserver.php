@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Observers\Media;
+
+use App\Jobs\RecordActivityJob;
+use App\Models\Media;
+use App\Enums\Log\LogActionEnum;
+use App\Enums\Log\LogLevelEnum;
+
+class MediaObserver
+{
+    public function deleted(Media $media): void
+    {
+        $mediaDto = new \App\DTOs\RecordActivityLogs\MediaJobDTO(
+            id: $media->getKey(),
+            path: $media->path,
+            name: $media->name,
+            mime_type: $media->mime_type,
+            size: $media->size
+        );
+
+        RecordActivityJob::dispatch(
+            $mediaDto,
+            LogActionEnum::DELETED,
+            LogLevelEnum::WARNING,
+            'El media ha sido eliminado',
+            request()->ip(),
+            request()->userAgent(),
+            request()->headers->get('referer'),
+            auth()->user()
+        );
+    }
+}

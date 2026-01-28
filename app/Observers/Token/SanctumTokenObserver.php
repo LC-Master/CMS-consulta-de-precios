@@ -5,7 +5,7 @@ namespace App\Observers\Token;
 use App\DTOs\RecordActivityLogs\PersonalAccessTokenJobDTO;
 use App\Enums\Log\LogActionEnum;
 use App\Enums\Log\LogLevelEnum;
-use App\Jobs\RecordPersonalAccessTokenActivityJob;
+use App\Jobs\RecordActivityJob;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class SanctumTokenObserver
@@ -21,7 +21,7 @@ class SanctumTokenObserver
             center_code: $token->tokenable?->code,
         );
 
-        RecordPersonalAccessTokenActivityJob::dispatch(
+        RecordActivityJob::dispatch(
             $personalAccessTokenJobDTO,
             LogActionEnum::TOKEN_CREATED,
             LogLevelEnum::SUCCESS,
@@ -42,7 +42,7 @@ class SanctumTokenObserver
             center_name: $token->tokenable?->name,
             center_code: $token->tokenable?->code,
         );
-        RecordPersonalAccessTokenActivityJob::dispatch(
+        RecordActivityJob::dispatch(
             $personalAccessTokenJobDTO,
             LogActionEnum::TOKEN_DELETED,
             LogLevelEnum::WARNING,
