@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Agreement::observe(\App\Observers\Agreement\AgreementObserver::class);
         User::observe(\App\Observers\User\UserObserver::class);
-        Campaign::observe(\App\Observers\CampaignObserver::class);
+        Campaign::observe(\App\Observers\Campaign\CampaignObserver::class);
         PersonalAccessToken::observe(\App\Observers\Token\SanctumTokenObserver::class);
         Media::observe(\App\Observers\Media\MediaObserver::class);
     }
