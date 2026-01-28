@@ -35,7 +35,6 @@ export type Pivot = {
 
 export default function useAuth() {
     const { auth } = usePage().props as unknown as { auth: AuthProps };
-
     const hasRole = (role: string): boolean => {
         if (!role.includes('|')) return auth?.roles?.includes(role) ?? false;
         return role

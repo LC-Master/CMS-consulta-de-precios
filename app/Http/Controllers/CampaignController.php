@@ -32,14 +32,14 @@ class CampaignController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:campaigns.list', only: ['index']),
-            new Middleware('permission:campaigns.view', only: ['show']),
-            new Middleware('permission:campaigns.create', only: ['create', 'store']),
-            new Middleware('permission:campaigns.update', only: ['edit', 'update']),
-            new Middleware('permission:campaigns.delete', only: ['destroy']),
-            new Middleware('permission:campaigns.activate', only: ['activate']),
-            new Middleware('permission:campaigns.cancel', only: ['cancel']),
-            new Middleware('permission:campaigns.report', only: ['report', 'export']),
+            new Middleware('permission:campaign.list', only: ['index']),
+            new Middleware('permission:campaign.show', only: ['show']),
+            new Middleware('permission:campaign.create', only: ['create', 'store']),
+            new Middleware('permission:campaign.update', only: ['edit', 'update']),
+            new Middleware('permission:campaign.delete', only: ['destroy']),
+            new Middleware('permission:campaign.activate', only: ['activate']),
+            new Middleware('permission:campaign.cancel', only: ['cancel']),
+            new Middleware('permission:campaign.report', only: ['report', 'export']),
         ];
     }
 

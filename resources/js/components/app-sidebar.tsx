@@ -29,11 +29,11 @@ const Logo = lazy(() => import('@/components/app-logo'));
 
 export function AppSidebar() {
 
-    const { hasRole, can } = useAuth();
+    const { can } = useAuth();
 
     const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
 
-    const mainNavItems = hasRole('admin|publicidad|supervisor|consultor') ? [
+    const mainNavItems = [
         can('dashboard.view') ? {
             title: 'Panel de estadísticas',
             url: dashboard().url,
@@ -44,27 +44,27 @@ export function AppSidebar() {
             icon: Megaphone,
             isActive: currentPath.includes('/campaign') || currentPath.includes('/calendar'),
             items: [
-                can('campaigns.create') ? {
+                can('campaign.create') ? {
                     title: 'Crear campaña',
                     url: create().url,
                     icon: SquarePlus,
                 } : undefined,
-                can('campaigns.list') ? {
+                can('campaign.list') ? {
                     title: 'Listado de campañas',
                     url: index().url,
                     icon: List,
                 } : undefined,
-                can('campaigns.history') ? {
+                can('campaign.history') ? {
                     title: 'Historial',
                     url: indexHistory().url,
                     icon: History,
                 } : undefined,
-                can('campaigns.history.calendar') ? {
+                can('campaign.history.calendar') ? {
                     title: 'Calendario',
                     url: calendar().url,
                     icon: Calendar,
                 } : undefined,
-                can('reports.view') ?
+                can('report.view') ?
                     {
                         title: 'Reportes',
                         url: reportList().url,
@@ -78,43 +78,41 @@ export function AppSidebar() {
             icon: Handshake,
             isActive: currentPath.includes('/agreement'),
             items: [
-                can('agreements.create') ? {
+                can('agreement.create') ? {
                     title: 'Crear Acuerdo',
                     url: agreementCreate().url,
                     icon: SquarePlus,
                 } : undefined,
-                can('agreements.list') ? {
+                can('agreement.list') ? {
                     title: 'Listado de Acuerdos',
                     url: agreement().url,
                     icon: Handshake,
                 } : undefined,
             ].filter((item) => item !== undefined)
         }
-    ].filter(item => item !== undefined) : [];
+    ].filter(item => item !== undefined);
 
-    const adminElement = hasRole('admin|supervisor') ? [
-        can('users.list') ? {
+    const adminElement = [
+        can('user.list') ? {
             title: 'Usuarios',
             href: user().url,
             icon: Users,
         } : undefined,
-        can('tokens.list') ? {
+        can('token.list') ? {
             title: 'Lista de tokens',
             href: tokens().url,
             icon: KeyRound,
-        } : undefined,
-    ] : [];
-
-
+        } : undefined
+    ];
 
 
     const footerNavItems = [
-        can('medias.list') ? {
+        can('media.list') ? {
             title: 'Listado de Medios',
             href: media().url,
             icon: Film,
         } : undefined,
-        can('logs.list') ? {
+        can('log.list') ? {
             title: 'Logs de actividad',
             href: indexActivityLog().url,
             icon: Logs,

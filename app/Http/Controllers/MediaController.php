@@ -32,11 +32,11 @@ class MediaController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:medias.list', only: ['index']),
-            new Middleware('permission:medias.show', only: ['show']),
-            new Middleware('permission:medias.create', only: ['store']),
-            new Middleware('permission:medias.update', only: ['update']),
-            new Middleware('permission:medias.delete', only: ['destroy']),
+            new Middleware('permission:media.list', only: ['index']),
+            new Middleware('permission:media.show', only: ['show']),
+            new Middleware('permission:media.create', only: ['store']),
+            new Middleware('permission:media.update', only: ['update']),
+            new Middleware('permission:media.delete', only: ['destroy']),
         ];
     }
 

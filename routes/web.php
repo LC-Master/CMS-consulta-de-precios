@@ -13,11 +13,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/', fn() => redirect()->route('campaign.index'))
         ->name('home')
-        ->middleware('permission:campaigns.list');
+        ->middleware('permission:campaign.list');
 
     Route::get('/centers', [CenterController::class, 'index'])
         ->name('centers.index')
-        ->middleware('permission:centers.list');
+        ->middleware('permission:center.list');
 
     Route::get('dashboard', [DashboardController::class, 'index'])
         ->name('dashboard')
@@ -36,7 +36,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('logs', [ActivityLogController::class, 'index'])
         ->name('logs.index')
-        ->middleware('permission:logs.list');
+        ->middleware('permission:log.list');
 
     Route::resource('agreement', AgreementController::class);
 

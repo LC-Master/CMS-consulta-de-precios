@@ -6,6 +6,7 @@ use App\Actions\Agreement\CreateAgreementAction;
 use App\Enums\AgreementStatus;
 use App\Http\Requests\Agreement\StoreAgreementRequest;
 use App\Http\Requests\Agreement\UpdateAgreementRequest;
+use Illuminate\Routing\Controllers\Middleware;
 use App\Models\Agreement;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,13 +21,11 @@ class AgreementController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            'index' => ['permission:agreements.list'],
-            'create' => ['permission:agreements.create'],
-            'store' => ['permission:agreements.create'],
-            'show' => ['permission:agreements.view'],
-            'edit' => ['permission:agreements.update'],
-            'update' => ['permission:agreements.update'],
-            'destroy' => ['permission:agreements.delete'],
+            new Middleware('permission:agreement.list', only: ['index']),
+            new Middleware('permission:agreement.show', only: ['show']),
+            new Middleware('permission:agreement.create', only: ['create', 'store']),
+            new Middleware('permission:agreement.update', only: ['edit', 'update']),
+            new Middleware('permission:agreement.delete', only: ['destroy']),
         ];
     }
 
