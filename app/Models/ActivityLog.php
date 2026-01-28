@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ActivityLog extends Model
 {
@@ -15,6 +16,7 @@ class ActivityLog extends Model
     use HasFactory;
 
     use HasUuids;
+    use SoftDeletes;
 
     public $timestamps = false;
 

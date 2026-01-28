@@ -30,6 +30,7 @@ class CenterSnapshotController extends Controller
 
             return response()->json([
                 'meta' => [
+                    'api_version' => config('dto.dto_version'),
                     'version' => $snapShot->getAttribute('version_hash'),
                     'generated_at' => now()->toIso8601String(),
                 ],

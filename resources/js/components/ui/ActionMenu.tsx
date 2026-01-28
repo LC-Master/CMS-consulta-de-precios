@@ -60,7 +60,6 @@ const ItemLink = ({ children, href, className = "", variant = 'default' }: ItemP
     );
 };
 
-
 const Separator = () => <div className="h-px bg-gray-100 my-1" />;
 
 export function ActionMenu({ children }: ActionMenuProps) {
@@ -73,10 +72,21 @@ export function ActionMenu({ children }: ActionMenuProps) {
 
         if (!isOpen && triggerRef.current) {
             const rect = triggerRef.current.getBoundingClientRect();
-            setCoords({
-                top: rect.bottom + window.scrollY + 8,
-                left: rect.right + window.scrollX - 224,
-            });
+            const MENU_APPROX_HEIGHT = 150;
+            const spaceBelow = window.innerHeight - rect.bottom;
+
+            if (spaceBelow < 400) {
+                const topAbove = window.scrollY + rect.top - 8 - MENU_APPROX_HEIGHT;
+                setCoords({
+                    top: Math.max(topAbove, window.scrollY + 8),
+                    left: rect.right + window.scrollX - 224,
+                });
+            } else {
+                setCoords({
+                    top: rect.bottom + window.scrollY + 8,
+                    left: rect.right + window.scrollX - 224,
+                });
+            }
         }
         setIsOpen(!isOpen);
     };
@@ -111,7 +121,7 @@ export function ActionMenu({ children }: ActionMenuProps) {
                 <div
                     style={{ position: 'absolute', top: coords.top, left: coords.left, minWidth: '14rem' }}
                     className="bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-gray-200 py-1.5 z-9999 animate-in fade-in zoom-in duration-100"
-                    onClick={(e) => e.stopPropagation()} // Permite clics dentro del menú sin cerrarlo
+                    onClick={(e) => e.stopPropagation()}
                 >
                     {children}
                 </div>,

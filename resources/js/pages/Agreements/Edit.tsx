@@ -7,6 +7,8 @@ import { Label } from "@radix-ui/react-dropdown-menu"
 import { Spinner } from "@/components/ui/spinner"
 import { Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import InputError from "@/components/input-error"
+import { Input } from "@/components/ui/input"
 
 export default function AgreementsEdit({ agreement }: { agreement: Agreement }) {
     const { data, setData, processing, errors, put, cancel } = useForm({
@@ -58,8 +60,8 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
                         {/* Fila 1: Nombres */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label htmlFor="name" className="block text-sm font-bold mb-3 text-gray-700">Nombre Comercial. *</label>
-                                <input
+                                <Label className="block text-sm font-bold mb-3 text-gray-700">Nombre Comercial. *</Label>
+                                <Input
                                     type="text"
                                     id="name"
                                     name="name"
@@ -69,12 +71,12 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
                                     onChange={e => setData('name', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                                <InputError message={errors.name} />
                             </div>
 
                             <div>
-                                <label htmlFor="legal_name" className="block text-sm font-bold mb-3 text-gray-700">Razón Social. *</label>
-                                <input
+                                <Label className="block text-sm font-bold mb-3 text-gray-700">Razón Social. *</Label>
+                                <Input
                                     type="text"
                                     id="legal_name"
                                     name="legal_name"
@@ -84,15 +86,15 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
                                     onChange={e => setData('legal_name', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.legal_name && <p className="text-red-500 text-sm mt-1">{errors.legal_name}</p>}
+                                <InputError message={errors.legal_name} />
                             </div>
                         </div>
 
                         {/* Fila 2: Identificación y Contacto */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label htmlFor="tax_id" className="block text-sm font-bold text-gray-700">RIF / Identificación Fiscal. *</label>
-                                <input
+                                <Label className="block text-sm font-bold text-gray-700">RIF / Identificación Fiscal. *</Label>
+                                <Input
                                     type="text"
                                     id="tax_id"
                                     name="tax_id"
@@ -102,12 +104,12 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
                                     onChange={e => setData('tax_id', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.tax_id && <p className="text-red-500 text-sm mt-1">{errors.tax_id}</p>}
+                                <InputError message={errors.tax_id} />
                             </div>
 
                             <div>
-                                <label htmlFor="contact_person" className="block text-sm font-bold text-gray-700">Persona de Contacto. *</label>
-                                <input
+                                <Label className="block text-sm font-bold text-gray-700">Persona de Contacto. *</Label>
+                                <Input
                                     type="text"
                                     id="contact_person"
                                     name="contact_person"
@@ -117,15 +119,15 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
                                     onChange={e => setData('contact_person', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.contact_person && <p className="text-red-500 text-sm mt-1">{errors.contact_person}</p>}
+                                <InputError message={errors.contact_person} />
                             </div>
                         </div>
 
                         {/* Fila 3: Comunicación */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label htmlFor="contact_email" className="block text-sm font-bold mb-3 text-gray-700">Correo Electrónico. *</label>
-                                <input
+                                <Label className="block text-sm font-bold mb-3 text-gray-700">Correo Electrónico. *</Label>
+                                <Input
                                     type="email"
                                     id="contact_email"
                                     name="contact_email"
@@ -135,12 +137,12 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
                                     onChange={e => setData('contact_email', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.contact_email && <p className="text-red-500 text-sm mt-1">{errors.contact_email}</p>}
+                                <InputError message={errors.contact_email} />
                             </div>
 
                             <div>
-                                <label htmlFor="contact_phone" className="block text-sm font-bold mb-3 text-gray-700">Teléfono. *</label>
-                                <input
+                                <Label className="block text-sm font-bold mb-3 text-gray-700">Teléfono. *</Label>
+                                <Input
                                     type="text"
                                     id="contact_phone"
                                     name="contact_phone"
@@ -170,7 +172,7 @@ export default function AgreementsEdit({ agreement }: { agreement: Agreement }) 
                                     onChange={e => setData('observations', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.observations && <p className="text-red-500 text-sm mt-1">{errors.observations}</p>}
+                                <InputError message={errors.observations} />
                             </div>
                         </div>
                     </form>

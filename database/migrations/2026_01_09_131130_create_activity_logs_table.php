@@ -21,7 +21,7 @@ return new class extends Migration {
             $table->string('user_email');
 
             $table->string('action', 100);
-            $table->string('level', 20);
+            $table->string('level', length: 20);
             $table->text('message')->nullable();
             $table->json('properties')->nullable();
 
@@ -34,6 +34,8 @@ return new class extends Migration {
             $table->index(['subject_id', 'subject_type']);
             $table->index('action');
             $table->index('created_at');
+
+            $table->softDeletes();
         });
     }
 

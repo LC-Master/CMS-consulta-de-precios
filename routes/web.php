@@ -3,31 +3,45 @@
 use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ThumbnailController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\CenterController;
-use Inertia\Inertia;
 
-Route::middleware(['auth', 'verified', 'role:admin|publicidad|supervisor|consultor'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('/', fn() => redirect()->route('campaign.index'));
+    Route::get('/', fn() => redirect()->route('campaign.index'))
+        ->name('home')
+        ->middleware('permission:campaigns.list');
 
-    Route::get('/centers', [CenterController::class, 'index'])->name('centers.index');
+    Route::get('/centers', [CenterController::class, 'index'])
+        ->name('centers.index')
+        ->middleware('permission:centers.list');
 
-    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard')
+        ->middleware('permission:dashboard.view');
 
     Route::resource('media', MediaController::class)->parameters([
         'media' => 'media'
     ]);
-    Route::get('/media/cdn/{media}', [MediaController::class, 'preview'])->name('media.cdn');
 
-    Route::resource('logs', ActivityLogController::class)->only(['index']);
+    Route::get('/media/cdn/{media}', [MediaController::class, 'preview'])
+        ->name('media.cdn');
+
+    Route::post('/media/upload', [MediaController::class, 'store'])
+        ->name('media.upload')
+        ->middleware('permission:media.upload');
+
+    Route::get('logs', [ActivityLogController::class, 'index'])
+        ->name('logs.index')
+        ->middleware('permission:logs.list');
 
     Route::resource('agreement', AgreementController::class);
 
-    Route::post('/media/upload', [MediaController::class, 'store'])->name('video.upload');
-    Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show']);
+    Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show'])
+        ->name('thumbnail.cdn');
 });
 
 Route::get(

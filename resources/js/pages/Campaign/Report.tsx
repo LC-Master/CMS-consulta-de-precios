@@ -84,32 +84,31 @@ export default function CampaignReport({ flash, departments, agreements, statuse
     const optionsDepartment: Option[] = makeOptions<Department>(departments, d => d.id, d => d.name)
     const optionsAgreement: Option[] = makeOptions<Agreement>(agreements, a => a.id, a => a.name)
 
-    // Estilos personalizados para React-Select (Tamaño pequeño y bordes redondeados)
     const customSelectStyles = {
         control: (provided: any) => ({
             ...provided,
-            borderRadius: '0.5rem', // rounded-lg
-            borderColor: '#D1D5DB', // gray-300
+            borderRadius: '0.5rem', 
+            borderColor: '#D1D5DB', 
             minHeight: '42px',
-            fontSize: '0.875rem', // text-sm
+            fontSize: '0.875rem',
             boxShadow: 'none',
             '&:hover': {
-                borderColor: '#9CA3AF' // gray-400
+                borderColor: '#9CA3AF' 
             }
         }),
         placeholder: (provided: any) => ({
             ...provided,
-            fontSize: '0.875rem', // text-sm
-            color: '#6B7280', // gray-500
+            fontSize: '0.875rem', 
+            color: '#6B7280', 
         }),
         menu: (provided: any) => ({
             ...provided,
             zIndex: 9999,
-            fontSize: '0.875rem' // text-sm en las opciones
+            fontSize: '0.875rem'
         }),
         option: (provided: any, state: any) => ({
             ...provided,
-            fontSize: '0.875rem', // text-sm
+            fontSize: '0.875rem',
         })
     };
 

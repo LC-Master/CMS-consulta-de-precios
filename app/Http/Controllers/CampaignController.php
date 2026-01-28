@@ -16,6 +16,7 @@ use App\Models\Status;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -25,8 +26,23 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Exports\SingleCampaignExport;
 
-class CampaignController extends Controller
+class CampaignController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:campaigns.list', only: ['index']),
+            new Middleware('permission:campaigns.view', only: ['show']),
+            new Middleware('permission:campaigns.create', only: ['create', 'store']),
+            new Middleware('permission:campaigns.update', only: ['edit', 'update']),
+            new Middleware('permission:campaigns.delete', only: ['destroy']),
+            new Middleware('permission:campaigns.activate', only: ['activate']),
+            new Middleware('permission:campaigns.cancel', only: ['cancel']),
+            new Middleware('permission:campaigns.report', only: ['report', 'export']),
+        ];
+    }
+
+
     public function index(Request $request)
     {
         $query = Campaign::with(['status']);
@@ -124,10 +140,8 @@ class CampaignController extends Controller
             ],
         ]));
 
-        $campaign->makeHidden(['updated_by', 'created_by', 'status_id']);
-
         return Inertia::render('Campaign/Edit', [
-            'campaign' => $campaign,
+            'campaign' => $campaign->makeHidden(['updated_by', 'created_by', 'status_id']),
             'statuses' => Status::all(['id', 'status']),
             'departments' => Department::all(['id', 'name']),
             'agreements' => Agreement::where('is_active', true)->get(['id', 'name']),
