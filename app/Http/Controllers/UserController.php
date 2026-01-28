@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Actions\User\CreateUserAction;
 use App\Actions\User\UpdateUserAction;
-use App\Enums\UserStatusesEnum;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
@@ -14,7 +13,6 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
 class UserController extends Controller implements HasMiddleware
@@ -83,7 +81,6 @@ class UserController extends Controller implements HasMiddleware
 
         return Inertia::render('Users/Edit', [
             'user' => $user,
-            'statuses' => array_map(fn(UserStatusesEnum $s) => ['name' => $s->name, 'value' => $s->value], UserStatusesEnum::cases()),
             'roles' => \Spatie\Permission\Models\Role::with('permissions:id,name')
                 ->select('id', 'name')
                 ->get()
@@ -98,7 +95,7 @@ class UserController extends Controller implements HasMiddleware
 
             $updateUserAction->execute($user, $request);
 
-            return Redirect::route('user.index')
+            return to_route('user.index')
                 ->with('success', 'Usuario actualizado correctamente.');
 
 
@@ -119,17 +116,22 @@ class UserController extends Controller implements HasMiddleware
 
         $user->delete();
 
-        return Redirect::route('user.index')
+        return to_route('user.index')
             ->with('success', 'Usuario desactivado correctamente.');
     }
 
-    public function restore($id)
+    public function restore(User $user)
     {
-        $user = User::withTrashed()->findOrFail($id);
-        
-        $user->restore();
+        try {
+            $user->restore();
 
-        return Redirect::route('user.index')
-            ->with('success', 'Usuario restaurado correctamente.');
+            return to_route('user.index')
+                ->with('success', 'Usuario restaurado correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error restoring user: ' . $e->getMessage(), ['admin_id' => Auth::id()]);
+
+            return back()
+                ->with('error', 'Ocurrió un error al restaurar el usuario.');
+        }
     }
 }

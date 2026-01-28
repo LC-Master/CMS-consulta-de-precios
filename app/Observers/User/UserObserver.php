@@ -80,7 +80,23 @@ class UserObserver
 
         $this->dispatchLog($dto, LogActionEnum::DELETED, 'El usuario ha sido eliminado');
     }
+    /**
+     * Summary of restore
+     * @abstract Escucha el evento de "restore" del modelo User y registra la recuperación en los logs
+     * @param \App\Models\User $user
+     * @return void
+     */
+    public function restored(\App\Models\User $user)
+    {
+        $dto = new UserJobDTO(
+            id: $user->getKey(),
+            name: $user->name,
+            email: $user->email,
+            payload: ['deleted_at' => null]
+        );
 
+        $this->dispatchLog($dto, LogActionEnum::RESTORED, 'El usuario ha sido recuperado');
+    }
     private function dispatchLog(UserJobDTO $dto, LogActionEnum $action, string $message): void
     {
         RecordActivityJob::dispatch(
