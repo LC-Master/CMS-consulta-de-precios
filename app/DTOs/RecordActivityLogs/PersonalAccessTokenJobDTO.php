@@ -5,6 +5,13 @@ namespace App\DTOs\RecordActivityLogs;
 use App\Contracts\LoggableDTO;
 use Laravel\Sanctum\PersonalAccessToken;
 
+/**
+ * Summary of PersonalAccessTokenJobDTO
+ * @author Francisco Rojas
+ * @abstract DTO para el modelo PersonalAccessToken que se utiliza para registrar actividades en logs.
+ * @version 1.0
+ * @since 2026-1-28
+ */
 readonly class PersonalAccessTokenJobDTO implements LoggableDTO
 {
     /**

@@ -9,12 +9,27 @@ use App\Http\Requests\Agreement\UpdateAgreementRequest;
 use App\Models\Agreement;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
-class AgreementController extends Controller
+class AgreementController extends Controller implements HasMiddleware
 {
+
+    public static function middleware(): array
+    {
+        return [
+            'index' => ['permission:agreements.list'],
+            'create' => ['permission:agreements.create'],
+            'store' => ['permission:agreements.create'],
+            'show' => ['permission:agreements.view'],
+            'edit' => ['permission:agreements.update'],
+            'update' => ['permission:agreements.update'],
+            'destroy' => ['permission:agreements.delete'],
+        ];
+    }
+
     public function index(Request $request)
     {
         $query = Agreement::query();

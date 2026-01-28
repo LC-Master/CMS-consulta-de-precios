@@ -4,14 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\Center;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\PersonalAccessToken;
 use Inertia\Inertia;
 use App\Http\Requests\CenterToken\StoreCenterTokenRequest;
-use App\Http\Requests\CenterToken\UpdateCenterTokenRequest;
 
-class CenterTokenController extends Controller
+
+class CenterTokenController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new \Illuminate\Routing\Controllers\Middleware('permission:tokens.list', only: ['index']),
+            new \Illuminate\Routing\Controllers\Middleware('permission:tokens.create', only: ['store']),
+            new \Illuminate\Routing\Controllers\Middleware('permission:tokens.delete', only: ['destroy']),
+        ];
+    }
+
     public function index(Request $request)
     {
         $query = PersonalAccessToken::with('tokenable')
@@ -52,77 +62,49 @@ class CenterTokenController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        return Inertia::render('CenterTokens/Create');
-    }
-
     /**
      * Store usa StoreCenterTokenRequest
      */
 
-        public function store(StoreCenterTokenRequest $request)
-        {
-            try {
+    public function store(StoreCenterTokenRequest $request)
+    {
+        try {
 
-                $request->validated();
+            $request->validated();
 
-                $exists = PersonalAccessToken::where('tokenable_id', $request->input('center_id'))
-                    ->where('tokenable_type', Center::class)
-                    ->exists();
+            $exists = PersonalAccessToken::where('tokenable_id', $request->input('center_id'))
+                ->where('tokenable_type', Center::class)
+                ->exists();
 
-                if ($exists) {
-                    return back()
-                        ->withInput()
-                        ->with('error', 'Ya existe un token asociado con este centro. Debe revocarlo antes de crear uno nuevo.');
-                }
-
-                $center = Center::findOrFail($request->input('center_id'));
-                
-                $token = $center->createToken($request->input('name'))->plainTextToken;
-                
-                event(new \App\Events\CenterToken\CenterTokenEvent(
-                    center: $center,
-                    type: 'create',
-                    tokenName: $request->input('name')
-                ));
-
-                return back()->with([
-                    'success' => ['success' => 'Token creado correctamente', 'token' => $token],
-                ]);
-
-            } catch (\Throwable $e) {
-                Log::error('Error creating center token: ' . $e->getMessage(), ['admin_id' => auth()->id()]);
-
+            if ($exists) {
                 return back()
                     ->withInput()
-                    ->with('error', 'Ocurrió un error inesperado al crear el token.');
+                    ->with('error', 'Ya existe un token asociado con este centro. Debe revocarlo antes de crear uno nuevo.');
             }
+
+            $center = Center::findOrFail($request->input('center_id'));
+
+            $token = $center->createToken($request->input('name'))->plainTextToken;
+
+            event(new \App\Events\CenterToken\CenterTokenEvent(
+                center: $center,
+                type: 'create',
+                tokenName: $request->input('name')
+            ));
+
+            return back()->with([
+                'success' => ['success' => 'Token creado correctamente', 'token' => $token],
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error('Error creating center token: ' . $e->getMessage(), ['admin_id' => auth()->id()]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error inesperado al crear el token.');
         }
-
-    public function show(PersonalAccessToken $centerToken)
-    {
-        return Inertia::render('CenterTokens/Show', [
-            'centerToken' => $centerToken,
-        ]);
     }
 
-    public function edit(PersonalAccessToken $centerToken)
-    {
-        return Inertia::render('CenterTokens/Edit', [
-            'centerToken' => $centerToken,
-        ]);
-    }
-
-    /**
-     * Update usa UpdateAgreementRequest
-     */
-    public function update(UpdateCenterTokenRequest $request, PersonalAccessToken $centerToken)
-    {
-        // $centerToken->update($request->validated());
-        // return to_route('centerTokens.index')
-        //     ->with('success', 'Token actualizado correctamente.');
-    }
 
     public function destroy(PersonalAccessToken $centertoken)
     {

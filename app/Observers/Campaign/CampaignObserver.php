@@ -8,10 +8,21 @@ use App\Jobs\RecordActivityJob;
 use App\Enums\Log\LogActionEnum;
 use App\Enums\Log\LogLevelEnum;
 
+
+/**
+ * Summary of CampaignObserver
+ * @author Francisco Rojas 
+ * @abstract Observador para el modelo Campaign que registra actividades en logs.
+ * @version 1.0
+ * @since 2026-1-28 
+ */
 class CampaignObserver
 {
     /**
-     * Escucha el evento de creación.
+     * Summary of created
+     * @abstract Escucha el evento de creación y registra la creación en los logs.
+     * @param Campaign $campaign
+     * @return void
      */
     public function created(Campaign $campaign): void
     {
@@ -25,7 +36,10 @@ class CampaignObserver
     }
 
     /**
-     * Escucha el evento de actualización.
+     * Summary of updated
+     * @abstract Escucha el evento de actualización y registra los cambios en los logs.
+     * @param Campaign $campaign
+     * @return void
      */
     public function updated(Campaign $campaign): void
     {
@@ -46,7 +60,10 @@ class CampaignObserver
     }
 
     /**
-     * Escucha el evento de eliminación (SoftDelete).
+     * Summary of deleted
+     * @abstract Escucha el evento de eliminación (SoftDelete) y registra la eliminación en los logs.
+     * @param Campaign $campaign
+     * @return void
      */
     public function deleted(Campaign $campaign): void
     {
@@ -58,9 +75,32 @@ class CampaignObserver
 
         $this->dispatchLog($dto, LogActionEnum::DELETED, "Campaña enviada a papelera");
     }
-
     /**
-     * Método privado para no repetir el dispatch
+     * Summary of restored
+     * @abstract Escucha el evento de restauración (SoftDelete) y registra la restauración en los logs.
+     * @param Campaign $campaign
+     * @return void
+     */
+    public function restored(Campaign $campaign): void
+    {
+        $dto = new CampaignJobDTO(
+            (string) $campaign->getKey(),
+            $campaign->getAttribute('title'),
+            ['deleted_at' => null]
+        );
+
+        $this->dispatchLog($dto, LogActionEnum::RESTORED, "Campaña restaurada desde papelera");
+    }
+    /**
+     * Despacha un trabajo de registro de actividad.
+     * 
+     * Método privado que centraliza el dispatch del RecordActivityJob
+     * para evitar repetición de código en los métodos del observador.
+     * 
+     * @param CampaignJobDTO $dto Datos de la campaña a registrar
+     * @param LogActionEnum $action Acción realizada (CREATED, UPDATED, DELETED, RESTORED)
+     * @param string $message Mensaje descriptivo de la acción
+     * @return void
      */
     private function dispatchLog(CampaignJobDTO $dto, LogActionEnum $action, string $message): void
     {
