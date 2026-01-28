@@ -7,6 +7,31 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html {
+    scrollbar-gutter: stable;
+}
+
+@layer utilities {
+    .scrollbar-gutter {
+        scrollbar-gutter: stable;
+    }
+
+    .scrollbar-no-gutter {
+        scrollbar-gutter: auto;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+}
+
 @theme {
     --font-sans:
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
@@ -21,7 +46,7 @@
     --color-locatel-morado: #9e28b5;
 
     --color-locatel-guia: #2a5b48;
-
+    --color-separator: #e5e7eb;
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);

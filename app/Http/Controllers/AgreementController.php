@@ -2,43 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Agreement;
-use App\Http\Requests\Agreement\StoreAgreementRequest; 
-use App\Http\Requests\Agreement\UpdateAgreementRequest; 
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Redirect;
 use App\Actions\Agreement\CreateAgreementAction;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Enums\AgreementStatus;
+use App\Http\Requests\Agreement\StoreAgreementRequest;
+use App\Http\Requests\Agreement\UpdateAgreementRequest;
+use Illuminate\Routing\Controllers\Middleware;
+use App\Models\Agreement;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
-class AgreementController extends Controller
+class AgreementController extends Controller implements HasMiddleware
 {
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:agreement.list', only: ['index']),
+            new Middleware('permission:agreement.show', only: ['show']),
+            new Middleware('permission:agreement.create', only: ['create', 'store']),
+            new Middleware('permission:agreement.update', only: ['edit', 'update']),
+            new Middleware('permission:agreement.delete', only: ['destroy']),
+        ];
+    }
+
     public function index(Request $request)
     {
-    $query = Agreement::query();
+        $query = Agreement::query();
 
-    // 1. Buscador: Nombre o RIF (tax_id)
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-              ->orWhere('tax_id', 'like', "%{$search}%");
-        });
-    }
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('tax_id', 'like', "%{$search}%");
+            });
+        }
 
-    // 2. Filtro por Estatus (0 o 1)
-    if ($request->filled('status')) {
-        $query->where('is_active', $request->status);
-    }
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status);
+        }
 
-    return Inertia::render('Agreements/Index', [
-        // Usamos latest() para ver los más recientes primero
-        'agreements' => Inertia::scroll(fn () => $query->latest()->paginate()),
-        // Devolvemos los filtros para mantener el estado de los inputs
-        'filters' => $request->only(['search', 'status']),
-    ]);
+        return Inertia::render('Agreements/Index', [
+            'agreements' => Inertia::scroll($query->latest()->paginate()),
+            'filters' => $request->only(['search', 'status']),
+            'statuses' => array_reverse(AgreementStatus::cases(), false),
+        ]);
     }
 
     public function create()
@@ -53,31 +64,45 @@ class AgreementController extends Controller
     {
         try {
 
-           $createAgreementAction->execute($request->validated());
+            $createAgreementAction->execute($request->validated());
 
             return to_route('agreement.index')
-                ->with('success', 'Convenio creado correctamente.');
+                ->with('success', 'Acuerdo creado correctamente.');
 
         } catch (\Throwable $e) {
             Log::error('Error creating agreement: ' . $e->getMessage(), ['user_id' => Auth::id()]);
-            
+
             return back()
                 ->withInput()
-                ->with('error', 'Ocurrió un error inesperado al crear el convenio. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error inesperado al crear el acuerdo. Por favor, intente nuevamente.');
         }
     }
 
     public function show(Agreement $agreement)
     {
+        $agreement = [
+            'id' => $agreement->getKey(),
+            'name' => $agreement->name,
+            'legal_name' => $agreement->legal_name,
+            'tax_id' => $agreement->tax_id,
+            'contact_person' => $agreement->contact_person,
+            'contact_email' => $agreement->contact_email,
+            'contact_phone' => $agreement->contact_phone,
+            'start_date' => $agreement->start_date,
+            'end_date' => $agreement->end_date,
+            'is_active' => filter_var($agreement->is_active, FILTER_VALIDATE_BOOLEAN),
+            'observations' => $agreement->observations,
+        ];
+
         return Inertia::render('Agreements/Show', [
-            'agreement' => $agreement
+            'agreement' => $agreement,
         ]);
     }
 
     public function edit(Agreement $agreement)
     {
         return Inertia::render('Agreements/Edit', [
-            'agreement' => $agreement
+            'agreement' => $agreement,
         ]);
     }
 
@@ -86,17 +111,34 @@ class AgreementController extends Controller
      */
     public function update(UpdateAgreementRequest $request, Agreement $agreement)
     {
-        $agreement->update($request->validated());
+        try {
+            $request->validated();
 
-        return Redirect::route('agreements.index')
-            ->with('success', 'Acuerdo actualizado correctamente.');
+            $agreement->update($request->all());
+
+            return to_route('agreement.index')
+                ->with('success', 'Acuerdo actualizado correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error updating agreement: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error inesperado al actualizar el acuerdo. Por favor, intente nuevamente.');
+        }
     }
 
     public function destroy(Agreement $agreement)
     {
-        $agreement->delete();
+        try {
+            $agreement->delete();
 
-        return Redirect::route('agreements.index')
-            ->with('success', 'Acuerdo eliminado correctamente.');
+            return to_route('agreement.index')
+                ->with('success', 'Acuerdo eliminado correctamente.');
+        } catch (\Throwable $e) {
+            Log::error('Error deleting agreement: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+
+            return back()
+                ->with('error', 'Ocurrió un error inesperado al eliminar el acuerdo. Por favor, intente nuevamente.');
+        }
     }
 }

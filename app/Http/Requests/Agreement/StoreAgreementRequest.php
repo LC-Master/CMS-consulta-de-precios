@@ -29,21 +29,52 @@ class StoreAgreementRequest extends FormRequest
             'tax_id' => 'required|string|max:20|unique:agreements,tax_id',
             'contact_person' => 'required|string|max:255',
             'contact_email' => 'required|string|email:rfc,dns|max:255',
-            'contact_phone' => ['required', 'string', 'min:10', 'max:20', 'regex:/^[0-9]+$/'],
-            'start_date' => 'required|date|before:end_date',
-            'end_date'   => 'required|date|after:start_date',
-            'observations' => 'nullable|string|max:1000',
+            'contact_phone' => ['required', 'string', 'digits_between:10,20'],
+            'observations' => 'required|string|max:1000',
         ];
     }
 
     public function messages(): array
     {
         return [
+            // name
             'name.required' => 'El nombre del acuerdo es obligatorio.',
-            'name.unique' => 'Ya existe un acuerdo con este nombre.',
-            'contact_phone.regex' => 'El teléfono solo debe contener números, sin espacios ni guiones.',
-            'contact_email.email' => 'Debes ingresar una dirección de correo válida.',
-            'tax_id.unique' => 'Este RIF ya se encuentra registrado en el sistema.',
+            'name.string'   => 'El nombre del acuerdo debe ser texto.',
+            'name.max'      => 'El nombre del acuerdo no debe exceder los 155 caracteres.',
+            'name.unique'   => 'Ya existe un acuerdo con este nombre.',
+
+            // legal_name
+            'legal_name.required' => 'La razón social es obligatoria.',
+            'legal_name.string'   => 'La razón social debe ser texto.',
+            'legal_name.max'      => 'La razón social no debe exceder los 155 caracteres.',
+
+            // tax_id
+            'tax_id.required' => 'El RIF es obligatorio.',
+            'tax_id.string'   => 'El RIF debe ser texto.',
+            'tax_id.max'      => 'El RIF no debe exceder los 20 caracteres.',
+            'tax_id.unique'   => 'Este RIF ya se encuentra registrado en el sistema.',
+
+            // contact_person
+            'contact_person.required' => 'La persona de contacto es obligatoria.',
+            'contact_person.string'   => 'La persona de contacto debe ser texto.',
+            'contact_person.max'      => 'La persona de contacto no debe exceder los 255 caracteres.',
+
+            // contact_email
+            'contact_email.required' => 'El correo de contacto es obligatorio.',
+            'contact_email.string'   => 'El correo de contacto debe ser texto.',
+            'contact_email.email'    => 'Debes ingresar una dirección de correo válida.',
+            'contact_email.max'      => 'El correo de contacto no debe exceder los 255 caracteres.',
+
+            // contact_phone
+            'contact_phone.required' => 'El teléfono de contacto es obligatorio.',
+            'contact_phone.integer'  => 'El teléfono solo debe contener números, sin espacios ni guiones.',
+            'contact_phone.min'      => 'El teléfono debe tener al menos 10 dígitos.',
+            'contact_phone.max'      => 'El teléfono no debe exceder los 20 dígitos.',
+
+            // observations
+            'observations.required' => 'Los detalles del acuerdo son obligatorios',
+            'observations.string' => 'Los detalles del acuerdo deben ser texto.',
+            'observations.max'    => 'Los detalles del acuerdo no deben exceder los 1000 caracteres.',
         ];
     }
 }

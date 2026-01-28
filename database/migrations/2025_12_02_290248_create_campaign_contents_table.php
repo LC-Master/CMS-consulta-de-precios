@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('campaign_type');
             $table->text('url');
             $table->text('metadata');
+
+            $table->index(['campaign_id', 'campaign_type']);
+
             $table->timestamps();
         });
     }

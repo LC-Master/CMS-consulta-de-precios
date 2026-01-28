@@ -15,14 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory(10)->create();
-        User::firstOrCreate(
-            ['email' => 'test@example.com'],
-            [
-                'name' => 'Test User',
-                'password' => 'password',
-                'email_verified_at' => now(),
-            ]
-        );
+
         Center::create([
             'name' => 'Todo',
             'code' => 'CTR-0001',
@@ -31,12 +24,22 @@ class DatabaseSeeder extends Seeder
             RolesPermissionsSeeder::class,
             StatusSeeder::class,
             DepartmentSeeder::class,
+            ProviderSeeder::class,
             AgreementSeeder::class,
             DeviceSeeder::class,
             CampaignSeeder::class,
             MediaSeeder::class,
+            CampaignAgreementSeeder::class,
             TimeLineItemSeeder::class,
+            TokenSeeder::class,
         ]);
-
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => 'password',
+                'email_verified_at' => now(),
+            ]
+        )->assignRole('supervisor');
     }
 }

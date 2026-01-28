@@ -1,0 +1,37 @@
+export interface User {
+    id: number;
+    name: string;
+    email: string;
+    email_verified_at?: string;
+    created_at: string;
+    updated_at: string;
+    status: number;
+    roles: Role[];
+    deleted_at?: string | null;
+}
+
+export interface Props {
+    users: { data: User[] };
+    filters: { search?: string };
+    flash: any;
+}
+
+export interface Permission {
+    id: number;
+    name: string;
+}
+
+export interface Role {
+    id: number;
+    name: string;
+    permissions: Permission[];
+}
+
+export type PropsEditPage = {
+    user: User;
+    statuses: { name: string; value: number }[];
+    roles: Role[];
+    flash?: any;
+};
+
+export type PropsCreatePage = Pick<PropsEditPage, 'roles'> & { flash?: any };

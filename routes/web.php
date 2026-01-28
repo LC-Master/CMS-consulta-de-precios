@@ -1,36 +1,55 @@
 <?php
 
-use App\Http\Controllers\CampaignController;
-use App\Http\Controllers\TimeLineController;
 use App\Http\Controllers\AgreementController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\ThumbnailController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
-use Laravel\Fortify\Features; 
-
-Route::get('/', function (Request $req) {
-    return Inertia::render('welcome', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]);
-})->name('home');
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\CenterController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
 
-    Route::resource('campaign', CampaignController::class);
-    Route::resource('timeline', TimeLineController::class);
+    Route::get('/', fn() => redirect()->route('campaign.index'))
+        ->name('home')
+        ->middleware('permission:campaign.list');
+
+    Route::get('/centers', [CenterController::class, 'index'])
+        ->name('centers.index')
+        ->middleware('permission:center.list');
+
+    Route::get('dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard')
+        ->middleware('permission:dashboard.view');
+
+    Route::resource('media', MediaController::class)->parameters([
+        'media' => 'media'
+    ]);
+
+    Route::get('/media/cdn/{media}', [MediaController::class, 'preview'])
+        ->name('media.cdn');
+
+    Route::post('/media/upload', [MediaController::class, 'store'])
+        ->name('media.upload')
+        ->middleware('permission:media.upload');
+
+    Route::get('logs', [ActivityLogController::class, 'index'])
+        ->name('logs.index')
+        ->middleware('permission:log.list');
+
     Route::resource('agreement', AgreementController::class);
+
+    Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show'])
+        ->name('thumbnail.cdn');
 });
 
-Route::get('/video', function () {
-    return Inertia::render('video');
-});
+Route::get(
+    '/health',
+    fn() =>
+    response()->json(['status' => 'OK'], 200)
+);
 
-Route::get('/files', function () {
-    return response()->file(Storage::disk('public')->path('1416529-hd_1920_1080_30fps.mp4'));
-});
-
-require __DIR__.'/settings.php';
-
+require __DIR__ . '/campaign.php';
+require __DIR__ . '/admin.php';
+require __DIR__ . '/settings.php';

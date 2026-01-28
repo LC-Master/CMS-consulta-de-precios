@@ -34,16 +34,14 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                    <Link
+                    <a
                         className="block w-full"
-                        href={edit()}
-                        as="button"
-                        prefetch
+                        href="/settings/password"
                         onClick={cleanup}
                     >
                         <Settings className="mr-2" />
                             Configuración
-                    </Link>
+                    </a>
                 </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

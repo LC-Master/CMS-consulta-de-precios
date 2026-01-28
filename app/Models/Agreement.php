@@ -5,13 +5,37 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Provider;
 
 class Agreement extends Model
 {
     /** @use HasFactory<\Database\Factories\AgreementFactory> */
     use HasFactory;
     use HasUuids;
-    protected $fillable = ['name','legal_name','tax_id',
-    'contact_person','contact_email','contact_phone','start_date',
-    'end_date','is_active','observations','created_at','updated_at'];
+    use SoftDeletes;
+
+    protected $fillable = [
+        'name',
+        'legal_name',
+        'tax_id',
+        'contact_person',
+        'contact_email',
+        'contact_phone',
+        'is_active',
+        'observations',
+        'provider_id',
+        'created_at',
+        'updated_at'
+    ];
+
+    public function campaigns()
+    {
+        return $this->hasMany(Campaign::class);
+    }
+
+    public function provider()
+    {
+        return $this->belongsTo(Provider::class);
+    }
 }

@@ -1,0 +1,27 @@
+import { cn } from "@/lib/utils";
+import { createPortal } from "react-dom";
+
+export default function Modal({ children, closeModal, className, blur = true, actionWhenCloseTouchOutside }: { blur?: boolean; children: React.ReactNode; closeModal: () => void; className?: string; actionWhenCloseTouchOutside?: () => void }) {
+    return createPortal(
+        <div
+            className={`fixed inset-0 flex items-center ${blur ? 'backdrop-blur-md' : ''} justify-center z-50`}
+            onClick={() => {
+                closeModal();
+                actionWhenCloseTouchOutside?.();
+            }}
+        >
+
+            <div
+                className={cn(
+                    "bg-white w-11/12 md:w-2/3 lg:w-1/2 xl:w-2/3 p-6 rounded-lg shadow-2xl relative z-50 ",
+                    className
+                )}
+                onClick={(e) => e.stopPropagation()}
+            >
+
+                {children}
+            </div>
+        </div>,
+        document.body!
+    );
+}

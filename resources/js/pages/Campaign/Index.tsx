@@ -1,32 +1,118 @@
 import { useState } from 'react'
-import { InfiniteScroll, router } from '@inertiajs/react'
-import { Search } from 'lucide-react'
+import { Head, router } from '@inertiajs/react'
 import AppLayout from '@/layouts/app-layout';
-import Select from 'react-select';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
+import { Filter } from '@/components/Filter';
+import { Column } from '@/types/datatable.types';
+import { Eye, Pencil, Trash } from 'lucide-react';
+import { DataTable } from '@/components/DataTable';
+import { Campaign, Props } from '@/types/campaign/index.types';
+import useToast from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Check, X } from 'lucide-react'
+import { edit, index, show, activate, } from '@/routes/campaign';
+import useModal from '@/hooks/use-modal';
+import { breadcrumbs } from '@/helpers/breadcrumbs';
+import { PillStatus } from '@/components/ui/PillStatus';
+import { StatusCampaignEnum } from '@/enums/statusCampaignEnum';
+import DeleteCampaignModal from '@/components/modals/DeleteCampaignModal';
+import CancelCampaignModal from '@/components/modals/CancelCampaignModal';
+import { ActionMenu } from '@/components/ui/ActionMenu';
 
-interface Status {
-    id: string;
-    status: string;
-}
-
-interface Campaign {
-    id: string;
-    title: string;
-    status: Status;
-    created_at: string;
-    [key: string]: unknown;
-}
-
-interface Props {
-    campaigns: { data: Campaign[] };
-    filters: { search?: string; status?: string };
-    statuses: Status[];
-}
-
-export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] }: Props) {
+export default function CampaignsIndex({ campaigns, filters = {}, statuses = [], flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
+    const { isOpen, closeModal, openModal } = useModal(false)
+    const { isOpen: isOpenDelete, closeModal: closeDeleteModal, openModal: openModalDelete } = useModal(false)
+    const [campaignId, setCampaignId] = useState<string | null>('');
     const [status, setStatus] = useState(filters.status || '')
+    const { ToastContainer } = useToast(flash);
+
+    const columns: Column<Campaign>[] = [
+        {
+            key: 'title',
+            header: 'Título',
+            render: (a) => a.title,
+        },
+        {
+            key: 'status',
+            header: 'Estado',
+            render: (a) => (
+                <PillStatus status={a.status.status} />
+            ),
+        },
+        {
+            key: 'start_at',
+            header: 'Inicio',
+            render: (a) => new Date(a.start_at).toLocaleString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }),
+        },
+        {
+            key: 'end_at',
+            header: 'Fin',
+            render: (a) => new Date(a.end_at).toLocaleString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }),
+        },
+        {
+            key: 'actions',
+            header: 'Acciones',
+            render: (a) => (
+                <div className="flex gap-2">
+                    {a.status.status === StatusCampaignEnum.DRAFT ? (
+                        <Button title='Activar campaña' onClick={() => {
+                            router.get(activate({ id: a.id }).url, {}, {
+                                only: ['campaigns', 'flash'],
+                                reset: ['campaigns', 'flash'],
+                                preserveScroll: true
+                            });
+                        }} className='p-2 bg-yellow-300 hover:bg-yellow-400 h-8 text-white rounded-md'>
+                            <Check className='w-4 text-black h-4' />
+                        </Button>
+                    ) : (
+                        a.status.status === StatusCampaignEnum.ACTIVE && (
+                            <Button title='Cancelar campaña' onClick={() => {
+                                setCampaignId(a.id);
+                                openModal();
+                            }} className='p-2 bg-red-600 h-8 hover:bg-red-400 text-white rounded-md'>
+                                <X className='w-4 h-4' />
+                            </Button>
+                        )
+                    )}
+                    <ActionMenu>
+                        <ActionMenu.ItemLink href={show({ id: a.id }).url}>
+                            <Eye className="w-4 h-4" />
+                            <span>Ver</span>
+                        </ActionMenu.ItemLink>
+                        <ActionMenu.ItemLink href={edit({ id: a.id }).url}>
+                            <Pencil className="w-4 h-4" />
+                            <span>Editar</span>
+                        </ActionMenu.ItemLink>
+                        <ActionMenu.Separator />
+
+                        <ActionMenu.Item variant="danger" onClick={() => {
+                            setCampaignId(a.id);
+                            openModalDelete();
+                        }}>
+                            <Trash className="w-4 h-4" />
+                            <span>Inhabilitar</span>
+                        </ActionMenu.Item>
+                    </ActionMenu>
+                </div>
+            ),
+        },
+    ]
+
     useUpdateEffect(() => {
         router.get(
             window.location.pathname,
@@ -34,82 +120,57 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [] 
             { preserveState: true, replace: true, preserveScroll: true }
         )
     }, [search, status])
-    return (
-        <AppLayout>
-            <div className="space-y-4 px-4 pb-4">
-                {/* Filtros */}
-                <div className="flex flex-col sm:flex-row gap-4 mt-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <input
-                            type="text"
-                            placeholder="Buscar por título..."
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-locatel-oscuro focus:border-locatel-oscuro outline-none transition-all"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                    </div>
-                    <div className="w-full sm:w-48">
-                        <Select
-                            options={[{ id: '', status: 'Todos' }, ...statuses].map((s) => ({
-                                value: s.id,
-                                label: s.status,
-                            }))}
-                            value={status ? { value: status, label: statuses.find((s) => s.id === status)?.status || '' } : { value: '', label: 'Todos' }}
-                            onChange={(selectedOption) => {
-                                setStatus(selectedOption ? selectedOption.value : '')
-                            }}
-                            isClearable={false}
-                            placeholder="Filtrar por estado"
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                        />
-                    </div>
-                </div>
 
-                <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-                    <InfiniteScroll data="campaigns">
-                        <table className="min-w-full bg-white divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Título</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Estado</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Creada</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-100">
-                                {Array.isArray(campaigns?.data) && campaigns.data.length > 0 ? (
-                                    campaigns.data.map((campaign) => {
-                                        return (
-                                            <tr key={campaign.id} className="hover:bg-gray-50">
-                                                <td className="px-4 py-3 text-sm text-gray-900">{campaign.title}</td>
-                                                <td className="px-4 py-3 text-sm text-gray-700">{campaign.status?.status}</td>
-                                                <td className="px-4 py-3 text-sm text-gray-700">
-                                                    {campaign.created_at ? new Date(campaign.created_at).toLocaleString() : '-'}
-                                                </td>
-                                                <td className="px-4 py-3 text-sm">
-                                                    <a
-                                                        href={`/campaign/${campaign.id}`}
-                                                        className="text-blue-600 hover:underline"
-                                                    >
-                                                        Ver
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        )
-                                    })
-                                ) : (
-                                    <tr>
-                                        <td colSpan={5} className="px-4 py-6 text-center text-sm text-gray-500">
-                                            No hay campañas
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </InfiniteScroll>
-                </div>
+    return (
+        <AppLayout breadcrumbs={breadcrumbs('Lista de campañas', index().url)}>
+            {ToastContainer()}
+            <Head title="Lista de campañas" />
+            <CancelCampaignModal isOpen={isOpen} campaignId={campaignId} closeModal={closeModal} setCampaignId={setCampaignId} />
+            <DeleteCampaignModal isOpen={isOpenDelete} campaignId={campaignId} closeDeleteModal={closeDeleteModal} />
+            <div className="space-y-4 px-4 pb-4">
+                <Filter
+                    filters={[
+                        {
+                            type: 'search',
+                            key: 'search',
+                            value: search,
+                            label: 'Buscar por título',
+                            placeholder: 'Buscar por título...',
+                            onChange: setSearch,
+                        },
+                        {
+                            type: 'select',
+                            key: 'status',
+                            value: status,
+                            label: 'Estatus',
+                            placeholder: 'Filtrar por estado',
+                            options: [
+                                { value: '', label: 'Todos' },
+                                ...statuses.map(s => ({
+                                    value: s.id,
+                                    label: s.status,
+                                })),
+                            ],
+                            onChange: setStatus,
+                        },
+                        {
+                            type: 'reset',
+                            onReset: () => {
+                                setSearch('');
+                                setStatus('');
+                            },
+                            key: 'reset',
+                        }
+                    ]}
+                />
+
+                <DataTable
+                    data={campaigns.data}
+                    columns={columns}
+                    rowKey={(a) => a.id}
+                    infiniteData="campaigns"
+                />
+
             </div>
         </AppLayout>
     )

@@ -1,5 +1,300 @@
-export default function CampaignShow(){
+import { PillStatus } from "@/components/ui/PillStatus";
+import AppLayout from "@/layouts/app-layout";
+import { index } from "@/routes/campaign";
+import { breadcrumbs } from "@/helpers/breadcrumbs";
+import { CampaignExtended } from "@/types/campaign/index.types";
+import { Head, Link } from "@inertiajs/react";
+import { Building, CalendarDays, CalendarX, Handshake, SquareLibrary, Store, Sun, Moon, X } from "lucide-react";
+import { formatDate, isVideo } from "@/helpers/mediaTools";
+import CenterCard from "@/components/CenterCard";
+import ErrorBanner from "@/components/ui/ErrorBanner";
+import { InfoCard } from "@/components/ui/InfoCard";
+import { show } from "@/routes/agreement";
+import { cdn } from "@/routes/media";
+
+export default function CampaignShow({ campaign }: { campaign: CampaignExtended }) {
+    const mediaAM = campaign.media
+        .filter(m => m.pivot.slot === "am")
+        .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));
+
+    const mediaPM = campaign.media
+        .filter(m => m.pivot.slot === "pm")
+        .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));
     return (
-        <div>Campaign Show</div>
-    )
+        <AppLayout breadcrumbs={breadcrumbs('Detalles de campaña', index().url)}>
+            <Head title="Detalles de campaña" />
+            <div className="p-6 space-y-6">
+                <div>
+                    <div className="mb-6 ml-2">
+                        <h1 className="text-3xl mb-2 font-bold">
+                            Detalles de la campaña
+                        </h1>
+                        <p className="text-gray-600 text-sm">
+                            Detalles para la campaña "<strong>{campaign.title}</strong>".
+                        </p>
+                    </div>
+
+                    {/* Campaign info */}
+                    <div className="flex flex-wrap md:flex-nowrap gap-4">
+                        <InfoCard
+                            className="w-full md:w-[65%]"
+                            title="Información general"
+                            headerEnd={<PillStatus status={campaign.status?.status} />}
+                            contentClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-8 text-sm"
+                        >
+                            <div className="flex flex-col space-y-6">
+                                <div>
+                                    <p className="text-gray-500 mb-1">Titulo de la campaña</p>
+                                    <p className="font-medium text-gray-900">{campaign.title}</p>
+                                </div>
+
+                                <div>
+                                    <p className="text-gray-500 mb-1">Creado</p>
+                                    <p className="font-medium text-gray-900">{formatDate(campaign.created_at)}</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col space-y-6">
+                                <div>
+                                    <p className="text-gray-500 mb-1">Departamento / Categoria </p>
+                                    <div className="flex items-center gap-2">
+                                        <Building className="w-4 h-4 text-gray-500" />
+                                        <p className="font-medium text-gray-900">{campaign.department?.name}</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p className="text-gray-500 mb-1">Ultima vez actualizada</p>
+                                    <p className="font-medium text-gray-900">{formatDate(campaign.updated_at)}</p>
+                                </div>
+                            </div>
+
+                            <div className="border-l-0 lg:border-l lg:pl-6 border-gray-100 flex flex-col h-full">
+                                <div className="flex items-center gap-2 mb-3 text-gray-700 font-medium shrink-0">
+                                    <Handshake className="w-5 h-5 text-gray-500" />
+                                    <h2>Acuerdos</h2>
+                                </div>
+                                <div className="grow relative">
+                                    <div className="absolute inset-0 overflow-y-auto pr-2 custom-scrollbar space-y-2">
+                                        {campaign.agreements && campaign.agreements.length > 0 ? (
+                                            campaign.agreements.map(agreement => (
+                                                <Link viewTransition href={show({ id: agreement.id }).url} key={agreement.id} className="bg-gray-50 border hover:text-locatel-claro
+                                                     border-gray-200 rounded px-3 py-2 text-xs font-medium text-gray-700 block text-break-words">
+                                                    {agreement.name}
+                                                </Link>
+                                            ))
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center ">
+                                                <span className="bg-gray-100 rounded-full p-3 h-12 w-12 flex items-center justify-center mb-2" aria-hidden="true">
+                                                    <X className="w-6 h-6 text-red-500" />
+                                                </span>
+                                                <p className="text-gray-500 text-sm italic">Sin acuerdos asociados</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </InfoCard>
+
+                        {/* Dates */}
+                        <InfoCard
+                            className="flex flex-col text-sm w-full md:w-[35%]"
+                            title={<h2 className="font-bold text-lg">Fechas</h2>}
+                            headerClassName="px-7 py-6 mb-4"
+                            contentClassName="px-7 pb-6 space-y-6"
+                        >
+                            <div className="flex items-center pt-4 gap-4 justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center" aria-hidden="true">
+                                        <CalendarDays className="w-6 h-6 text-blue-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Inicio</p>
+                                        <span className="font-semibold text-lg md:text-sm">{formatDate(campaign.start_at)}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-4 justify-between border-t pt-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center" aria-hidden="true">
+                                        <CalendarX className="w-6 h-6 text-red-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Fin</p>
+                                        <p className="font-semibold text-lg md:text-sm">{formatDate(campaign.end_at)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </InfoCard>
+
+                    </div>
+
+                    <InfoCard
+                        title="Centros asociados"
+                        icon={<Store />}
+                        headerEnd={
+                            <span className="text-sm text-gray-500 bg-gray-300 rounded-lg px-3 py-1">
+                                {campaign.centers.length} centros
+                            </span>
+                        }
+                        contentClassName="py-4 flex flex-row overflow-x-auto"
+                    >
+                        {campaign.centers ? campaign.centers.map(center => (
+                            <CenterCard key={center.id} id={center.id} name={center.name} code={center.code} />
+                        )) : (
+                            <ErrorBanner message="No hay centros asociados" description="Esta campaña aún no tiene centros vinculados." />
+                        )}
+                    </InfoCard>
+                    {/* Media AM */}
+                    <div className="py-6 pl-2">
+
+                        <div className="flex items-center mb-4 justify-between px-2">
+                            <div className="flex items-center gap-2">
+                                <Sun className="text-blue-400" />
+                                <h2 className="text-lg font-semibold">Media AM</h2>
+                            </div>
+                            <span className="text-sm text-gray-500 rounded-lg px-3 py-1">
+                                Total: {mediaAM.length}
+                            </span>
+                        </div>
+
+                        {mediaAM.length === 0 ? (
+                            <div className="bg-white rounded-xl p-6 shadow shadow-stone-400 m-2">
+                                <div className="w-full flex flex-col items-center justify-center py-8 px-6 text-center space-y-3">
+                                    <div className="relative">
+                                        <div
+                                            title="Sin contenido AM"
+                                            aria-hidden="true"
+                                            className="bg-linear-to-br from-blue-50 to-white text-blue-600 rounded-full p-4 inline-flex items-center justify-center shadow-md ring-1 ring-blue-100"
+                                        >
+                                            <SquareLibrary className="w-8 h-8" />
+                                        </div>
+                                        <div className="absolute -right-1 -bottom-1 bg-blue-600 text-white rounded-full p-1.5 flex items-center justify-center shadow text-xs ring-2 ring-white">
+                                            <Sun className="w-3 h-3" />
+                                        </div>
+                                    </div>
+                                    <h3 className="text-lg font-semibold">No hay contenido AM</h3>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="ml-2 flex flex-wrap gap-4">
+                                {mediaAM.map(item => (
+                                    <div
+                                        key={item.id}
+                                        className="flex-none w-1/2 md:w-1/4 border rounded-lg overflow-hidden"
+                                    >
+                                        {isVideo(item.mime_type) ? (
+                                            <video
+                                                src={cdn({ id: item.id }).url}
+                                                controls
+                                                className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
+                                            />
+                                        ) : (
+                                            <img
+                                                src={cdn({ id: item.id }).url}
+                                                className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
+                                            />
+                                        )}
+
+                                        <div className="p-2 text-xs space-y-1">
+                                            <p className="font-medium truncate">{item.name}</p>
+                                            <p className="text-gray-500">
+                                                Posición: {item.pivot.position}
+                                            </p>
+                                            {item.duration_seconds && (
+                                                <p className="text-gray-500">
+                                                    Duración: {item.duration_seconds}s
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Media PM */}
+                    <div className="py-6 pl-2">
+                        <div className="flex items-center mb-4 justify-between px-2">
+                            <div className="flex items-center gap-2">
+                                <Moon className="text-blue-400" />
+                                <h2 className="text-lg font-semibold">Media PM</h2>
+                            </div>
+                            <span className="text-sm text-gray-500 rounded-lg px-3 py-1">
+                                Total: {mediaPM.length}
+                            </span>
+                        </div>
+
+                        {mediaPM.length === 0 ? (
+                            <div className="bg-white rounded-xl p-6 shadow shadow-stone-400 m-2">
+                                <div className="w-full flex flex-col items-center justify-center py-8 px-6 text-center space-y-3">
+                                    <div className="relative">
+                                        <div
+                                            title="Sin contenido PM"
+                                            aria-hidden="true"
+                                            className="bg-linear-to-br from-blue-50 to-white text-blue-600 rounded-full p-4 inline-flex items-center justify-center shadow-md ring-1 ring-blue-100"
+                                        >
+                                            <SquareLibrary className="w-8 h-8" />
+                                        </div>
+                                        <div className="absolute -right-1 -bottom-1 bg-blue-600 text-white rounded-full p-1.5 flex items-center justify-center shadow text-xs ring-2 ring-white">
+                                            <Moon className="w-3 h-3" />
+                                        </div>
+                                    </div>
+                                    <h3 className="text-lg font-semibold">No hay contenido PM</h3>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="ml-2 flex flex-wrap gap-4">
+                                {mediaPM.map(item => (
+                                    <div
+                                        key={item.id}
+                                        className="flex-none w-1/2 md:w-1/4 border rounded-lg overflow-hidden"
+                                    >
+                                        {isVideo(item.mime_type) ? (
+                                            <video
+                                                src={cdn({ id: item.id }).url}
+                                                controls
+                                                className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
+                                            />
+                                        ) : (
+                                            <img
+                                                src={cdn({ id: item.id }).url}
+                                                className="aspect-w-16 aspect-h-9 w-full h-40 object-cover"
+                                            />
+                                        )}
+
+                                        <div className="p-2 text-xs space-y-1">
+                                            <p className="font-medium truncate">{item.name}</p>
+                                            <p className="text-gray-500">
+                                                Posición: {item.pivot.position}
+                                            </p>
+                                            {item.duration_seconds && (
+                                                <p className="text-gray-500">
+                                                    Duración: {item.duration_seconds}s
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    {/* Page header */}
+                    <div className="flex items-center justify-between px-2">
+                        <Link
+                            viewTransition
+                            href={index().url}
+                            className="inline-flex items-center gap-2 bg-locatel-claro hover:bg-locatel-medio px-4 py-2 rounded-md text-white text-sm font-medium shadow"
+                        >
+                            ← Volver
+                        </Link>
+
+                        <span className="text-sm text-gray-500">
+                            ID: {campaign.id}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </AppLayout>
+    );
 }
