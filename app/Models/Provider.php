@@ -6,11 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Provider;
 
-class Agreement extends Model
+class Provider extends Model
 {
-    /** @use HasFactory<\Database\Factories\AgreementFactory> */
     use HasFactory;
     use HasUuids;
     use SoftDeletes;
@@ -23,19 +21,12 @@ class Agreement extends Model
         'contact_email',
         'contact_phone',
         'is_active',
-        'observations',
-        'provider_id',
-        'created_at',
-        'updated_at'
     ];
 
-    public function campaigns()
-    {
-        return $this->hasMany(Campaign::class);
-    }
-
-    public function provider()
-    {
-        return $this->belongsTo(Provider::class);
-    }
+    /**
+     * Los atributos que deben ser convertidos a tipos nativos.
+     */
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 }

@@ -8,7 +8,7 @@ export default function DeleteAgreementModal({ isOpen, closeModal, agreementId }
     return (
         <Modal className='w-90 bg-white p-6 ' closeModal={closeModal}>
             <h2 className='text-xl font-semibold mb-4'>Confirmar eliminación</h2>
-            <p className='mb-6'>¿Estás seguro de que deseas eliminar este convenio? Esta acción no se puede deshacer.</p>
+            <p className='mb-6'>¿Estás seguro de que deseas eliminar este acuerdo? Esta acción no se puede deshacer.</p>
             <div className='flex justify-end gap-4'>
                 <Button variant='outline' onClick={closeModal}>Cancelar</Button>
                 <Button className='bg-red-600 text-white' onClick={() => {

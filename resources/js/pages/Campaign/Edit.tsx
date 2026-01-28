@@ -100,7 +100,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                             </div>
 
                             <div>
-                                <label htmlFor="department_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Departamento. *</label>
+                                <label htmlFor="department_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Departamento / Categoria. *</label>
                                 <Select<Option, false>
                                     options={optionsDepartment}
                                     inputId="department_id"

@@ -32,7 +32,7 @@ class UserController extends Controller implements HasMiddleware
 
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::withTrashed();
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -114,12 +114,22 @@ class UserController extends Controller implements HasMiddleware
     public function destroy(User $user)
     {
         if ($user->getKey() === Auth::id()) {
-            return back()->withErrors('name', 'No puedes eliminar tu propia cuenta.');
+            return back()->withErrors('name', 'No puedes desactivar tu propia cuenta.');
         }
 
         $user->delete();
 
         return Redirect::route('user.index')
-            ->with('success', 'Usuario eliminado correctamente.');
+            ->with('success', 'Usuario desactivado correctamente.');
+    }
+
+    public function restore($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+        
+        $user->restore();
+
+        return Redirect::route('user.index')
+            ->with('success', 'Usuario restaurado correctamente.');
     }
 }

@@ -13,15 +13,22 @@ import { index } from '@/routes/user';
 
 export default function UserCreate({ roles }: PropsCreatePage) {
     const optionsRoles = roles.map((role) => ({ value: role.name, label: role.name }))
+    
     const { data, setData, processing, errors, post } = useForm({
         name: '',
-        email: '',
         role: '',
+        email: '',
+        email_confirmation: '',
         password: '',
         password_confirmation: '',
     });
 
     const selectedRole = roles.find(role => role.name === data.role);
+
+    // Función auxiliar para bloquear copiar y pegar
+    const preventCopyPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Crear Usuario', index().url)}>
@@ -32,7 +39,7 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                         Registrar un nuevo usuario
                     </h2>
                     <p className="mt-2 text-sm text-gray-600">
-                        Complete los campos a continuación para registrar un nuevo miembro al equipo y asignar un nuevo miembro.
+                        Complete los campos a continuación para registrar un nuevo miembro al equipo.
                     </p>
                 </div>
 
@@ -42,24 +49,8 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                         post(store().url);
                     }} className="mt-8 space-y-6" autoComplete="off">
 
+                        {/* BLOQUE 1: Nombre y Rol */}
                         <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
-                            <div className="flex-1 flex flex-col gap-2">
-                                <Label htmlFor="email">Correo electrónico</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    value={data.email}
-                                    required
-                                    placeholder="email@ejemplo.com"
-                                    autoComplete="new-email"
-                                    name="new-email-field"
-                                    readOnly={true}
-                                    onFocus={(e) => e.target.readOnly = false}
-                                    onChange={(e) => setData('email', e.target.value)}
-                                />
-                                <InputError message={errors.email} />
-                            </div>
-
                             <div className="flex-1 flex flex-col gap-2">
                                 <Label htmlFor="name">Nombre</Label>
                                 <Input
@@ -74,8 +65,86 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                                 />
                                 <InputError message={errors.name} />
                             </div>
+
+                            <div className="flex-1 flex flex-col gap-2">
+                                <Label htmlFor="role">Rol de Usuario</Label>
+                                <Select
+                                    value={optionsRoles.find(option => option.value === data.role)}
+                                    onChange={(val) => setData('role', val ? String(val.value) : '')}
+                                    options={optionsRoles}
+                                    inputId="role"
+                                    name="role"
+                                    classNamePrefix="react-select"
+                                    placeholder="Selecciona un rol"
+                                    isClearable
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            borderColor: errors.role ? '#ef4444' : provided.borderColor,
+                                            borderRadius: '0.375rem',
+                                        }),
+                                    }}
+                                />
+                                <InputError message={errors.role} />
+                            </div>
                         </div>
 
+                        {/* Mostrar permisos del rol seleccionado (Visual) */}
+                        {data.role && (
+                            <div className="p-3 bg-gray-50 rounded-md border border-gray-100 animate-in fade-in slide-in-from-top-1 duration-300">
+                                <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
+                                    Permisos incluidos:
+                                </p>
+                                {selectedRole?.permissions?.length ? (
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {selectedRole.permissions.map((perm) => (
+                                            <span key={perm.id} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                                {perm.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-xs text-gray-400 italic">Este rol no tiene permisos asignados.</p>
+                                )}
+                            </div>
+                        )}
+
+                        {/* BLOQUE 2: Correo y Confirmación */}
+                        <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
+                            <div className="flex-1 flex flex-col gap-2">
+                                <Label htmlFor="email">Correo electrónico</Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    value={data.email}
+                                    required
+                                    placeholder="email@ejemplo.com"
+                                    autoComplete="new-email"
+                                    name="new-email-field"
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    onPaste={preventCopyPaste} // Bloquea pegar
+                                    onCopy={preventCopyPaste}  // Bloquea copiar
+                                />
+                                <InputError message={errors.email} />
+                            </div>
+
+                            <div className="flex-1 flex flex-col gap-2">
+                                <Label htmlFor="email_confirmation">Confirmar Correo electrónico</Label>
+                                <Input
+                                    id="email_confirmation"
+                                    type="email"
+                                    value={data.email_confirmation}
+                                    required
+                                    placeholder="Repita el correo"
+                                    autoComplete="off"
+                                    onChange={(e) => setData('email_confirmation', e.target.value)}
+                                    onPaste={preventCopyPaste} // Bloquea pegar
+                                    className={data.email && data.email_confirmation && data.email !== data.email_confirmation ? "border-red-500 focus-visible:ring-red-500" : ""}
+                                />
+                            </div>
+                        </div>
+
+                        {/* BLOQUE 3: Contraseñas */}
                         <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
                             <div className="flex-1 flex flex-col gap-2">
                                 <Label htmlFor="password">Contraseña</Label>
@@ -87,9 +156,9 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                                     placeholder="********"
                                     autoComplete="new-password"
                                     name="new-password-field"
-                                    readOnly={true}
-                                    onFocus={(e) => e.target.readOnly = false}
                                     onChange={(e) => setData('password', e.target.value)}
+                                    onPaste={preventCopyPaste} // Bloquea pegar
+                                    onCopy={preventCopyPaste}  // Bloquea copiar
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -104,60 +173,9 @@ export default function UserCreate({ roles }: PropsCreatePage) {
                                     placeholder="********"
                                     autoComplete="new-password"
                                     onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    onPaste={preventCopyPaste} // Bloquea pegar
                                 />
                             </div>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                            <Label htmlFor="role">Rol de Usuario</Label>
-                            <Select
-                                value={optionsRoles.find(option => option.value === data.role)}
-                                onChange={(val) => setData('role', val ? String(val.value) : '')}
-                                options={optionsRoles}
-                                inputId="role"
-                                name="role"
-                                classNamePrefix="react-select"
-                                placeholder="Selecciona un rol"
-                                isClearable
-                                aria-required={false}
-                                aria-invalid={!!errors.role}
-                                aria-describedby={errors.role ? 'role-error' : undefined}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        borderColor: errors.role ? '#ef4444' : provided.borderColor,
-                                        boxShadow: errors.role ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
-                                        '&:hover': {
-                                            borderColor: errors.role ? '#ef4444' : provided.borderColor,
-                                        },
-                                        borderRadius: '0.375rem',
-                                    }),
-                                }}
-                            />
-                            <InputError message={errors.role} />
-
-                            {data.role && (
-                                <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-100 animate-in fade-in slide-in-from-top-1 duration-300">
-                                    <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
-                                        Permisos incluidos:
-                                    </p>
-
-                                    {selectedRole?.permissions?.length ? (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {selectedRole.permissions.map((perm) => (
-                                                <span
-                                                    key={perm.id}
-                                                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200"
-                                                >
-                                                    {perm.name}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <p className="text-xs text-gray-400 italic">Este rol no tiene permisos asignados.</p>
-                                    )}
-                                </div>
-                            )}
                         </div>
 
                         <div className="grid gap-3 pt-4">

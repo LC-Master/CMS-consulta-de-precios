@@ -68,14 +68,14 @@ class AgreementController extends Controller implements HasMiddleware
             $createAgreementAction->execute($request->validated());
 
             return to_route('agreement.index')
-                ->with('success', 'Convenio creado correctamente.');
+                ->with('success', 'Acuerdo creado correctamente.');
 
         } catch (\Throwable $e) {
             Log::error('Error creating agreement: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
             return back()
                 ->withInput()
-                ->with('error', 'Ocurrió un error inesperado al crear el convenio. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error inesperado al crear el acuerdo. Por favor, intente nuevamente.');
         }
     }
 
@@ -124,7 +124,7 @@ class AgreementController extends Controller implements HasMiddleware
 
             return back()
                 ->withInput()
-                ->with('error', 'Ocurrió un error inesperado al actualizar el convenio. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error inesperado al actualizar el acuerdo. Por favor, intente nuevamente.');
         }
     }
 
@@ -134,12 +134,12 @@ class AgreementController extends Controller implements HasMiddleware
             $agreement->delete();
 
             return to_route('agreement.index')
-                ->with('success', 'Convenio eliminado correctamente.');
+                ->with('success', 'Acuerdo eliminado correctamente.');
         } catch (\Throwable $e) {
             Log::error('Error deleting agreement: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
             return back()
-                ->with('error', 'Ocurrió un error inesperado al eliminar el convenio. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error inesperado al eliminar el acuerdo. Por favor, intente nuevamente.');
         }
     }
 }

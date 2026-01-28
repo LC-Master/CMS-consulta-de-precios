@@ -102,7 +102,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                             </div>
 
                             <div>
-                                <Label htmlFor="department_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Departamento. *</Label>
+                                <Label htmlFor="department_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Departamento / Categoria. *</Label>
                                 <Select<Option, false>
                                     options={optionsDepartment}
                                     inputId="department_id"
@@ -110,7 +110,7 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                     name="department_id"
                                     classNamePrefix="react-select"
                                     onChange={(val) => setData('department_id', (val as Option | null)?.value ?? '')}
-                                    placeholder="Selecciona un departamento"
+                                    placeholder="Selecciona un departamento / Categoria"
                                     isClearable
                                     aria-required={false}
                                     aria-invalid={!!errors.department_id}

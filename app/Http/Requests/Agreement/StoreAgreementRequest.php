@@ -30,7 +30,7 @@ class StoreAgreementRequest extends FormRequest
             'contact_person' => 'required|string|max:255',
             'contact_email' => 'required|string|email:rfc,dns|max:255',
             'contact_phone' => ['required', 'string', 'digits_between:10,20'],
-            'observations' => 'nullable|string|max:1000',
+            'observations' => 'required|string|max:1000',
         ];
     }
 
@@ -72,8 +72,9 @@ class StoreAgreementRequest extends FormRequest
             'contact_phone.max'      => 'El teléfono no debe exceder los 20 dígitos.',
 
             // observations
-            'observations.string' => 'Las observaciones deben ser texto.',
-            'observations.max'    => 'Las observaciones no deben exceder los 1000 caracteres.',
+            'observations.required' => 'Los detalles del acuerdo son obligatorios',
+            'observations.string' => 'Los detalles del acuerdo deben ser texto.',
+            'observations.max'    => 'Los detalles del acuerdo no deben exceder los 1000 caracteres.',
         ];
     }
 }

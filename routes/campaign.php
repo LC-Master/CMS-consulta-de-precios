@@ -20,6 +20,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('campaign.export.list')
         ->middleware('permission:campaigns.report');
 
+    Route::get('/campaigns/{campaign}/export-detail', [CampaignController::class, 'exportDetail'])
+    ->name('campaign.export-detail');
+
     Route::resource('campaign', CampaignController::class);
 
     Route::get('/calendar', [CampaignHistoryController::class, 'calendar'])

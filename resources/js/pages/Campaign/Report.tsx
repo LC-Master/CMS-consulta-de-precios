@@ -32,6 +32,7 @@ export default function CampaignReport({ flash, departments, agreements, statuse
         agreement_id: '',
         status_id: ''
     })
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -82,6 +83,34 @@ export default function CampaignReport({ flash, departments, agreements, statuse
     const optionsStatuses: Option[] = makeOptions<Status>(statuses, s => s.id, s => s.status)
     const optionsDepartment: Option[] = makeOptions<Department>(departments, d => d.id, d => d.name)
     const optionsAgreement: Option[] = makeOptions<Agreement>(agreements, a => a.id, a => a.name)
+
+    const customSelectStyles = {
+        control: (provided: any) => ({
+            ...provided,
+            borderRadius: '0.5rem', 
+            borderColor: '#D1D5DB', 
+            minHeight: '42px',
+            fontSize: '0.875rem',
+            boxShadow: 'none',
+            '&:hover': {
+                borderColor: '#9CA3AF' 
+            }
+        }),
+        placeholder: (provided: any) => ({
+            ...provided,
+            fontSize: '0.875rem', 
+            color: '#6B7280', 
+        }),
+        menu: (provided: any) => ({
+            ...provided,
+            zIndex: 9999,
+            fontSize: '0.875rem'
+        }),
+        option: (provided: any, state: any) => ({
+            ...provided,
+            fontSize: '0.875rem',
+        })
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Generar Reporte', index().url)}>
@@ -137,58 +166,64 @@ export default function CampaignReport({ flash, departments, agreements, statuse
                             </h2>
                         </div>
 
+                        {/* Fila 2: Filtros con Labels */}
                         <div className="grid grid-cols-1 md:grid-cols-3 pl-6 pr-6 gap-6 pb-6">
-                            <Select
-                                options={optionsDepartment}
-                                inputId='department_id'
-                                name='department_id'
-                                placeholder='Selecciona un Departamento'
-                                isClearable
-                                onChange={option => setData('department_id', option ? option.value : '')}
-                                className="basic-single"
-                                classNamePrefix="select"
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        borderRadius: '0.375rem',
-                                    }),
-                                }}
-                            />
-                            <InputError message={errors.department_id} className="mt-1" />
-                            <Select
-                                options={optionsAgreement}
-                                inputId='agreement_id'
-                                name='agreement_id'
-                                placeholder='Selecciona un Acuerdo'
-                                isClearable
-                                onChange={option => setData('agreement_id', option ? option.value : '')}
-                                className="basic-single"
-                                classNamePrefix="select"
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        borderRadius: '0.375rem',
-                                    }),
-                                }}
-                            />
-                            <InputError message={errors.agreement_id} className="mt-1" />
-                            <Select
-                                options={optionsStatuses}
-                                inputId='status_id'
-                                name='status_id'
-                                placeholder='Selecciona un Estatus'
-                                isClearable
-                                onChange={option => setData('status_id', option ? option.value : '')}
-                                className="basic-single"
-                                classNamePrefix="select"
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        borderRadius: '0.375rem',
-                                    }),
-                                }}
-                            />
-                            <InputError message={errors.status_id} className="mt-1" />
+                            {/* Departamento */}
+                            <div>
+                                <Label htmlFor="department_id" className="block text-sm font-bold mb-2 ml-1 text-gray-700">
+                                    Departamento / Categoria
+                                </Label>
+                                <Select
+                                    options={optionsDepartment}
+                                    inputId='department_id'
+                                    name='department_id'
+                                    placeholder='Seleccionar...'
+                                    isClearable
+                                    onChange={option => setData('department_id', option ? option.value : '')}
+                                    className="basic-single mt-1"
+                                    classNamePrefix="select"
+                                    styles={customSelectStyles}
+                                />
+                                <InputError message={errors.department_id} className="mt-1" />
+                            </div>
+
+                            {/* Acuerdo */}
+                            <div>
+                                <Label htmlFor="agreement_id" className="block text-sm font-bold mb-2 ml-1 text-gray-700">
+                                    Acuerdo
+                                </Label>
+                                <Select
+                                    options={optionsAgreement}
+                                    inputId='agreement_id'
+                                    name='agreement_id'
+                                    placeholder='Seleccionar...'
+                                    isClearable
+                                    onChange={option => setData('agreement_id', option ? option.value : '')}
+                                    className="basic-single mt-1"
+                                    classNamePrefix="select"
+                                    styles={customSelectStyles}
+                                />
+                                <InputError message={errors.agreement_id} className="mt-1" />
+                            </div>
+
+                            {/* Estatus */}
+                            <div>
+                                <Label htmlFor="status_id" className="block text-sm font-bold mb-2 ml-1 text-gray-700">
+                                    Estatus
+                                </Label>
+                                <Select
+                                    options={optionsStatuses}
+                                    inputId='status_id'
+                                    name='status_id'
+                                    placeholder='Seleccionar...'
+                                    isClearable
+                                    onChange={option => setData('status_id', option ? option.value : '')}
+                                    className="basic-single mt-1"
+                                    classNamePrefix="select"
+                                    styles={customSelectStyles}
+                                />
+                                <InputError message={errors.status_id} className="mt-1" />
+                            </div>
                         </div>
                     </form>
 

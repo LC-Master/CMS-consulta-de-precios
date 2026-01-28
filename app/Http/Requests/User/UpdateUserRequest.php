@@ -16,7 +16,7 @@ class UpdateUserRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+         return [
             'name' => 'required|string|max:255',
             /*'email' => [
                 'required', 
@@ -26,24 +26,20 @@ class UpdateUserRequest extends FormRequest
                 Rule::unique('users')->ignore($this->user->id)
             ],*/
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
-            'status' => ['required', 'in:0,1'],
-            
             'role' => ['required', 'string', 'exists:roles,name'],
         ];
     }
 
-    public function withValidator($validator)
+   public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            
-            if ($this->user->id === Auth::id() && $this->input('status') == 0) {
-                $validator->errors()->add('status', 'Por seguridad, no puedes desactivar tu propia cuenta mientras estás logueado.');
-            }
+            $targetUser = $this->route('user'); 
 
-            if ($this->user->id === Auth::id() && $this->input('role') !== $this->user->getRoleNames()->first()) {
-                 $validator->errors()->add('role', 'Por seguridad, no puedes cambiar tu propio rol.');
+            if ($targetUser->id === Auth::id()) {
+                if ($this->input('role') !== $targetUser->getRoleNames()->first()) {
+                     $validator->errors()->add('role', 'Por seguridad, no puedes cambiar tu propio rol.');
+                }
             }
-
         });
     }
 }

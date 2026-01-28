@@ -69,7 +69,7 @@ export default function AgreementsIndex({ agreements, filters = {}, statuses, fl
                         href={edit(a.id).url}
                         icon={Pencil}
                     />
-                    <Button title='Eliminar Convenio' onClick={() => {
+                    <Button title='Eliminar Acuerdo' onClick={() => {
                         setAgreementId(a.id);
                         openModal();
                     }} className='p-2 bg-red-600 h-8 text-white rounded-md'>
@@ -88,7 +88,7 @@ export default function AgreementsIndex({ agreements, filters = {}, statuses, fl
     }, [search, status])
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs('Listado de Convenios', index().url)}>
+        <AppLayout breadcrumbs={breadcrumbs('Listado de Acuerdos', index().url)}>
             {ToastContainer()}
             <DeleteAgreementModal isOpen={isOpen} agreementId={agreementId} closeModal={closeModal} />
             <Head title="Listado de Convenios" />

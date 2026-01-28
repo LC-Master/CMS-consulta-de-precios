@@ -69,7 +69,7 @@ export default function AgreementShow({ agreement }: { agreement: Agreement }) {
                         <div className="shadow-lg w-full rounded-3xl p-6 bg-white">
                             <div className='flex items-center gap-2 mb-4 border-b pb-2'>
                                 <FileText />
-                                <h2 className='text-lg font-semibold text-gray-900'>Observaciones</h2>
+                                <h2 className='text-lg font-semibold text-gray-900'>Detalles del Acuerdo Comercial</h2>
                             </div>
                             <p className="mt-1 text-gray-900 bg-gray-200 h-40 p-6 rounded-4xl whitespace-pre-wrap">{agreement.observations || 'No hay observaciones'}</p>
                         </div>

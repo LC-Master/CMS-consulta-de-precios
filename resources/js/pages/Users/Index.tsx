@@ -1,17 +1,38 @@
 import { useState } from 'react'
 import { router, Link } from '@inertiajs/react'
-import { Pencil, Plus } from 'lucide-react'
-import AppLayout from '@/layouts/app-layout';
-import { useUpdateEffect } from '@/hooks/useUpdateEffect';
-import { Column, DataTable } from '@/components/DataTable';
-import { User, Props } from '@/types/user/index.types';
-import { Filter } from '@/components/Filter';
-import AnchorIcon from '@/components/ui/AnchorIcon';
-import { index } from '@/routes/user';
-import { breadcrumbs } from '@/helpers/breadcrumbs';
+import { Pencil, Plus, Trash2, RefreshCw } from 'lucide-react'
+import AppLayout from '@/layouts/app-layout'
+import { useUpdateEffect } from '@/hooks/useUpdateEffect'
+import { Column, DataTable } from '@/components/DataTable'
+import { User, Props } from '@/types/user/index.types'
+import { Filter } from '@/components/Filter'
+import AnchorIcon from '@/components/ui/AnchorIcon'
+import { index } from '@/routes/user'
+import { breadcrumbs } from '@/helpers/breadcrumbs'
+import useModal from '@/hooks/use-modal'
+import UserActionModal from '@/components/modals/UserActionModal'
+import useToast from '@/hooks/use-toast'
 
-export default function UsersIndex({ users, filters = {} }: Props) {
+export default function UsersIndex({ users, filters = {}, flash }: Props) { 
     const [search, setSearch] = useState(filters.search || '')
+    
+    const { ToastContainer } = useToast(flash);
+
+    const { isOpen, closeModal, openModal } = useModal(false)
+    const [selectedUserId, setSelectedUserId] = useState<string>('')
+    const [actionType, setActionType] = useState<'delete' | 'restore' | null>(null)
+
+    const confirmDelete = (id: string) => {
+        setSelectedUserId(id);
+        setActionType('delete');
+        openModal();
+    }
+
+    const confirmRestore = (id: string) => {
+        setSelectedUserId(id);
+        setActionType('restore');
+        openModal();
+    }
 
     const columns: Column<User>[] = [
         {
@@ -28,18 +49,18 @@ export default function UsersIndex({ users, filters = {} }: Props) {
             key: 'status',
             header: 'Estatus',
             render: (u) => (
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${Number(u.status) === 1
-                    ? 'bg-green-100 text-green-800 border border-green-200'
+                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    !u.deleted_at 
+                    ? 'bg-green-100 text-green-800 border border-green-200' 
                     : 'bg-red-100 text-red-800 border border-red-200'
-                    }`}>
-                    {Number(u.status) === 1 ? 'Activo' : 'Inactivo'}
+                }`}>
+                    {!u.deleted_at ? 'Activo' : 'Inactivo'}
                 </span>
             ),
         },
         {
             key: 'created_at',
             header: 'Fecha Registro',
-            // CAMBIO: Formato de fecha con hora
             render: (u) => new Date(u.created_at).toLocaleString('es-ES', {
                 day: '2-digit',
                 month: '2-digit',
@@ -54,10 +75,31 @@ export default function UsersIndex({ users, filters = {} }: Props) {
             header: 'Acciones',
             render: (u) => (
                 <div className="flex gap-2">
-                    <AnchorIcon
-                        href={`/user/${u.id}/edit`}
-                        icon={Pencil}
-                    />
+                    {!u.deleted_at && (
+                        <AnchorIcon
+                            href={`/user/${u.id}/edit`}
+                            icon={Pencil}
+                            title="Editar usuario"
+                        />
+                    )}
+
+                    {!u.deleted_at ? (
+                        <button
+                            onClick={() => confirmDelete(String(u.id))}
+                            className="p-2 bg-red-500 rounded-md text-white hover:bg-red-600 transition-colors shadow-sm cursor-pointer"
+                            title="Desactivar usuario"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => confirmRestore(String(u.id))}
+                            className="p-2 bg-orange-500 rounded-md text-white hover:bg-orange-600 transition-colors shadow-sm cursor-pointer"
+                            title="Restaurar usuario"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                        </button>
+                    )}
                 </div>
             ),
         },
@@ -73,12 +115,19 @@ export default function UsersIndex({ users, filters = {} }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Lista de usuarios', index().url)}>
+            
+            {ToastContainer()}
+
+            <UserActionModal 
+                isOpen={isOpen}
+                closeModal={closeModal}
+                userId={selectedUserId}
+                actionType={actionType}
+                setUserId={setSelectedUserId}
+            />
+
             <div className="space-y-4 px-4 pb-4">
-
-                {/* Contenedor Flex para alinear Filtro y Botón */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-
-                    {/* El Filtro ocupa el espacio disponible */}
                     <div className="w-full sm:flex-1">
                         <Filter
                             filters={[
@@ -94,7 +143,6 @@ export default function UsersIndex({ users, filters = {} }: Props) {
                         />
                     </div>
 
-                    {/* Botón de Agregar Usuario */}
                     <Link
                         href="/user/create"
                         className="inline-flex items-center gap-2 px-4 py-2 bg-locatel-medio text-white rounded-md hover:brightness-95 transition-all shadow-sm font-medium text-sm whitespace-nowrap"

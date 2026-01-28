@@ -5,6 +5,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'password.confirm'])->group(function () {
     Route::resource('user', UserController::class);
+  
+    Route::put('/users/{user}/restore', [UserController::class, 'restore'])
+        ->withTrashed()
+        ->name('users.restore'); 
+  
     Route::resource('centertokens', CenterTokenController::class)
         ->only(['index', 'store', 'destroy']);
 });

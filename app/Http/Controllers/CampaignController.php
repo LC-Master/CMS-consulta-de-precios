@@ -24,7 +24,7 @@ use App\Exports\CampaignsExport;
 use App\Http\Requests\ExportCampaignListRequest;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
-use Illuminate\Routing\Controllers\Middleware;
+use App\Exports\SingleCampaignExport;
 
 class CampaignController extends Controller implements HasMiddleware
 {
@@ -274,6 +274,28 @@ class CampaignController extends Controller implements HasMiddleware
 
         return Excel::download(
             new CampaignsExport($filters),
+            $fileName
+        );
+    }
+    public function exportDetail(Campaign $campaign)
+    {
+        // Cargamos todas las relaciones necesarias para el reporte
+        $campaign->load([
+            'status',
+            'department',
+            'user',
+            'centers',
+            'agreements',
+            'timeLineItems.media' // Cargamos los ítems y sus medios asociados
+        ]);
+
+        // Generamos un nombre de archivo limpio
+        $safeTitle = \Illuminate\Support\Str::slug($campaign->title);
+        $date = now()->format('d-m-Y');
+        $fileName = "detalle_campaña_{$safeTitle}_{$date}.xlsx";
+
+        return Excel::download(
+            new SingleCampaignExport($campaign), 
             $fileName
         );
     }

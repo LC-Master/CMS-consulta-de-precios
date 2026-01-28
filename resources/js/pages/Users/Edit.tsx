@@ -10,14 +10,13 @@ import { update, index, edit } from '@/routes/user';
 import Select from 'react-select';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
 
-export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
+export default function UserEdit({ user, roles }: PropsEditPage) {
     const optionsRoles = roles.map((role) => ({ value: role.name, label: role.name }));
-    const optionsStatuses = statuses.map((status) => ({ value: status.value, label: status.name }));
 
     const { data, setData, processing, errors, put } = useForm({
         name: user.name,
         email: user.email,
-        status: user.status ? Number(user.status) : 1,
+        // ELIMINADO: status (ya no se maneja aquí)
         role: user.roles && user.roles.length > 0 ? user.roles[0].name : '',
         password: '',
         password_confirmation: '',
@@ -25,10 +24,15 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        // Asegúrate de que esta ruta 'update' genere la URL correcta (ej: /user/123)
         put(update({ id: user.id }).url);
     };
 
     const selectedRole = roles.find(role => role.name === data.role);
+
+    const preventCopyPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar usuario', edit({ id: user.id }).url)}>
@@ -40,7 +44,7 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
                             Editar usuario
                         </h2>
                         <p className="text-sm text-gray-600 text-right">
-                            Actualiza la información y permisos del usuario para el usuario seleccionado.
+                            Actualiza la información y permisos del usuario seleccionado.
                         </p>
                     </div>
                 </div>
@@ -48,23 +52,8 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
                 <div className="w-full max-w-2xl shadow-2xl border border-gray-100 mt-2 space-y-8 bg-white p-8 rounded-lg">
                     <form onSubmit={handleSubmit} className="mt-8 space-y-6" autoComplete="off">
 
+                        {/* Fila 1: Nombre y Rol */}
                         <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
-                            <div className="flex-1 flex flex-col gap-2">
-                                <Label htmlFor="email">Correo electrónico</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    value={data.email}
-                                    placeholder="email@ejemplo.com"
-                                    autoComplete="new-email"
-                                    name="new-email-field"
-                                    disabled={true}
-                                    onFocus={(e) => (e.target.readOnly = false)}
-                                    onChange={(e) => setData('email', e.target.value)}
-                                />
-                                <InputError message={errors.email} />
-                            </div>
-
                             <div className="flex-1 flex flex-col gap-2">
                                 <Label htmlFor="name">Nombre</Label>
                                 <Input
@@ -79,98 +68,91 @@ export default function UserEdit({ user, roles, statuses }: PropsEditPage) {
                                 />
                                 <InputError message={errors.name} />
                             </div>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
-                            <div className="flex-1 flex flex-col gap-2">
-                                <Label htmlFor="password">Contraseña</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    value={data.password}
-                                    placeholder="********"
-                                    autoComplete="new-password"
-                                    name="new-password-field"
-                                    readOnly={true}
-                                    onFocus={(e) => (e.target.readOnly = false)}
-                                    onChange={(e) => setData('password', e.target.value)}
-                                />
-                                <InputError message={errors.password} />
-                            </div>
 
                             <div className="flex-1 flex flex-col gap-2">
-                                <Label htmlFor="password_confirmation">Confirmar Contraseña</Label>
-                                <Input
-                                    id="password_confirmation"
-                                    type="password"
-                                    value={data.password_confirmation}
-                                    placeholder="********"
-                                    autoComplete="new-password"
-                                    onChange={(e) => setData('password_confirmation', e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                            <Label htmlFor="role">Rol de Usuario</Label>
-                            <Select
-                                value={optionsRoles.find(option => option.value === data.role)}
-                                onChange={(val) => setData('role', val ? String(val.value) : '')}
-                                options={optionsRoles}
-                                inputId="role"
-                                name="role"
-                                classNamePrefix="react-select"
-                                placeholder="Selecciona un rol"
-                                isClearable
-                                aria-required={false}
-                                aria-invalid={!!errors.role}
-                                aria-describedby={errors.role ? 'role-error' : undefined}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        borderColor: errors.role ? '#ef4444' : provided.borderColor,
-                                        boxShadow: errors.role ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
-                                        '&:hover': {
+                                <Label htmlFor="role">Rol de Usuario</Label>
+                                <Select
+                                    value={optionsRoles.find(option => option.value === data.role)}
+                                    onChange={(val) => setData('role', val ? String(val.value) : '')}
+                                    options={optionsRoles}
+                                    inputId="role"
+                                    placeholder="Selecciona un rol"
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
                                             borderColor: errors.role ? '#ef4444' : provided.borderColor,
-                                        },
-                                        borderRadius: '0.375rem',
-                                    }),
-                                }}
-                            />
-                            <InputError message={errors.role} />
-
-                            {data.role && (
-                                <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-100 animate-in fade-in slide-in-from-top-1 duration-300">
-                                    <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
-                                        Permisos incluidos:
-                                    </p>
-
-                                    {selectedRole?.permissions?.length ? (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {selectedRole.permissions.map((perm) => (
-                                                <span
-                                                    key={perm.id}
-                                                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200"
-                                                >
-                                                    {perm.name}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <p className="text-xs text-gray-400 italic">Este rol no tiene permisos asignados.</p>
-                                    )}
-                                </div>
-                            )}
+                                            borderRadius: '0.375rem',
+                                        }),
+                                    }}
+                                />
+                                <InputError message={errors.role} />
+                            </div>
                         </div>
 
+                        {/* Mostrar Permisos */}
+                        {data.role && selectedRole?.permissions && (
+                            <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
+                                <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
+                                    Permisos:
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {selectedRole.permissions.map((perm) => (
+                                        <span key={perm.id} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                            {perm.name}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Fila 2: Email (Solo Lectura) */}
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="status">Estatus</Label>
-                            <Select
-                                id="status"
-                                value={optionsStatuses.find(option => option.value === data.status)}
-                                onChange={(val) => setData('status', val ? Number(val.value) : 1)}
-                                options={optionsStatuses}
+                            <Label htmlFor="email">Correo electrónico</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={data.email}
+                                placeholder="email@ejemplo.com"
+                                disabled={true} 
+                                className="bg-gray-100 text-gray-500 cursor-not-allowed w-full"
+                                onPaste={preventCopyPaste}
+                                onCopy={preventCopyPaste}
                             />
+                            <InputError message={errors.email} />
+                        </div>
+
+                        {/* Fila 3: Contraseñas */}
+                        <div className="border-t border-gray-100 pt-4">
+                            <p className="text-sm text-gray-500 mb-4">Cambiar contraseña (dejar en blanco para mantener la actual)</p>
+                            <div className="flex flex-col sm:flex-row sm:space-x-4 gap-4">
+                                <div className="flex-1 flex flex-col gap-2">
+                                    <Label htmlFor="password">Nueva Contraseña</Label>
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        value={data.password}
+                                        placeholder="********"
+                                        autoComplete="new-password"
+                                        onChange={(e) => setData('password', e.target.value)}
+                                        onPaste={preventCopyPaste}
+                                        onCopy={preventCopyPaste}
+                                    />
+                                    <InputError message={errors.password} />
+                                </div>
+
+                                <div className="flex-1 flex flex-col gap-2">
+                                    <Label htmlFor="password_confirmation">Confirmar Contraseña</Label>
+                                    <Input
+                                        id="password_confirmation"
+                                        type="password"
+                                        value={data.password_confirmation}
+                                        placeholder="********"
+                                        autoComplete="new-password"
+                                        onChange={(e) => setData('password_confirmation', e.target.value)}
+                                        onPaste={preventCopyPaste}
+                                    />
+                                </div>
+                            </div>
                         </div>
 
                         <div className="flex flex-col gap-3 pt-4">

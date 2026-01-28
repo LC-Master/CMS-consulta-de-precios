@@ -10,6 +10,7 @@ import { StatusCampaignEnum } from "@/enums/statusCampaignEnum";
 import CenterCard from "@/components/CenterCard";
 import ErrorBanner from "@/components/ui/ErrorBanner";
 import { InfoCard } from "@/components/ui/InfoCard";
+import { show as showAgreement } from "@/routes/agreement";
 
 export default function CampaignShow({ campaign }: { campaign: CampaignExtended }) {
     const mediaAM = campaign.media
@@ -70,7 +71,7 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                             </div>
                             <div className="flex flex-col space-y-6">
                                 <div>
-                                    <p className="text-gray-500 mb-1">Departamento</p>
+                                    <p className="text-gray-500 mb-1">Departamento / Categoria </p>
                                     <div className="flex items-center gap-2">
                                         <Building className="w-4 h-4 text-gray-500" />
                                         <p className="font-medium text-gray-900">{campaign.department?.name}</p>
@@ -86,23 +87,23 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                             <div className="border-l-0 lg:border-l lg:pl-6 border-gray-100 flex flex-col h-full">
                                 <div className="flex items-center gap-2 mb-3 text-gray-700 font-medium shrink-0">
                                     <Handshake className="w-5 h-5 text-gray-500" />
-                                    <h2>Convenios</h2>
+                                    <h2>Acuerdos</h2>
                                 </div>
                                 <div className="grow relative">
                                     <div className="absolute inset-0 overflow-y-auto pr-2 custom-scrollbar space-y-2">
                                         {campaign.agreements && campaign.agreements.length > 0 ? (
                                             campaign.agreements.map(agreement => (
-                                                <Link viewTransition href={show({ id: agreement.id }).url} key={agreement.id} className="bg-gray-50 border hover:text-locatel-claro
-                                                                         border-gray-200 rounded px-3 py-2 text-xs font-medium text-gray-700 block text-break-words">
-                                                    {agreement.name}
-                                                </Link>
+                                                <Link viewTransition href={showAgreement({ id: agreement.id }).url} key={agreement.id} className="bg-gray-50 border hover:text-locatel-claro
+                                          border-gray-200 rounded px-3 py-2 text-xs font-medium text-gray-700 block text-break-words">
+                                                 {agreement.name}
+                                                  </Link>
                                             ))
                                         ) : (
                                             <div className="flex flex-col items-center justify-center ">
                                                 <span className="bg-gray-100 rounded-full p-3 h-12 w-12 flex items-center justify-center mb-2" aria-hidden="true">
                                                     <X className="w-6 h-6 text-red-500" />
                                                 </span>
-                                                <p className="text-gray-500 text-sm italic">Sin convenios asociados</p>
+                                                <p className="text-gray-500 text-sm italic">Sin acuerdos asociados</p>
                                             </div>
                                         )}
                                     </div>
