@@ -22,7 +22,7 @@ class CampaignObserver
      * Summary of created
      * @abstract Escucha el evento de creación y registra la creación en los logs.
      * @param Campaign $campaign
-     * @return void
+     * @return voidRoute::put('/users/{user}/restore', [UserController::class, 'restore'])
      */
     public function created(Campaign $campaign): void
     {

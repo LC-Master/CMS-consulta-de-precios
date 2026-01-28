@@ -11,6 +11,7 @@ return [
         'users.create',
         'users.update',
         'users.delete',
+        'users.restore',
 
         'tokens.list',
         'tokens.create',
@@ -55,6 +56,7 @@ return [
     'roles' => [
         'admin' => [
             'media.upload',
+            'users.restore',
 
             'logs.list',
             'users.list',
