@@ -5,7 +5,7 @@ export default function ErrorLayout({ children }: { children: React.ReactNode })
                 <img
                     src="/logo.webp"
                     alt="Logo Locatel"
-                    className="mx-auto mb-4 h-24 w-auto"
+                    className="caret-transparent mx-auto mb-4 h-24 w-auto"
                 />
             </header>
             <main className="grow w-full flex-col h-full flex items-center justify-center">

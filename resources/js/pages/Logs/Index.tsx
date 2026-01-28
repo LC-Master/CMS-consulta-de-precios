@@ -21,7 +21,7 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
     const [element, setElement] = useState<string>(filters.element || '')
     const [search, setSearch] = useState(filters.search || '')
     const { isOpen, closeModal, openModal } = useModal(false)
-
+    console.log(logs)
     const handleShowAudit = (log: Log) => {
         setAuditLog(log);
         openModal();

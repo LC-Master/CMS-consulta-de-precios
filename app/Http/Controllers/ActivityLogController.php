@@ -33,12 +33,13 @@ class ActivityLogController extends Controller
         }
         $elements = [
             (object) ['value' => 'campaign', 'label' => 'campañas'],
+            (object) ['value' => 'user', 'label' => 'usuarios'],
+            (object) ['value' => 'center', 'label' => 'tokens de centro'],
+            (object) ['value' => 'agreement', 'label' => 'Acuerdo'],
+            (object) ['value' => 'media', 'label' => 'Medios'],
+            (object) ['value' => 'PersonalAccessToken', 'label' => 'Tokens de acceso'],
         ];
 
-        if ($user->hasRole('admin')) {
-            $elements[] = (object) ['value' => 'user', 'label' => 'usuarios'];
-            $elements[] = (object) ['value' => 'center', 'label' => 'tokens de centro'];
-        }
         if ($request->has('search')) {
             $query->where('message', 'like', "%{$request->input('search')}%")->orWhere('action', 'like', "%{$request->input('search')}%")->orWhereHas('user', function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->input('search')}%")->orWhere('email', 'like', "%{$request->input('search')}%");
@@ -58,7 +59,7 @@ class ActivityLogController extends Controller
                     'user_email' => $log->user_email,
                     'message' => $log->message,
                     'user_agent' => $log->user_agent,
-                    'properties' => $log->properties,
+                    'properties' => json_decode($log->properties,true),
                     'ip_address' => $log->ip_address,
                     'created_at' => $log->created_at,
                     'subject_type' => class_basename($log->subject_type),

@@ -9,7 +9,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-} from '@/components/ui/sidebar';
+} from '@/components/ui/sidebar'; 
 import { create as agreementCreate, index as agreement } from '@/routes/agreement';
 import { index, create } from '@/routes/campaign';
 import { index as indexActivityLog } from '@/routes/logs';

@@ -48,7 +48,7 @@ class RecordActivityJob implements ShouldQueue
             'level' => $this->level,
             'message' => $this->message,
 
-            'causer_id' => $this->causer?->getKey(),
+            'causer_id' => $this->causer?->getKey() ?? 'Sistema',
             'user_name' => $this->causer?->name ?? 'Sistema',
             'user_email' => $this->causer?->email ?? 'N/A',
 
