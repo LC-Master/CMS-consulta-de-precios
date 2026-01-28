@@ -7,6 +7,13 @@ use App\Enums\Log\LogActionEnum;
 use App\Enums\Log\LogLevelEnum;
 use App\Jobs\RecordActivityJob;
 
+/**
+ * Summary of UserObserver
+ * @author Francisco Rojas
+ * @abstract Observer para el modelo User, utilizado para capturar los logs de aplicación
+ * @version 1.0.0
+ * @since 2026-01-28
+ */
 class UserObserver
 {
     public function created(\App\Models\User $user): void

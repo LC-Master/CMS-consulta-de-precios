@@ -8,6 +8,14 @@ use App\Jobs\RecordActivityJob;
 use App\Enums\Log\LogActionEnum;
 use App\Enums\Log\LogLevelEnum;
 
+
+/**
+ * Summary of CampaignObserver
+ * @author Francisco Rojas 
+ * @abstract Observador para el modelo Campaign que registra actividades en logs.
+ * @version 1.0
+ * @since 2026-1-28 
+ */
 class CampaignObserver
 {
     /**
@@ -58,7 +66,19 @@ class CampaignObserver
 
         $this->dispatchLog($dto, LogActionEnum::DELETED, "Campaña enviada a papelera");
     }
+    /**
+     * Escucha el evento de restauración (SoftDelete).
+     */
+    public function restored(Campaign $campaign): void
+    {
+        $dto = new CampaignJobDTO(
+            (string) $campaign->getKey(),
+            $campaign->getAttribute('title'),
+            ['deleted_at' => null]
+        );
 
+        $this->dispatchLog($dto, LogActionEnum::RESTORED, "Campaña restaurada desde papelera");
+    }
     /**
      * Método privado para no repetir el dispatch
      */

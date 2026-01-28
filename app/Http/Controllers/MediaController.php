@@ -10,6 +10,8 @@ use App\Http\Requests\Media\UpdateMediaRequest;
 use App\Models\Media;
 use App\Enums\MimeTypesEnum;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
@@ -24,8 +26,20 @@ use App\Actions\Media\IndexMediaAction;
  * @version 1.0
  * Controlador para la gestión de archivos multimedia.
  */
-class MediaController extends Controller
+class MediaController extends Controller implements HasMiddleware
 {
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:medias.list', only: ['index']),
+            new Middleware('permission:medias.show', only: ['show']),
+            new Middleware('permission:medias.create', only: ['store']),
+            new Middleware('permission:medias.update', only: ['update']),
+            new Middleware('permission:medias.delete', only: ['destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -43,13 +57,13 @@ class MediaController extends Controller
     }
 
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return Inertia::render('Media/Create');
-    }
+    // /**
+    //  * Show the form for creating a new resource.
+    //  */
+    // public function create()
+    // {
+    //     return Inertia::render('Media/Create');
+    // }
 
     /**
      * Store a newly created resource in storage.
@@ -124,8 +138,8 @@ class MediaController extends Controller
 
     public function preview(Media $media)
     {
-            try{
-                $path = Storage::disk($media->disk)->path($media->path);
+        try {
+            $path = Storage::disk($media->disk)->path($media->path);
 
             if (!Storage::disk($media->disk)->exists($media->path)) {
                 logger()->error('El archivo físico no existe en el servidor.', ['media_id' => $media->getKey()]);
@@ -133,10 +147,10 @@ class MediaController extends Controller
             }
 
             return response()->file($path);
-            }catch(\Throwable $e){
-                logger()->error('Error al previsualizar el archivo.', ['media_id' => $media->getKey(), 'error' => $e->getMessage()]);
-                return null;
-            }
+        } catch (\Throwable $e) {
+            logger()->error('Error al previsualizar el archivo.', ['media_id' => $media->getKey(), 'error' => $e->getMessage()]);
+            return null;
+        }
 
     }
     public function download(Media $media)

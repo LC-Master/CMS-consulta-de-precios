@@ -4,6 +4,8 @@ return [
 
     'permissions' => [
 
+        'logs.list',
+
         'users.list',
         'users.show',
         'users.create',
@@ -13,31 +15,48 @@ return [
         'tokens.list',
         'tokens.create',
         'tokens.delete',
+
         'dashboard.view',
+
         'campaigns.list',
         'campaigns.show',
         'campaigns.create',
         'campaigns.update',
         'campaigns.delete',
-        'campaigns.history',
+
+        'campaigns.activate',
+        'campaigns.cancel',
+        'campaigns.report',
+
+        'campaigns.history.view',
+        'campaigns.history.restore',
+        'campaigns.history.clone',
         'campaigns.history.calendar',
+
+
         'agreements.list',
         'agreements.show',
         'agreements.create',
         'agreements.update',
         'agreements.delete',
-        'logs.list',
+
         'medias.list',
         'medias.show',
         'medias.create',
         'medias.update',
         'medias.delete',
 
+        'media.upload',
+
         'reports.view',
+        'reports.generate',
     ],
 
     'roles' => [
         'admin' => [
+            'media.upload',
+
+            'logs.list',
             'users.list',
             'users.show',
             'users.create',
@@ -57,7 +76,6 @@ return [
             'agreements.update',
             'agreements.delete',
             'dashboard.view',
-
             'medias.list',
             'medias.show',
             'medias.create',
@@ -65,12 +83,16 @@ return [
             'medias.delete',
 
             'reports.view',
+            'reports.generate',
         ],
 
         'consultor' => [
+            'logs.list',
+            'media.upload',
+
             'users.list',
             'users.show',
-            'campaigns.history',
+            'campaigns.history.view',
             'campaigns.history.calendar',
             'campaigns.list',
             'campaigns.show',
@@ -82,18 +104,23 @@ return [
             'medias.list',
             'medias.show',
 
-            'reports.view',
         ],
 
         'supervisor' => '*',
 
         'publicidad' => [
+            'media.upload',
+
+            'logs.list',
+
             'campaigns.list',
             'campaigns.show',
             'campaigns.create',
             'campaigns.update',
             'campaigns.delete',
-            'campaigns.history',
+            'campaigns.history.view',
+            'campaigns.history.restore',
+            'campaigns.history.clone',
             'campaigns.history.calendar',
             'agreements.list',
             'agreements.show',
@@ -109,6 +136,7 @@ return [
             'dashboard.view',
 
             'reports.view',
+            'reports.generate',
         ],
     ],
 ];

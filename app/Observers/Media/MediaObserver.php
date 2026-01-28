@@ -7,6 +7,13 @@ use App\Models\Media;
 use App\Enums\Log\LogActionEnum;
 use App\Enums\Log\LogLevelEnum;
 
+/**
+ * Summary of MediaObserver
+ * @author Francisco Rojas 
+ * @abstract Observador para el modelo Media que registra actividades en logs.
+ * @version 1.0
+ * @since 2026-1-28 
+ */
 class MediaObserver
 {
     public function deleted(Media $media): void

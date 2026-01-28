@@ -42,6 +42,12 @@ class AgreementObserver
             $this->dispatchLog($dto, LogActionEnum::UPDATED, "Acuerdo comercial actualizado");
         }
     }
+    /**
+     * Summary of deleted
+     * @abstract Escucha el evento de eliminación (SoftDelete).
+     * @param Agreement $agreement
+     * @return void
+     */
     public function deleted(Agreement $agreement): void
     {
         $dto = new AgreementJobDTO(

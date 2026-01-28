@@ -8,6 +8,12 @@ use App\Enums\Log\LogLevelEnum;
 use App\Jobs\RecordActivityJob;
 use Laravel\Sanctum\PersonalAccessToken;
 
+/**
+ * @author Francisco Rojas
+ * @abstract Observador para el modelo PersonalAccessToken que registra actividades en logs.
+ * @version 1.0
+ * @since 2026-1-28
+ */
 class SanctumTokenObserver
 {
     public function created(PersonalAccessToken $token)
@@ -23,7 +29,7 @@ class SanctumTokenObserver
 
         RecordActivityJob::dispatch(
             $personalAccessTokenJobDTO,
-            LogActionEnum::TOKEN_CREATED,
+            LogActionEnum::CREATED,
             LogLevelEnum::SUCCESS,
             'Se ha creado un nuevo token de acceso personal.',
             request()->ip(),
@@ -44,7 +50,7 @@ class SanctumTokenObserver
         );
         RecordActivityJob::dispatch(
             $personalAccessTokenJobDTO,
-            LogActionEnum::TOKEN_DELETED,
+            LogActionEnum::DELETED,
             LogLevelEnum::WARNING,
             'El token ha sido eliminado',
             request()->ip(),
