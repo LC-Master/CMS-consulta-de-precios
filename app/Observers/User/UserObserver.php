@@ -16,6 +16,12 @@ use App\Jobs\RecordActivityJob;
  */
 class UserObserver
 {
+    /**
+     * Summary of created
+     * @abstract Escucha el evento "created" del modelo User y registra la creación en los logs.
+     * @param \App\Models\User $user
+     * @return void
+     */
     public function created(\App\Models\User $user): void
     {
         $dto = new UserJobDTO(
@@ -27,8 +33,12 @@ class UserObserver
 
         $this->dispatchLog($dto, LogActionEnum::CREATED, 'El usuario ha sido creado');
     }
-    
-    
+    /**
+     * Summary of updated
+     * @abstract Escucha el evento "updated" del modelo User y registra la actualización en los logs.
+     * @param \App\Models\User $user
+     * @return void
+     */
     public function updated(\App\Models\User $user): void
     {
         if ($user->wasChanged()) {
@@ -53,6 +63,12 @@ class UserObserver
             $this->dispatchLog($dto, LogActionEnum::UPDATED, "El usuario ha sido actualizado");
         }
     }
+    /**
+     * Summary of deleted
+     * @abstract Escucha el evento "deleted" del modelo User y registra la eliminación en los logs.
+     * @param \App\Models\User $user
+     * @return void
+     */
     public function deleted(\App\Models\User $user): void
     {
         $dto = new UserJobDTO(

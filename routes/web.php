@@ -34,7 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('media.upload')
         ->middleware('permission:media.upload');
 
-    Route::get('logs', ActivityLogController::class)
+    Route::get('logs', [ActivityLogController::class, 'index'])
         ->name('logs.index')
         ->middleware('permission:logs.list');
 

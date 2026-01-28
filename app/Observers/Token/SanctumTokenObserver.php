@@ -16,6 +16,12 @@ use Laravel\Sanctum\PersonalAccessToken;
  */
 class SanctumTokenObserver
 {
+    /**
+     * Summary of created
+     * @abstract Escucha el evento "created" del modelo PersonalAccessToken y registra la creación en los logs.
+     * @param PersonalAccessToken $token
+     * @return void
+     */
     public function created(PersonalAccessToken $token)
     {
 
@@ -38,7 +44,12 @@ class SanctumTokenObserver
             auth()->user()
         );
     }
-
+    /**
+     * Summary of deleted
+     * @abstract Escucha el evento "deleted" del modelo PersonalAccessToken y registra la eliminación en los logs.
+     * @param PersonalAccessToken $token
+     * @return void
+     */
     public function deleted(PersonalAccessToken $token)
     {
         $personalAccessTokenJobDTO = new PersonalAccessTokenJobDTO(

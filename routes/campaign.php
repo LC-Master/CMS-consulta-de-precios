@@ -4,7 +4,7 @@ use App\Http\Controllers\CampaignController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CampaignHistoryController;
 
-Route::middleware(['auth', 'verified', 'role:admin|publicidad|supervisor|consultor'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/campaign/activate/{campaign}', [CampaignController::class, 'activate'])
         ->name('campaign.activate')
         ->middleware('permission:campaigns.activate');

@@ -4,7 +4,13 @@ namespace App\DTOs\RecordActivityLogs;
 
 use App\Contracts\LoggableDTO;
 use App\Models\Media;
-
+/**
+ * Summary of MediaJobDTO
+ * @author Francisco Rojas
+ * @abstract DTO para el modelo Media que se utiliza para registrar actividades en logs.
+ * @version 1.0
+ * @since 2026-1-28
+ */
 readonly class MediaJobDTO implements LoggableDTO
 {
     /**

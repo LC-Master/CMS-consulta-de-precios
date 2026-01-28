@@ -19,7 +19,10 @@ use App\Enums\Log\LogLevelEnum;
 class CampaignObserver
 {
     /**
-     * Escucha el evento de creación.
+     * Summary of created
+     * @abstract Escucha el evento de creación y registra la creación en los logs.
+     * @param Campaign $campaign
+     * @return void
      */
     public function created(Campaign $campaign): void
     {
@@ -33,7 +36,10 @@ class CampaignObserver
     }
 
     /**
-     * Escucha el evento de actualización.
+     * Summary of updated
+     * @abstract Escucha el evento de actualización y registra los cambios en los logs.
+     * @param Campaign $campaign
+     * @return void
      */
     public function updated(Campaign $campaign): void
     {
@@ -54,7 +60,10 @@ class CampaignObserver
     }
 
     /**
-     * Escucha el evento de eliminación (SoftDelete).
+     * Summary of deleted
+     * @abstract Escucha el evento de eliminación (SoftDelete) y registra la eliminación en los logs.
+     * @param Campaign $campaign
+     * @return void
      */
     public function deleted(Campaign $campaign): void
     {
@@ -67,7 +76,10 @@ class CampaignObserver
         $this->dispatchLog($dto, LogActionEnum::DELETED, "Campaña enviada a papelera");
     }
     /**
-     * Escucha el evento de restauración (SoftDelete).
+     * Summary of restored
+     * @abstract Escucha el evento de restauración (SoftDelete) y registra la restauración en los logs.
+     * @param Campaign $campaign
+     * @return void
      */
     public function restored(Campaign $campaign): void
     {

@@ -5,5 +5,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'password.confirm'])->group(function () {
     Route::resource('user', UserController::class);
-    Route::resource('centertokens', CenterTokenController::class)->only(['index', 'store', 'destroy']);
+    Route::resource('centertokens', CenterTokenController::class)
+        ->only(['index', 'store', 'destroy']);
 });

@@ -5,6 +5,13 @@ namespace App\DTOs\RecordActivityLogs;
 use App\Contracts\LoggableDTO;
 use App\Models\User;
 
+
+/**
+ * Summary of UserJobDTO
+ * @author Francisco Rojas
+ * @abstract Objecto de transferencia para el job que se encarga de guardar los logs
+ * @since 2026-01-28
+ */
 readonly class UserJobDTO implements LoggableDTO
 {
     /**

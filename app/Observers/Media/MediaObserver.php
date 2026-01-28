@@ -16,6 +16,12 @@ use App\Enums\Log\LogLevelEnum;
  */
 class MediaObserver
 {
+    /**
+     * Summary of deleted
+     * @abstract Escucha el evento "deleted" del modelo Media y registra la eliminación en los logs.
+     * @param Media $media
+     * @return void
+     */
     public function deleted(Media $media): void
     {
         $mediaDto = new \App\DTOs\RecordActivityLogs\MediaJobDTO(
