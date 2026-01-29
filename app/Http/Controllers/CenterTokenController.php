@@ -16,9 +16,9 @@ class CenterTokenController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new \Illuminate\Routing\Controllers\Middleware('permission:tokens.list', only: ['index']),
-            new \Illuminate\Routing\Controllers\Middleware('permission:tokens.create', only: ['store']),
-            new \Illuminate\Routing\Controllers\Middleware('permission:tokens.delete', only: ['destroy']),
+            new \Illuminate\Routing\Controllers\Middleware('permission:token.list', only: ['index']),
+            new \Illuminate\Routing\Controllers\Middleware('permission:token.create', only: ['store']),
+            new \Illuminate\Routing\Controllers\Middleware('permission:token.delete', only: ['destroy']),
         ];
     }
 

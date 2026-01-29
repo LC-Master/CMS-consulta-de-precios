@@ -8,7 +8,7 @@ Route::middleware(['auth', 'verified', 'password.confirm'])->group(function () {
   
     Route::put('/users/{user}/restore', [UserController::class, 'restore'])
         ->withTrashed()
-        ->middleware('permission:users.restore')
+        ->middleware('permission:user.restore')
         ->name('user.restore'); 
   
     Route::resource('centertokens', CenterTokenController::class)

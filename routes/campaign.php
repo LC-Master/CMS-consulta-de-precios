@@ -30,6 +30,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('calendar.show')
         ->middleware('permission:campaign.history.calendar');
 
+    Route::post('/campaigns/calendar/export', [CampaignHistoryController::class, 'exportCalendar'])
+    ->name('campaign.calendar.export');
+
     Route::prefix('/history/campaigns')->group(function () {
         Route::get('/', [CampaignHistoryController::class, 'index'])
             ->name('campaignsHistory.history')
