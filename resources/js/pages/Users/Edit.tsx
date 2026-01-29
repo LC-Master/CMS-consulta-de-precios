@@ -111,7 +111,7 @@ export default function UserEdit({ user, roles, permissions }: PropsEditPage) {
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar usuario', edit({ id: user.id }).url)}>
             <Head title="Editar usuario" />
-            <div className="flex flex-col items-center py-6 px-4 sm:px-6 lg:px-8 min-w-[370px]">
+            <div className="flex flex-col items-center py-6 px-4 sm:px-6 lg:px-8 min-w-92.5">
                 <div className="w-full max-w-4xl flex justify-start mb-4">
                     <div className="flex flex-col gap-2 items-start">
                         <h2 className="text-2xl font-bold tracking-tight text-gray-900">

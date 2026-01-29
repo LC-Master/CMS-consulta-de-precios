@@ -94,7 +94,7 @@ export default function UserCreate({ roles, permissions }: PropsCreatePage) {
     return (
         <AppLayout breadcrumbs={breadcrumbs('Crear Usuario', index().url)}>
             <Head title="Crear Usuario" />
-            <div className="flex flex-col items-center py-6 px-4 sm:px-6 lg:px-8 min-w-[370px]">
+            <div className="flex flex-col items-center py-6 px-4 sm:px-6 lg:px-8 min-w-92.5">
                 <div className="w-full max-w-7xl flex justify-start mb-4">
                     <div className="flex flex-col gap-2 items-start">
                         <h2 className="text-2xl font-bold tracking-tight text-gray-900">
@@ -218,13 +218,13 @@ export default function UserCreate({ roles, permissions }: PropsCreatePage) {
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
                                     <div className="flex gap-2 mb-1">
-                                         <button type="button" onClick={() => toggleSelectAll(true)} className="text-[10px] font-bold uppercase tracking-wider text-locatel hover:text-locatel-oscuro bg-transparent border-none p-0 cursor-pointer">
+                                         <Button type="button" onClick={() => toggleSelectAll(true)} className="text-[10px] font-bold uppercase tracking-wider text-locatel hover:text-locatel-oscuro bg-transparent border-none p-0 cursor-pointer">
                                             Seleccionar Todo
-                                         </button>
+                                         </Button>
                                          <span className="text-gray-300 text-[10px]">|</span>
-                                         <button type="button" onClick={() => toggleSelectAll(false)} className="text-[10px] font-bold uppercase tracking-wider text-gray-400 hover:text-gray-600 bg-transparent border-none p-0 cursor-pointer">
+                                         <Button type="button" onClick={() => toggleSelectAll(false)} className="text-[10px] font-bold uppercase tracking-wider text-gray-400 hover:text-gray-600 bg-transparent border-none p-0 cursor-pointer">
                                             Limpiar
-                                         </button>
+                                         </Button>
                                     </div>
                                 </div>
                             </div>
@@ -238,13 +238,13 @@ export default function UserCreate({ roles, permissions }: PropsCreatePage) {
                                             <h4 className="text-gray-900 text-xs font-black uppercase tracking-[0.2em]">
                                                 {groupTranslations[group] || `${group} Management`}
                                             </h4>
-                                            <button 
+                                            <Button 
                                                 type="button" 
                                                 onClick={() => toggleGroup(perms)}
                                                 className="text-[10px] uppercase font-bold text-locatel hover:text-locatel-oscuro bg-transparent border-none p-0 cursor-pointer transition-colors"
                                             >
                                                 {perms.every((p) => data.selectedPermissions.includes(p.id)) ? 'Deseleccionar grupo' : 'Seleccionar grupo'}
-                                            </button>
+                                            </Button>
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -272,7 +272,7 @@ export default function UserCreate({ roles, permissions }: PropsCreatePage) {
                                                     </div>
 
                                                     <div className="relative inline-flex items-center">
-                                                        <input
+                                                        <Input
                                                             type="checkbox"
                                                             className="w-4 h-4 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500 accent-emerald-500 cursor-pointer"
                                                             checked={data.selectedPermissions.includes(p.id)}
