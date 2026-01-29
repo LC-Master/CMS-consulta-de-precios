@@ -15,3 +15,4 @@ Schedule::command('app:force-delete-old-logs')->monthlyOn(1, '2:00');
 Schedule::command('campaigns:check')->everyTenMinutes();
 Schedule::command('app:check-expiring-campaigns-eight')->hourly();
 Schedule::command('app:check-expiring-campaigns')->daily();
+Schedule::command('media:clean-old')->monthlyOn(1, '00:00');
