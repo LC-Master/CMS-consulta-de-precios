@@ -111,7 +111,7 @@ export default function UserEdit({ user, roles, permissions }: PropsEditPage) {
     return (
         <AppLayout breadcrumbs={breadcrumbs('Editar usuario', edit({ id: user.id }).url)}>
             <Head title="Editar usuario" />
-            <div className="flex flex-col items-center py-6 px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col items-center py-6 px-4 sm:px-6 lg:px-8 min-w-[370px]">
                 <div className="w-full max-w-4xl flex justify-start mb-4">
                     <div className="flex flex-col gap-2 items-start">
                         <h2 className="text-2xl font-bold tracking-tight text-gray-900">
@@ -123,7 +123,7 @@ export default function UserEdit({ user, roles, permissions }: PropsEditPage) {
                     </div>
                 </div>
 
-                <div className="w-full max-w-7xl shadow-2xl border border-gray-100 space-y-8 bg-white p-8 rounded-lg">
+                <div className="w-full max-w-7xl shadow-2xl border border-gray-100 space-y-8 bg-white p-4 sm:p-8 rounded-lg">
                     <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
 
                         {/* SECCIÓN 1: DATOS PERSONALES */}
@@ -209,7 +209,7 @@ export default function UserEdit({ user, roles, permissions }: PropsEditPage) {
 
                         {/* SECCIÓN 3: MATRIZ DE PERMISOS */}
                         <div className="border-t border-gray-100 pt-8">
-                            <div className="mb-6 flex justify-between items-end">
+                            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
                                     <h3 className="text-lg font-bold text-gray-900">Matriz de Control de Acceso</h3>
                                     <p className="text-xs text-gray-500">Administra las capacidades técnicas del usuario</p>
@@ -245,13 +245,13 @@ export default function UserEdit({ user, roles, permissions }: PropsEditPage) {
                                             </button>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                             {perms.map((p) => (
                                                 <div
                                                     key={p.id}
                                                     onClick={() => handlePermissionChange(p.id)}
                                                     className={`
-                                                        flex md:flex-col lg:flex-row items-center justify-between p-3 rounded-md border transition-all duration-200 group cursor-pointer h-full
+                                                        flex flex-row items-center justify-between p-3 rounded-md border transition-all duration-200 group cursor-pointer h-full
                                                         ${data.selectedPermissions.includes(p.id)
                                                             ? 'bg-emerald-50 border-emerald-200 hover:border-emerald-300 shadow-sm'
                                                             : 'bg-white border-gray-100 hover:border-gray-300 hover:shadow-xs'
