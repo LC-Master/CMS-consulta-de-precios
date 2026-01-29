@@ -125,8 +125,6 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
         }
     };
 
-    // SOLUCIÓN: Usamos useMemo para objetos que se pasan al calendario
-    // para evitar que se recreen en cada render y causen el bucle.
     const validRange = useMemo(() => {
         const year = new Date().getFullYear();
         return {
@@ -141,14 +139,13 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
         right: 'today prev,next'
     }), []);
 
-    // SOLUCIÓN: Validamos si realmente cambió el mes antes de actualizar el estado
+ 
     const handleDatesSet = useCallback((dateInfo: DatesSetArg) => {
         const middleDate = new Date(
             (dateInfo.start.getTime() + dateInfo.end.getTime()) / 2
         );
         
-        // Solo actualizamos si el mes o el año son diferentes
-        setCurrentViewDate((prevDate) => {
+       setCurrentViewDate((prevDate) => {
             if (middleDate.getMonth() !== prevDate.getMonth() || 
                 middleDate.getFullYear() !== prevDate.getFullYear()) {
                 return middleDate;
@@ -226,7 +223,6 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
                             dayMaxEvents={4}
                             moreLinkClick="popover"
                             eventClick={handleEventClick}
-                            // Usamos las versiones memoizadas/controladas
                             datesSet={handleDatesSet}
                             headerToolbar={headerToolbar}
                             validRange={validRange}
