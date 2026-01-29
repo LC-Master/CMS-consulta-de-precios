@@ -10,6 +10,9 @@ use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Exports\CalendarVisualExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
 class CampaignHistoryController extends Controller
 {
@@ -147,5 +150,29 @@ class CampaignHistoryController extends Controller
             Log::error("Error en Calendario: " . $e->getMessage());
             return back()->with('error', 'Error interno: ' . $e->getMessage());
         }
+    }
+
+    public function exportCalendar(Request $request)
+    {
+    
+    ini_set('memory_limit', '256M');
+    ini_set('post_max_size', '40M');
+    ini_set('upload_max_filesize', '40M');
+
+    $request->validate([
+        'image' => 'required|string', // Viene en base64
+    ]);
+
+    $image = $request->input('image');
+    $image = str_replace('data:image/png;base64,', '', $image);
+    $image = str_replace(' ', '+', $image);
+    $imageName = 'temp_calendar_' . time() . '.png';
+    
+    $path = storage_path('app/public/' . $imageName);
+    file_put_contents($path, base64_decode($image));
+
+    $fileName = "calendario_visual_" . now()->format('Y-m-d_H-i') . ".xlsx";
+
+    return Excel::download(new CalendarVisualExport($path), $fileName);
     }
 }

@@ -4,13 +4,13 @@ import AppLayout from '@/layouts/app-layout';
 import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Filter } from '@/components/Filter';
 import { Column } from '@/types/datatable.types';
-import { Eye, Pencil, Trash } from 'lucide-react';
+import { Eye, Pencil, Trash, FileSpreadsheet } from 'lucide-react';
 import { DataTable } from '@/components/DataTable';
 import { Campaign, Props } from '@/types/campaign/index.types';
 import useToast from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react'
-import { edit, index, show, activate, } from '@/routes/campaign';
+import { edit, index, show, activate, exportDetail } from '@/routes/campaign';
 import useModal from '@/hooks/use-modal';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
 import { PillStatus } from '@/components/ui/PillStatus';
@@ -94,10 +94,19 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                             <Eye className="w-4 h-4" />
                             <span>Ver</span>
                         </ActionMenu.ItemLink>
+                        
                         <ActionMenu.ItemLink href={edit({ id: a.id }).url}>
                             <Pencil className="w-4 h-4" />
                             <span>Editar</span>
                         </ActionMenu.ItemLink>
+
+                        <ActionMenu.Item onClick={() => {
+                            window.location.href = exportDetail({ id: a.id }).url
+                        }}>
+                            <FileSpreadsheet className="w-4 h-4" />
+                            <span>Exportar</span>
+                        </ActionMenu.Item>
+
                         <ActionMenu.Separator />
 
                         <ActionMenu.Item variant="danger" onClick={() => {
