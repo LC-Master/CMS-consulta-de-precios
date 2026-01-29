@@ -1,8 +1,9 @@
 import { cdn } from "@/routes/media";
 import { cdn as thumbnailCDN } from "@/routes/thumbnail"
-import { MediaItem } from "@/types/campaign/index.types";
+import { MediaItem } from "@/types/media/index.type";
 import { ReactNode } from "react";
 import { useState } from "react";
+
 export default function MediaItemCard({ item, controls }: { item: MediaItem; controls: ReactNode }) {
     const hasPreview = item.mime_type.startsWith('image') || !!item.thumbnail;
     const [error, setError] = useState(!hasPreview);

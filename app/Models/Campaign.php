@@ -22,6 +22,10 @@ class Campaign extends Model
     use SoftDeletes;
     use HasUuids;
 
+    public $old_media_files;
+    public $old_agreements;
+    public $old_centers;
+
     protected $fillable = [
         'title',
         'start_at',

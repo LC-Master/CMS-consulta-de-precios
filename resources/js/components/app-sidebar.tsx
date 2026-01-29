@@ -54,7 +54,7 @@ export function AppSidebar() {
                     url: index().url,
                     icon: List,
                 } : undefined,
-                can('campaign.history') ? {
+                can('campaign.history.view') ? {
                     title: 'Historial',
                     url: indexHistory().url,
                     icon: History,

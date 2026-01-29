@@ -6,7 +6,7 @@ import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 import { Column, DataTable } from '@/components/DataTable';
 import AnchorIcon from '@/components/ui/AnchorIcon';
 import Select from 'react-select';
-import { MediaItem, Props } from '@/types/campaign/index.types';
+import { Props } from '@/types/campaign/index.types';
 import { Button } from '@/components/ui/button';
 import useToast from '@/hooks/use-toast';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
@@ -16,6 +16,7 @@ import { show as showMedia } from '@/routes/media';
 import useModal from '@/hooks/use-modal';
 import ExpandableCampaignList from '@/components/ui/ExpandableCampaignList';
 import DeleteMedia from '@/components/modals/DeleteMedia';
+import { MediaItem } from '@/types/media/index.type';
 
 export default function MediaIndex({ medias, filters = {}, mimeTypes = [], flash }: Props) {
     const { isOpen, closeModal, openModal } = useModal(false)

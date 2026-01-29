@@ -30,7 +30,6 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
     const ToastComponent = useToast(flash)
     const { moveDown, moveUp, transfer } = useMediaActions<MediaItem>()
     const { handlerSearch, search, filteredItems } = useSearch<MediaItem>(mediaList)
-
     const { data, setData, processing, errors, put, transform, cancel } = useForm({
         title: campaign.title || '',
         start_at: campaign.start_at ? new Date(campaign.start_at).toISOString().slice(0, 16) : '',
@@ -38,8 +37,8 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
         centers: campaign.centers ? campaign.centers.map(center => center.id) : [],
         department_id: String(campaign.department_id || ''),
         agreements: campaign.agreements ? campaign.agreements.map(agreement => agreement.id) : [],
-        am_media: campaign.media.filter(item => item.slot === 'am').map(item => item.id) || [] as string[],
-        pm_media: campaign.media.filter(item => item.slot === 'pm').map(item => item.id) || [] as string[],
+        am_media: campaign.media.filter(item => item.slot === 'am').map(item => (item.id, item.instanceId)) || [],
+        pm_media: campaign.media.filter(item => item.slot === 'pm').map(item => (item.id, item.instanceId)) || [],
     })
     const filteredCenters = (val: Option[] | null): void => {
         const selected = val ?? []
@@ -100,7 +99,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                             </div>
 
                             <div>
-                                <label htmlFor="department_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Departamento / Categoria. *</label>
+                                <label htmlFor="department_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Departamento / Categoría. *</label>
                                 <Select<Option, false>
                                     options={optionsDepartment}
                                     inputId="department_id"

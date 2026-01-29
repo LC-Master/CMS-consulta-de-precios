@@ -36,7 +36,6 @@ readonly class CampaignJobDTO implements LoggableDTO
     public function getProperties(): array
     {
         return [
-            'title' => $this->title,
             'payload' => $this->payload,
             'changes' => $this->changes,
         ];
