@@ -20,6 +20,8 @@ class StoreUserRequest extends FormRequest
             'email' => 'required|string|email:rfc,dns|max:255|unique:users,email|confirmed',
             'role' => 'required|string|exists:roles,name',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'selectedPermissions' => 'nullable|array',
+            'selectedPermissions.*' => 'string',
         ];
     }
     

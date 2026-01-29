@@ -18,15 +18,10 @@ class UpdateUserRequest extends FormRequest
     {
          return [
             'name' => 'required|string|max:255',
-            /*'email' => [
-                'required', 
-                'string', 
-                'email:rfc,dns', 
-                'max:255', 
-                Rule::unique('users')->ignore($this->user->id)
-            ],*/
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'exists:roles,name'],
+            'role' => ['nullable', 'string', 'exists:roles,name'],
+            'selectedPermissions' => ['nullable', 'array'],
+            'selectedPermissions.*' => ['string'],
         ];
     }
 

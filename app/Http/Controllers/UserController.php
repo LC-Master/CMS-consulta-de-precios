@@ -48,10 +48,11 @@ class UserController extends Controller implements HasMiddleware
 
     public function create()
     {
+        $permissionsAndRoles = $this->getPermissionsAndRoles();
+
         return Inertia::render('Users/Create', [
-            'roles' => \Spatie\Permission\Models\Role::with('permissions:id,name')
-                ->select('id', 'name')
-                ->get()
+            'permissions' => $permissionsAndRoles['matrix'],
+            'roles' => $permissionsAndRoles['roles'],
         ]);
     }
 
@@ -77,13 +78,15 @@ class UserController extends Controller implements HasMiddleware
 
     public function edit(User $user)
     {
-        $user->load('roles');
+        $permissionsAndRoles = $this->getPermissionsAndRoles();
+
+        // Cargar roles y sus permisos, ADEMÁS de los permisos directos del usuario
+        $user->load(['roles.permissions', 'permissions']);
 
         return Inertia::render('Users/Edit', [
             'user' => $user,
-            'roles' => \Spatie\Permission\Models\Role::with('permissions:id,name')
-                ->select('id', 'name')
-                ->get()
+            'permissions' => $permissionsAndRoles['matrix'],
+            'roles' => $permissionsAndRoles['roles'],
         ]);
     }
 
@@ -133,5 +136,27 @@ class UserController extends Controller implements HasMiddleware
             return back()
                 ->with('error', 'Ocurrió un error al restaurar el usuario.');
         }
+    }
+    private function getPermissionsAndRoles()
+    {
+        $permissions = config('permissions.permissions');
+        $roles = config('permissions.roles');
+
+        $structured = [];
+
+        foreach ($permissions as $perm) {
+            $parts = explode('.', $perm);
+            $group = $parts[0];
+            $structured[$group][] = [
+                'id' => $perm,
+                'name' => str_replace($group . '.', '', $perm),
+                'label' => str_replace('.', ' ', $perm),
+            ];
+        }
+
+        return [
+            'matrix' => $structured,
+            'roles' => $roles
+        ];
     }
 }

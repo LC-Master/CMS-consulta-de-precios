@@ -133,7 +133,7 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
             { preserveState: true, replace: true, preserveScroll: true }
         )
     }, [search, element])
-    console.log(elements)
+    
     return (
         <AppLayout breadcrumbs={breadcrumbs('Logs de actividad', index().url)}>
             <Head title="Logs de actividad" />

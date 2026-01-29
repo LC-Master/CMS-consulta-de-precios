@@ -1,3 +1,5 @@
+import { Flash } from "../flash/flash.type";
+
 export interface User {
     id: number;
     name: string;
@@ -7,19 +9,31 @@ export interface User {
     updated_at: string;
     status: number;
     roles: Role[];
+    permissions?: Permission[];
     deleted_at?: string | null;
 }
 
 export interface Props {
     users: { data: User[] };
     filters: { search?: string };
-    flash: any;
+    flash: Flash;
+}
+export type Permission = {
+    id: number | string;
+    name: string;
+    label?: string;
+    guard_name?: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
-export interface Permission {
-    id: number;
+export interface PermissionMatrixItem {
+    id: string;
     name: string;
+    label: string;
 }
+
+export type PermissionMatrix = Record<string, PermissionMatrixItem[]>;
 
 export interface Role {
     id: number;
@@ -29,9 +43,10 @@ export interface Role {
 
 export type PropsEditPage = {
     user: User;
+    permissions: PermissionMatrix;
     statuses: { name: string; value: number }[];
-    roles: Role[];
-    flash?: any;
+    roles: Record<string, string[] | string>; // roles config from config('permissions.roles')
+    flash?: Flash;
 };
 
-export type PropsCreatePage = Pick<PropsEditPage, 'roles'> & { flash?: any };
+export type PropsCreatePage = Pick<PropsEditPage, 'roles'> & { permissions: PermissionMatrix, flash?: Flash };

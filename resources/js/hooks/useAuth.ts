@@ -44,7 +44,7 @@ export default function useAuth() {
     };
 
     const can = (permission: string): boolean => {
-        return auth?.permissions?.includes(permission) ?? false;
+        return (auth?.permissions?.includes(permission) || auth.user.permissions?.some(p => p.name === permission)) ?? false;
     };
     return { hasRole, can, Permissions };
 }
