@@ -8,7 +8,7 @@ import useModal from "@/hooks/use-modal";
 import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 import AppLayout from "@/layouts/app-layout";
 import { index } from "@/routes/logs";
-import { Props, Log } from "@/types/logs/index.type";
+import { Log, Props } from "@/types/logs/index.type";
 import { Head, router } from "@inertiajs/react";
 import { Link } from '@inertiajs/react';
 import {
@@ -133,6 +133,7 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
             { preserveState: true, replace: true, preserveScroll: true }
         )
     }, [search, element])
+    console.log(elements)
     return (
         <AppLayout breadcrumbs={breadcrumbs('Logs de actividad', index().url)}>
             <Head title="Logs de actividad" />

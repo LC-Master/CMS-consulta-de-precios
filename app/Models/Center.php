@@ -20,4 +20,5 @@ class Center extends Authenticatable
         'is_syncing',
         'sync_status'
     ];
+    protected $hidden = ['pivot'];
 }

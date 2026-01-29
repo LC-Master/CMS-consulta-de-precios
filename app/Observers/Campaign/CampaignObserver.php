@@ -43,16 +43,52 @@ class CampaignObserver
      */
     public function updated(Campaign $campaign): void
     {
+        $newMediaFiles = $campaign->timeLineItems()
+            ->with('media')
+            ->get()
+            ->map(fn($item) => $item->media->name ?? 'archivo-desconocido')
+            ->toArray();
+        $newAgreements = $campaign->agreements->pluck('name')->toArray();
+        $newCenters = $campaign->centers->pluck('name')->toArray();
+
+        $oldMediaFiles = $campaign->old_media_files ?? [];
+        $oldCenters = $campaign->old_centers ?? [];
+        $oldAgreements = $campaign->old_agreements ?? [];
+
         if ($campaign->wasChanged()) {
             $changes = [
                 'before' => array_intersect_key($campaign->getOriginal(), $campaign->getChanges()),
                 'after' => $campaign->getChanges(),
+                'media_files' => [
+                    'before' => $oldMediaFiles,
+                    'after' => $newMediaFiles,
+                ],
+                'agreements' => [
+                    'before' => $oldAgreements,
+                    'after' => $newAgreements,
+                ],
+                'centers' => [
+                    'before' => $oldCenters,
+                    'after' => $newCenters,
+                ],
             ];
 
+            $payload = $campaign->toArray();
+
+            $payload['agreements'] = $campaign->agreements->map(fn($agreement) => [
+                'id' => $agreement->id,
+                'name' => $agreement->name,
+            ])->toArray();
+            $payload['centers'] = $campaign->centers->map(fn($center) => [
+                'id' => $center->id,
+                'name' => $center->name,
+            ])->toArray();
+
             $dto = new CampaignJobDTO(
-                (string) $campaign->getKey(),
-                $campaign->getAttribute('title'),
-                $changes
+                id: (string) $campaign->getKey(),
+                title: $campaign->getAttribute('title'),
+                payload: $payload,
+                changes: $changes
             );
 
             $this->dispatchLog($dto, LogActionEnum::UPDATED, "Campaña actualizada");

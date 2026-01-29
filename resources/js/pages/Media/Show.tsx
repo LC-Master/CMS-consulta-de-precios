@@ -3,12 +3,12 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/media';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
-import { MediaItem } from '@/types/campaign/index.types';
 import { Head, Link } from '@inertiajs/react';
 import { mediaNameNormalizer, formatBytes } from '@/helpers/mediaTools';
 import { CircleAlert, DownloadCloud, ArrowLeft, Book, ChevronRight } from 'lucide-react';
 import { show } from '@/routes/campaign';
 import MediaPreview from '@/components/media/MediaPreview';
+import { MediaItem } from '@/types/media/index.type';
 
 export default function MediaShow({ media }: { media: MediaItem }) {
     const imgRef = useRef<HTMLImageElement | null>(null);

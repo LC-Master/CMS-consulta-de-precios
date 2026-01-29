@@ -2,25 +2,14 @@ import { StatusCampaignEnum } from '@/enums/statusCampaignEnum';
 import { Agreement } from '../agreement/index.types';
 import { Status } from '../status/status.type';
 import { Flash } from '../flash/flash.type';
-export interface Department {
+import { Media, MediaItem } from '../media/index.type';
+
+export type Department = {
     id: string;
     name: string;
 }
 export interface Center extends Pick<Department, 'id' | 'name'> {
     code: string;
-}
-export interface MediaItem extends Pick<Department, 'id' | 'name'> {
-    size: string;
-    instanceId?: string;
-    duration_seconds: number | null;
-    slot?: 'am' | 'pm';
-    campaigns?: Campaign[];
-    position?: string;
-    mime_type: 'image/jpeg' | 'video/mp4';
-    thumbnail?: {
-        id: string;
-        media_id: string;
-    } | null;
 }
 
 export interface Option {
@@ -53,24 +42,7 @@ export interface DragEndEvent {
     canceled: boolean;
 }
 
-export type MediaPivot = {
-    campaign_id: string;
-    media_id: string;
-    position: string;
-    slot: 'am' | 'pm';
-    created_at: string;
-    updated_at: string;
-};
 
-export type Media = {
-    id: string;
-    name: string;
-    mime_type: string;
-    duration_seconds: string | null;
-    created_at: string;
-    updated_at: string;
-    pivot: MediaPivot;
-};
 
 export interface Center extends Pick<Department, 'id' | 'name'> {
     code: string;

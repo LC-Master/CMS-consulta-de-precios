@@ -1,6 +1,6 @@
 import { PillStatus } from "@/components/ui/PillStatus";
 import AppLayout from "@/layouts/app-layout";
-import { history as index, show } from "@/routes/campaignsHistory";
+import { history as index } from "@/routes/campaignsHistory";
 import { breadcrumbs } from "@/helpers/breadcrumbs";
 import { CampaignExtended } from "@/types/campaign/index.types";
 import { Head, Link, } from "@inertiajs/react";

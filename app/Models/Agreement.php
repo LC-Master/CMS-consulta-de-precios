@@ -29,6 +29,8 @@ class Agreement extends Model
         'updated_at'
     ];
 
+    protected $hidden = ['pivot'];
+
     public function campaigns()
     {
         return $this->hasMany(Campaign::class);

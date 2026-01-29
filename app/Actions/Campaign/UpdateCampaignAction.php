@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Campaign;
 use App\Enums\Schedules;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 
 class UpdateCampaignAction
 {
@@ -15,6 +16,15 @@ class UpdateCampaignAction
     public function execute(Request $request, Campaign $campaign): Campaign
     {
         return DB::transaction(function () use ($request, $campaign) {
+
+            $campaign->old_media_files = $campaign->timeLineItems()
+                ->with('media')
+                ->get()
+                ->map(fn($item) => $item->media->name ?? 'archivo-desconocido')
+                ->toArray();
+
+            $campaign->old_agreements = $campaign->agreements->pluck('name')->toArray();
+            $campaign->old_centers = $campaign->centers->pluck('name')->toArray();
 
             $campaign->update($request->only([
                 'title',

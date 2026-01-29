@@ -20,6 +20,7 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use App\Exports\CampaignsExport;
 use App\Http\Requests\ExportCampaignListRequest;
@@ -132,6 +133,7 @@ class CampaignController extends Controller implements HasMiddleware
         $campaign->setRelation('media', $campaign->getRelation('media')->map(fn($item) => [
             'id' => $item->id,
             'name' => $item->name,
+            'instanceId' => Str::uuid7()->toString(),
             'mime_type' => $item->mime_type,
             'duration_seconds' => $item->duration_seconds,
             'slot' => $item->pivot->slot,

@@ -21,7 +21,7 @@ export default function MediaColumn({ title, items, onMoveToOther, onMoveUp, onM
                 )}
                 {items.map((item) => (
                     <MediaItemCard
-                        key={`${type ? 'am' : 'pm'}-${item.instanceId ? item.instanceId : item.id}`}
+                        key={item.instanceId}
                         item={item}
                         controls={
                             <>

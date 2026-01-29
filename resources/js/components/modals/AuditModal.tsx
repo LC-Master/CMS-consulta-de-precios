@@ -1,6 +1,9 @@
 import { Log } from "@/types/logs/index.type";
 import { ShieldCheck, X, Activity } from "lucide-react";
 import Modal from "../Modal";
+import { Button } from "../ui/button";
+import { SubjectsEnum } from "@/enums/SubjectsEnum";
+import { fielTranslateLog } from "@/i18n/field_translate_log";
 
 export default function AuditModal({ log, isOpen, onClose }: { log: Log | null, isOpen: boolean, onClose: () => void }) {
     if (!isOpen || !log) return null;
@@ -26,11 +29,53 @@ export default function AuditModal({ log, isOpen, onClose }: { log: Log | null, 
                 <div className="grid grid-cols-2 divide-x divide-gray-100 border-b border-gray-100 bg-white">
                     <div className="p-3 px-5">
                         <p className="text-[9px] uppercase font-bold text-slate-400">Responsable</p>
-                        <p className="text-xs font-bold text-slate-600 truncate">{log.user?.name || 'Sistema'}</p>
+                        <p className="text-xs font-bold text-slate-600 truncate">{log.user_name || 'Sistema'}</p>
+                    </div>
+                    <div className="p-3 px-5">
+                        <p className="text-[9px] uppercase font-bold text-slate-400">Responsable Email</p>
+                        <p className="text-xs font-bold text-slate-600 truncate">{log.user_email || 'Sistema'}</p>
+                    </div>
+                    <div className="p-3 px-5">
+                        <p className="text-[9px] uppercase font-bold text-slate-400">Responsable Id</p>
+                        <p className="text-xs font-bold text-slate-600 truncate">{log.causer_id || 'id'}</p>
                     </div>
                     <div className="p-3 px-5">
                         <p className="text-[9px] uppercase font-bold text-slate-400">IP Origen</p>
                         <p className="text-xs font-mono font-bold text-slate-600">{log.ip_address}</p>
+                    </div>
+                    <div className="p-3 px-5">
+                        <p className="text-[9px] uppercase font-bold text-slate-400">User-Agent</p>
+                        <p className="text-xs font-mono font-bold text-slate-600">{log.user_agent}</p>
+                    </div>
+                    <div className="p-3 px-5">
+                        <p className="text-[9px] uppercase font-bold text-slate-400">Elemento</p>
+                        <p className="text-xs font-mono font-bold text-slate-600">{SubjectsEnum[log.subject_type as keyof typeof SubjectsEnum]}</p>
+                    </div>
+                </div>
+
+                <div className="p-5 bg-slate-50/50 border-b border-gray-100">
+                    <h3>Información Cargada</h3>
+                    <div className="space-y-3">
+                        {log.properties?.payload ? (
+                            Object.entries(log.properties.payload).map(([key, value]) => (
+                                <div key={key} className="p-3 px-5">
+                                    <p className="text-[9px] uppercase font-bold text-slate-400">{fielTranslateLog[key] || key}</p>
+                                    {Array.isArray(value) ? (
+                                        <ul className="list-disc list-inside">
+                                            {value.map((item, index) => (
+                                                <li key={index} className="text-xs font-bold text-slate-600">
+                                                    {typeof item === 'object' ? Object.values(item).join(', ') : item}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p className="text-xs font-bold text-slate-600 truncate">{value}</p>
+                                    )}
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-center text-xs text-slate-400">Sin información cargada.</p>
+                        )}
                     </div>
                 </div>
 
@@ -41,7 +86,7 @@ export default function AuditModal({ log, isOpen, onClose }: { log: Log | null, 
 
                     <div className="space-y-3">
                         {log.properties?.changes ? (
-                            Object.entries(log.properties.changes).map(([key, value]: [string, { old: string; new: string }]) => (
+                            Object.entries(log.properties.changes).map(([key, value]) => (
                                 <div key={key} className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
                                     {/* Nombre del Campo */}
                                     <div className="bg-slate-50 px-3 py-1.5 border-b border-slate-200">
@@ -51,21 +96,42 @@ export default function AuditModal({ log, isOpen, onClose }: { log: Log | null, 
                                     </div>
 
                                     <div className="p-3 space-y-2">
-                                        {/* Valor Anterior */}
-                                        <div className="flex items-start gap-2 opacity-60">
-                                            <span className="text-[9px] font-bold text-red-500 bg-red-50 px-1 rounded mt-0.5">OLD</span>
-                                            <p className="text-xs font-mono text-slate-500 line-through truncate">
-                                                {String(value.old ?? 'n/a')}
-                                            </p>
-                                        </div>
-
-                                        {/* Valor Nuevo */}
-                                        <div className="flex items-start gap-2">
-                                            <span className="text-[9px] font-bold text-emerald-500 bg-emerald-50 px-1 rounded mt-0.5">NEW</span>
-                                            <p className="text-xs font-mono text-slate-800 font-bold wrap-break-words">
-                                                {String(value.new)}
-                                            </p>
-                                        </div>
+                                        {key === 'before' || key === 'after' ? (
+                                            Object.entries(value).map(([k, v]) => (
+                                                <div key={k} className="flex items-start gap-2">
+                                                    <span className={`text-[9px] font-bold px-1 rounded mt-0.5 ${key === 'before' ? 'text-red-500 bg-red-50' : 'text-emerald-500 bg-emerald-50'}`}>{key === 'before' ? 'Viejo' : 'Nuevo'}</span>
+                                                    <p className={`text-xs font-mono ${key === 'before' ? 'text-slate-500 line-through' : 'text-slate-800 font-bold'} truncate`}>
+                                                        {`${k}: ${String(v)}`}
+                                                    </p>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-xs font-mono text-slate-600">
+                                                {Array.isArray(value) ? (
+                                                    <ul className="list-disc list-inside">
+                                                        {value.map((item, index) => (
+                                                            <li key={index} className="text-xs font-bold text-slate-600">
+                                                                {typeof item === 'object' ? Object.values(item || {}).join(', ') : item}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p className="text-xs font-bold text-slate-600 truncate">
+                                                        {typeof value === 'object' && value !== null ? (
+                                                            Object.entries(value).map(([subKey, subValue]) => (
+                                                                subValue && Array.isArray(subValue) && subValue.length > 0 && (
+                                                                    <span key={subKey} className="block">
+                                                                        <span className="font-mono font-semibold text-slate-500">{fielTranslateLog[subKey] || subKey}:</span> {Array.isArray(subValue) ? subValue.join(', ') : String(subValue)}
+                                                                    </span>
+                                                                )
+                                                            ))
+                                                        ) : (
+                                                            value
+                                                        )}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             ))
@@ -77,13 +143,13 @@ export default function AuditModal({ log, isOpen, onClose }: { log: Log | null, 
             </div>
 
             <div className="p-4 bg-gray-50/50 border-t border-gray-100 flex justify-end">
-                <button
+                <Button
                     onClick={onClose}
-                    className="px-4 py-2 bg-slate-900 text-white text-[10px] font-bold uppercase rounded-lg hover:bg-black transition-all active:scale-95"
+                    className="px-4 py-2 bg-locatel-medio hover:bg-locatel-oscuro  text-white text-[10px] font-bold uppercase rounded-lg transition-all active:scale-95"
                 >
                     Entendido
-                </button>
+                </Button>
             </div>
-        </Modal>
+        </Modal >
     );
 };

@@ -7,6 +7,7 @@ export const SUBJECT_CONFIG: Record<string, { label: string; url: string; color:
 };
 
 export const LEVEL_STYLES: Record<LogLevelEnum, string> = {
+    [LogLevelEnum.SUCCESS]: 'bg-green-100 text-green-700 border-green-200',
     [LogLevelEnum.INFO]: 'bg-blue-100 text-blue-700 border-blue-200',
     [LogLevelEnum.WARNING]: 'bg-yellow-100 text-yellow-700 border-yellow-200',
     [LogLevelEnum.ERROR]: 'bg-orange-100 text-orange-700 border-orange-200',
