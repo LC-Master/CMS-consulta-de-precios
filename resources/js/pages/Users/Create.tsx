@@ -206,6 +206,7 @@ export default function UserCreate({ roles, permissions }: PropsCreatePage) {
                                 <p className="text-xs text-gray-500 mt-2">
                                     Al seleccionar un rol, se marcarán automáticamente los permisos asociados.
                                 </p>
+                                <InputError message={errors.role} />
                             </div>
                         </div>
 
@@ -218,11 +219,11 @@ export default function UserCreate({ roles, permissions }: PropsCreatePage) {
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
                                     <div className="flex gap-2 mb-1">
-                                         <Button type="button" onClick={() => toggleSelectAll(true)} className="text-[10px] font-bold uppercase tracking-wider text-locatel hover:text-locatel-oscuro bg-transparent border-none p-0 cursor-pointer">
+                                         <Button type="button" onClick={() => toggleSelectAll(true)} className="text-[10px] font-bold uppercase tracking-wider text-locatel hover:bg-white hover:text-locatel-oscuro bg-transparent border-none p-0 cursor-pointer">
                                             Seleccionar Todo
                                          </Button>
                                          <span className="text-gray-300 text-[10px]">|</span>
-                                         <Button type="button" onClick={() => toggleSelectAll(false)} className="text-[10px] font-bold uppercase tracking-wider text-gray-400 hover:text-gray-600 bg-transparent border-none p-0 cursor-pointer">
+                                         <Button type="button" onClick={() => toggleSelectAll(false)} className="text-[10px] hover:bg-white font-bold uppercase tracking-wider text-gray-400 hover:text-gray-600 bg-transparent border-none p-0 cursor-pointer">
                                             Limpiar
                                          </Button>
                                     </div>
@@ -241,7 +242,7 @@ export default function UserCreate({ roles, permissions }: PropsCreatePage) {
                                             <Button 
                                                 type="button" 
                                                 onClick={() => toggleGroup(perms)}
-                                                className="text-[10px] uppercase font-bold text-locatel hover:text-locatel-oscuro bg-transparent border-none p-0 cursor-pointer transition-colors"
+                                                className="text-[10px] uppercase hover:bg-white font-bold text-locatel hover:text-locatel-oscuro bg-transparent border-none p-0 cursor-pointer transition-colors"
                                             >
                                                 {perms.every((p) => data.selectedPermissions.includes(p.id)) ? 'Deseleccionar grupo' : 'Seleccionar grupo'}
                                             </Button>

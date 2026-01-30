@@ -204,6 +204,7 @@ export default function UserEdit({ user, roles, permissions }: PropsEditPage) {
                                 <p className="text-xs text-gray-500 mt-2">
                                     Al seleccionar un rol, se marcarán automáticamente los permisos asociados. Puedes personalizar la selección después.
                                 </p>
+                                <InputError message={errors.role} />
                             </div>
                         </div>
 

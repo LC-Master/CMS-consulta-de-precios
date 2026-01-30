@@ -12,7 +12,6 @@ class CreateUserAction
     public function execute(Request $data): User
     {
         return DB::transaction(function () use ($data) {
-
             $user = User::create([
                 'name' => $data->input('name'),
                 'email' => $data->input('email'),
@@ -21,7 +20,7 @@ class CreateUserAction
 
             $selectedRole = $data->input('role');
             $selectedPermissions = $data->input('selectedPermissions', []);
-            
+
             $roleConfig = config("permissions.roles.{$selectedRole}");
             $shouldKeepRole = true;
 

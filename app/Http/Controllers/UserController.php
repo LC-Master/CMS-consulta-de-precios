@@ -80,7 +80,6 @@ class UserController extends Controller implements HasMiddleware
     {
         $permissionsAndRoles = $this->getPermissionsAndRoles();
 
-        // Cargar roles y sus permisos, ADEMÁS de los permisos directos del usuario
         $user->load(['roles.permissions', 'permissions']);
 
         return Inertia::render('Users/Edit', [
@@ -153,6 +152,8 @@ class UserController extends Controller implements HasMiddleware
                 'label' => str_replace('.', ' ', $perm),
             ];
         }
+
+        unset($roles['supervisor']);
 
         return [
             'matrix' => $structured,

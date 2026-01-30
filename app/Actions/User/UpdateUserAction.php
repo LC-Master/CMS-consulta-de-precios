@@ -14,7 +14,6 @@ class UpdateUserAction
         return DB::transaction(function () use ($user, $data) {
             $updateData = [
                 'name' => $data->input('name'),
-                'status' => $data->input('status'),
             ];
 
             if (!empty($data->input('password'))) {
