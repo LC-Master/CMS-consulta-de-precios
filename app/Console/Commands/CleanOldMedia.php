@@ -20,10 +20,8 @@ class CleanOldMedia extends Command
     {
         $this->info('Iniciando limpieza de archivos antiguos...');
 
-        // Definir la fecha de corte (3 meses atrás)
         $cutOffDate = now()->subMonths(3)->startOfDay();
 
-        // (no se debe borrar si está en estos)
         $protectedStatuses = [
             CampaignStatus::DRAFT->value,
             CampaignStatus::ACTIVE->value,
@@ -36,7 +34,7 @@ class CleanOldMedia extends Command
                           $q->whereIn('status', $protectedStatuses);
                       });
             })
-            ->with('thumbnail') // Cargamos el thumbnail para borrarlo también
+            ->with('thumbnail') 
             ->get();
 
         $count = $mediasToDelete->count();
