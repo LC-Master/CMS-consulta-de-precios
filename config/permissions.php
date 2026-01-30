@@ -25,6 +25,12 @@ return [
         'campaign.update',
         'campaign.delete',
 
+        'center.list',
+        'center.show',
+        'center.create',
+        'center.update',
+        'center.delete',
+
         'campaign.activate',
         'campaign.cancel',
         'campaign.report',
@@ -56,9 +62,13 @@ return [
     'roles' => [
         'admin' => [
             'media.upload',
-            
-            'log.list',
 
+            'log.list',
+            'center.list',
+            'center.show',
+            'center.create',
+            'center.update',
+            'center.delete',
             'user.list',
             'user.show',
             'user.create',
@@ -70,7 +80,7 @@ return [
             'campaign.history.restore',
             'campaign.history.clone',
             'campaign.history.calendar',
-            
+
             'campaign.list',
             'campaign.show',
             'campaign.create',
@@ -100,13 +110,13 @@ return [
         'consultor' => [
             'log.list',
             'media.upload',
-
+            'center.list',
             'user.list',
             'user.show',
 
             'campaign.history.view',
             'campaign.history.calendar',
-            
+
             'campaign.list',
             'campaign.show',
 
@@ -126,6 +136,12 @@ return [
 
             'log.list',
 
+            'center.list',
+            'center.show',
+            'center.create',
+            'center.update',
+            'center.delete',
+
             'campaign.list',
             'campaign.show',
             'campaign.create',
@@ -135,7 +151,7 @@ return [
             'campaign.history.restore',
             'campaign.history.clone',
             'campaign.history.calendar',
-            
+
             'agreement.list',
             'agreement.show',
             'agreement.create',

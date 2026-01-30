@@ -298,7 +298,7 @@ class CampaignController extends Controller implements HasMiddleware
         $fileName = "detalle_campaña_{$safeTitle}_{$date}.xlsx";
 
         return Excel::download(
-            new SingleCampaignExport($campaign), 
+            new SingleCampaignExport($campaign),
             $fileName
         );
     }

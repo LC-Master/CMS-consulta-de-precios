@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Todo',
             'code' => 'CTR-0001',
         ]);
+        
         $this->call([
             RolesPermissionsSeeder::class,
             StatusSeeder::class,

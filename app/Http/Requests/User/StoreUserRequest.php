@@ -18,15 +18,28 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email:rfc,dns|max:255|unique:users,email|confirmed',
-            'role' => 'required|string|exists:roles,name',
+            'role' => 'nullable|string|exists:roles,name',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'selectedPermissions' => 'nullable|array',
+            'selectedPermissions.*' => 'string',
         ];
     }
-    
+
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            if ($this->user()->id == $this->route('id')) {
+            $hasRole = $this->filled('role');
+            $hasPermissions = $this->filled('selectedPermissions') && count($this->selectedPermissions) > 0;
+
+            if (!$hasRole && !$hasPermissions) {
+                $validator->errors()->add(
+                    'role',
+                    'Debes asignar al menos un rol o seleccionar permisos manualmente.'
+                );
+            }
+
+
+            if (Auth::id() == $this->route('id')) {
                 $validator->errors()->add(
                     'name',
                     'No puedes modificar tu propio perfil.'

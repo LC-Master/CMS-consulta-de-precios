@@ -26,7 +26,7 @@ class ForceDeleteOldLogs extends Command
      */
     public function handle()
     {
-        $date = now()->subMonths(config('logs.force_delete_old_logs', 6));
+        $date = now()->subMonths(value: config('logs.force_delete_old_logs', 6));
 
         $logs = ActivityLog::onlyTrashed()->where('deleted_at', '<', $date);
 

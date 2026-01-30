@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import { index } from '@/routes/media';
+import { cdn, index } from '@/routes/media';
 import { breadcrumbs } from '@/helpers/breadcrumbs';
 import { Head, Link } from '@inertiajs/react';
 import { mediaNameNormalizer, formatBytes } from '@/helpers/mediaTools';
@@ -65,7 +65,7 @@ export default function MediaShow({ media }: { media: MediaItem }) {
 
     const ratioText = (w: number, h: number) => `${Math.round((w / h) * 100) / 100}:1`;
 
-    const cdnUrl = `/media/cdn/${media.id}${retryCount ? `?r=${retryCount}` : ''}`;
+    const cdnUrl = cdn({id: media.id }).url + `?retry=${retryCount}`;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs(`Detalle de medio - ${media.name}`, index().url)}>
