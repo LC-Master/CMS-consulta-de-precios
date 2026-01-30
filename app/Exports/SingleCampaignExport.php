@@ -49,7 +49,6 @@ class SingleCampaignExport implements WithTitle, WithDrawings, WithEvents
                 $sheet = $event->sheet;
                 $campaign = $this->campaign;
 
-                // --- ESTILOS GLOBALES ---
                 $headerStyle = [
                     'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
                     'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF00A650']],
@@ -62,27 +61,25 @@ class SingleCampaignExport implements WithTitle, WithDrawings, WithEvents
                     'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]]
                 ];
 
-                // CAMBIO: Color del borde a NEGRO (FF000000)
                 $borderStyle = [
                     'borders' => [
                         'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']],
                     ],
                 ];
 
-                // Ajustar ancho de columnas
-                $sheet->getColumnDimension('B')->setWidth(25);
-                $sheet->getColumnDimension('C')->setWidth(40); // Un poco más ancho para nombres largos
-                $sheet->getColumnDimension('D')->setWidth(20);
-                $sheet->getColumnDimension('E')->setWidth(15);
+                $sheet->getColumnDimension('B')->setWidth(26);
+                $sheet->getColumnDimension('C')->setWidth(45);
+                $sheet->getColumnDimension('D')->setWidth(22);
+                $sheet->getColumnDimension('E')->setWidth(25);
 
-                // --- TÍTULO PRINCIPAL ---
+                $sheet->getStyle('B:E')->getAlignment()->setWrapText(true);
+
                 $sheet->mergeCells('C2:E3');
                 $sheet->setCellValue('C2', 'DETALLE DE CAMPAÑA');
                 $sheet->getStyle('C2')->getFont()->setSize(20)->setBold(true);
                 $sheet->getStyle('C2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle('C2')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
-                // --- SECCIÓN 1: DATOS GENERALES ---
                 $row = 6;
                 $sheet->mergeCells("B$row:E$row");
                 $sheet->setCellValue("B$row", 'INFORMACIÓN GENERAL');
@@ -115,10 +112,8 @@ class SingleCampaignExport implements WithTitle, WithDrawings, WithEvents
                 $sheet->setCellValue("E$row", $campaign->user?->name);
                 $sheet->getStyle("D$row")->getFont()->setBold(true);
 
-                // Aplicar bordes negros a Sección 1
                 $sheet->getStyle("B7:E$row")->applyFromArray($borderStyle);
 
-                // --- SECCIÓN 2: CENTROS Y ACUERDOS ---
                 $row += 3;
                 
                 $sheet->mergeCells("B$row:C$row");
@@ -160,12 +155,10 @@ class SingleCampaignExport implements WithTitle, WithDrawings, WithEvents
                 $maxRow = max($currentCenterRow, $currentAgreeRow);
                 
                 if ($maxRow > $startListRow) {
-                    // Aplicar bordes negros a las listas
                     $sheet->getStyle("B$startListRow:C" . ($maxRow - 1))->applyFromArray($borderStyle);
                     $sheet->getStyle("D$startListRow:E" . ($maxRow - 1))->applyFromArray($borderStyle);
                 }
 
-                // --- SECCIÓN 3: PROGRAMACIÓN MULTIMEDIA ---
                 $row = $maxRow + 2;
                 
                 $sheet->mergeCells("B$row:E$row");
@@ -182,10 +175,8 @@ class SingleCampaignExport implements WithTitle, WithDrawings, WithEvents
 
                 $tableStartRow = $row + 1;
                 
-                // Ordenar ítems
                 $items = $campaign->timeLineItems->sortBy('position');
                 
-                // CAMBIO: Separamos los ítems por bloque para procesar el "Merge"
                 $amItems = $items->where('slot', 'am');
                 $pmItems = $items->where('slot', 'pm');
 
@@ -196,7 +187,6 @@ class SingleCampaignExport implements WithTitle, WithDrawings, WithEvents
                     $sheet->getStyle("B$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     $sheet->getStyle("B$row:E$row")->applyFromArray($borderStyle);
                 } else {
-                    // 1. Procesar Bloque AM
                     if ($amItems->isNotEmpty()) {
                         $startAmRow = $row + 1;
                         foreach ($amItems as $item) {
@@ -205,13 +195,11 @@ class SingleCampaignExport implements WithTitle, WithDrawings, WithEvents
                         }
                         $endAmRow = $row;
                         
-                        // Combinar celda del bloque AM verticalmente
                         $sheet->mergeCells("B$startAmRow:B$endAmRow");
                         $sheet->setCellValue("B$startAmRow", '🌞 MAÑANA (AM)');
                         $sheet->getStyle("B$startAmRow")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
                     }
 
-                    // 2. Procesar Bloque PM
                     if ($pmItems->isNotEmpty()) {
                         $startPmRow = $row + 1;
                         foreach ($pmItems as $item) {
@@ -220,34 +208,27 @@ class SingleCampaignExport implements WithTitle, WithDrawings, WithEvents
                         }
                         $endPmRow = $row;
 
-                        // Combinar celda del bloque PM verticalmente
                         $sheet->mergeCells("B$startPmRow:B$endPmRow");
                         $sheet->setCellValue("B$startPmRow", '🌙 TARDE (PM)');
                         $sheet->getStyle("B$startPmRow")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
                     }
 
-                    // Aplicar bordes negros a toda la tabla multimedia al final
                     $sheet->getStyle("B$tableStartRow:E$row")->applyFromArray($borderStyle);
                 }
             },
         ];
     }
 
-    /**
-     * Función auxiliar para escribir los datos de una fila multimedia
-     */
     private function writeMediaRow($sheet, $row, $item)
     {
         $mediaName = $item->media ? $item->media->name : 'Archivo eliminado';
         $mime = $item->media ? $item->media->mime_type : '-';
 
-        // Nota: No escribimos en la columna B aquí, eso se hace en el merge.
         $sheet->setCellValue("C$row", $mediaName);
         $sheet->setCellValue("D$row", $mime);
         $sheet->setCellValue("E$row", $item->position);
         
-        // Alineación
-        $sheet->getStyle("B$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Para el texto del bloque
+        $sheet->getStyle("B$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle("D$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle("E$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
     }
