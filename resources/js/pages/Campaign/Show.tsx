@@ -55,7 +55,7 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                             </div>
                             <div className="flex flex-col space-y-6">
                                 <div>
-                                    <p className="text-gray-500 mb-1">Departamento / Categoria </p>
+                                    <p className="text-gray-500 mb-1">Departamento / Categoría </p>
                                     <div className="flex items-center gap-2">
                                         <Building className="w-4 h-4 text-gray-500" />
                                         <p className="font-medium text-gray-900">{campaign.department?.name}</p>

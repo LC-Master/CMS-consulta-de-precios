@@ -7,8 +7,8 @@ import { Head, Link } from '@inertiajs/react'
 
 export default function AgreementShow({ agreement }: { agreement: Agreement }) {
     return (
-        <AppLayout breadcrumbs={breadcrumbs(agreement.name ?? 'Mostrar Convenio', index().url)}>
-            <Head title={agreement.name ?? 'Mostrar Convenio'} />
+        <AppLayout breadcrumbs={breadcrumbs(agreement.name ?? 'Acuerdo Comercial', index().url)}>
+            <Head title={agreement.name ?? 'Acuerdo Comercial'} />
             <div className="p-6 bg-gray-100 space-y-6">
                 <div>
                     <div className='flex items-center gap-4'>
