@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { PropsEditPage,  PermissionMatrixItem } from '@/types/user/index.types';
+import { PropsEditPage, PermissionMatrixItem } from '@/types/user/index.types';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,28 +12,28 @@ import { groupTranslations } from '@/i18n/permissions';
 import { getTranslatedLabel } from '@/helpers/permissions';
 
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select"
 
 export default function UserEdit({ user, roles, permissions }: PropsEditPage) {
     const getInitialPermissions = () => {
         const direct = user.permissions ? user.permissions.map((p) => p.name) : [];
         const userRoleName = user.roles && user.roles.length > 0 ? user.roles[0].name : null;
-        
+
         let rolePerms: string[] = [];
         if (userRoleName && roles[userRoleName as keyof typeof roles]) {
-             const config = roles[userRoleName as keyof typeof roles];
-             if (config === '*') {
-                 rolePerms = Object.values(permissions).flat().map((p) => p.id);
-             } else if (Array.isArray(config)) {
-                 rolePerms = config;
-             }
+            const config = roles[userRoleName as keyof typeof roles];
+            if (config === '*') {
+                rolePerms = Object.values(permissions).flat().map((p) => p.id);
+            } else if (Array.isArray(config)) {
+                rolePerms = config;
+            }
         }
-        
+
         return Array.from(new Set([...direct, ...rolePerms]));
     };
 
@@ -70,7 +70,7 @@ export default function UserEdit({ user, roles, permissions }: PropsEditPage) {
     const handleRoleChange = (roleName: string) => {
         const config = roles[roleName as keyof typeof roles];
         let newPerms: string[] = [];
-        
+
         if (config === '*') {
             newPerms = Object.values(permissions).flat().map((p) => p.id);
         } else if (Array.isArray(config)) {
@@ -86,24 +86,24 @@ export default function UserEdit({ user, roles, permissions }: PropsEditPage) {
 
     const toggleSelectAll = (all: boolean) => {
         if (all) {
-             const allIds = Object.values(permissions).flat().map((p) => p.id);
-             setData('selectedPermissions', allIds);
+            const allIds = Object.values(permissions).flat().map((p) => p.id);
+            setData('selectedPermissions', allIds);
         } else {
-             setData('selectedPermissions', []);
+            setData('selectedPermissions', []);
         }
     };
 
     const toggleGroup = (groupPerms: PermissionMatrixItem[]) => {
         const groupIds = groupPerms.map(p => p.id);
         const allSelected = groupIds.every(id => data.selectedPermissions.includes(id));
-        
+
         let newSelected = [...data.selectedPermissions];
-        
+
         if (allSelected) {
             newSelected = newSelected.filter(id => !groupIds.includes(id));
         } else {
-             const toAdd = groupIds.filter(id => !newSelected.includes(id));
-             newSelected = [...newSelected, ...toAdd];
+            const toAdd = groupIds.filter(id => !newSelected.includes(id));
+            newSelected = [...newSelected, ...toAdd];
         }
         setData('selectedPermissions', newSelected);
     };
@@ -217,13 +217,13 @@ export default function UserEdit({ user, roles, permissions }: PropsEditPage) {
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
                                     <div className="flex gap-2 mb-1">
-                                         <button type="button" onClick={() => toggleSelectAll(true)} className="text-[10px] font-bold uppercase tracking-wider text-locatel hover:text-locatel-oscuro bg-transparent border-none p-0 cursor-pointer">
+                                        <button type="button" onClick={() => toggleSelectAll(true)} className="text-[10px] font-bold uppercase tracking-wider text-locatel hover:text-locatel-oscuro bg-transparent border-none p-0 cursor-pointer">
                                             Seleccionar Todo
-                                         </button>
-                                         <span className="text-gray-300 text-[10px]">|</span>
-                                         <button type="button" onClick={() => toggleSelectAll(false)} className="text-[10px] font-bold uppercase tracking-wider text-gray-400 hover:text-gray-600 bg-transparent border-none p-0 cursor-pointer">
+                                        </button>
+                                        <span className="text-gray-300 text-[10px]">|</span>
+                                        <button type="button" onClick={() => toggleSelectAll(false)} className="text-[10px] font-bold uppercase tracking-wider text-gray-400 hover:text-gray-600 bg-transparent border-none p-0 cursor-pointer">
                                             Limpiar
-                                         </button>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -232,57 +232,56 @@ export default function UserEdit({ user, roles, permissions }: PropsEditPage) {
                                 {Object.entries(permissions)
                                     .filter(([group]) => group !== 'token')
                                     .map(([group, perms]) => (
-                                    <div key={group} className="mb-8 last:mb-0">
-                                        <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
-                                            <h4 className="text-gray-900 text-xs font-black uppercase tracking-[0.2em]">
-                                                {groupTranslations[group] || `${group} Management`}
-                                            </h4>
-                                            <button 
-                                                type="button" 
-                                                onClick={() => toggleGroup(perms)}
-                                                className="text-[10px] uppercase font-bold text-locatel hover:text-locatel-oscuro bg-transparent border-none p-0 cursor-pointer transition-colors"
-                                            >
-                                                {perms.every((p) => data.selectedPermissions.includes(p.id)) ? 'Deseleccionar grupo' : 'Seleccionar grupo'}
-                                            </button>
-                                        </div>
+                                        <div key={group} className="mb-8 last:mb-0">
+                                            <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
+                                                <h4 className="text-gray-900 text-xs font-black uppercase tracking-[0.2em]">
+                                                    {groupTranslations[group] || `${group} Management`}
+                                                </h4>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => toggleGroup(perms)}
+                                                    className="text-[10px] uppercase font-bold text-locatel hover:text-locatel-oscuro bg-transparent border-none p-0 cursor-pointer transition-colors"
+                                                >
+                                                    {perms.every((p) => data.selectedPermissions.includes(p.id)) ? 'Deseleccionar grupo' : 'Seleccionar grupo'}
+                                                </button>
+                                            </div>
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                            {perms.map((p) => (
-                                                <div
-                                                    key={p.id}
-                                                    onClick={() => handlePermissionChange(p.id)}
-                                                    className={`
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                                {perms.map((p) => (
+                                                    <div
+                                                        key={p.id}
+                                                        onClick={() => handlePermissionChange(p.id)}
+                                                        className={`
                                                         flex flex-row items-center justify-between p-3 rounded-md border transition-all duration-200 group cursor-pointer h-full
                                                         ${data.selectedPermissions.includes(p.id)
-                                                            ? 'bg-emerald-50 border-emerald-200 hover:border-emerald-300 shadow-sm'
-                                                            : 'bg-white border-gray-100 hover:border-gray-300 hover:shadow-xs'
-                                                        }
+                                                                ? 'bg-emerald-50 border-emerald-200 hover:border-emerald-300 shadow-sm'
+                                                                : 'bg-white border-gray-100 hover:border-gray-300 hover:shadow-xs'
+                                                            }
                                                     `}
-                                                >
-                                                    <div className="flex flex-col flex-1 mr-2">
-                                                        <span className="text-[10px] text-gray-600 uppercase font-bold tracking-wider mb-0.5">
-                                                            {getTranslatedLabel(p.id)}
-                                                        </span>
-                                                        <span className={`text-[9px] font-mono truncate transition-colors ${
-                                                            data.selectedPermissions.includes(p.id) ? 'text-emerald-700/80 font-bold' : 'text-gray-500'
-                                                        }`}>
-                                                            {p.id}
-                                                        </span>
-                                                    </div>
+                                                    >
+                                                        <div className="flex flex-col flex-1 mr-2">
+                                                            <span className="text-[10px] text-gray-600 uppercase font-bold tracking-wider mb-0.5">
+                                                                {getTranslatedLabel(p.id)}
+                                                            </span>
+                                                            <span className={`text-[9px] font-mono truncate transition-colors ${data.selectedPermissions.includes(p.id) ? 'text-emerald-700/80 font-bold' : 'text-gray-500'
+                                                                }`}>
+                                                                {p.id}
+                                                            </span>
+                                                        </div>
 
-                                                    <div className="relative inline-flex items-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="w-4 h-4 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500 accent-emerald-500 cursor-pointer"
-                                                            checked={data.selectedPermissions.includes(p.id)}
-                                                            onChange={() => handlePermissionChange(p.id)}
-                                                        />
+                                                        <div className="relative inline-flex items-center">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="w-4 h-4 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500 accent-emerald-500 cursor-pointer"
+                                                                checked={data.selectedPermissions.includes(p.id)}
+                                                                onChange={() => handlePermissionChange(p.id)}
+                                                            />
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
                             </div>
                         </div>
 
