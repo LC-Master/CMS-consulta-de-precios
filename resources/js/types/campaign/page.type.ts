@@ -2,6 +2,7 @@ import { Agreement } from '../agreement/index.types';
 import { Flash } from '../flash/flash.type';
 import { MediaItem } from '../media/index.type';
 import { Status } from '../status/status.type';
+import { RegionGroup, Store } from '../store/index.type';
 import { Department } from './index.types';
 
 export type CampaignReportProps = {
@@ -10,16 +11,6 @@ export type CampaignReportProps = {
     agreements: Agreement[];
     statuses: Status[];
 };
-interface Store {
-    ID: string;
-    name: string;
-    store_code: string;
-    address: string;
-}
-interface RegionGroup {
-    region: string;
-    stores: Store[];
-}
 export type CampaignCreateProps = {
     stores: RegionGroup[]
     departments: Department[];

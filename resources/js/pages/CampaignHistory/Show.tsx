@@ -151,13 +151,13 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                         icon={<Store />}
                         headerEnd={
                             <span className="text-sm text-gray-500 bg-gray-300 rounded-lg px-3 py-1">
-                                {campaign.centers.length} centros
+                                {campaign.stores.length} centros
                             </span>
                         }
                         contentClassName="py-4 flex flex-row overflow-x-auto"
                     >
-                        {campaign.centers ? campaign.centers.map(center => (
-                            <CenterCard key={center.id} id={center.id} name={center.name} code={center.code} />
+                        {campaign.stores ? campaign.stores.map(store => (
+                            <CenterCard key={store.id} id={store.id} name={store.name} code={store.store_code} />
                         )) : (
                             <ErrorBanner message="No hay centros asociados" description="Esta campaña aún no tiene centros vinculados." />
                         )}

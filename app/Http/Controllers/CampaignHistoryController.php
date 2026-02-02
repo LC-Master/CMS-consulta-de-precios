@@ -25,7 +25,7 @@ class CampaignHistoryController extends Controller
 
         $query->where(function ($q) {
             $q->whereHas('status', fn($sq) =>
-            $sq->where('status', CampaignStatus::FINISHED->value)->orWhere('status', CampaignStatus::CANCELLED->value))
+                $sq->where('status', CampaignStatus::FINISHED->value)->orWhere('status', CampaignStatus::CANCELLED->value))
                 ->orWhereNotNull('deleted_at');
         });
 
@@ -65,9 +65,17 @@ class CampaignHistoryController extends Controller
             'status:id,status',
             'department:id,name',
             'agreements' => fn($query) => $query->withTrashed()->select('id', 'name', 'deleted_at'),
-            'centers:id,name,code',
+            'Stores:ID,Name,StoreCode',
             'media:id,name,mime_type,duration_seconds',
         ])->makeHidden(['status_id', 'department_id', 'agreement_id', 'updated_by', 'user_id', 'updated_at']);
+
+        $campaign->setRelation('stores', $campaign
+            ->getRelation('Stores')
+            ->map(fn($item) => [
+                'id' => $item->ID,
+                'name' => $item->Name,
+                'store_code' => $item->StoreCode,
+            ]));
 
         return Inertia::render('CampaignHistory/Show', [
             'campaign' => $campaign,
@@ -160,9 +168,9 @@ class CampaignHistoryController extends Controller
         $image = $request->input('image');
         $image = str_replace('data:image/png;base64,', '', $image);
         $image = str_replace(' ', '+', $image);
-        
+
         $imageName = 'temp_calendar_' . uniqid() . '.png';
-        
+
         $path = storage_path('app/public/' . $imageName);
         file_put_contents($path, base64_decode($image));
 
