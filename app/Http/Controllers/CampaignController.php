@@ -82,7 +82,6 @@ class CampaignController extends Controller implements HasMiddleware
                 ->limit(30)
                 ->get(['id', 'name', 'mime_type']),
             'stores' => Store::getStoresByGroup(),
-            'centers' => Center::get(['id', 'code', 'name']),
             'departments' => Department::get(['id', 'name']),
             'agreements' => Agreement::where('is_active', true)->get(['id', 'name']),
         ]);
@@ -111,17 +110,9 @@ class CampaignController extends Controller implements HasMiddleware
             'status',
             'department:id,name',
             'agreements' => fn($query) => $query->withTrashed()->select('id', 'name'),
-            'Stores:ID,Name,StoreCode',
+            'stores:ID,Name,StoreCode',
             'media:id,name,mime_type,duration_seconds',
         ]);
-
-        $campaign->setRelation('stores', $campaign
-            ->getRelation('Stores')
-            ->map(fn($item) => [
-                'id' => $item->ID,
-                'name' => $item->Name,
-                'store_code' => $item->StoreCode,
-            ]));
 
         $campaign->makeHidden(['status_id', 'department_id', 'agreement_id']);
 
@@ -135,7 +126,7 @@ class CampaignController extends Controller implements HasMiddleware
         $campaign->load([
             'media:id,name,mime_type,duration_seconds',
             'media.thumbnail:id,path,media_id',
-            'Stores:ID',
+            'stores:ID',
             'agreements' => fn($query) => $query->withTrashed()->select('id', 'name'),
         ]);
 
@@ -295,7 +286,7 @@ class CampaignController extends Controller implements HasMiddleware
             'status',
             'department',
             'user',
-            'Stores',
+            'stores',
             'agreements',
             'timeLineItems.media'
         ]);

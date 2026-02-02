@@ -65,17 +65,9 @@ class CampaignHistoryController extends Controller
             'status:id,status',
             'department:id,name',
             'agreements' => fn($query) => $query->withTrashed()->select('id', 'name', 'deleted_at'),
-            'Stores:ID,Name,StoreCode',
+            'stores:ID,Name,StoreCode',
             'media:id,name,mime_type,duration_seconds',
         ])->makeHidden(['status_id', 'department_id', 'agreement_id', 'updated_by', 'user_id', 'updated_at']);
-
-        $campaign->setRelation('stores', $campaign
-            ->getRelation('Stores')
-            ->map(fn($item) => [
-                'id' => $item->ID,
-                'name' => $item->Name,
-                'store_code' => $item->StoreCode,
-            ]));
 
         return Inertia::render('CampaignHistory/Show', [
             'campaign' => $campaign,
@@ -124,7 +116,7 @@ class CampaignHistoryController extends Controller
             $campaigns = Campaign::with([
                 'status:id,status',
                 'department:id,name',
-                'centers:id,name',
+                'stores:ID,Name',
                 'agreements' => fn($query) => $query->withTrashed()->select('id', 'name', 'deleted_at'),
             ])
                 ->whereYear('start_at', $now->year)
@@ -145,7 +137,7 @@ class CampaignHistoryController extends Controller
                         'extendedProps' => [
                             'department' => $c->department->name ?? 'N/A',
                             'agreements' => $c->agreements->pluck('name')->toArray(),
-                            'centers' => $c->centers->pluck('name')->toArray(),
+                            'stores' => $c->stores->pluck('Name')->toArray(),
                         ]
                     ];
                 });
@@ -155,7 +147,7 @@ class CampaignHistoryController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error("Error en Calendario: " . $e->getMessage());
-            return back()->with('error', 'Error interno: ' . $e->getMessage());
+            return back()->with('error', 'Error interno');
         }
     }
 

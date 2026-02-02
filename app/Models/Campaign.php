@@ -98,7 +98,7 @@ class Campaign extends Model
         return $this->belongsToMany(Agreement::class, 'campaign_agreements')->withTimestamps();
     }
 
-    public function Stores()
+    public function stores()
     {
         return $this->belongsToMany(Store::class, 'campaign_store', 'campaign_id', 'store_id')->withTimestamps();
     }
