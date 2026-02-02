@@ -31,14 +31,14 @@ class CampaignSnapshotDTO
 
         foreach ($campaigns as $c) {
             $snapshot['campaigns'][] = [
-                'id' => $c->getKey(),
+                'id' => $c->id,
                 'title' => $c->title,
                 'status' => $c->status?->status,
                 'department' => $c->department?->name,
                 'agreements' => $c->agreements?->map(fn($a) => $a->name)->all(),
                 'start_at' => $c->start_at?->toIso8601String(),
                 'end_at' => $c->end_at?->toIso8601String(),
-                'media' => $c->getRelation('media')
+                'media' => collect($c->media)
                     ->map(fn($m) => [
                         'id' => $m->id,
                         'name' => $m->name,
