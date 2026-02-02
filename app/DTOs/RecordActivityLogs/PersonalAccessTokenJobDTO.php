@@ -20,9 +20,9 @@ readonly class PersonalAccessTokenJobDTO implements LoggableDTO
     public function __construct(
         public int $id,
         public string $token_name,
-        public string $center_id,
-        public string $center_name,
-        public string $center_code,
+        public string $store_id,
+        public string $store_name,
+        public string $store_code,
     ) {
         //
     }
@@ -38,9 +38,9 @@ readonly class PersonalAccessTokenJobDTO implements LoggableDTO
     {
         return [
             'token_name' => $this->token_name,
-            'center_id' => $this->center_id,
-            'center_name' => $this->center_name,
-            'center_code' => $this->center_code,
+            'store_id' => $this->store_id,
+            'store_name' => $this->store_name,
+            'store_code' => $this->store_code,
         ];
     }
 }

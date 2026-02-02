@@ -23,11 +23,10 @@ class StoreCenterTokenRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'center_id' => [
+            'store_id' => [
                 'required',
                 'string',
-                'uuid',
-                'exists:centers,id',
+                'exists:Store,ID',
             ],
         ];
     }
@@ -44,11 +43,11 @@ class StoreCenterTokenRequest extends FormRequest
             'name.string' => 'El nombre debe ser una cadena de texto.',
             'name.max' => 'El nombre no puede tener más de :max caracteres.',
 
-            'center_id.required' => 'El centro es obligatorio.',
-            'center_id.string' => 'El identificador del centro debe ser una cadena.',
-            'center_id.uuid' => 'El identificador del centro debe ser un UUID válido.',
-            'center_id.exists' => 'El centro seleccionado no existe.',
-            'center_id.unique' => 'Ya existe un token asociado con este centro.',
+            'store_id.required' => 'El centro es obligatorio.',
+            'store_id.string' => 'El identificador del centro debe ser una cadena.',
+            'store_id.uuid' => 'El identificador del centro debe ser un UUID válido.',
+            'store_id.exists' => 'El centro seleccionado no existe.',
+            'store_id.unique' => 'Ya existe un token asociado con este centro.',
         ];
     }
 
@@ -61,7 +60,7 @@ class StoreCenterTokenRequest extends FormRequest
     {
         return [
             'name' => 'nombre',
-            'center_id' => 'centro',
+            'store_id' => 'centro',
         ];
     }
 }

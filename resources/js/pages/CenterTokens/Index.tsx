@@ -15,18 +15,18 @@ import { Filter } from "@/components/Filter";
 import { Plus } from "lucide-react";
 import CreateCenterToken from "@/components/modals/CreateCenterToken";
 
-export default function CenterTokensIndex({ centers, centerTokens, flash, filters }: Props) {
+export default function CenterTokensIndex({ stores, centerTokens, flash, filters }: Props) {
     const [tokenId, setTokenId] = useState<number | null>(null);
     const { isOpen, closeModal, openModal } = useModal(false);
     const { isOpen: isOpenCreateToken, closeModal: closeModalCreateToken, openModal: openModalCreateToken } = useModal(false);
     const { ToastContainer } = useToast(flash);
-    const [selectedCenter, setSelectedCenter] = useState(filters.center || '');
+    const [selectedStore, setSelectedStore] = useState(filters.store || '');
     const [search, setSearch] = useState(filters.search || '');
     useUpdateEffect(() => {
         const timer = setTimeout(() => {
             router.get(
                 index().url,
-                { search: search, center: selectedCenter },
+                { search: search, store: selectedStore },
                 {
                     preserveState: true,
                     replace: true,
@@ -36,8 +36,7 @@ export default function CenterTokensIndex({ centers, centerTokens, flash, filter
             );
         }, 300);
         return () => clearTimeout(timer);
-    }, [search, selectedCenter]);
-
+    }, [search, selectedStore]);
     const columns: Column<CenterToken>[] = [
         {
             key: 'name',
@@ -45,9 +44,9 @@ export default function CenterTokensIndex({ centers, centerTokens, flash, filter
             render: (ct) => ct.name,
         },
         {
-            key: 'center',
+            key: 'store',
             header: 'Centro',
-            render: (ct) => ct.center?.name || 'N/A',
+            render: (ct) => ct.store?.name || 'N/A',
         },
         {
             key: 'last_used_at',
@@ -83,7 +82,7 @@ export default function CenterTokensIndex({ centers, centerTokens, flash, filter
         <AppLayout breadcrumbs={breadcrumbs('Lista de tokens', index().url)}>
             {ToastContainer()}
             {isOpen && <DeleteCenterToken closeModal={closeModal} tokenId={tokenId!} />}
-            {isOpenCreateToken && <CreateCenterToken closeModal={closeModalCreateToken} centers={centers} />}
+            {isOpenCreateToken && <CreateCenterToken closeModal={closeModalCreateToken} stores={stores} />}
             <div className="space-y-4 px-4 pb-4">
                 <div className="flex flex-wrap items-center gap-4">
                     <div className="flex-1 min-w-0">
@@ -93,22 +92,24 @@ export default function CenterTokensIndex({ centers, centerTokens, flash, filter
                                     type: 'search',
                                     key: 'search',
                                     value: search,
+                                    label: 'Buscar',
                                     placeholder: 'Buscar por título...',
                                     onChange: setSearch
                                 },
                                 {
                                     type: 'select',
-                                    key: 'center_id',
-                                    value: selectedCenter,
-                                    placeholder: 'Filtrar por centro',
+                                    key: 'store_id',
+                                    label: 'Tienda',
+                                    value: selectedStore,
+                                    placeholder: 'Filtrar por tienda',
                                     options: [
-                                        { value: '', label: 'Todos los centros' },
-                                        ...centers.map(s => ({
+                                        { value: '', label: 'Todas las tiendas' },
+                                        ...stores.map(s => ({
                                             value: s.id.toString(),
-                                            label: `${s.name} (${s.code})`,
+                                            label: `${s.name} (${s.store_code})`,
                                         })),
                                     ],
-                                    onChange: setSelectedCenter,
+                                    onChange: setSelectedStore,
                                 },
                             ]}
                         />
