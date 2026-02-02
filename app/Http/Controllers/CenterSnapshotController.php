@@ -21,7 +21,7 @@ class CenterSnapshotController extends Controller
 
             $snapShot = CenterSnapshot::updateOrCreate(
                 [
-                    'center_id' => $request->user()->id,
+                    'store_id' => $request->user()->getKey(),
                 ],
                 [
                     'snapshot_json' => $campaignSnapshotDTO,
