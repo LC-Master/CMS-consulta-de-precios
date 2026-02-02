@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Exports\CalendarVisualExport;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Storage;
 
 class CampaignHistoryController extends Controller
 {
@@ -160,7 +159,7 @@ class CampaignHistoryController extends Controller
     ini_set('upload_max_filesize', '40M');
 
     $request->validate([
-        'image' => 'required|string', // Viene en base64
+        'image' => 'required|string',
     ]);
 
     $image = $request->input('image');
