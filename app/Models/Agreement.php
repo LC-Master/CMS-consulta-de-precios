@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Provider;
+use App\Models\Supplier;
 
 class Agreement extends Model
 {
@@ -24,7 +24,7 @@ class Agreement extends Model
         'contact_phone',
         'is_active',
         'observations',
-        'provider_id',
+        'supplier_id',
         'created_at',
         'updated_at'
     ];
@@ -36,8 +36,8 @@ class Agreement extends Model
         return $this->hasMany(Campaign::class);
     }
 
-    public function provider()
+    public function supplier()
     {
-        return $this->belongsTo(Provider::class);
+        return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
     }
 }

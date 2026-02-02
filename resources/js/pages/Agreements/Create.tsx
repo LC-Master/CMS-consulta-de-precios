@@ -2,13 +2,30 @@ import AppLayout from '@/layouts/app-layout'
 import { index, store } from '@/routes/agreement'
 import { breadcrumbs } from '@/helpers/breadcrumbs'
 import { useForm, Link, Head } from '@inertiajs/react'
-import { Save } from 'lucide-react'
+import { Save, UserSearch } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
+import Select from 'react-select' 
+import { Label } from '@/components/ui/label'
+import InputError from '@/components/input-error'
+import { Input } from '@/components/ui/input'
+import { useState, useRef } from 'react'
+import axios from 'axios'
 
-export default function AgreementCreate() {
+interface Supplier {
+    id: string;
+    SupplierName: string;
+    AccountNumber: string;
+    ContactName: string;
+    EmailAddress: string;
+    PhoneNumber: string;
+    Notes: string;
+}
 
-    const { data, setData, processing, errors, post, cancel } = useForm({
+export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSuppliers: Supplier[] }) {
+
+    const { data, setData, processing, errors, post } = useForm({
+        supplier_id: '',
         name: '',
         legal_name: '',
         tax_id: '',
@@ -20,9 +37,68 @@ export default function AgreementCreate() {
         observations: '',
     })
 
+    // Opciones iniciales (los 50 que vienen del controller)
+    const initialOptions = defaultSuppliers.map(s => ({
+        value: s.id,
+        label: `${s.SupplierName} - ${s.AccountNumber}`,
+        original: s
+    }));
+
+    const [options, setOptions] = useState(initialOptions);
+    const [isLoading, setIsLoading] = useState(false);
+    const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+
+    const handleInputChange = (inputValue: string, { action }: any) => {
+        // Solo reaccionar si el usuario está escribiendo
+        if (action !== 'input-change') return;
+
+        // 1. CORRECCIÓN IMPORTANTE: Limpiar el timeout SIEMPRE al inicio
+        if (searchTimeout.current) {
+            clearTimeout(searchTimeout.current);
+        }
+
+        // 2. Si borró todo, restauramos inmediatamente y salimos
+        if (!inputValue) {
+            setOptions(initialOptions);
+            setIsLoading(false);
+            return;
+        }
+
+        // 3. Si hay texto, programamos la búsqueda
+        searchTimeout.current = setTimeout(() => {
+            setIsLoading(true);
+            axios.get('/api/suppliers/search', { params: { query: inputValue } })
+                .then((response) => {
+                    // Si hay resultados los mostramos, si no, lista vacía
+                    setOptions(response.data);
+                })
+                .catch(err => {
+                    console.error("Error buscando:", err);
+                    setOptions([]); // En error, limpiar opciones para evitar confusión
+                })
+                .finally(() => setIsLoading(false));
+        }, 300);
+    };
+
+    const handleSupplierChange = (option: any) => {
+        if (!option) return;
+        const s = option.original;
+
+        setData(previousData => ({
+            ...previousData,
+            supplier_id: s.id,
+            name: s.SupplierName,
+            legal_name: s.SupplierName,
+            tax_id: s.AccountNumber,
+            contact_person: s.ContactName || '',
+            contact_email: s.EmailAddress || '',
+            contact_phone: s.PhoneNumber || '',
+            observations: s.Notes || '',
+        }));
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-
         post(store().url)
     }
 
@@ -37,114 +113,134 @@ export default function AgreementCreate() {
 
                 <div className="space-y-4 w-full pt-10 rounded-3xl p-6 bg-white shadow-[0_0_20px_rgba(0,0,0,0.08)]">
                     <form id="form" method="post" onSubmit={handleSubmit} className="space-y-4 ">
+                        
+                        {/* BUSCADOR DE PROVEEDOR */}
+                        <div className="bg-green-50 p-4 rounded-xl border border-green-100 mb-6">
+                            <Label className="block text-sm font-bold mb-2 text-green-800 flex items-center gap-2">
+                                <UserSearch className="w-4 h-4" /> Buscar Proveedor Maestro (Autollenado)
+                            </Label>
+                            
+                            <Select
+                                options={options}
+                                onInputChange={handleInputChange}
+                                onChange={handleSupplierChange}
+                                isLoading={isLoading}
+                                placeholder="Escriba nombre o RIF..."
+                                classNamePrefix="react-select"
+                                isClearable
+                                isSearchable
+                                filterOption={() => true} // Evita filtro local
+                                noOptionsMessage={() => isLoading ? "Buscando..." : "No se encontraron proveedores"}
+                            />
+                            
+                            <p className="text-xs text-green-700 mt-2">
+                                * Escriba para buscar en la base de datos
+                            </p>
+                            <InputError message={errors.supplier_id} />
+                        </div>
+
                         {/* Fila 1: Nombres */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label htmlFor="name" className="block text-sm font-bold mb-3 text-gray-700">Nombre Comercial. *</label>
-                                <input
+                                <Label htmlFor="name" className="block text-sm font-bold mb-3 text-gray-700">Nombre Comercial. *</Label>
+                                <Input
                                     type="text"
                                     id="name"
-                                    name="name"
                                     value={data.name}
                                     required
                                     placeholder='Ej. Empresa X'
                                     onChange={e => setData('name', e.target.value)}
-                                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
+                                    className={`mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio ${data.supplier_id ? 'bg-gray-50' : ''}`}
+                                    readOnly={!!data.supplier_id} 
                                 />
-                                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                                <InputError message={errors.name} />
                             </div>
 
                             <div>
-                                <label htmlFor="legal_name" className="block text-sm font-bold mb-3 text-gray-700">Razón Social. *</label>
-                                <input
+                                <Label htmlFor="legal_name" className="block text-sm font-bold mb-3 text-gray-700">Razón Social. *</Label>
+                                <Input
                                     type="text"
                                     id="legal_name"
-                                    name="legal_name"
                                     value={data.legal_name}
                                     required
                                     placeholder='Ej. Inversiones Empresa X, C.A.'
                                     onChange={e => setData('legal_name', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.legal_name && <p className="text-red-500 text-sm mt-1">{errors.legal_name}</p>}
+                                <InputError message={errors.legal_name} />
                             </div>
                         </div>
 
                         {/* Fila 2: Identificación y Contacto */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label htmlFor="tax_id" className="block text-sm font-bold text-gray-700">RIF / Identificación Fiscal. *</label>
-                                <input
+                                <Label htmlFor="tax_id" className="block text-sm font-bold mb-3 text-gray-700">RIF / Identificación Fiscal. *</Label>
+                                <Input
                                     type="text"
                                     id="tax_id"
-                                    name="tax_id"
                                     value={data.tax_id}
                                     required
                                     placeholder='Ej. J-12345678-9'
                                     onChange={e => setData('tax_id', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.tax_id && <p className="text-red-500 text-sm mt-1">{errors.tax_id}</p>}
+                                <InputError message={errors.tax_id} />
                             </div>
 
                             <div>
-                                <label htmlFor="contact_person" className="block text-sm font-bold text-gray-700">Persona de Contacto. *</label>
-                                <input
+                                <Label htmlFor="contact_person" className="block text-sm font-bold mb-3 text-gray-700">Persona de Contacto. *</Label>
+                                <Input
                                     type="text"
                                     id="contact_person"
-                                    name="contact_person"
                                     value={data.contact_person}
                                     required
                                     placeholder='Nombre del representante'
                                     onChange={e => setData('contact_person', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.contact_person && <p className="text-red-500 text-sm mt-1">{errors.contact_person}</p>}
+                                <InputError message={errors.contact_person} />
                             </div>
                         </div>
 
                         {/* Fila 3: Comunicación */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label htmlFor="contact_email" className="block text-sm font-bold mb-3 text-gray-700">Correo Electrónico. *</label>
-                                <input
+                                <Label htmlFor="contact_email" className="block text-sm font-bold mb-3 text-gray-700">Correo Electrónico. *</Label>
+                                <Input
                                     type="email"
                                     id="contact_email"
-                                    name="contact_email"
                                     value={data.contact_email}
                                     required
                                     placeholder='contacto@empresa.com'
                                     onChange={e => setData('contact_email', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.contact_email && <p className="text-red-500 text-sm mt-1">{errors.contact_email}</p>}
+                                <InputError message={errors.contact_email} />
                             </div>
 
                             <div>
-                                <label htmlFor="contact_phone" className="block text-sm font-bold mb-3 text-gray-700">Teléfono. *</label>
-                                <input
+                                <Label htmlFor="contact_phone" className="block text-sm font-bold mb-3 text-gray-700">Teléfono. *</Label>
+                                <Input
                                     type="text"
                                     id="contact_phone"
-                                    name="contact_phone"
                                     value={data.contact_phone}
                                     required
                                     placeholder='4141234567'
                                     onChange={e => setData('contact_phone', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.contact_phone && <p className="text-red-500 text-sm mt-1">{errors.contact_phone}</p>}
+                                <InputError message={errors.contact_phone} />
                             </div>
                         </div>
 
-                        {/* Fila 4: Fechas */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Fila 4: Observaciones */}
+                        <div className="grid grid-cols-1 gap-4">
                             <div className="md:col-span-2">
-                                <label htmlFor="observations" className="block text-sm font-bold mb-3 text-gray-700">
+                                <Label htmlFor="observations" className="block text-sm font-bold mb-3 text-gray-700">
                                     Detalles del Acuerdo Comercial
-                                </label>
+                                </Label>
                                 <textarea
                                     id="observations"
-                                    name="observations"
                                     value={data.observations}
                                     rows={4}
                                     required
@@ -152,7 +248,7 @@ export default function AgreementCreate() {
                                     onChange={e => setData('observations', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                {errors.observations && <p className="text-red-500 text-sm mt-1">{errors.observations}</p>}
+                                <InputError message={errors.observations} />
                             </div>
                         </div>
                     </form>
@@ -169,16 +265,13 @@ export default function AgreementCreate() {
                         <Link
                             viewTransition
                             href={index().url}
-                            onClick={() => {
-                                if (processing) cancel()
-                            }}
-                            className="bg-red-500 text-white rounded-md px-6 py-3 shadow hover:brightness-95"
+                            className="bg-red-500 text-white rounded-md px-6 py-3 shadow hover:brightness-95 flex items-center"
                         >
                             Cancelar
                         </Link>
                     </div>
                 </div>
             </div>
-        </AppLayout >
+        </AppLayout>
     )
 }

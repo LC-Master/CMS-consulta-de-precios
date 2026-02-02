@@ -83,7 +83,10 @@ class CampaignController extends Controller implements HasMiddleware
 
             'centers' => Center::get(['id', 'code', 'name']),
             'departments' => Department::get(['id', 'name']),
-            'agreements' => Agreement::where('is_active', true)->get(['id', 'name']),
+            'agreements' => Agreement::where('is_active', true)
+                ->select(['id', 'name', 'tax_id']) 
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 
@@ -127,7 +130,7 @@ class CampaignController extends Controller implements HasMiddleware
             'media:id,name,mime_type,duration_seconds',
             'media.thumbnail:id,path,media_id',
             'centers:id,code,name',
-            'agreements' => fn($query) => $query->withTrashed()->select('id', 'name'),
+            'agreements' => fn($query) => $query->withTrashed()->select('id', 'name', 'tax_id'),
         ]);
 
         $campaign->setRelation('media', $campaign->getRelation('media')->map(fn($item) => [
@@ -147,7 +150,10 @@ class CampaignController extends Controller implements HasMiddleware
             'campaign' => $campaign->makeHidden(['updated_by', 'created_by', 'status_id']),
             'statuses' => Status::all(['id', 'status']),
             'departments' => Department::all(['id', 'name']),
-            'agreements' => Agreement::where('is_active', true)->get(['id', 'name']),
+            'agreements' => Agreement::where('is_active', true)
+                ->select(['id', 'name', 'tax_id'])
+                ->orderBy('name')
+                ->get(),
             'media' => Media::with('thumbnail:id,media_id')
                 ->orderBy('created_at', 'desc')
                 ->limit(30)

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\CenterController;
+use App\Http\Controllers\SupplierController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -38,6 +39,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('permission:log.list');
 
     Route::resource('agreement', AgreementController::class);
+
+    Route::get('/api/suppliers/search', [SupplierController::class, 'search'])
+    ->name('api.suppliers.search');
 
     Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show'])
         ->name('thumbnail.cdn');

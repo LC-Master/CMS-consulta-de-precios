@@ -17,12 +17,11 @@ class UpdateAgreementRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
+            // 'supplier_id' eliminado
             'name' => [
                 'required',
                 'string',
@@ -80,12 +79,12 @@ class UpdateAgreementRequest extends FormRequest
             'contact_phone.min' => 'El teléfono debe tener al menos 10 dígitos.',
             'contact_phone.max' => 'El teléfono no debe exceder los 20 dígitos.',
 
-            // observations
             'observations.required' => 'Los detalles del acuerdo son obligatorios',
             'observations.string' => 'Los detalles del acuerdo deben ser texto.',
             'observations.max'    => 'Los detalles del acuerdo no deben exceder los 1000 caracteres.',
         ];
     }
+
     public function attributes(): array
     {
         return [
