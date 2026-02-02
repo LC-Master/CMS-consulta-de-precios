@@ -1,7 +1,8 @@
 import { Agreement } from '../agreement/index.types';
 import { Flash } from '../flash/flash.type';
+import { MediaItem } from '../media/index.type';
 import { Status } from '../status/status.type';
-import { Center, Department, MediaItem } from './index.types';
+import { Department } from './index.types';
 
 export type CampaignReportProps = {
     flash?: Flash;
@@ -9,9 +10,18 @@ export type CampaignReportProps = {
     agreements: Agreement[];
     statuses: Status[];
 };
-
+interface Store {
+    ID: string;
+    name: string;
+    store_code: string;
+    address: string;
+}
+interface RegionGroup {
+    region: string;
+    stores: Store[];
+}
 export type CampaignCreateProps = {
-    centers: Center[];
+    stores: RegionGroup[]
     departments: Department[];
     agreements: Agreement[];
     media: MediaItem[];
@@ -23,7 +33,7 @@ export type CampaignEditProps = {
     departments: Department[];
     agreements: Agreement[];
     media: MediaItem[];
-    centers: Center[];
+    stores: RegionGroup[];
     flash: Flash;
 };
 export type CampaignFormValues = {
@@ -37,5 +47,5 @@ export type CampaignFormValues = {
     media: MediaItem[];
     created_at: string;
     updated_at: string;
-    centers: Center[];
+    stores: Store[];
 };

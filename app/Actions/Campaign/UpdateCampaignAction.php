@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Campaign;
 use App\Enums\Schedules;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Arr;
 
 class UpdateCampaignAction
 {
@@ -22,9 +21,8 @@ class UpdateCampaignAction
                 ->get()
                 ->map(fn($item) => $item->media->name ?? 'archivo-desconocido')
                 ->toArray();
-
             $campaign->old_agreements = $campaign->agreements->pluck('name')->toArray();
-            $campaign->old_centers = $campaign->centers->pluck('name')->toArray();
+            $campaign->old_centers = $campaign->stores->pluck('Name')->toArray();
 
             $campaign->update($request->only([
                 'title',
@@ -34,7 +32,7 @@ class UpdateCampaignAction
             ]));
 
             $campaign->agreements()->sync($request->input('agreements', []));
-            $campaign->centers()->sync($request->input('centers', []));
+            $campaign->stores()->sync($request->input('stores', []));
 
             $this->updateTimeline($campaign, $request->input('am_media', []), Schedules::AM);
             $this->updateTimeline($campaign, $request->input('pm_media', []), Schedules::PM);

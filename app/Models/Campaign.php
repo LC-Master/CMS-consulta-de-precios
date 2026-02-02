@@ -98,6 +98,11 @@ class Campaign extends Model
         return $this->belongsToMany(Agreement::class, 'campaign_agreements')->withTimestamps();
     }
 
+    public function Stores()
+    {
+        return $this->belongsToMany(Store::class, 'campaign_store', 'campaign_id', 'store_id')->withTimestamps();
+    }
+
     public function centers()
     {
         return $this->belongsToMany(Center::class, 'campaign_centers')->withTimestamps();

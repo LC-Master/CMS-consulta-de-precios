@@ -10,6 +10,7 @@ use App\Http\Requests\Campaigns\UpdateCampaignRequest;
 use App\Models\Agreement;
 use App\Models\Campaign;
 use App\Models\Center;
+use App\Models\Store;
 use App\Models\Department;
 use App\Models\Media;
 use App\Models\Status;
@@ -80,7 +81,7 @@ class CampaignController extends Controller implements HasMiddleware
                 ->orderBy('created_at', 'desc')
                 ->limit(30)
                 ->get(['id', 'name', 'mime_type']),
-
+            'stores' => Store::getStoresByGroup(),
             'centers' => Center::get(['id', 'code', 'name']),
             'departments' => Department::get(['id', 'name']),
             'agreements' => Agreement::where('is_active', true)->get(['id', 'name']),
@@ -126,7 +127,7 @@ class CampaignController extends Controller implements HasMiddleware
         $campaign->load([
             'media:id,name,mime_type,duration_seconds',
             'media.thumbnail:id,path,media_id',
-            'centers:id,code,name',
+            'Stores:ID',
             'agreements' => fn($query) => $query->withTrashed()->select('id', 'name'),
         ]);
 
@@ -152,7 +153,7 @@ class CampaignController extends Controller implements HasMiddleware
                 ->orderBy('created_at', 'desc')
                 ->limit(30)
                 ->get(['id', 'name', 'mime_type']),
-            'centers' => Center::all(['id', 'code', 'name']),
+            'stores' => Store::getStoresByGroup(),
         ]);
     }
 
