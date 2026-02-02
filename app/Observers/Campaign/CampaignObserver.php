@@ -7,7 +7,7 @@ use App\DTOs\RecordActivityLogs\CampaignJobDTO;
 use App\Jobs\RecordActivityJob;
 use App\Enums\Log\LogActionEnum;
 use App\Enums\Log\LogLevelEnum;
-
+use Illuminate\Support\Facades\Log;
 
 /**
  * Summary of CampaignObserver
@@ -49,7 +49,7 @@ class CampaignObserver
             ->map(fn($item) => $item->media->name ?? 'archivo-desconocido')
             ->toArray();
         $newAgreements = $campaign->agreements->pluck('name')->toArray();
-        $newCenters = $campaign->centers->pluck('name')->toArray();
+        $newCenters = $campaign->stores->pluck('Name')->toArray();
 
         $oldMediaFiles = $campaign->old_media_files ?? [];
         $oldCenters = $campaign->old_centers ?? [];
@@ -79,9 +79,9 @@ class CampaignObserver
                 'id' => $agreement->id,
                 'name' => $agreement->name,
             ])->toArray();
-            $payload['centers'] = $campaign->centers->map(fn($center) => [
-                'id' => $center->id,
-                'name' => $center->name,
+            $payload['stores'] = $campaign->stores->map(fn($store) => [
+                'id' => $store->ID,
+                'name' => $store->Name,
             ])->toArray();
 
             $dto = new CampaignJobDTO(

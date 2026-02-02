@@ -10,15 +10,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('center_snapshots', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+        Schema::create('campaign_store', function (Blueprint $table) {
+            $table->foreignUuid('campaign_id')->constrained()->onDelete('cascade');
             $table->string('store_id');
-            $table->jsonb('snapshot_json');
-            $table->string('version_hash', 64);
-
-            $table->index(['store_id', 'created_at']);
-            $table->index('version_hash');
-
+            $table->primary(['campaign_id', 'store_id']);
+            $table->index(['store_id']);
             $table->timestamps();
         });
     }
@@ -28,6 +24,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('center_snapshots');
+        Schema::dropIfExists('campaign_store');
     }
 };

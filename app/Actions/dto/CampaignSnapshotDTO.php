@@ -3,7 +3,7 @@
 namespace App\Actions\dto;
 
 use App\Enums\CampaignStatus;
-use App\Models\Center;
+use App\Models\Store;
 use App\Models\Campaign;
 
 class CampaignSnapshotDTO
@@ -11,12 +11,12 @@ class CampaignSnapshotDTO
     /**
      * Create a new class instance.
      */
-    public static function execute(Center $center)
+    public static function execute(Store $store)
     {
         $campaigns = Campaign::whereHas(
-            'centers',
+            'stores',
             fn($q) =>
-            $q->where('centers.id', $center->getKey())
+            $q->where('store.ID', $store->getKey())
         )->whereHas(
                 'status',
                 fn($q) =>
@@ -25,20 +25,20 @@ class CampaignSnapshotDTO
             ->with(['status', 'department', 'agreements', 'media'])
             ->get();
         $snapshot = [
-            'center_id' => $center->getKey(),
+            'store_id' => $store->getKey(),
             'campaigns' => [],
         ];
 
         foreach ($campaigns as $c) {
             $snapshot['campaigns'][] = [
-                'id' => $c->getKey(),
+                'id' => $c->id,
                 'title' => $c->title,
                 'status' => $c->status?->status,
                 'department' => $c->department?->name,
                 'agreements' => $c->agreements?->map(fn($a) => $a->name)->all(),
                 'start_at' => $c->start_at?->toIso8601String(),
                 'end_at' => $c->end_at?->toIso8601String(),
-                'media' => $c->getRelation('media')
+                'media' => collect($c->media)
                     ->map(fn($m) => [
                         'id' => $m->id,
                         'name' => $m->name,

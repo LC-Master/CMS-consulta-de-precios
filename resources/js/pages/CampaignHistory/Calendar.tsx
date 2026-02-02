@@ -13,10 +13,13 @@ import { Button } from "@/components/ui/button";
 import { FileSpreadsheet, Loader2 } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import axios from 'axios';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RegionData } from '@/types/store/index.type';
 
-export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) {
+export default function Calendar({ campaigns, stores }: { campaigns: CampaignEvent[], stores: RegionData[] }) {
     const locatelGreen = "#008a4f";
-    const [selectedCenter, setSelectedCenter] = useState<string>('all');
+    const [selectedRegion, setSelectedRegion] = useState<string>('all');
+    const [selectedStore, setSelectedStore] = useState<string>('all');
     const [currentViewDate, setCurrentViewDate] = useState<Date>(new Date());
     const [isExporting, setIsExporting] = useState(false);
     
@@ -43,9 +46,26 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
 
     const filteredEvents: EventInput[] = useMemo(() => {
         return campaigns
-            .filter(c => selectedCenter === 'all' || c.extendedProps.centers.includes(selectedCenter))
+            .filter(c => {
+                const storeIds = c.extendedProps.store_ids || [];
+                // Filtro por Sucursal específica
+                if (selectedStore !== 'all') {
+                    return storeIds.includes(selectedStore);
+                }
+                
+                // Filtro por Región
+                if (selectedRegion !== 'all') {
+                    const regionData = stores.find(r => r.region === selectedRegion);
+                    if (regionData) {
+                        const regionStoreIds = regionData.stores.map(s => s.id);
+                        return storeIds.some(id => regionStoreIds.includes(id));
+                    }
+                }
+
+                return true;
+            })
             .map((c) => {
-                const targetCenter = selectedCenter === 'all' ? (c.extendedProps.centers[0] || '') : selectedCenter;
+                const targetCenter = c.extendedProps.centers[0] || '';
                 const bgColor = centerColors[targetCenter] || locatelGreen;
 
                 return {
@@ -63,7 +83,7 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
                     },
                 };
             });
-    }, [campaigns, selectedCenter, centerColors]);
+    }, [campaigns, selectedRegion, selectedStore, centerColors, stores]);
 
     const handleEventClick = ({ event }: { event: { id: string } }) => {
         router.get(show({ id: event.id }).url);
@@ -83,7 +103,6 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
                 skipFonts: true,
                 fontEmbedCSS: '', 
                 filter: (node) => {
-                    const exclusionClasses = ['hide-on-export'];
                     if (node.tagName === 'IMG' || (node.classList && node.classList.contains('hide-on-export'))) {
                         return false;
                     }
@@ -105,7 +124,7 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
             let fileName = 'calendario.xlsx';
             if (contentDisposition) {
                 const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
-                if (fileNameMatch && fileNameMatch.length === 2)
+                if (fileNameMatch && fileNameMatch.length === 2 && fileNameMatch[1])
                     fileName = fileNameMatch[1];
             }
             
@@ -123,6 +142,18 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
             setIsExporting(false);
             alert("Hubo un error al descargar el archivo. Verifica la consola para más detalles.");
         }
+    };
+
+    const availableStores = useMemo(() => {
+        if (selectedRegion === 'all') {
+            return stores.flatMap(s => s.stores);
+        }
+        return stores.find(s => s.region === selectedRegion)?.stores || [];
+    }, [stores, selectedRegion]);
+
+    const handleRegionChange = (val: string) => {
+        setSelectedRegion(val);
+        setSelectedStore('all');
     };
 
     const validRange = useMemo(() => {
@@ -163,7 +194,7 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
                     <div className="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                             <h3 className="text-sm font-black text-[#008a4f] uppercase tracking-tighter">
-                                Filtrar por Centro
+                                Filtros de Calendario
                             </h3>
                             
                             <Button 
@@ -176,42 +207,57 @@ export default function Calendar({ campaigns }: { campaigns: CampaignEvent[] }) 
                             </Button>
                         </div>
 
-                        <div className="flex flex-wrap gap-3">
-                            {centersList.map(name => {
-                                if(name === 'Todo') return null;
-
-                                const isSelected = selectedCenter === name;
-                                const btnColor = name === 'all' ? locatelGreen : (centerColors[name] || locatelGreen);
-
-                                return (
-                                    <Button
-                                        key={name}
-                                        onClick={() => setSelectedCenter(name)}
-                                        style={{
-                                            backgroundColor: isSelected ? btnColor : 'white',
-                                            borderColor: isSelected ? btnColor : '#e5e7eb',
-                                            color: isSelected ? 'white' : '#374151'
-                                        }}
-                                        className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all border shadow-sm ${
-                                            isSelected 
-                                                ? 'shadow-lg' 
-                                                : 'hover:bg-gray-50'
-                                        }`}
-                                    >
-                                        {name === 'all' ? 'TODOS LOS CENTROS' : name.toUpperCase()}
-                                    </Button>
-                                );
-                            })}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-gray-500 uppercase">Región / Grupo</label>
+                                <Select value={selectedRegion} onValueChange={handleRegionChange}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Seleccionar Región" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem value="all">TODAS LAS REGIONES</SelectItem>
+                                            {stores.map((region) => (
+                                                <SelectItem key={region.region} value={region.region}>
+                                                    {region.region.toUpperCase()}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-gray-500 uppercase">Sucursal / Centro</label>
+                                <Select value={selectedStore} onValueChange={setSelectedStore} disabled={availableStores.length === 0}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Seleccionar Sucursal" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem value="all">TODAS LAS SUCURSALES</SelectItem>
+                                            {availableStores.map((store) => (
+                                                <SelectItem key={store.id} value={store.id}>
+                                                    {store.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     </div>
 
                     <div ref={calendarRef} className="calendar-card shadow-2xl border border-gray-200 rounded-xl overflow-hidden bg-white p-4">
                         <div className="mb-4 text-center">
                             <h2 className="text-xl font-bold text-gray-800">Calendario de Campañas</h2>
-                            <p className="text-sm text-gray-500">
-                                {currentViewDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase()} 
+                            <p className="text-sm text-gray-500 uppercase">
+                                {currentViewDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' })} 
                                 {' - '} 
-                                {selectedCenter === 'all' ? 'Todos los centros' : selectedCenter}
+                                {selectedStore !== 'all' 
+                                    ? availableStores.find(s => s.id === selectedStore)?.name 
+                                    : (selectedRegion !== 'all' ? `REGIÓN ${selectedRegion}` : 'NACIONAL (TODOS)')
+                                }
                             </p>
                         </div>
 

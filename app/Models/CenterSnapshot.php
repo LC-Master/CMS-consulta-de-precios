@@ -10,7 +10,7 @@ class CenterSnapshot extends Model
 
     use HasUuids;
     protected $fillable = [
-        'center_id',
+        'store_id',
         'snapshot_json',
         'version_hash',
     ];

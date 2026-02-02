@@ -28,9 +28,9 @@ class SanctumTokenObserver
         $personalAccessTokenJobDTO = new PersonalAccessTokenJobDTO(
             id: $token->getKey(),
             token_name: $token->getAttribute('name'),
-            center_id: $token->tokenable?->id,
-            center_name: $token->tokenable?->name,
-            center_code: $token->tokenable?->code,
+            store_id: $token->tokenable?->id,
+            store_name: $token->tokenable?->name,
+            store_code: $token->tokenable?->store_code,
         );
 
         RecordActivityJob::dispatch(
@@ -55,9 +55,9 @@ class SanctumTokenObserver
         $personalAccessTokenJobDTO = new PersonalAccessTokenJobDTO(
             id: $token->getKey(),
             token_name: $token->getAttribute('name'),
-            center_id: $token->tokenable?->id,
-            center_name: $token->tokenable?->name,
-            center_code: $token->tokenable?->code,
+            store_id: $token->tokenable?->id,
+            store_name: $token->tokenable?->name,
+            store_code: $token->tokenable?->store_code,
         );
         RecordActivityJob::dispatch(
             $personalAccessTokenJobDTO,

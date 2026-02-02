@@ -7,7 +7,7 @@ use App\Models\Campaign;
 use App\Models\Status;
 use App\Models\Department;
 use App\Models\Agreement;
-use App\Models\Center;
+use App\Models\Store;
 
 class CampaignSeeder extends Seeder
 {
@@ -16,7 +16,7 @@ class CampaignSeeder extends Seeder
         $statuses = Status::all();
         $departments = Department::all();
         $agreements = Agreement::all();
-        $centers = Center::all();
+        $store = Store::all();
 
         Campaign::factory()
             ->count(30)
@@ -24,16 +24,16 @@ class CampaignSeeder extends Seeder
             ->recycle($departments)
             ->recycle($agreements)
             ->create()
-            ->each(function ($campaign) use ($centers) {
+            ->each(function ($campaign) use ($store) {
 
-                $campaign->centers()->attach(
-                    $centers->random(rand(1, 3))->mapWithKeys(function ($center) {
+                $campaign->stores()->attach(
+                    $store->random(rand(1, 3))->mapWithKeys(function ($store) {
 
                         $createdAt = fake()->dateTimeBetween('-1 year', 'now');
                         $updatedAt = fake()->dateTimeBetween($createdAt, 'now');
 
                         return [
-                            $center->getKey() => [
+                            $store->getKey() => [
                                 'created_at' => $createdAt,
                                 'updated_at' => $updatedAt,
                             ]

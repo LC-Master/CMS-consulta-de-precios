@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout'
 import { useForm, Link, Head } from '@inertiajs/react'
 import Select from 'react-select'
-import { Option, MediaItem, } from '@/types/campaign/index.types'
+import { Option } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
 import useSearch from '@/hooks/use-search'
 import { Button } from '@/components/ui/button'
@@ -21,12 +21,15 @@ import useLoadEdit from '@/hooks/use-load-edit'
 import { useEffect } from 'react'
 import { CircleAlert, PlusCircle, Save, SquarePlay } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
+import { Label } from '@/components/ui/label'
+import { MediaItem } from '@/types/media/index.type'
+import GroupedSelect from '@/components/ui/GroupedSelect'
 
-export default function CampaignEdit({ centers, departments, agreements, media, flash, campaign }: CampaignEditProps) {
+export default function CampaignEdit({ departments, stores, agreements, media, flash, campaign }: CampaignEditProps) {
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { isOpen, openModal, closeModal } = useModal(false)
     useLoadEdit(campaign, setAm, setPm)
-    const { optionsCenter, optionsDepartment, optionsAgreement } = useLoadOptions(centers, departments, agreements)
+    const { optionsDepartment, optionsAgreement } = useLoadOptions(departments, agreements)
     const ToastComponent = useToast(flash)
     const { moveDown, moveUp, transfer } = useMediaActions<MediaItem>()
     const { handlerSearch, search, filteredItems } = useSearch<MediaItem>(mediaList)
@@ -34,23 +37,15 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
         title: campaign.title || '',
         start_at: campaign.start_at ? new Date(campaign.start_at).toISOString().slice(0, 16) : '',
         end_at: campaign.end_at ? new Date(campaign.end_at).toISOString().slice(0, 16) : '',
-        centers: campaign.centers ? campaign.centers.map(center => center.id) : [],
+        stores: campaign.stores ? campaign.stores.map(store => store.ID) : [],
         department_id: String(campaign.department_id || ''),
         agreements: campaign.agreements ? campaign.agreements.map(agreement => agreement.id) : [],
         am_media: campaign.media.filter(item => item.slot === 'am').map(item => (item.id, item.instanceId)) || [],
         pm_media: campaign.media.filter(item => item.slot === 'pm').map(item => (item.id, item.instanceId)) || [],
     })
-    const filteredCenters = (val: Option[] | null): void => {
-        const selected = val ?? []
-        const values = selected.map(v => v.value)
-        const todoValue = optionsCenter.find(o => /\bTodo\b/i.test(o.label))?.value
-
-        if (todoValue && values.includes(todoValue)) {
-            setData('centers', [todoValue])
-        } else {
-            setData('centers', todoValue ? values.filter(v => v !== todoValue) : values)
-        }
-    }
+    const handleSelection = (ids: string[]) => {
+        setData('stores', ids);
+    };
     useEffect(() => {
         transform((data) => ({
             ...data,
@@ -81,7 +76,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
                             <div>
-                                <label htmlFor="title" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Título. *</label>
+                                <Label htmlFor="title" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Título. *</Label>
                                 <Input
                                     type="text"
                                     id="title"
@@ -99,7 +94,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                             </div>
 
                             <div>
-                                <label htmlFor="department_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Departamento / Categoría. *</label>
+                                <Label htmlFor="department_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Departamento / Categoría. *</Label>
                                 <Select<Option, false>
                                     options={optionsDepartment}
                                     inputId="department_id"
@@ -130,7 +125,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
 
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
                             <div>
-                                <label htmlFor="start_at" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Fecha y hora (inicio). *</label>
+                                <Label htmlFor="start_at" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Fecha y hora (inicio). *</Label>
                                 <Input
                                     type="datetime-local"
                                     id="start_at"
@@ -146,7 +141,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                             </div>
 
                             <div>
-                                <label htmlFor="end_at" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Fecha y hora (fin). *</label>
+                                <Label htmlFor="end_at" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Fecha y hora (fin). *</Label>
                                 <Input
                                     type="datetime-local"
                                     id="end_at"
@@ -163,38 +158,17 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
                             <div>
-                                <label htmlFor="centers" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Centros. *</label>
-                                <Select<Option, true>
-                                    options={optionsCenter}
-                                    inputId="centers"
-                                    value={optionsCenter.filter(o => data.centers.includes(o.value))}
-                                    name="centers"
-                                    required={false}
-                                    isMulti
-                                    className="mt-1 rounded-md"
-                                    classNamePrefix="react-select"
-                                    onChange={(val) => filteredCenters(val as Option[] | null)}
-                                    placeholder="Selecciona centros..."
-                                    aria-required={true}
-                                    aria-invalid={!!errors.centers}
-                                    aria-describedby={errors.centers ? 'centers-error' : undefined}
-                                    styles={{
-                                        control: (provided) => ({
-                                            ...provided,
-                                            borderColor: errors.centers ? '#ef4444' : provided.borderColor,
-                                            boxShadow: errors.centers ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
-                                            '&:hover': {
-                                                borderColor: errors.centers ? '#ef4444' : provided.borderColor,
-                                            },
-                                            borderRadius: '0.375rem',
-                                        }),
-                                    }}
+                                <Label htmlFor="centers" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Centros. *</Label>
+                                <GroupedSelect
+                                    dataFromBackend={stores}
+                                    onSelectionChange={handleSelection}
+                                    initialSelectedIds={data.stores}
                                 />
-                                <InputError message={errors.centers} id="centers-error" />
+                                <InputError message={errors.stores} id="centers-error" />
                             </div>
 
                             <div>
-                                <label htmlFor="agreement_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Acuerdo</label>
+                                <Label htmlFor="agreement_id" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Acuerdo</Label>
                                 <Select<Option, true>
                                     options={optionsAgreement}
                                     inputId="agreement_id"
@@ -227,7 +201,7 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                             <div className='flex flex-row pl-6 pr-6 justify-between items-center'>
                                 <div className='flex items-center gap-2 mb-2'>
                                     <SquarePlay />
-                                    <label className="block text-xl font-bold ">Programación Multimedia</label>
+                                    <Label className="block text-xl font-bold ">Programación Multimedia</Label>
                                 </div>
                                 <Button type='button' className='bg-locatel-medio hover:bg-locatel-oscuro' onClick={openModal}>
                                     <PlusCircle />
