@@ -153,25 +153,27 @@ class CampaignHistoryController extends Controller
 
     public function exportCalendar(Request $request)
     {
-    
-    ini_set('memory_limit', '256M');
-    ini_set('post_max_size', '40M');
-    ini_set('upload_max_filesize', '40M');
+        $request->validate([
+            'image' => 'required|string',
+        ]);
 
-    $request->validate([
-        'image' => 'required|string',
-    ]);
+        $image = $request->input('image');
+        $image = str_replace('data:image/png;base64,', '', $image);
+        $image = str_replace(' ', '+', $image);
+        
+        $imageName = 'temp_calendar_' . uniqid() . '.png';
+        
+        $path = storage_path('app/public/' . $imageName);
+        file_put_contents($path, base64_decode($image));
 
-    $image = $request->input('image');
-    $image = str_replace('data:image/png;base64,', '', $image);
-    $image = str_replace(' ', '+', $image);
-    $imageName = 'temp_calendar_' . time() . '.png';
-    
-    $path = storage_path('app/public/' . $imageName);
-    file_put_contents($path, base64_decode($image));
+        register_shutdown_function(function () use ($path) {
+            if (file_exists($path)) {
+                @unlink($path);
+            }
+        });
 
-    $fileName = "calendario_visual_" . now()->format('Y-m-d_H-i') . ".xlsx";
+        $fileName = "calendario_visual_" . now()->format('Y-m-d_H-i') . ".xlsx";
 
-    return Excel::download(new CalendarVisualExport($path), $fileName);
+        return Excel::download(new CalendarVisualExport($path), $fileName);
     }
 }
