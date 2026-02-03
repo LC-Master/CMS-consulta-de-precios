@@ -43,5 +43,12 @@ class CenterSnapshotController extends Controller
             ], 500);
         }
     }
+    public function health()
+    {
+        return response()->json([
+            'status' => 'ok',
+            'timestamp' => now()->toIso8601String(),
+        ]);
+    }
 
 }
