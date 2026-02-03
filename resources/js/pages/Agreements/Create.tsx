@@ -13,7 +13,7 @@ import { useState, useRef } from 'react'
 import axios from 'axios'
 
 interface Supplier {
-    id: string;
+    id: number; 
     SupplierName: string;
     AccountNumber: string;
     ContactName: string;
@@ -25,7 +25,7 @@ interface Supplier {
 export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSuppliers: Supplier[] }) {
 
     const { data, setData, processing, errors, post } = useForm({
-        supplier_id: '',
+        supplier_id: '' as string | number, // Acepta numero o string vacio
         name: '',
         legal_name: '',
         tax_id: '',
@@ -37,7 +37,6 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
         observations: '',
     })
 
-    // Opciones iniciales (los 50 que vienen del controller)
     const initialOptions = defaultSuppliers.map(s => ({
         value: s.id,
         label: `${s.SupplierName} - ${s.AccountNumber}`,
@@ -49,33 +48,28 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
     const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
     const handleInputChange = (inputValue: string, { action }: any) => {
-        // Solo reaccionar si el usuario está escribiendo
         if (action !== 'input-change') return;
 
-        // 1. CORRECCIÓN IMPORTANTE: Limpiar el timeout SIEMPRE al inicio
         if (searchTimeout.current) {
             clearTimeout(searchTimeout.current);
         }
 
-        // 2. Si borró todo, restauramos inmediatamente y salimos
         if (!inputValue) {
             setOptions(initialOptions);
-            setIsLoading(false);
             return;
         }
 
-        // 3. Si hay texto, programamos la búsqueda
         searchTimeout.current = setTimeout(() => {
             setIsLoading(true);
             axios.get('/api/suppliers/search', { params: { query: inputValue } })
                 .then((response) => {
-                    // Si hay resultados los mostramos, si no, lista vacía
-                    setOptions(response.data);
+                    if (response.data && response.data.length > 0) {
+                        setOptions(response.data);
+                    } else {
+                        setOptions([]);
+                    }
                 })
-                .catch(err => {
-                    console.error("Error buscando:", err);
-                    setOptions([]); // En error, limpiar opciones para evitar confusión
-                })
+                .catch(err => console.error("Error buscando:", err))
                 .finally(() => setIsLoading(false));
         }, 300);
     };
@@ -86,7 +80,7 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
 
         setData(previousData => ({
             ...previousData,
-            supplier_id: s.id,
+            supplier_id: s.id, // Ahora es un numero
             name: s.SupplierName,
             legal_name: s.SupplierName,
             tax_id: s.AccountNumber,
@@ -114,7 +108,6 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
                 <div className="space-y-4 w-full pt-10 rounded-3xl p-6 bg-white shadow-[0_0_20px_rgba(0,0,0,0.08)]">
                     <form id="form" method="post" onSubmit={handleSubmit} className="space-y-4 ">
                         
-                        {/* BUSCADOR DE PROVEEDOR */}
                         <div className="bg-green-50 p-4 rounded-xl border border-green-100 mb-6">
                             <Label className="block text-sm font-bold mb-2 text-green-800 flex items-center gap-2">
                                 <UserSearch className="w-4 h-4" /> Buscar Proveedor Maestro (Autollenado)
@@ -129,17 +122,17 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
                                 classNamePrefix="react-select"
                                 isClearable
                                 isSearchable
-                                filterOption={() => true} // Evita filtro local
+                                filterOption={() => true}
                                 noOptionsMessage={() => isLoading ? "Buscando..." : "No se encontraron proveedores"}
                             />
                             
                             <p className="text-xs text-green-700 mt-2">
-                                * Escriba para buscar en la base de datos
+                                * Escriba para buscar en la base de datos maestra. Se muestran 50 por defecto.
                             </p>
                             <InputError message={errors.supplier_id} />
                         </div>
 
-                        {/* Fila 1: Nombres */}
+                        {/* Fila 1 */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <Label htmlFor="name" className="block text-sm font-bold mb-3 text-gray-700">Nombre Comercial. *</Label>
@@ -150,6 +143,7 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
                                     required
                                     placeholder='Ej. Empresa X'
                                     onChange={e => setData('name', e.target.value)}
+                                    // Comprobamos si tiene valor (number o string no vacio)
                                     className={`mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio ${data.supplier_id ? 'bg-gray-50' : ''}`}
                                     readOnly={!!data.supplier_id} 
                                 />
@@ -171,7 +165,7 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
                             </div>
                         </div>
 
-                        {/* Fila 2: Identificación y Contacto */}
+                        {/* Fila 2 */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <Label htmlFor="tax_id" className="block text-sm font-bold mb-3 text-gray-700">RIF / Identificación Fiscal. *</Label>
@@ -202,7 +196,7 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
                             </div>
                         </div>
 
-                        {/* Fila 3: Comunicación */}
+                        {/* Fila 3 */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <Label htmlFor="contact_email" className="block text-sm font-bold mb-3 text-gray-700">Correo Electrónico. *</Label>
@@ -233,7 +227,7 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
                             </div>
                         </div>
 
-                        {/* Fila 4: Observaciones */}
+                        {/* Fila 4 */}
                         <div className="grid grid-cols-1 gap-4">
                             <div className="md:col-span-2">
                                 <Label htmlFor="observations" className="block text-sm font-bold mb-3 text-gray-700">

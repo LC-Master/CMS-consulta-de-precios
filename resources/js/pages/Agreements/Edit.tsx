@@ -14,7 +14,7 @@ import { useState, useRef } from 'react'
 import axios from 'axios'
 
 interface Supplier {
-    id: string;
+    id: number;
     SupplierName: string;
     AccountNumber: string;
     ContactName: string;
@@ -26,7 +26,7 @@ interface Supplier {
 export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { agreement: Agreement, defaultSuppliers: Supplier[] }) {
     
     const { data, setData, processing, errors, put, cancel } = useForm({
-        supplier_id: agreement.supplier_id ?? '',
+        supplier_id: agreement.supplier_id ?? '' as string | number,
         name: agreement.name ?? '',
         legal_name: agreement.legal_name ?? '',
         tax_id: agreement.tax_id ?? '',
@@ -45,8 +45,6 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
 
     const [options, setOptions] = useState(initialOptions);
     const [isLoading, setIsLoading] = useState(false);
-    
-    // Referencia para Debounce
     const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
     const currentSupplierOption = options.find(op => op.value === data.supplier_id) || null;
@@ -54,18 +52,15 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
     const handleInputChange = (inputValue: string, { action }: any) => {
         if (action !== 'input-change') return;
         
-        // 1. Limpieza INICIAL del timeout
         if (searchTimeout.current) {
             clearTimeout(searchTimeout.current);
         }
 
-        // 2. Restauración si está vacío
         if (!inputValue) {
             setOptions(initialOptions);
             return;
         }
 
-        // 3. Programación de nueva búsqueda
         searchTimeout.current = setTimeout(() => {
             setIsLoading(true);
             axios.get('/api/suppliers/search', { params: { query: inputValue } })
@@ -147,7 +142,7 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
                                 classNamePrefix="react-select"
                                 isClearable
                                 isSearchable
-                                filterOption={() => true} // CORRECCIÓN CRÍTICA
+                                filterOption={() => true}
                                 noOptionsMessage={() => isLoading ? "Buscando..." : "No se encontraron proveedores"}
                             />
                             <p className="text-xs text-green-700 mt-2">
@@ -156,7 +151,7 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
                             <InputError message={errors.supplier_id} />
                         </div>
 
-                        {/* RESTO DE CAMPOS IGUALES... */}
+                        {/* Fila 1 */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <Label className="block text-sm font-bold mb-3 text-gray-700">Nombre Comercial. *</Label>
@@ -170,6 +165,7 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
                             </div>
                         </div>
                         
+                        {/* Fila 2 */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <Label className="block text-sm font-bold mb-3 text-gray-700">RIF / Identificación Fiscal. *</Label>
@@ -183,6 +179,7 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
                             </div>
                         </div>
 
+                        {/* Fila 3 */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <Label className="block text-sm font-bold mb-3 text-gray-700">Correo Electrónico. *</Label>
@@ -196,6 +193,7 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
                             </div>
                         </div>
 
+                        {/* Fila 4 */}
                         <div className="grid grid-cols-1 gap-4">
                             <div className="md:col-span-2">
                                 <Label className="block text-sm font-bold mb-3 text-gray-700">Detalles del Acuerdo Comercial</Label>
@@ -207,11 +205,7 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
                     </form>
 
                     <div className="flex flex-wrap justify-center border-t border-gray-200 pt-20 mt-25 gap-3">
-                        <Button
-                            form="form"
-                            className="bg-locatel-medio flex flex-row h-12 gap-2 items-center text-white rounded-md px-6 py-3 shadow"
-                            disabled={processing}
-                        >
+                        <Button form="form" className="bg-locatel-medio flex flex-row h-12 gap-2 items-center text-white rounded-md px-6 py-3 shadow" disabled={processing}>
                             {processing ? (<><Spinner /> Guardando....</>) : <><Save /> Guardar</>}
                         </Button>
                         <Link href={index().url} className="bg-red-500 text-white rounded-md px-6 py-3 shadow flex items-center">Cancelar</Link>

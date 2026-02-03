@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Agreement\CreateAgreementAction;
-use App\Actions\Agreement\UpdateAgreementAction; // Asegúrate de importar esto
+use App\Actions\Agreement\UpdateAgreementAction;
 use App\Enums\AgreementStatus;
 use App\Http\Requests\Agreement\StoreAgreementRequest;
 use App\Http\Requests\Agreement\UpdateAgreementRequest;
@@ -57,7 +57,7 @@ class AgreementController extends Controller implements HasMiddleware
     public function create()
     {
         $defaultSuppliers = Supplier::select([
-            'id', 
+            'id',
             'SupplierName', 
             'AccountNumber',
             'ContactName', 
@@ -92,7 +92,7 @@ class AgreementController extends Controller implements HasMiddleware
 
     public function show(Agreement $agreement)
     {
-        $agreementData = [ // Renombrado para evitar conflicto de variables
+        $agreementData = [
             'id' => $agreement->getKey(),
             'name' => $agreement->name,
             'legal_name' => $agreement->legal_name,
@@ -121,9 +121,9 @@ class AgreementController extends Controller implements HasMiddleware
 
         $currentSupplier = null;
         if ($agreement->supplier_id) {
+            // Buscamos por el ID entero
             $currentSupplier = Supplier::find($agreement->supplier_id);
             
-            // Si el proveedor actual no está en la lista de 50, lo agregamos
             if ($currentSupplier && !$defaultSuppliers->contains('id', $currentSupplier->id)) {
                 $defaultSuppliers->push($currentSupplier);
             }
@@ -139,8 +139,6 @@ class AgreementController extends Controller implements HasMiddleware
     {
         try {
             $request->validated();
-            // Nota: Aquí deberías usar un Action si tienes lógica compleja, 
-            // pero el update directo funciona si el fillable está bien.
             $agreement->update($request->all());
 
             return to_route('agreement.index')

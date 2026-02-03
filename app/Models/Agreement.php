@@ -10,7 +10,6 @@ use App\Models\Supplier;
 
 class Agreement extends Model
 {
-    /** @use HasFactory<\Database\Factories\AgreementFactory> */
     use HasFactory;
     use HasUuids;
     use SoftDeletes;
@@ -38,6 +37,6 @@ class Agreement extends Model
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
+        return $this->belongsTo(Supplier::class, 'supplier_id', 'ID');
     }
 }

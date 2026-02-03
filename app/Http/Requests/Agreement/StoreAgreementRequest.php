@@ -4,12 +4,10 @@ namespace App\Http\Requests\Agreement;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class StoreAgreementRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         if(Auth::id()){
@@ -18,19 +16,30 @@ class StoreAgreementRequest extends FormRequest
         return false;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
     public function rules(): array
     {
         return [
-            // 'supplier_id' eliminado
-            'name' => 'required|string|max:155|unique:agreements,name',
+            'supplier_id' => 'nullable|integer',
+            
+            'name' => [
+                'required',
+                'string',
+                'max:155',
+                Rule::unique('agreements', 'name')->withoutTrashed(),
+            ],
+            
             'legal_name' => 'required|string|max:155',
-            'tax_id' => 'required|string|max:20|unique:agreements,tax_id',
+            
+            'tax_id' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('agreements', 'tax_id')->withoutTrashed(),
+            ],
+
             'contact_person' => 'required|string|max:255',
             'contact_email' => 'required|string|email:rfc,dns|max:255',
-            'contact_phone' => ['required', 'string', 'digits_between:10,20'],
+            'contact_phone' => ['required', 'string'],
             'observations' => 'required|string|max:1000',
         ];
     }
@@ -38,10 +47,12 @@ class StoreAgreementRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'supplier_id.integer' => 'El identificador del proveedor debe ser un número entero.',
+
             'name.required' => 'El nombre del acuerdo es obligatorio.',
             'name.string'   => 'El nombre del acuerdo debe ser texto.',
             'name.max'      => 'El nombre del acuerdo no debe exceder los 155 caracteres.',
-            'name.unique'   => 'Ya existe un acuerdo con este nombre.',
+            'name.unique'   => 'Ya existe un acuerdo ACTIVO con este nombre.',
 
             'legal_name.required' => 'La razón social es obligatoria.',
             'legal_name.string'   => 'La razón social debe ser texto.',
@@ -50,7 +61,7 @@ class StoreAgreementRequest extends FormRequest
             'tax_id.required' => 'El RIF es obligatorio.',
             'tax_id.string'   => 'El RIF debe ser texto.',
             'tax_id.max'      => 'El RIF no debe exceder los 20 caracteres.',
-            'tax_id.unique'   => 'Este RIF ya se encuentra registrado en el sistema.',
+            'tax_id.unique'   => 'Este RIF ya se encuentra ACTIVO en el sistema.',
 
             'contact_person.required' => 'La persona de contacto es obligatoria.',
             'contact_person.string'   => 'La persona de contacto debe ser texto.',
