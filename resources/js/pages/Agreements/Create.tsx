@@ -127,7 +127,7 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
                             />
                             
                             <p className="text-xs text-green-700 mt-2">
-                                * Escriba para buscar en la base de datos maestra. Se muestran 50 por defecto.
+                                * Escriba para buscar en la base de datos
                             </p>
                             <InputError message={errors.supplier_id} />
                         </div>
