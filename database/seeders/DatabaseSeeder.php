@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             CampaignAgreementSeeder::class,
             TimeLineItemSeeder::class,
             TokenSeeder::class,
+            StorePlaceHolderSeeder::class,
         ]);
         User::firstOrCreate(
             ['email' => 'test@example.com'],

@@ -2,25 +2,26 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class StoreSyncState extends Model
 {
+    use HasUuids;
+
     protected $fillable = [
         'store_id',
         'url',
         'placeholder_id',
-        'is_syncing',
         'sync_started_at',
         'sync_ended_at',
         'disk',
         'uptimed_at',
-        'last_sync_status',
+        'sync_status',
         'last_synced_at',
         'last_reported_at',
     ];
     protected $casts = [
-        'is_syncing' => 'boolean',
         'disk' => 'array',
         'sync_started_at' => 'datetime',
         'sync_ended_at' => 'datetime',

@@ -50,6 +50,8 @@ class CampaignController extends Controller implements HasMiddleware
     {
         $query = Campaign::with(['status']);
 
+        // broadcast(new \App\Events\StoreSyncUpdated(message: 'Usuario ' . Auth::user()?->name . ' ha accedido a la lista de campañas.'));
+
         $query->whereHas('status', function ($q) {
             $q->where('status', '!=', CampaignStatus::FINISHED->value)->where('status', '!=', CampaignStatus::CANCELLED->value);
         });

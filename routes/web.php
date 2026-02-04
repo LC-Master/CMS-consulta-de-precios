@@ -7,17 +7,12 @@ use App\Models\Store;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityLogController;
-use App\Http\Controllers\CenterController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/', fn() => redirect()->route('campaign.index'))
         ->name('home')
         ->middleware('permission:campaign.list');
-
-    Route::get('/centers', [CenterController::class, 'index'])
-        ->name('centers.index')
-        ->middleware('permission:center.list');
 
     Route::get('dashboard', [DashboardController::class, 'index'])
         ->name('dashboard')
@@ -53,3 +48,4 @@ Route::get(
 require __DIR__ . '/campaign.php';
 require __DIR__ . '/admin.php';
 require __DIR__ . '/settings.php';
+require __DIR__ . '/store.php';

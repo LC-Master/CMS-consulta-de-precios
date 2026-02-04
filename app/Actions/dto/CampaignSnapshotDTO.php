@@ -26,6 +26,7 @@ class CampaignSnapshotDTO
             ->get();
         $snapshot = [
             'store_id' => $store->getKey(),
+            'place_holder' => $store->syncState->placeholder?->id ?? null,
             'campaigns' => [],
         ];
 
