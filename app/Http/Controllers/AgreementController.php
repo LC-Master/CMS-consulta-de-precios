@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Agreement\CreateAgreementAction;
+use App\Actions\Agreement\UpdateAgreementAction;
 use App\Enums\AgreementStatus;
 use App\Http\Requests\Agreement\StoreAgreementRequest;
 use App\Http\Requests\Agreement\UpdateAgreementRequest;
@@ -14,6 +15,7 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use App\Models\Supplier;
 
 class AgreementController extends Controller implements HasMiddleware
 {
@@ -54,16 +56,26 @@ class AgreementController extends Controller implements HasMiddleware
 
     public function create()
     {
-        return Inertia::render('Agreements/Create');
+        $defaultSuppliers = Supplier::select([
+            'id',
+            'SupplierName', 
+            'AccountNumber',
+            'ContactName', 
+            'EmailAddress', 
+            'PhoneNumber', 
+            'Notes'
+        ])
+        ->orderBy('SupplierName')
+        ->get();
+
+        return Inertia::render('Agreements/Create', [
+            'defaultSuppliers' => $defaultSuppliers
+        ]);
     }
 
-    /**
-     * Store usa StoreAgreementRequest
-     */
     public function store(StoreAgreementRequest $request, CreateAgreementAction $createAgreementAction): RedirectResponse
     {
         try {
-
             $createAgreementAction->execute($request->validated());
 
             return to_route('agreement.index')
@@ -74,13 +86,13 @@ class AgreementController extends Controller implements HasMiddleware
 
             return back()
                 ->withInput()
-                ->with('error', 'Ocurrió un error inesperado al crear el acuerdo. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error inesperado al crear el acuerdo.');
         }
     }
 
     public function show(Agreement $agreement)
     {
-        $agreement = [
+        $agreementData = [
             'id' => $agreement->getKey(),
             'name' => $agreement->name,
             'legal_name' => $agreement->legal_name,
@@ -95,25 +107,38 @@ class AgreementController extends Controller implements HasMiddleware
         ];
 
         return Inertia::render('Agreements/Show', [
-            'agreement' => $agreement,
+            'agreement' => $agreementData,
         ]);
     }
 
     public function edit(Agreement $agreement)
     {
+        $defaultSuppliers = Supplier::select([
+            'id', 'SupplierName', 'AccountNumber', 'ContactName', 'EmailAddress', 'PhoneNumber', 'Notes'
+        ])
+        ->orderBy('SupplierName')
+        ->get();
+
+        $currentSupplier = null;
+        if ($agreement->supplier_id) {
+            // Buscamos por el ID entero
+            $currentSupplier = Supplier::find($agreement->supplier_id);
+            
+            if ($currentSupplier && !$defaultSuppliers->contains('id', $currentSupplier->id)) {
+                $defaultSuppliers->push($currentSupplier);
+            }
+        }
+
         return Inertia::render('Agreements/Edit', [
             'agreement' => $agreement,
+            'defaultSuppliers' => $defaultSuppliers,
         ]);
     }
 
-    /**
-     * Update usa UpdateAgreementRequest
-     */
     public function update(UpdateAgreementRequest $request, Agreement $agreement)
     {
         try {
             $request->validated();
-
             $agreement->update($request->all());
 
             return to_route('agreement.index')
@@ -123,7 +148,7 @@ class AgreementController extends Controller implements HasMiddleware
 
             return back()
                 ->withInput()
-                ->with('error', 'Ocurrió un error inesperado al actualizar el acuerdo. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error inesperado al actualizar el acuerdo.');
         }
     }
 
@@ -131,14 +156,11 @@ class AgreementController extends Controller implements HasMiddleware
     {
         try {
             $agreement->delete();
-
             return to_route('agreement.index')
                 ->with('success', 'Acuerdo eliminado correctamente.');
         } catch (\Throwable $e) {
             Log::error('Error deleting agreement: ' . $e->getMessage(), ['user_id' => Auth::id()]);
-
-            return back()
-                ->with('error', 'Ocurrió un error inesperado al eliminar el acuerdo. Por favor, intente nuevamente.');
+            return back()->with('error', 'Ocurrió un error inesperado al eliminar el acuerdo.');
         }
     }
 }

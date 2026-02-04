@@ -30,6 +30,7 @@ export default function CampaignCreate({ departments, stores, agreements, media,
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { handlerSearch, search, filteredItems } = useSearch(mediaList);
     const { moveUp, moveDown, transfer, removeItem } = useMediaActions<MediaItem>();
+    
     const { data, setData, processing, errors, post, transform, cancel } = useForm({
         title: '',
         start_at: '',
@@ -41,8 +42,8 @@ export default function CampaignCreate({ departments, stores, agreements, media,
         pm_media: [] as string[],
     })
     const optionsDepartment: Option[] = makeOptions<Department>(departments, d => d.id, d => d.name)
-
-    const optionsAgreement: Option[] = makeOptions<Agreement>(agreements, a => a.id, a => a.name)
+    
+    const optionsAgreement: Option[] = makeOptions<Agreement>(agreements, a => a.id, a => `${a.name} - ${a.tax_id}`)
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -66,7 +67,7 @@ export default function CampaignCreate({ departments, stores, agreements, media,
                     <p className='text-gray-600 '>Complete el formulario a continuación para crear una nueva campaña.</p>
                 </div>
                 <div className="shadow-[0_0_20px_rgba(0,0,0,0.08)] rounded-lg bg-white">
-                    <form id="form" method="post" onSubmit={handleSubmit} className="space-y-6" action={store().url} noValidate>
+                    <form id="form" method="post" onSubmit={handleSubmit} className="space-y-6" noValidate>
                         <div className='flex items-center gap-2 pl-6 pr-6 mb-4 pt-6 pb-2'>
                             <CircleAlert />
                             <h2 className='text-bold font-bold text-lg text-gray-900'>
@@ -79,13 +80,10 @@ export default function CampaignCreate({ departments, stores, agreements, media,
                                 <Input
                                     type="text"
                                     id="title"
-                                    name="title"
                                     value={data.title}
                                     required
                                     placeholder="Título de la campaña"
                                     autoComplete="off"
-                                    aria-invalid={!!errors.title}
-                                    aria-describedby={errors.title ? 'title-error' : undefined}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('title', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
@@ -99,27 +97,11 @@ export default function CampaignCreate({ departments, stores, agreements, media,
                                     options={optionsDepartment}
                                     inputId="department_id"
                                     value={optionsDepartment.find(o => o.value === data.department_id) || null}
-                                    name="department_id"
-                                    classNamePrefix="react-select"
                                     onChange={(val) => setData('department_id', (val as Option | null)?.value ?? '')}
-                                    placeholder="Selecciona un departamento / Categoría"
+                                    placeholder="Selecciona un departamento"
                                     isClearable
-                                    aria-required={false}
-                                    aria-invalid={!!errors.department_id}
-                                    aria-describedby={errors.department_id ? 'department_id-error' : undefined}
-                                    styles={{
-                                        control: (provided) => ({
-                                            ...provided,
-                                            borderColor: errors.department_id ? '#ef4444' : provided.borderColor,
-                                            boxShadow: errors.department_id ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
-                                            '&:hover': {
-                                                borderColor: errors.department_id ? '#ef4444' : provided.borderColor,
-                                            },
-                                            borderRadius: '0.375rem',
-                                        }),
-                                    }}
                                 />
-                                <InputError message={errors.department_id} id="department_id-error" />
+                                <InputError message={errors.department_id} />
                             </div>
                         </div>
 
@@ -129,15 +111,12 @@ export default function CampaignCreate({ departments, stores, agreements, media,
                                 <Input
                                     type="datetime-local"
                                     id="start_at"
-                                    name="start_at"
                                     value={data.start_at}
                                     required
                                     onChange={e => setData('start_at', e.target.value)}
-                                    aria-invalid={!!errors.start_at}
-                                    aria-describedby={errors.start_at ? 'start_at-error' : undefined}
-                                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
+                                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio text-left [&::-webkit-calendar-picker-indicator]:ml-auto [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                                 />
-                                <InputError message={errors.start_at} id="start_at-error" />
+                                <InputError message={errors.start_at} />
                             </div>
 
                             <div>
@@ -145,15 +124,12 @@ export default function CampaignCreate({ departments, stores, agreements, media,
                                 <Input
                                     type="datetime-local"
                                     id="end_at"
-                                    name="end_at"
                                     value={data.end_at}
                                     required
                                     onChange={e => setData('end_at', e.target.value)}
-                                    aria-invalid={!!errors.end_at}
-                                    aria-describedby={errors.end_at ? 'end_at-error' : undefined}
-                                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
+                                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio text-left [&::-webkit-calendar-picker-indicator]:ml-auto [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                                 />
-                                <InputError message={errors.end_at} id="end_at-error" />
+                                <InputError message={errors.end_at} />
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
@@ -172,28 +148,12 @@ export default function CampaignCreate({ departments, stores, agreements, media,
                                     options={optionsAgreement}
                                     inputId="agreement_id"
                                     value={optionsAgreement.filter(o => data.agreements.includes(o.value))}
-                                    name="agreements"
-                                    classNamePrefix="react-select"
                                     onChange={(val) => setData('agreements', (val as Option[]).map(v => v.value))}
                                     placeholder="Selecciona un acuerdo"
                                     isClearable
                                     isMulti
-                                    aria-required={false}
-                                    aria-invalid={!!errors.agreements}
-                                    aria-describedby={errors.agreements ? 'agreements-error' : undefined}
-                                    styles={{
-                                        control: (provided) => ({
-                                            ...provided,
-                                            borderColor: errors.agreements ? '#ef4444' : provided.borderColor,
-                                            boxShadow: errors.agreements ? '0 0 0 1px rgba(239,68,68,0.25)' : provided.boxShadow,
-                                            '&:hover': {
-                                                borderColor: errors.agreements ? '#ef4444' : provided.borderColor,
-                                            },
-                                            borderRadius: '0.375rem',
-                                        }),
-                                    }}
                                 />
-                                <InputError message={errors.agreements} id="agreements-error" />
+                                <InputError message={errors.agreements} />
                             </div>
                         </div>
                         <div className='pt-12 border-t-2 border-gray-100 w-full'>
