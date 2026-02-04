@@ -11,6 +11,7 @@ use App\Models\TimeLineItem;
 use App\Models\Media;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Store;
 
 /**
  * @property-read \App\Models\User $user
@@ -97,16 +98,12 @@ class Campaign extends Model
     {
         return $this->belongsToMany(Agreement::class, 'campaign_agreements')->withTimestamps();
     }
-
     public function stores()
     {
+        // Asegúrate que esta relación exista y esté correcta
         return $this->belongsToMany(Store::class, 'campaign_store', 'campaign_id', 'store_id')->withTimestamps();
     }
 
-    public function centers()
-    {
-        return $this->belongsToMany(Center::class, 'campaign_centers')->withTimestamps();
-    }
     public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by');

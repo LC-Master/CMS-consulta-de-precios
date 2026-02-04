@@ -29,7 +29,7 @@ export default function AgreementShow({ agreement }: { agreement: Agreement }) {
                     <div className="shadow-lg w-full rounded-3xl p-6 bg-white">
                         <div className="flex items-center gap-2 mb-4 border-b pb-2">
                             <CircleAlert className="text-gray-500" />
-                            <h2 className="text-lg font-semibold text-gray-900">Detalles del convenio</h2>
+                            <h2 className="text-lg font-semibold text-gray-900">Datos del Acuerdo</h2>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
