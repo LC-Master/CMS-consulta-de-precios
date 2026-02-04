@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('center_media_errors', function (Blueprint $table) {
             $table->uuid("id")->primary();
 
-            $table->foreignUuid('center_id')->constrained()->cascadeOnDelete();
+            $table->string('store_id')->index();
 
             $table->uuid('media_id')->nullable();
 
@@ -26,7 +26,7 @@ return new class extends Migration {
 
             $table->timestamps();
 
-            $table->index(['center_id', 'media_id']);
+            $table->index(['store_id', 'media_id']);
             $table->index('checksum');
         });
     }

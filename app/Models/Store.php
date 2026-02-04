@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\StoreSyncState;
 
 class Store extends Model
 {
@@ -20,18 +21,31 @@ class Store extends Model
         'id',
         'name',
         'store_code',
+        'address',
+        'region',
+        'city',
+        'country',
+        'fax_number',
+        'phone_number',
+        // 'inactive',
     ];
-    protected $fillable = [
+    // protected $fillable = [
+    //     "Region",
+    //     "City",
+    //     "Country",
+    //     "FaxNumber",
+    //     "PhoneNumber",
+    //     "Inactive"
+    // ];
+
+    protected $hidden = [
         "Region",
-        "Address1",
         "City",
         "Country",
         "FaxNumber",
         "PhoneNumber",
-        "Inactive"
-    ];
-
-    protected $hidden = [
+        "Inactive",
+        "Address1",
         "Zip",
         "pivot",
         "ID",
@@ -87,6 +101,20 @@ class Store extends Model
             get: fn() => $this->attributes['Name'] ?? 'Sin nombre',
         );
     }
+    /**
+     * Summary of address
+     * @return Attribute
+     * Accessor para el Address1 recortado antes del guion
+     *  Permite usar $store->address en lugar de $store->Address1
+     */
+    protected function address(): Attribute
+    {
+        $address1 = $this->attributes['Address1'] ?? '';
+
+        return Attribute::make(
+            get: fn() => $address1,
+        );
+    }
 
     /**
      * Accessor para el StoreCode (Snake Case)
@@ -98,6 +126,72 @@ class Store extends Model
             get: fn() => $this->attributes['StoreCode'] ?? null,
         );
     }
+
+    /**
+     * Accessor para el Region
+     * Permite usar $store->region en lugar de $store->Region
+     */
+    protected function region(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => explode('-', $this->attributes['Region'] ?? '')[1] ?? null,
+        );
+    }
+
+    /**
+     * Accessor para el City
+     * Permite usar $store->city en lugar de $store->City
+     */
+    protected function city(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->attributes['City'] ?? null,
+        );
+    }
+
+    /**
+     * Accessor para el Country
+     * Permite usar $store->country en lugar de $store->Country
+     */
+    protected function country(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->attributes['Country'] ?? null,
+        );
+    }
+
+    /**
+     * Accessor para el FaxNumber
+     * Permite usar $store->fax_number en lugar de $store->FaxNumber
+     */
+    protected function faxNumber(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->attributes['FaxNumber'] ?? null,
+        );
+    }
+
+    /**
+     * Accessor para el PhoneNumber
+     * Permite usar $store->phone_number en lugar de $store->PhoneNumber
+     */
+    protected function phoneNumber(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->attributes['PhoneNumber'] ?? null,
+        );
+    }
+
+    // /**
+    //  * Accessor para el Inactive
+    //  * Permite usar $store->inactive en lugar de $store->Inactive
+    //  */
+    // protected function inactive(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn() => $this->attributes['Inactive'] ?? null,
+    //     );
+    // }
 
     protected static function boot()
     {
@@ -140,5 +234,13 @@ class Store extends Model
                     'fax_number' => $store->getAttribute('FaxNumber'),
                 ])->values(),
             ])->values();
+    }
+    public function syncState()
+    {
+        return $this->hasOne(StoreSyncState::class, 'store_id', 'ID');
+    }
+    public function centerMediaErrors()
+    {
+        return $this->hasMany(CenterMediaError::class, 'store_id', 'ID');
     }
 }

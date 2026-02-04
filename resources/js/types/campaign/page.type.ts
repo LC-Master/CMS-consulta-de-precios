@@ -2,7 +2,7 @@ import { Agreement } from '../agreement/index.types';
 import { Flash } from '../flash/flash.type';
 import { MediaItem } from '../media/index.type';
 import { Status } from '../status/status.type';
-import { RegionGroup, Store } from '../store/index.type';
+import { RegionData, Store } from '../store/index.type';
 import { Department } from './index.types';
 
 export type CampaignReportProps = {
@@ -12,7 +12,7 @@ export type CampaignReportProps = {
     statuses: Status[];
 };
 export type CampaignCreateProps = {
-    stores: RegionGroup[]
+    stores: RegionData[]
     departments: Department[];
     agreements: Agreement[];
     media: MediaItem[];
@@ -24,7 +24,7 @@ export type CampaignEditProps = {
     departments: Department[];
     agreements: Agreement[];
     media: MediaItem[];
-    stores: RegionGroup[];
+    stores: RegionData[];
     flash: Flash;
 };
 export type CampaignFormValues = {
