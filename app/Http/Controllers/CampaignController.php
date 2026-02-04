@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use App\Actions\Campaign\CreateCampaignAction;
 use App\Actions\Campaign\UpdateCampaignAction;
 use App\Enums\CampaignStatus;
@@ -10,6 +11,7 @@ use App\Http\Requests\Campaigns\UpdateCampaignRequest;
 use App\Models\Agreement;
 use App\Models\Campaign;
 use App\Models\Center;
+use App\Models\Store;
 use App\Models\Department;
 use App\Models\Media;
 use App\Models\Status;
@@ -20,7 +22,6 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use App\Exports\CampaignsExport;
 use App\Http\Requests\ExportCampaignListRequest;
@@ -48,6 +49,8 @@ class CampaignController extends Controller implements HasMiddleware
     public function index(Request $request)
     {
         $query = Campaign::with(['status']);
+
+        // broadcast(new \App\Events\StoreSyncUpdated(message: 'Usuario ' . Auth::user()?->name . ' ha accedido a la lista de campañas.'));
 
         $query->whereHas('status', function ($q) {
             $q->where('status', '!=', CampaignStatus::FINISHED->value)->where('status', '!=', CampaignStatus::CANCELLED->value);
@@ -80,8 +83,7 @@ class CampaignController extends Controller implements HasMiddleware
                 ->orderBy('created_at', 'desc')
                 ->limit(30)
                 ->get(['id', 'name', 'mime_type']),
-
-            'centers' => Center::get(['id', 'code', 'name']),
+            'stores' => Store::getStoresByGroup(),
             'departments' => Department::get(['id', 'name']),
             'agreements' => Agreement::where('is_active', true)
                 ->select(['id', 'name', 'tax_id']) 
@@ -113,7 +115,7 @@ class CampaignController extends Controller implements HasMiddleware
             'status',
             'department:id,name',
             'agreements' => fn($query) => $query->withTrashed()->select('id', 'name'),
-            'centers:id,code,name',
+            'stores:ID,Name,StoreCode',
             'media:id,name,mime_type,duration_seconds',
         ]);
 
@@ -129,7 +131,7 @@ class CampaignController extends Controller implements HasMiddleware
         $campaign->load([
             'media:id,name,mime_type,duration_seconds',
             'media.thumbnail:id,path,media_id',
-            'centers:id,code,name',
+            'stores:ID',
             'agreements' => fn($query) => $query->withTrashed()->select('id', 'name', 'tax_id'),
         ]);
 
@@ -158,7 +160,7 @@ class CampaignController extends Controller implements HasMiddleware
                 ->orderBy('created_at', 'desc')
                 ->limit(30)
                 ->get(['id', 'name', 'mime_type']),
-            'centers' => Center::all(['id', 'code', 'name']),
+            'stores' => Store::getStoresByGroup(),
         ]);
     }
 
@@ -288,18 +290,16 @@ class CampaignController extends Controller implements HasMiddleware
     }
     public function exportDetail(Campaign $campaign)
     {
-        // Cargamos todas las relaciones necesarias para el reporte
         $campaign->load([
             'status',
             'department',
             'user',
-            'centers',
+            'stores',
             'agreements',
-            'timeLineItems.media' // Cargamos los ítems y sus medios asociados
+            'timeLineItems.media'
         ]);
 
-        // Generamos un nombre de archivo limpio
-        $safeTitle = \Illuminate\Support\Str::slug($campaign->title);
+        $safeTitle = Str::slug($campaign->getAttribute('title'));
         $date = now()->format('d-m-Y');
         $fileName = "detalle_campaña_{$safeTitle}_{$date}.xlsx";
 

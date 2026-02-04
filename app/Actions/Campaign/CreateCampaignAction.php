@@ -5,7 +5,6 @@ namespace App\Actions\Campaign;
 use App\Enums\Schedules;
 use App\Models\Campaign;
 use App\Models\Status;
-use App\Models\Center;
 use App\Enums\CampaignStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,18 +21,7 @@ class CreateCampaignAction
             throw new \RuntimeException('Error de configuración del sistema: Estado inicial no encontrado.');
         }
 
-        $inputCenterIds = $data->input('centers') ?? [];
-        $finalCenterIds = $inputCenterIds;
-
-        if (!empty($inputCenterIds)) {
-            $specialCenterId = Center::where('code', 'CTR-0001')->value('id');
-
-            if ($specialCenterId && \in_array($specialCenterId, $inputCenterIds)) {
-                $finalCenterIds = Center::pluck('id')->toArray();
-            }
-        }
-
-        return DB::transaction(function () use ($data, $draftStatus, $finalCenterIds) {
+        return DB::transaction(function () use ($data, $draftStatus) {
 
             $campaign = Campaign::create([
                 ...$data->all(),
@@ -45,8 +33,8 @@ class CreateCampaignAction
             }
 
 
-            if (!empty($finalCenterIds)) {
-                $campaign->centers()->attach($finalCenterIds);
+            if (!empty($data->input('stores'))) {
+                $campaign->stores()->attach($data->input('stores'));
             }
 
             $timelineItems = [];

@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout'
 import { useForm, Link, Head } from '@inertiajs/react'
 import Select from 'react-select'
-import { Center, Department, Option, MediaItem, } from '@/types/campaign/index.types'
+import { Department, Option } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import useModal from '@/hooks/use-modal'
@@ -21,8 +21,10 @@ import { Spinner } from '@/components/ui/spinner'
 import { Label } from '@/components/ui/label'
 import InputError from '@/components/input-error'
 import { makeOptions } from '@/helpers/reactSelect'
+import { MediaItem } from '@/types/media/index.type'
+import GroupedSelect from '@/components/ui/GroupedSelect'
 
-export default function CampaignCreate({ centers, departments, agreements, media, flash }: CampaignCreateProps) {
+export default function CampaignCreate({ departments, stores, agreements, media, flash }: CampaignCreateProps) {
     const { isOpen, openModal, closeModal } = useModal(false)
     const ToastComponent = useToast(flash)
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
@@ -33,30 +35,15 @@ export default function CampaignCreate({ centers, departments, agreements, media
         title: '',
         start_at: '',
         end_at: '',
-        centers: [] as string[],
+        stores: [] as string[],
         department_id: '',
         agreements: [] as string[],
         am_media: [] as string[],
         pm_media: [] as string[],
     })
-
-    const optionsCenter: Option[] = makeOptions<Center>(centers, c => c.id, c => c.name + " - " + c.code)
     const optionsDepartment: Option[] = makeOptions<Department>(departments, d => d.id, d => d.name)
     
-    // Mostrar Nombre y RIF (tax_id) en el selector
     const optionsAgreement: Option[] = makeOptions<Agreement>(agreements, a => a.id, a => `${a.name} - ${a.tax_id}`)
-
-    const filteredCenters = (val: Option[] | null): void => {
-        const selected = val ?? []
-        const values = selected.map(v => v.value)
-        const todoValue = optionsCenter.find(o => /\bTodo\b/i.test(o.label))?.value
-
-        if (todoValue && values.includes(todoValue)) {
-            setData('centers', [todoValue])
-        } else {
-            setData('centers', todoValue ? values.filter(v => v !== todoValue) : values)
-        }
-    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -67,7 +54,9 @@ export default function CampaignCreate({ centers, departments, agreements, media
         }))
         post(store().url, { preserveScroll: true, forceFormData: true })
     }
-
+    const handleSelection = (ids: string[]) => {
+        setData('stores', ids);
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs('Crear Campaña', index().url)}>
             {ToastComponent.ToastContainer()}
@@ -98,7 +87,8 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('title', e.target.value)}
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio"
                                 />
-                                <InputError message={errors.title} />
+
+                                <InputError message={errors.title} id="title-error" />
                             </div>
 
                             <div>
@@ -124,7 +114,6 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                     value={data.start_at}
                                     required
                                     onChange={e => setData('start_at', e.target.value)}
-                                    // CORRECCIÓN: Alineación del icono
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio text-left [&::-webkit-calendar-picker-indicator]:ml-auto [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                                 />
                                 <InputError message={errors.start_at} />
@@ -138,7 +127,6 @@ export default function CampaignCreate({ centers, departments, agreements, media
                                     value={data.end_at}
                                     required
                                     onChange={e => setData('end_at', e.target.value)}
-                                    // CORRECCIÓN: Alineación del icono
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio text-left [&::-webkit-calendar-picker-indicator]:ml-auto [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                                 />
                                 <InputError message={errors.end_at} />
@@ -147,15 +135,11 @@ export default function CampaignCreate({ centers, departments, agreements, media
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
                             <div>
                                 <Label htmlFor="centers" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Centros. *</Label>
-                                <Select<Option, true>
-                                    options={optionsCenter}
-                                    inputId="centers"
-                                    value={optionsCenter.filter(o => data.centers.includes(o.value))}
-                                    isMulti
-                                    onChange={val => filteredCenters(val as Option[] | null)}
-                                    placeholder="Selecciona centros..."
+                                <GroupedSelect
+                                    dataFromBackend={stores}
+                                    onSelectionChange={handleSelection}
                                 />
-                                <InputError message={errors.centers} />
+                                <InputError message={errors.stores} id="centers-error" />
                             </div>
 
                             <div>

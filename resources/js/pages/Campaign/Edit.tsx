@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout'
 import { useForm, Link, Head } from '@inertiajs/react'
 import Select from 'react-select'
-import { Option, MediaItem, } from '@/types/campaign/index.types'
+import { Option } from '@/types/campaign/index.types'
 import { Input } from '@/components/ui/input'
 import useSearch from '@/hooks/use-search'
 import { Button } from '@/components/ui/button'
@@ -22,18 +22,14 @@ import { useEffect } from 'react'
 import { CircleAlert, PlusCircle, Save, SquarePlay } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { Label } from '@/components/ui/label'
-import { makeOptions } from '@/helpers/reactSelect'
-import { Agreement } from '@/types/agreement/index.types'
+import { MediaItem } from '@/types/media/index.type'
+import GroupedSelect from '@/components/ui/GroupedSelect'
 
-export default function CampaignEdit({ centers, departments, agreements, media, flash, campaign }: CampaignEditProps) {
+export default function CampaignEdit({ departments, stores, agreements, media, flash, campaign }: CampaignEditProps) {
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
     const { isOpen, openModal, closeModal } = useModal(false)
     useLoadEdit(campaign, setAm, setPm)
-    const { optionsCenter, optionsDepartment } = useLoadOptions(centers, departments, agreements)
-    
-    // Mostrar Nombre y RIF (tax_id) en el selector
-    const optionsAgreement: Option[] = makeOptions<Agreement>(agreements, a => a.id, a => `${a.name} - ${a.tax_id}`)
-
+    const { optionsDepartment, optionsAgreement } = useLoadOptions(departments, agreements)
     const ToastComponent = useToast(flash)
     const { moveDown, moveUp, transfer, removeItem } = useMediaActions<MediaItem>()
     const { handlerSearch, search, filteredItems } = useSearch<MediaItem>(mediaList)
@@ -42,25 +38,15 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
         title: campaign.title || '',
         start_at: campaign.start_at ? new Date(campaign.start_at).toISOString().slice(0, 16) : '',
         end_at: campaign.end_at ? new Date(campaign.end_at).toISOString().slice(0, 16) : '',
-        centers: campaign.centers ? campaign.centers.map(center => center.id) : [],
+        stores: campaign.stores ? campaign.stores.map(store => store.ID) : [],
         department_id: String(campaign.department_id || ''),
         agreements: campaign.agreements ? campaign.agreements.map(agreement => agreement.id) : [],
         am_media: campaign.media.filter(item => item.slot === 'am').map(item => item.id) || [],
         pm_media: campaign.media.filter(item => item.slot === 'pm').map(item => item.id) || [],
     })
-
-    const filteredCenters = (val: Option[] | null): void => {
-        const selected = val ?? []
-        const values = selected.map(v => v.value)
-        const todoValue = optionsCenter.find(o => /\bTodo\b/i.test(o.label))?.value
-
-        if (todoValue && values.includes(todoValue)) {
-            setData('centers', [todoValue])
-        } else {
-            setData('centers', todoValue ? values.filter(v => v !== todoValue) : values)
-        }
-    }
-
+    const handleSelection = (ids: string[]) => {
+        setData('stores', ids);
+    };
     useEffect(() => {
         transform((data) => ({
             ...data,
@@ -153,15 +139,12 @@ export default function CampaignEdit({ centers, departments, agreements, media, 
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
                             <div>
                                 <Label htmlFor="centers" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Centros. *</Label>
-                                <Select<Option, true>
-                                    options={optionsCenter}
-                                    inputId="centers"
-                                    value={optionsCenter.filter(o => data.centers.includes(o.value))}
-                                    isMulti
-                                    onChange={val => filteredCenters(val as Option[] | null)}
-                                    placeholder="Selecciona centros..."
+                                <GroupedSelect
+                                    dataFromBackend={stores}
+                                    onSelectionChange={handleSelection}
+                                    initialSelectedIds={data.stores}
                                 />
-                                <InputError message={errors.centers} />
+                                <InputError message={errors.stores} id="centers-error" />
                             </div>
 
                             <div>

@@ -10,8 +10,8 @@ class StoreAgreementRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        if(Auth::id()){
-            return true; 
+        if (Auth::id()) {
+            return true;
         }
         return false;
     }
@@ -43,7 +43,6 @@ class StoreAgreementRequest extends FormRequest
             'observations' => 'required|string|max:1000',
         ];
     }
-
     public function messages(): array
     {
         return [
@@ -55,8 +54,8 @@ class StoreAgreementRequest extends FormRequest
             'name.unique'   => 'Ya existe un acuerdo ACTIVO con este nombre.',
 
             'legal_name.required' => 'La razón social es obligatoria.',
-            'legal_name.string'   => 'La razón social debe ser texto.',
-            'legal_name.max'      => 'La razón social no debe exceder los 155 caracteres.',
+            'legal_name.string' => 'La razón social debe ser texto.',
+            'legal_name.max' => 'La razón social no debe exceder los 155 caracteres.',
 
             'tax_id.required' => 'El RIF es obligatorio.',
             'tax_id.string'   => 'El RIF debe ser texto.',
@@ -64,22 +63,22 @@ class StoreAgreementRequest extends FormRequest
             'tax_id.unique'   => 'Este RIF ya se encuentra ACTIVO en el sistema.',
 
             'contact_person.required' => 'La persona de contacto es obligatoria.',
-            'contact_person.string'   => 'La persona de contacto debe ser texto.',
-            'contact_person.max'      => 'La persona de contacto no debe exceder los 255 caracteres.',
+            'contact_person.string' => 'La persona de contacto debe ser texto.',
+            'contact_person.max' => 'La persona de contacto no debe exceder los 255 caracteres.',
 
             'contact_email.required' => 'El correo de contacto es obligatorio.',
-            'contact_email.string'   => 'El correo de contacto debe ser texto.',
-            'contact_email.email'    => 'Debes ingresar una dirección de correo válida.',
-            'contact_email.max'      => 'El correo de contacto no debe exceder los 255 caracteres.',
+            'contact_email.string' => 'El correo de contacto debe ser texto.',
+            'contact_email.email' => 'Debes ingresar una dirección de correo válida.',
+            'contact_email.max' => 'El correo de contacto no debe exceder los 255 caracteres.',
 
             'contact_phone.required' => 'El teléfono de contacto es obligatorio.',
-            'contact_phone.integer'  => 'El teléfono solo debe contener números, sin espacios ni guiones.',
-            'contact_phone.min'      => 'El teléfono debe tener al menos 10 dígitos.',
-            'contact_phone.max'      => 'El teléfono no debe exceder los 20 dígitos.',
+            'contact_phone.integer' => 'El teléfono solo debe contener números, sin espacios ni guiones.',
+            'contact_phone.min' => 'El teléfono debe tener al menos 10 dígitos.',
+            'contact_phone.max' => 'El teléfono no debe exceder los 20 dígitos.',
 
             'observations.required' => 'Los detalles del acuerdo son obligatorios',
             'observations.string' => 'Los detalles del acuerdo deben ser texto.',
-            'observations.max'    => 'Los detalles del acuerdo no deben exceder los 1000 caracteres.',
+            'observations.max' => 'Los detalles del acuerdo no deben exceder los 1000 caracteres.',
         ];
     }
 }

@@ -12,11 +12,11 @@ return new class extends Migration {
     {
         Schema::create('center_snapshots', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('center_id')->constrained()->onDelete('cascade');
+            $table->string('store_id');
             $table->jsonb('snapshot_json');
             $table->string('version_hash', 64);
 
-            $table->index(['center_id', 'created_at']);
+            $table->index(['store_id', 'created_at']);
             $table->index('version_hash');
 
             $table->timestamps();

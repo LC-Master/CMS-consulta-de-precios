@@ -3,6 +3,7 @@ import { Agreement } from '../agreement/index.types';
 import { Status } from '../status/status.type';
 import { Flash } from '../flash/flash.type';
 import { Media, MediaItem } from '../media/index.type';
+import { Store } from '../store/index.type';
 
 export type Department = {
     id: string;
@@ -67,7 +68,7 @@ export type Campaign = {
 export type CampaignExtended = Campaign & {
     agreements: Pick<Agreement, 'id' | 'name'>[];
     department: Department;
-    centers: Center[];
+    stores: Store[];
     start_at: string;
     end_at: string;
 

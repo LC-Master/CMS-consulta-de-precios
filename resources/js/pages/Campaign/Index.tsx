@@ -94,7 +94,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                             <Eye className="w-4 h-4" />
                             <span>Ver</span>
                         </ActionMenu.ItemLink>
-                        
+
                         <ActionMenu.ItemLink href={edit({ id: a.id }).url}>
                             <Pencil className="w-4 h-4" />
                             <span>Editar</span>

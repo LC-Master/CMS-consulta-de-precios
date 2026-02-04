@@ -14,7 +14,7 @@ class TokenCreatedNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct(public $center, public string $tokenName)
+    public function __construct(public $store, public string $tokenName)
     {
         //
     }
@@ -35,9 +35,9 @@ class TokenCreatedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject("Token creado para {$this->center->name} — Acceso a campañas")
+            ->subject("Token creado para {$this->store->name} — Acceso a campañas")
             ->greeting("Hola {$notifiable->name},")
-            ->line("Se ha generado un token para que el centro \"{$this->center->name}\" pueda acceder y reproducir sus campañas.")
+            ->line("Se ha generado un token para que el centro \"{$this->store->name}\" pueda acceder y reproducir sus campañas.")
             ->line("Nombre del token: {$this->tokenName}")
             ->line('Uso: este token autoriza la reproducción de las campañas del centro desde sistemas y dispositivos autorizados.')
             ->line('Mantén este token seguro y compártelo únicamente con personal o servicios autorizados. Si se filtra, revócalo de inmediato.')
@@ -54,8 +54,8 @@ class TokenCreatedNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'center_id' => $this->center->id,
-            'center_name' => $this->center->name,
+            'store_id' => $this->store->getKey(),
+            'store_name' => $this->store->name,
             'token_name' => $this->tokenName,
         ];
     }

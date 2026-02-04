@@ -7,6 +7,7 @@ export interface CampaignEvent {
     extendedProps: {
         department: string;
         agreement: string;
-        centers: string[]; 
+        centers: string[];
+        store_ids?: string[];
     }
 }

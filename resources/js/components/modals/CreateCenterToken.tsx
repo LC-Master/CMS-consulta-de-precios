@@ -1,4 +1,4 @@
-import { Center, Option } from "@/types/campaign/index.types";
+import { Option } from "@/types/campaign/index.types";
 import Modal from "@/components/Modal";
 import Select from 'react-select';
 import { useForm } from "@inertiajs/react";
@@ -9,12 +9,13 @@ import { Label } from "../ui/label";
 import { store } from "@/routes/centertokens";
 import { useState } from "react";
 import { Spinner } from "../ui/spinner";
+import { Store } from "@/types/store/index.type";
 
-export default function CreateCenterToken({ centers, closeModal }: { closeModal: () => void, centers: Center[] }) {
+export default function CreateCenterToken({ stores, closeModal }: { closeModal: () => void, stores: Store[] }) {
     const [tokenValue, setTokenValue] = useState<string | null>(null);
     const { post, setData, processing, errors, cancel } = useForm({
         name: '',
-        center_id: ''
+        store_id: ''
     });
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -67,13 +68,13 @@ export default function CreateCenterToken({ centers, closeModal }: { closeModal:
                         </Label>
                         <div className="text-sm">
                             <Select<Option, false>
-                                name="center_id"
-                                id="center_id"
-                                options={centers.map(center => ({ value: center.id, label: `${center.name} (${center.code})` }))}
+                                name="store_id"
+                                id="store_id"
+                                options={stores.map(store => ({ value: store.id, label: `${store.name} (${store.store_code})` }))}
                                 className="basic-multi-select"
                                 classNamePrefix="select"
-                                onChange={(e) => setData('center_id', e?.value || '')}
-                                placeholder="Selecciona un centro"
+                                onChange={(e) => setData('store_id', e?.value || '')}
+                                placeholder="Selecciona una tienda"
                                 styles={{
                                     option: (provided) => ({ ...provided, padding: '8px 10px', minHeight: 'auto', fontSize: '13px' }),
                                     control: (provided) => ({ ...provided, minHeight: '40px', borderRadius: '6px', borderColor: '#e5e7eb', boxShadow: 'none' }),
@@ -86,7 +87,7 @@ export default function CreateCenterToken({ centers, closeModal }: { closeModal:
                                 required
                             />
                         </div>
-                        <InputError message={errors.center_id} />
+                        <InputError message={errors.store_id} />
                         {tokenValue && (
                             <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
                                 <h2 className="text-sm font-medium text-green-800 mb-2">Token creado exitosamente</h2>

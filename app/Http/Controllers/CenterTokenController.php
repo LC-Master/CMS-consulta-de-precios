@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Center;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Log;
@@ -25,10 +25,10 @@ class CenterTokenController extends Controller implements HasMiddleware
     public function index(Request $request)
     {
         $query = PersonalAccessToken::with('tokenable')
-            ->where('tokenable_type', Center::class);
+            ->where('tokenable_type', Store::class);
 
-        if ($request->filled('center')) {
-            $query->where('tokenable_id', $request->input('center'));
+        if ($request->filled('store')) {
+            $query->where('tokenable_id', $request->input('store'));
         }
 
         if ($request->filled('search')) {
@@ -36,8 +36,8 @@ class CenterTokenController extends Controller implements HasMiddleware
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhereHas('tokenable', function ($q2) use ($search): void {
-                        $q2->where('name', 'like', "%{$search}%")
-                            ->orWhere('code', 'like', "%{$search}%");
+                        $q2->where('Name', 'like', "%{$search}%")
+                            ->orWhere('StoreCode', 'like', "%{$search}%");
                     });
             });
         }
@@ -49,16 +49,16 @@ class CenterTokenController extends Controller implements HasMiddleware
                 'abilities' => $token->abilities,
                 'last_used_at' => $token->last_used_at,
                 'created_at' => $token->created_at,
-                'center' => $token->tokenable_type === Center::class && $token->tokenable
+                'store' => $token->tokenable_type === Store::class && $token->tokenable
                     ? [
                         'id' => $token->tokenable->id,
                         'name' => $token->tokenable->name,
-                        'code' => $token->tokenable->code,
+                        'store_code' => $token->tokenable->store_code,
                     ]
                     : null,
             ])),
-            'filters' => $request->only(['search', 'center']),
-            'centers' => Center::get(['id', 'name', 'code']),
+            'filters' => $request->only(['search', 'store']),
+            'stores' => Store::orderBy('Name')->get(['ID', 'Name', 'StoreCode']),
         ]);
     }
 
@@ -72,8 +72,8 @@ class CenterTokenController extends Controller implements HasMiddleware
 
             $request->validated();
 
-            $exists = PersonalAccessToken::where('tokenable_id', $request->input('center_id'))
-                ->where('tokenable_type', Center::class)
+            $exists = PersonalAccessToken::where('tokenable_id', $request->input('store_id'))
+                ->where('tokenable_type', Store::class)
                 ->exists();
 
             if ($exists) {
@@ -82,12 +82,12 @@ class CenterTokenController extends Controller implements HasMiddleware
                     ->with('error', 'Ya existe un token asociado con este centro. Debe revocarlo antes de crear uno nuevo.');
             }
 
-            $center = Center::findOrFail($request->input('center_id'));
+            $store = Store::findOrFail($request->input('store_id'));
 
-            $token = $center->createToken($request->input('name'))->plainTextToken;
+            $token = $store->createToken($request->input('name'))->plainTextToken;
 
             event(new \App\Events\CenterToken\CenterTokenEvent(
-                center: $center,
+                store: $store,
                 type: 'create',
                 tokenName: $request->input('name')
             ));
@@ -109,10 +109,10 @@ class CenterTokenController extends Controller implements HasMiddleware
     public function destroy(PersonalAccessToken $centertoken)
     {
         try {
-            $center = $centertoken->getAttribute('tokenable');
+            $store = $centertoken->getAttribute('tokenable');
             $centertoken->delete();
             event(new \App\Events\CenterToken\CenterTokenEvent(
-                center: $center,
+                store: $store,
                 type: 'delete',
                 tokenName: $centertoken->getAttribute('name')
             ));

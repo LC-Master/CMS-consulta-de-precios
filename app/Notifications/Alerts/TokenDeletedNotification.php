@@ -2,7 +2,7 @@
 
 namespace App\Notifications\Alerts;
 
-use App\Models\Center;
+use App\Models\Store;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -15,7 +15,7 @@ class TokenDeletedNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct(public Center $center, public string $tokenName)
+    public function __construct(public Store $store, public string $tokenName)
     {
         //
     }
@@ -36,9 +36,9 @@ class TokenDeletedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject("Token eliminado para {$this->center->name} — Acceso a campañas")
+            ->subject("Token eliminado para {$this->store->name} — Acceso a campañas")
             ->greeting("Hola {$notifiable->name},")
-            ->line("Se ha eliminado el token que permitía al centro \"{$this->center->name}\" acceder y reproducir sus campañas.")
+            ->line("Se ha eliminado el token que permitía al centro \"{$this->store->name}\" acceder y reproducir sus campañas.")
             ->line("Nombre del token: {$this->tokenName}")
             ->line('Consecuencias:')
             ->line('• El centro perderá acceso automático a sus campañas y estas podrían dejar de reproducirse.')
@@ -57,8 +57,8 @@ class TokenDeletedNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'center_id' => $this->center->id,
-            'center_name' => $this->center->name,
+            'store_id' => $this->store->getKey(),
+            'store_name' => $this->store->name,
             'token_name' => $this->tokenName,
         ];
     }
