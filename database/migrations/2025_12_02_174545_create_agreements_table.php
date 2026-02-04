@@ -26,6 +26,12 @@ return new class extends Migration {
             $table->index('tax_id');
             $table->index('deleted_at');
 
+            $table->integer('supplier_id')->nullable();
+
+            $table->foreign('supplier_id')
+                  ->references('ID')
+                  ->on('Supplier');
+
             $table->timestamps();
         });
     }
