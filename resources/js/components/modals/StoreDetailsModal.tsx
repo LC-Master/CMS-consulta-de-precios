@@ -38,6 +38,42 @@ export default function StoreDetailsModal({ isOpen, onClose, store }: StoreDetai
         });
     };
 
+    const formatBytes = (bytes: number, decimals = 2) => {
+        if (!+bytes) return '0 Bytes';
+
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+    };
+
+    const getUptimeDiff = (dateString?: string) => {
+        if (!dateString) return 'No disponible';
+        
+        const start = new Date(dateString).getTime();
+        const now = new Date().getTime();
+        
+        let diff = Math.abs(now - start);
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        diff -= days * (1000 * 60 * 60 * 24);
+        
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        diff -= hours * (1000 * 60 * 60);
+        
+        const minutes = Math.floor(diff / (1000 * 60));
+        
+        const parts = [];
+        if (days > 0) parts.push(`${days}d`);
+        if (hours > 0) parts.push(`${hours}h`);
+        parts.push(`${minutes}m`);
+        
+        return parts.join(' ');
+    };
+
     const syncState = store.sync_state;
 
     const handleUpdateUrl = (e: React.FormEvent) => {
@@ -159,16 +195,35 @@ export default function StoreDetailsModal({ isOpen, onClose, store }: StoreDetai
                                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">UPTIME</p>
                                 <div className="flex items-center gap-2 text-gray-500 font-medium text-xs italic">
                                     <Clock className="w-3.5 h-3.5" />
-                                    <span>{syncState.uptimed_at || 'No disponible'}</span>
+                                    <span>{getUptimeDiff(syncState.uptimed_at)}</span>
                                 </div>
                             </div>
 
                             <div className="border border-gray-100 rounded-2xl p-3 bg-gray-50/50">
                                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">ESPACIO EN DISCO</p>
-                                <div className="flex items-center gap-2 text-gray-500 font-medium text-xs italic">
-                                    <HardDrive className="w-3.5 h-3.5" />
-                                    <span>{syncState.disk || 'No disponible'}</span>
-                                </div>
+                                {syncState.disk ? (
+                                    <>
+                                        <div className="flex flex-col gap-1 text-gray-700 text-xs">
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400 text-[10px] uppercase">Libre</span>
+                                                <span className="font-bold text-green-600">{formatBytes(syncState.disk.free)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400 text-[10px] uppercase">Usado</span>
+                                                <span className="font-bold text-blue-600">{formatBytes(syncState.disk.used)}</span>
+                                            </div>
+                                            <div className="flex justify-between border-t border-dashed border-gray-200 pt-1 mt-1">
+                                                <span className="text-gray-400 text-[10px] uppercase">Total</span>
+                                                <span className="font-bold">{formatBytes(syncState.disk.size)}</span>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="flex items-center gap-2 text-gray-500 font-medium text-xs italic">
+                                        <HardDrive className="w-3.5 h-3.5" />
+                                        <span>No disponible</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ) : (

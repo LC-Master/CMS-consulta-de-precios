@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->string('store_id')->unique()->index();
             $table->string('url')->nullable();
+            $table->string('communication_key')->nullable();
             $table->foreignUuid('placeholder_id')->nullable()->constrained('media');
             $table->timestamp('sync_started_at')->nullable();
             $table->timestamp('sync_ended_at')->nullable();

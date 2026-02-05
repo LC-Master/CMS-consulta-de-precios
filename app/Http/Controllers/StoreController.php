@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Media;
+use ParagonIE\Paseto\Keys\AsymmetricSecretKey;
+use ParagonIE\Paseto\Builder;
+use ParagonIE\Paseto\Purpose;
+use ParagonIE\Paseto\Protocol\Version4;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use App\Models\Store;
+use Illuminate\Support\Facades\Http;
 use App\Enums\SyncStatusEnum;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Facades\Auth;
 use App\Actions\Media\StorePlaceholderAction;
+
 class StoreController extends Controller implements HasMiddleware
 {
     public static function middleware(): array
@@ -90,17 +93,87 @@ class StoreController extends Controller implements HasMiddleware
     }
     public function forceSync(Store $store)
     {
-        // Lógica para forzar la sincronización del store
-        // Por ejemplo, podrías despachar un trabajo o actualizar un campo en la base de datos
+        try {
 
-        return redirect()->back()->with('success', "Sincronización forzada para la tienda: {$store->name}");
+            $url = $store->syncState->getAttribute('url') ?? null;
+            $key = $store->syncState->getAttribute('communication_key') ?? null;
+
+            if (!$url && !$key) {
+                return back()->with('error', "La tienda: {$store->getAttribute('Name')} no tiene URL o clave de comunicación configurada");
+            }
+
+            $response = $this->sendCommand(
+                $key,
+                rtrim($url, '/') . '/api/sync/force',
+                ['force' => true],
+                (string) $store->getKey()
+            );
+
+            if ($response->failed()) {
+                \Log::error('Error al forzar la sincronización.', ['error' => $response->body()]);
+
+                return back()->with('error', "Error al enviar el comando de sincronización para la tienda: {$store->getAttribute('Name')}");
+            }
+            if ($response->successful()) {
+                return back()->with('success', "Sincronización forzada para la tienda: {$store->getAttribute('Name')}");
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error al forzar la sincronización.', ['error' => $e->getMessage()]);
+            return back()->with('error', "Error al forzar la sincronización para la tienda: {$store->getAttribute('Name')}");
+        }
     }
-    public function forcePlaylist(Store $store)
+    public function forceToken(Store $store)
     {
-        // Lógica para forzar la actualización de la playlist del store
-        // Por ejemplo, podrías despachar un trabajo o actualizar un campo en la base de datos
+        try {
+            $url = $store->syncState->getAttribute('url') ?? null;
+            $key = $store->syncState->getAttribute('communication_key') ?? null;
 
-        return redirect()->back()->with('success', "Playlist forzada para la tienda: {$store->name}");
+            if (!$url && !$key) {
+                return back()->with('error', "La tienda: {$store->getAttribute('Name')} no tiene URL o clave de comunicación configurada");
+            }
+
+            $response = $this->sendCommand(
+                $key,
+                rtrim($url, '/') . '/api/sync/force/token',
+                ['generate' => true],
+                (string) $store->getKey()
+            );
+
+            if ($response->failed()) {
+                \Log::error('Error al forzar la generación del token.', ['error' => $response->body()]);
+
+                return back()->with('error', "Error al enviar el comando de generación del token. para la tienda: {$store->getAttribute('Name')}");
+            }
+            if ($response->successful()) {
+                return back()->with('success', "Token generado para la tienda: {$store->getAttribute('Name')}");
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error al forzar la generación del token.', ['error' => $e->getMessage()]);
+            return back()->with('error', "Error al forzar la generación del token para la tienda: {$store->getAttribute('Name')}");
+        }
+    }
+    public function sendCommand(string $key, string $endpoint, array $payload, string $storeId)
+    {
+        $seed = sodium_hex2bin($key);
+
+        $keypair = sodium_crypto_sign_seed_keypair($seed);
+
+        $secretKey = sodium_crypto_sign_secretkey($keypair);
+
+        $privateKey = new AsymmetricSecretKey($secretKey);
+
+        $token = (new Builder())
+            ->setKey($privateKey)
+            ->setVersion(new Version4())
+            ->setPurpose(Purpose::public())
+            ->setIssuedAt()
+            ->setExpiration((new \DateTime())->add(new \DateInterval('PT2H')))
+            ->setClaims([
+                'store_id' => $storeId,
+                'iat' => now()->toIso8601String(),
+            ]);
+        return Http::withToken($token)
+            ->post($endpoint, $payload);
     }
     public function updatePlaceholder(Request $request, Store $store, StorePlaceholderAction $action)
     {

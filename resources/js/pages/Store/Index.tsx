@@ -3,7 +3,7 @@ import { Column } from "@/types/datatable.types";
 import { Store } from "@/types/store/index.type";
 import { Button } from "@headlessui/react";
 import { Head, router } from "@inertiajs/react";
-import { Eye, Pencil, FileSpreadsheet } from "lucide-react";
+import { Eye, Pencil, FileSpreadsheet, AlertCircle } from "lucide-react";
 import { index } from "@/routes/stores";
 import { DataTable } from "@/components/DataTable";
 import { breadcrumbs } from "@/helpers/breadcrumbs";
@@ -27,7 +27,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
     const [status, setStatus] = useState(filters.status || '')
     const { listen, stopListening } = useEcho('monitoring', '.sync.updated', () => router
         .get(window.location.pathname, {}, { preserveState: true, replace: true, preserveScroll: true, fresh: true }))
-
+    console.log(stores)
     useEffect(() => {
         listen()
         return () => {
@@ -106,21 +106,14 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
                             setStoreSelected(a);
                             openErrors();
                         }}
-                        className="flex items-center gap-1.5 px-2 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-md transition-colors text-xs font-medium border border-red-100"
+                        className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-full transition-colors text-xs font-bold border border-red-100 group shadow-sm"
                     >
-                        <span className="material-symbols-outlined text-[14px] filled">error</span>
+                        <AlertCircle className="w-3.5 h-3.5" />
                         <span>{errorCount} {errorCount === 1 ? 'Error' : 'Errores'}</span>
                     </button>
                 );
             }
         },
-        // {
-        //     key: 'status',
-        //     header: 'Estado',
-        //     render: (a) => (
-        //         <PillStatus status={a.status.status} />
-        //     ),
-        // },
         {
             key: 'actions',
             header: 'Acciones',
@@ -141,13 +134,13 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
                         </Button>
                         <Button
                             disabled={!hasUrl}
-                            onClick={() => router.post(`/stores/${a.id}/force-playlist`)}
+                            onClick={() => router.post(`/stores/${a.id}/force-token`)}
                             className={`px-3 h-8 text-xs font-medium text-white rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 ${hasUrl
                                 ? 'bg-locatel-medio hover:bg-locatel-claro focus:ring-locatel-claro'
                                 : 'bg-gray-300 cursor-not-allowed opacity-70'
                                 }`}
                         >
-                            Forzar playlist
+                            Forzar Token
                         </Button>
                         <ActionMenu>
                             <ActionMenu.Item onClick={() => {

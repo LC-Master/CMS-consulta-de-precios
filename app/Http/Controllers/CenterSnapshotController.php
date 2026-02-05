@@ -52,18 +52,19 @@ class CenterSnapshotController extends Controller
     }
     public function health(Request $request)
     {
-        $request->validate([
+        $validated = \Validator::make($request->all(), [
             'syncState' => ['required', 'string', 'in:pending,syncing,success,failed,stale'],
             'start_at' => ['required', 'date'],
             'end_at' => ['nullable', 'date'],
+            'communicationKey' => ['nullable', 'string'],
             'disk.size' => ['required', 'numeric'],
             'disk.free' => ['required', 'numeric'],
             'disk.used' => ['required', 'numeric'],
             'dtoChanged' => ['required', 'boolean'],
-            'uptime' => ['required', 'decimal:1,100'],
+            'uptime' => ['required', 'decimal:1,1000'],
             'mediaCount' => ['required', 'integer'],
             'reported_at' => ['nullable', 'date'],
-            'mediaError' => ['sometimes', 'array'],
+            'mediaError' => ['nullable', 'array'],
             'mediaError.*.id' => ['required_with:mediaError', 'string'],
             'mediaError.*.name' => ['required_with:mediaError', 'string'],
             'mediaError.*.checksum' => ['required_with:mediaError', 'string'],
@@ -72,13 +73,18 @@ class CenterSnapshotController extends Controller
             'mediaError.*.lastErrorAt' => ['required_with:mediaError', 'date'],
         ]);
 
-        \Log::info('point 1', $request->all());
+        if ($validated->fails()) {
+            \Log::error('Errors:', $validated->errors()->toArray());
+
+            return response()->json([
+                'message' => 'Validation Failed',
+            ], 422);
+        }
 
         $report = HealthReportDTO::fromRequest($request);
 
         try {
-            \Log::info('point 2', $request->all());
-
+    
             /** @var \App\Models\Store $store */
             $store = $request->user();
 
@@ -91,17 +97,22 @@ class CenterSnapshotController extends Controller
                     'last_synced_at' => $report->endAt ?? $report->startAt,
                     'sync_started_at' => $report->startAt,
                     'sync_ended_at' => $report->endAt,
-                    'disk' => json_encode([
+                    'disk' => [
                         'size' => $report->disk->size,
                         'free' => $report->disk->free,
                         'used' => $report->disk->used,
-                    ]),
+                    ],
                     'uptimed_at' => $report->uptime,
                     'media_count' => $report->mediaCount,
                     'last_reported_at' => $report->reportedAt,
                 ]
             );
-            \Log::info('point 3', $request->all());
+
+            if ($report->communicationKey !== null) {
+                StoreSyncState::where('store_id', $store->getKey())->update([
+                    'communication_key' => $report->communicationKey,
+                ]);
+            }
 
             if (!empty($report->mediaErrors)) {
                 $errorsArray = array_map(fn(MediaErrorDTO $e) => [
@@ -122,18 +133,15 @@ class CenterSnapshotController extends Controller
             } else {
                 $store->centerMediaErrors()->delete();
             }
-            \Log::info('point 4', $request->all());
 
             StoreSyncUpdated::dispatch('Health check recibida');
-
-            \Log::info('point 5', $request->all());
-
 
             return response()->json([
                 'status' => 'ok',
                 'timestamp' => now()->toIso8601String(),
             ]);
         } catch (\Exception $e) {
+            \Log::error('Error al procesar el informe de estado de salud.', ['error' => $e->getMessage()]);
             return response()->json([
                 'error' => 'Failed to update health status',
                 'timestamp' => now()->toIso8601String(),

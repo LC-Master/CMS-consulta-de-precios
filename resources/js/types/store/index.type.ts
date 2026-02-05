@@ -6,7 +6,11 @@ export interface SyncState {
     url?: string;
     sync_started_at?: string;
     sync_ended_at?: string;
-    disk?: string;
+    disk?: {
+        free: number;
+        used: number;
+        size: number;
+    };
     uptimed_at?: string;
     last_reported_at?: string;
 }
@@ -19,10 +23,14 @@ export interface StoreDetailsModalProps {
 
 
 export interface MediaError {
-    id: number;
-    store_id: number;
-    file_name: string;
-    error_message: string;
+    id: string;
+    store_id: string;
+    name: string;
+    error_type: string;
+    error_count: string;
+    checksum: string;
+    media_id: string;
+    last_seen_at: string;
     created_at: string;
     updated_at: string;
 }

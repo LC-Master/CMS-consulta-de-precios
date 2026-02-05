@@ -32,6 +32,7 @@ readonly class HealthReportDTO
     public function __construct(
         public DiskInfo $disk,
         public Carbon $startAt,
+        public ?string $communicationKey,
         public ?Carbon $endAt,
         public SyncStatusEnum $syncState,
         public bool $dtoChanged,
@@ -63,6 +64,7 @@ readonly class HealthReportDTO
         return new self(
             disk: $disk,
             startAt: Carbon::parse($data['start_at']),
+            communicationKey: $data['communicationKey'],
             endAt: isset($data['end_at']) ? Carbon::parse($data['end_at']) : null,
             syncState: SyncStatusEnum::from($data['syncState']),
             dtoChanged: (bool) ($data['dtoChanged'] ?? false),
@@ -74,8 +76,6 @@ readonly class HealthReportDTO
     }
     public static function getUptimeFormatted($uptime): string
     {
-        return CarbonInterval::seconds($uptime)
-            ->cascade()
-            ->forHumans(['short' => true]);
+        return now()->subSeconds((float) $uptime)->toIso8601String();
     }
 }
