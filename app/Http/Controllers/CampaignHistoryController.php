@@ -93,19 +93,24 @@ class CampaignHistoryController extends Controller
 
     public function clone(Campaign $campaign)
     {
+        $campaign->load(['agreements', 'stores', 'media']);
 
         $newCampaign = $campaign->replicate();
         $newCampaign->setAttribute('deleted_at', null);
         $newCampaign->setAttribute('title', "Copia de {$campaign->getAttribute('title')}");
-        $newCampaign->setAttribute('status_id', Status::where('status', CampaignStatus::DRAFT->value)->first()->getKey());
+        $draftStatus = Status::where('status', CampaignStatus::DRAFT->value)->first();
+        $newCampaign->setAttribute('status_id', $draftStatus ? $draftStatus->getKey() : 1); 
         $newCampaign->setAttribute('start_at', now()->addDay()->startOfDay());
         $newCampaign->setAttribute('end_at', now()->addDays(8)->endOfDay());
         $newCampaign->save();
 
-        $newCampaign->agreements()->attach($campaign->agreements->pluck('id'));
-        $newCampaign->centers()->attach($campaign->centers->pluck('id'));
+        if ($campaign->agreements->isNotEmpty()) {
+            $newCampaign->agreements()->attach($campaign->agreements->pluck('id'));
+        }
 
-        $campaign->load('media');
+        if ($campaign->stores->isNotEmpty()) {
+            $newCampaign->stores()->attach($campaign->stores->pluck('id'));
+        }
 
         foreach ($campaign->media as $mediaItem) {
             $newCampaign->media()->attach($mediaItem->id, [
@@ -116,7 +121,7 @@ class CampaignHistoryController extends Controller
         }
 
         return to_route("campaign.edit", ['campaign' => $newCampaign->getKey()])
-            ->with('success', 'Campaña clonada. Revisa las fechas.');
+            ->with('success', 'Campaña clonada. Revisa las fechas y tiendas.');
     }
 
     public function calendar()
