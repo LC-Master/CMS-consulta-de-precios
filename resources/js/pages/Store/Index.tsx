@@ -25,7 +25,8 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
     const { ToastContainer } = useToast(flash);
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
-    const { listen, stopListening } = useEcho('monitoring', '.sync.updated', () => router.reload())
+    const { listen, stopListening } = useEcho('monitoring', '.sync.updated', () => router
+        .get(window.location.pathname, {}, { preserveState: true, replace: true, preserveScroll: true, fresh: true }))
 
     useEffect(() => {
         listen()

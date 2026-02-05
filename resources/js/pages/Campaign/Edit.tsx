@@ -38,7 +38,7 @@ export default function CampaignEdit({ departments, stores, agreements, media, f
         title: campaign.title || '',
         start_at: campaign.start_at ? new Date(campaign.start_at).toISOString().slice(0, 16) : '',
         end_at: campaign.end_at ? new Date(campaign.end_at).toISOString().slice(0, 16) : '',
-        stores: campaign.stores ? campaign.stores.map(store => store.ID) : [],
+        stores: campaign.stores ? campaign.stores.map(store => store.id) : [],
         department_id: String(campaign.department_id || ''),
         agreements: campaign.agreements ? campaign.agreements.map(agreement => agreement.id) : [],
         am_media: campaign.media.filter(item => item.slot === 'am').map(item => item.id) || [],

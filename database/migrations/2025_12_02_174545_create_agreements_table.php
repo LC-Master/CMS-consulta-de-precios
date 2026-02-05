@@ -20,6 +20,10 @@ return new class extends Migration {
             $table->string('contact_phone')->nullable();
             $table->boolean('is_active')->default(true);
             $table->text('observations')->nullable();
+                $table->integer('supplier_id')->nullable();
+            $table->foreign('supplier_id')
+                  ->references('ID')
+                  ->on('Supplier');
             $table->softDeletes();
 
             $table->index('is_active');

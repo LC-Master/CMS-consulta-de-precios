@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Store;
 
 class CenterMediaError extends Model
 {
@@ -18,12 +19,12 @@ class CenterMediaError extends Model
         'last_seen_at',
     ];
 
-    public function center()
+    public function store()
     {
-        return $this->belongsTo(Center::class);
+        return $this->belongsToMany(Store::class, 'store_id', 'ID');
     }
     public function media()
     {
-        return $this->belongsTo(Media::class, 'media_id', 'id', 'media');
+        return $this->belongsTo(Media::class);
     }
 }
