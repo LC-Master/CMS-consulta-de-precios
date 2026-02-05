@@ -9,7 +9,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-} from '@/components/ui/sidebar'; 
+} from '@/components/ui/sidebar';
 import { create as agreementCreate, index as agreement } from '@/routes/agreement';
 import { index, create } from '@/routes/campaign';
 import { index as indexActivityLog } from '@/routes/logs';
@@ -24,6 +24,7 @@ import { lazy } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { dashboard } from '@/routes';
 import { list as reportList } from '@/routes/campaign/report';
+import { index as indexStore } from '@/routes/stores';
 
 const Logo = lazy(() => import('@/components/app-logo'));
 
@@ -107,6 +108,11 @@ export function AppSidebar() {
 
 
     const footerNavItems = [
+        can('store.list') ? {
+            title: 'Tiendas',
+            href: indexStore().url,
+            icon: List,
+        } : undefined,
         can('media.list') ? {
             title: 'Listado de Medios',
             href: media().url,

@@ -3,44 +3,43 @@
 namespace App\Http\Requests\Agreement;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rule; // <--- Importante
 
 class UpdateAgreementRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
+            'supplier_id' => 'nullable|integer',
+
             'name' => [
                 'required',
                 'string',
                 'max:155',
                 Rule::unique('agreements', 'name')
-                    ->ignore($this->route('agreement')->id ?? $this->route('agreement')),
+                    ->ignore($this->route('agreement')->id ?? $this->route('agreement'))
+                    ->withoutTrashed(),
             ],
+            
             'legal_name' => ['required', 'string', 'max:155'],
+            
             'tax_id' => [
                 'required',
                 'string',
                 'max:20',
                 Rule::unique('agreements', 'tax_id')
-                    ->ignore($this->route('agreement')->id ?? $this->route('agreement')),
+                    ->ignore($this->route('agreement')->id ?? $this->route('agreement'))
+                    ->withoutTrashed(),
             ],
+
             'contact_person' => ['required', 'string', 'max:255'],
             'contact_email' => ['required', 'string', 'email:rfc,dns', 'max:255'],
-            'contact_phone' => ['required', 'string', 'digits_between:10,20'],
+            'contact_phone' => ['required', 'string'],
             'is_active' => ['required', 'boolean'],
             'observations' => ['required', 'string', 'max:1000'],
         ];
@@ -49,10 +48,12 @@ class UpdateAgreementRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'supplier_id.integer' => 'El identificador del proveedor debe ser un número entero.',
+            
             'name.required' => 'El nombre del acuerdo es obligatorio.',
             'name.string' => 'El nombre del acuerdo debe ser texto.',
             'name.max' => 'El nombre del acuerdo no debe exceder los 155 caracteres.',
-            'name.unique' => 'Ya existe un acuerdo con este nombre.',
+            'name.unique' => 'Ya existe un acuerdo ACTIVO con este nombre.',
 
             'is_active.required' => 'El estado es obligatorio.',
             'is_active.boolean' => 'El estado debe ser verdadero o falso.',
@@ -64,7 +65,7 @@ class UpdateAgreementRequest extends FormRequest
             'tax_id.required' => 'El RIF es obligatorio.',
             'tax_id.string' => 'El RIF debe ser texto.',
             'tax_id.max' => 'El RIF no debe exceder los 20 caracteres.',
-            'tax_id.unique' => 'Este RIF ya se encuentra registrado en el sistema.',
+            'tax_id.unique' => 'Este RIF ya se encuentra registrado y ACTIVO en el sistema.',
 
             'contact_person.required' => 'La persona de contacto es obligatoria.',
             'contact_person.string' => 'La persona de contacto debe ser texto.',
@@ -80,12 +81,12 @@ class UpdateAgreementRequest extends FormRequest
             'contact_phone.min' => 'El teléfono debe tener al menos 10 dígitos.',
             'contact_phone.max' => 'El teléfono no debe exceder los 20 dígitos.',
 
-            // observations
             'observations.required' => 'Los detalles del acuerdo son obligatorios',
             'observations.string' => 'Los detalles del acuerdo deben ser texto.',
             'observations.max'    => 'Los detalles del acuerdo no deben exceder los 1000 caracteres.',
         ];
     }
+
     public function attributes(): array
     {
         return [

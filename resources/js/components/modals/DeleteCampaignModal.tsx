@@ -19,7 +19,6 @@ export default function DeleteCampaignModal({ isOpen, campaignId, closeDeleteMod
         return () => clearTimeout(id);
     }, [isOpen]);
 
-    // Run countdown only while modal is open
     useEffect(() => {
         if (!isOpen || count === 0) return;
         const timer = setTimeout(() => setCount(c => c - 1), ms('1s'));

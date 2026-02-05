@@ -62,7 +62,7 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
                 'Título de la Campaña',
                 'Fecha Inicio',
                 'Fecha Fin',
-                'Departamento / Categoria',
+                'Departamento / Categoría',
                 'Estatus',
                 'Usuario Creador',
                 'Acuerdos Asociados',
@@ -83,7 +83,7 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
             $campaign->department?->name ?? 'N/A', 
             $campaign->status?->status ?? 'Sin Estatus',
             $campaign->user?->name ?? 'Sistema',
-            $agreementsList, // Aquí mostramos la lista de acuerdos
+            $agreementsList,
         ];
     }
 
@@ -108,9 +108,6 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
 
     public function styles(Worksheet $sheet)
     {
-        // el rango hasta la columna G (7 columnas en total)
-        
-        // Título Principal
         $sheet->mergeCells('A1:G1'); 
         $sheet->getRowDimension(1)->setRowHeight(60);
         
@@ -135,7 +132,6 @@ class CampaignsExport implements FromQuery, WithHeadings, WithMapping, WithStyle
             'borders' => [
                 'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']],
             ],
-            // Alineación superior para celdas con múltiples líneas (como los acuerdos)
             'alignment' => ['vertical' => Alignment::VERTICAL_TOP, 'wrapText' => true],
         ]);
 

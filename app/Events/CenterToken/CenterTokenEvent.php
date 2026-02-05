@@ -2,7 +2,7 @@
 
 namespace App\Events\CenterToken;
 
-use App\Models\Center;
+use App\Models\Store;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -19,7 +19,7 @@ class CenterTokenEvent
      * Create a new event instance.
      */
     public function __construct(
-        public Center $center,
+        public Store $store,
         public string $type,
         public string $tokenName
     ) {
