@@ -7,5 +7,5 @@ use App\Http\Controllers\CenterSnapshotController;
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/centers/snapshots', [CenterSnapshotController::class, 'show']);
     Route::post('/center/health', [CenterSnapshotController::class, 'health']);
-    Route::get('/media/{media}', [MediaController::class, 'download']);
+    Route::get('/media/{media}', [CenterSnapshotController::class, 'download']);
 });

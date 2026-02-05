@@ -1,6 +1,7 @@
 import React from 'react';
 import Modal from '../Modal';
 import { MediaError } from '@/types/store/index.type';
+import { AlertCircle, X, CheckCircle, FileWarning, Clock, Hash } from 'lucide-react';
 
 interface MediaErrorsModalProps {
     isOpen: boolean;
@@ -13,69 +14,109 @@ export default function MediaErrorsModal({ isOpen, onClose, errors, storeName }:
     if (!isOpen) return null;
 
     return (
-        <Modal closeModal={onClose} actionWhenCloseTouchOutside={onClose} blur={false}>
-            <div className="bg-white dark:bg-[#20200e] text-[#1c1c0d] dark:text-white flex flex-col max-h-[90vh] w-full max-w-2xl mx-auto rounded-lg overflow-hidden shadow-xl">
-
-                {/* Header */}
-                <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-red-50/50 dark:bg-red-900/10">
-                    <div className="flex items-center gap-3">
-                        <div className="size-8 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center text-red-600 dark:text-red-400">
-                            <span className="material-symbols-outlined text-lg">error_outline</span>
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-bold text-red-700 dark:text-red-400">Errores de Media</h2>
-                            <p className="text-xs text-gray-500">{storeName || 'Tienda'}</p>
-                        </div>
+        <Modal 
+            closeModal={onClose} 
+            actionWhenCloseTouchOutside={onClose} 
+            blur={true}
+            className="p-0 bg-white overflow-hidden max-w-4xl w-full rounded-xl shadow-2xl"
+        >
+            {/* Header */}
+            <div className="bg-red-50/50 px-6 py-4 flex items-center justify-between border-b border-red-100">
+                <div className="flex items-center gap-4">
+                    <div className="p-2 bg-red-100 rounded-lg text-red-600">
+                        <AlertCircle className="w-6 h-6" />
                     </div>
-                    <button onClick={onClose} className="size-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors">
-                        <span className="material-symbols-outlined text-sm">close</span>
-                    </button>
-                </header>
+                    <div>
+                        <h2 className="text-lg font-bold text-gray-900">Errores de Media</h2>
+                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{storeName || 'Tienda'}</p>
+                    </div>
+                </div>
+                <button 
+                    onClick={onClose} 
+                    className="p-2 rounded-full hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors"
+                >
+                    <X className="w-5 h-5" />
+                </button>
+            </div>
 
-                {/* Content */}
-                <div className="p-0 overflow-y-auto">
-                    {!errors || errors.length === 0 ? (
-                        <div className="p-10 flex flex-col items-center justify-center text-center text-gray-400">
-                            <span className="material-symbols-outlined text-4xl mb-2 text-green-500">check_circle</span>
-                            <p>No se encontraron errores de media registrados.</p>
+            {/* Content */}
+            <div className="max-h-[70vh] overflow-y-auto">
+                {!errors || errors.length === 0 ? (
+                    <div className="py-16 flex flex-col items-center justify-center text-center text-gray-400">
+                        <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-4">
+                            <CheckCircle className="w-8 h-8 text-green-500" />
                         </div>
-                    ) : (
+                        <h3 className="text-gray-900 font-medium mb-1">Todo en orden</h3>
+                        <p className="text-sm">No se encontraron errores de media registrados.</p>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
-                            <thead className="text-xs text-gray-500 uppercase bg-gray-50 dark:bg-gray-800/50 sticky top-0">
+                            <thead className="bg-gray-50 text-xs text-gray-500 uppercase font-semibold sticky top-0 z-10 shadow-sm">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3">Archivo</th>
-                                    <th scope="col" className="px-6 py-3">Mensaje de Error</th>
-                                    <th scope="col" className="px-6 py-3">Fecha</th>
+                                    <th className="px-6 py-3 whitespace-nowrap">Archivo / Checksum</th>
+                                    <th className="px-6 py-3 whitespace-nowrap">Tipo de Error</th>
+                                    <th className="px-6 py-3 text-center whitespace-nowrap">Frecuencia</th>
+                                    <th className="px-6 py-3 whitespace-nowrap">Última incidencia</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                            <tbody className="divide-y divide-gray-100">
                                 {errors.map((error) => (
-                                    <tr key={error.id} className="bg-white dark:bg-[#20200e] hover:bg-gray-50 dark:hover:bg-gray-800/30">
-                                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                                            {error.file_name || 'Desconocido'}
+                                    <tr key={error.id} className="bg-white hover:bg-gray-50 transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-start gap-3">
+                                                <FileWarning className="w-5 h-5 text-gray-400 mt-0.5 shrink-0 group-hover:text-red-500 transition-colors" />
+                                                <div className="min-w-0">
+                                                    <p className="font-medium text-gray-900 truncate max-w-50 md:max-w-xs" title={error.name || error.file_name}>
+                                                        {error.name || error.file_name || 'Desconocido'}
+                                                    </p>
+                                                    <div className="flex items-center gap-1 mt-1">
+                                                        <Hash className="w-3 h-3 text-gray-300" />
+                                                        <code className="text-[10px] text-gray-500 bg-gray-100 px-1 py-0.5 rounded font-mono truncate max-w-30" title={error.checksum}>
+                                                            {error.checksum}
+                                                        </code>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4 text-red-600 dark:text-red-400 max-w-xs truncate" title={error.error_message}>
-                                            {error.error_message}
+                                        <td className="px-6 py-4">
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100">
+                                                {error.error_type || error.error_message || 'Error General'}
+                                            </span>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-500 whitespace-nowrap">
-                                            {new Date(error.created_at).toLocaleString()}
+                                        <td className="px-6 py-4 text-center">
+                                            <div className="inline-flex flex-col items-center justify-center">
+                                                 <span className="text-lg font-bold text-gray-700">{error.error_count || 1}</span>
+                                                 <span className="text-[10px] text-gray-400 uppercase">veces</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2 text-gray-500">
+                                                <Clock className="w-3.5 h-3.5" />
+                                                <span className="text-xs whitespace-nowrap">
+                                                    {error.last_seen_at 
+                                                        ? new Date(error.last_seen_at).toLocaleString('es-VE', { dateStyle: 'medium', timeStyle: 'short' })
+                                                        : new Date(error.created_at).toLocaleString('es-VE', { dateStyle: 'medium', timeStyle: 'short' })
+                                                    }
+                                                </span>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
-                    )}
-                </div>
+                    </div>
+                )}
+            </div>
 
-                {/* Footer */}
-                <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-[#1a1a0c] flex justify-end">
-                    <button
-                        onClick={onClose}
-                        className="px-6 py-2 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-transparent dark:border-gray-700 dark:hover:bg-gray-800 rounded-full font-medium text-sm transition-colors"
-                    >
-                        Cerrar
-                    </button>
-                </div>
+            {/* Footer */}
+            <div className="bg-gray-50 px-6 py-4 flex justify-end items-center border-t border-gray-200">
+                <button
+                    onClick={onClose}
+                    className="px-6 py-2 bg-white border border-gray-300 hover:bg-gray-50 hover:text-gray-900 text-gray-700 rounded-full font-bold text-sm transition-all shadow-sm hover:shadow"
+                >
+                    Cerrar listado
+                </button>
             </div>
         </Modal>
     );

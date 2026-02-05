@@ -39,7 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn(\App\Exceptions\MediaInUseException $e, $request)
             => back()->with('error', $e->getMessage()));
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
-            if (app()->environment('local') && in_array($response->getStatusCode(), [500, 503, 404, 403])) {
+            if (app()->environment('local') && in_array($response->getStatusCode(), [ 404, 403])) {
                 return Inertia::render('error', ['status' => $response->getStatusCode()])
                     ->toResponse($request)
                     ->setStatusCode($response->getStatusCode());
