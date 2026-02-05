@@ -3,20 +3,17 @@
 use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ThumbnailController;
+use App\Models\Store;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityLogController;
-use App\Http\Controllers\CenterController;
+use App\Http\Controllers\SupplierController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/', fn() => redirect()->route('campaign.index'))
         ->name('home')
         ->middleware('permission:campaign.list');
-
-    Route::get('/centers', [CenterController::class, 'index'])
-        ->name('centers.index')
-        ->middleware('permission:center.list');
 
     Route::get('dashboard', [DashboardController::class, 'index'])
         ->name('dashboard')
@@ -39,6 +36,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('agreement', AgreementController::class);
 
+    Route::get('/api/suppliers/search', [SupplierController::class, 'search'])
+    ->name('api.suppliers.search');
+
     Route::get('thumbnail/cdn/{thumbnail}', [ThumbnailController::class, 'show'])
         ->name('thumbnail.cdn');
 });
@@ -52,3 +52,4 @@ Route::get(
 require __DIR__ . '/campaign.php';
 require __DIR__ . '/admin.php';
 require __DIR__ . '/settings.php';
+require __DIR__ . '/store.php';

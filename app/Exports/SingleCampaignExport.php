@@ -128,14 +128,14 @@ class SingleCampaignExport implements WithTitle, WithDrawings, WithEvents
                 $currentCenterRow = $startListRow;
                 $currentAgreeRow = $startListRow;
                 
-                if ($campaign->centers->isEmpty()) {
+                if ($campaign->stores->isEmpty()) {
                     $sheet->setCellValue("B$currentCenterRow", "Sin centros asignados");
                     $sheet->mergeCells("B$currentCenterRow:C$currentCenterRow");
                     $currentCenterRow++;
                 } else {
-                    foreach ($campaign->centers as $center) {
-                        $sheet->setCellValue("B$currentCenterRow", $center->code);
-                        $sheet->setCellValue("C$currentCenterRow", $center->name);
+                    foreach ($campaign->stores as $store) {
+                        $sheet->setCellValue("B$currentCenterRow", $store->ID);
+                        $sheet->setCellValue("C$currentCenterRow", $store->Name);
                         $currentCenterRow++;
                     }
                 }

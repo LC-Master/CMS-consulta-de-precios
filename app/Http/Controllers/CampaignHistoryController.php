@@ -10,69 +10,79 @@ use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Models\Store;
 use App\Exports\CalendarVisualExport;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Storage;
 
 class CampaignHistoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Campaign::withTrashed()->with([
-            'status:id,status',
-            'department:id,name',
-            'agreements:id,name'
-        ]);
+        try {
+            $query = Campaign::withTrashed()->with([
+                'status:id,status',
+                'department:id,name',
+                'agreements:id,name'
+            ]);
 
-        $query->where(function ($q) {
-            $q->whereHas('status', fn($sq) =>
-            $sq->where('status', CampaignStatus::FINISHED->value)->orWhere('status', CampaignStatus::CANCELLED->value))
-                ->orWhereNotNull('deleted_at');
-        });
+            $query->where(function ($q) {
+                $q->whereHas('status', fn($sq) =>
+                    $sq->where('status', CampaignStatus::FINISHED->value)->orWhere('status', CampaignStatus::CANCELLED->value))
+                    ->orWhereNotNull('deleted_at');
+            });
 
-        if ($request->filled('search')) {
-            $query->where('title', 'like', "%{$request->input('search')}%");
-        }
-
-        if ($request->filled('ended_at')) {
-            $query->whereDate('end_at', '<=', $request->input('ended_at'));
-        }
-
-        if ($request->filled('started_at')) {
-            $query->whereDate('start_at', '>=', $request->input('started_at'));
-        }
-
-        if ($request->filled('status')) {
-            $status = $request->input('status');
-            if ($status === 'deleted') {
-                $query->onlyTrashed();
-            } else {
-                $query->where('status_id', $status);
+            if ($request->filled('search')) {
+                $query->where('title', 'like', "%{$request->input('search')}%");
             }
+
+            if ($request->filled('ended_at')) {
+                $query->whereDate('end_at', '<=', $request->input('ended_at'));
+            }
+
+            if ($request->filled('started_at')) {
+                $query->whereDate('start_at', '>=', $request->input('started_at'));
+            }
+
+            if ($request->filled('status')) {
+                $status = $request->input('status');
+                if ($status === 'deleted') {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status_id', $status);
+                }
+            }
+
+            $statuses = Status::where('status', '=', value: CampaignStatus::FINISHED->value)
+                ->orWhere('status', '=', value: CampaignStatus::CANCELLED->value)->get(['id', 'status']);
+
+            return Inertia::render('CampaignHistory/Index', [
+                'campaigns' => Inertia::scroll($query->latest()->paginate(10)->withQueryString()),
+                'filters' => $request->only(['search', 'status', 'ended_at', 'started_at']),
+                'statuses' => $statuses
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error en Historial de Campañas: " . $e->getMessage());
+            return back()->with('error', 'Error interno');
         }
-
-        $statuses = Status::where('status', '=', value: CampaignStatus::FINISHED->value)
-            ->orWhere('status', '=', value: CampaignStatus::CANCELLED->value)->get(['id', 'status']);
-
-        return Inertia::render('CampaignHistory/Index', [
-            'campaigns' => Inertia::scroll($query->latest()->paginate(10)->withQueryString()),
-            'filters' => $request->only(['search', 'status', 'ended_at', 'started_at']),
-            'statuses' => $statuses
-        ]);
     }
     public function show(Campaign $campaign)
     {
-        $campaign->load([
-            'status:id,status',
-            'department:id,name',
-            'agreements' => fn($query) => $query->withTrashed()->select('id', 'name', 'deleted_at'),
-            'centers:id,name,code',
-            'media:id,name,mime_type,duration_seconds',
-        ])->makeHidden(['status_id', 'department_id', 'agreement_id', 'updated_by', 'user_id', 'updated_at']);
+        try {
+            $campaign->load([
+                'status:id,status',
+                'department:id,name',
+                'agreements' => fn($query) => $query->withTrashed()->select('id', 'name', 'deleted_at'),
+                'stores:ID,Name,StoreCode',
+                'media:id,name,mime_type,duration_seconds',
+            ])->makeHidden(['status_id', 'department_id', 'agreement_id', 'updated_by', 'user_id', 'updated_at']);
 
-        return Inertia::render('CampaignHistory/Show', [
-            'campaign' => $campaign,
-        ]);
+            return Inertia::render('CampaignHistory/Show', [
+                'campaign' => $campaign,
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error en ver detalle de Campaña: " . $e->getMessage());
+            return back()->with('error', 'Error interno');
+        }
     }
     public function restore(Campaign $campaign)
     {
@@ -83,19 +93,24 @@ class CampaignHistoryController extends Controller
 
     public function clone(Campaign $campaign)
     {
+        $campaign->load(['agreements', 'stores', 'media']);
 
         $newCampaign = $campaign->replicate();
         $newCampaign->setAttribute('deleted_at', null);
         $newCampaign->setAttribute('title', "Copia de {$campaign->getAttribute('title')}");
-        $newCampaign->setAttribute('status_id', Status::where('status', CampaignStatus::DRAFT->value)->first()->getKey());
+        $draftStatus = Status::where('status', CampaignStatus::DRAFT->value)->first();
+        $newCampaign->setAttribute('status_id', $draftStatus ? $draftStatus->getKey() : 1); 
         $newCampaign->setAttribute('start_at', now()->addDay()->startOfDay());
         $newCampaign->setAttribute('end_at', now()->addDays(8)->endOfDay());
         $newCampaign->save();
 
-        $newCampaign->agreements()->attach($campaign->agreements->pluck('id'));
-        $newCampaign->centers()->attach($campaign->centers->pluck('id'));
+        if ($campaign->agreements->isNotEmpty()) {
+            $newCampaign->agreements()->attach($campaign->agreements->pluck('id'));
+        }
 
-        $campaign->load('media');
+        if ($campaign->stores->isNotEmpty()) {
+            $newCampaign->stores()->attach($campaign->stores->pluck('id'));
+        }
 
         foreach ($campaign->media as $mediaItem) {
             $newCampaign->media()->attach($mediaItem->id, [
@@ -106,7 +121,7 @@ class CampaignHistoryController extends Controller
         }
 
         return to_route("campaign.edit", ['campaign' => $newCampaign->getKey()])
-            ->with('success', 'Campaña clonada. Revisa las fechas.');
+            ->with('success', 'Campaña clonada. Revisa las fechas y tiendas.');
     }
 
     public function calendar()
@@ -114,10 +129,12 @@ class CampaignHistoryController extends Controller
         try {
             $now = now();
 
+            $stores = Store::getStoresByGroup();
+
             $campaigns = Campaign::with([
                 'status:id,status',
                 'department:id,name',
-                'centers:id,name',
+                'stores:ID,Name',
                 'agreements' => fn($query) => $query->withTrashed()->select('id', 'name', 'deleted_at'),
             ])
                 ->whereYear('start_at', $now->year)
@@ -138,17 +155,19 @@ class CampaignHistoryController extends Controller
                         'extendedProps' => [
                             'department' => $c->department->name ?? 'N/A',
                             'agreements' => $c->agreements->pluck('name')->toArray(),
-                            'centers' => $c->centers->pluck('name')->toArray(),
+                            'store_ids' => $c->stores->pluck('ID')->map(fn($id) => (string) $id)->toArray(),
+                            'centers' => $c->stores->pluck('Name')->toArray(),
                         ]
                     ];
                 });
 
             return Inertia::render('CampaignHistory/Calendar', [
-                'campaigns' => $campaigns
+                'campaigns' => $campaigns,
+                'stores' => $stores
             ]);
         } catch (\Exception $e) {
             Log::error("Error en Calendario: " . $e->getMessage());
-            return back()->with('error', 'Error interno: ' . $e->getMessage());
+            return back()->with('error', 'Error interno');
         }
     }
 
@@ -161,9 +180,9 @@ class CampaignHistoryController extends Controller
         $image = $request->input('image');
         $image = str_replace('data:image/png;base64,', '', $image);
         $image = str_replace(' ', '+', $image);
-        
+
         $imageName = 'temp_calendar_' . uniqid() . '.png';
-        
+
         $path = storage_path('app/public/' . $imageName);
         file_put_contents($path, base64_decode($image));
 

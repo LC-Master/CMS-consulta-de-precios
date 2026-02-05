@@ -25,11 +25,11 @@ return [
         'campaign.update',
         'campaign.delete',
 
-        'center.list',
-        'center.show',
-        'center.create',
-        'center.update',
-        'center.delete',
+        'store.list',
+        'store.show',
+        'store.create',
+        'store.update',
+        'store.delete',
 
         'campaign.activate',
         'campaign.cancel',
@@ -64,11 +64,11 @@ return [
             'media.upload',
 
             'log.list',
-            'center.list',
-            'center.show',
-            'center.create',
-            'center.update',
-            'center.delete',
+            'store.list',
+            'store.show',
+            'store.create',
+            'store.update',
+            'store.delete',
             'user.list',
             'user.show',
             'user.create',
@@ -110,7 +110,7 @@ return [
         'consultor' => [
             'log.list',
             'media.upload',
-            'center.list',
+            'store.list',
             'user.list',
             'user.show',
 
@@ -136,11 +136,11 @@ return [
 
             'log.list',
 
-            'center.list',
-            'center.show',
-            'center.create',
-            'center.update',
-            'center.delete',
+            'store.list',
+            'store.show',
+            'store.create',
+            'store.update',
+            'store.delete',
 
             'campaign.list',
             'campaign.show',

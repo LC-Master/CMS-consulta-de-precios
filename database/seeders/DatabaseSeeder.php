@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Center;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -16,23 +15,17 @@ class DatabaseSeeder extends Seeder
     {
         User::factory(10)->create();
 
-        Center::create([
-            'name' => 'Todo',
-            'code' => 'CTR-0001',
-        ]);
-        
         $this->call([
             RolesPermissionsSeeder::class,
             StatusSeeder::class,
             DepartmentSeeder::class,
-            ProviderSeeder::class,
             AgreementSeeder::class,
-            DeviceSeeder::class,
             CampaignSeeder::class,
             MediaSeeder::class,
             CampaignAgreementSeeder::class,
             TimeLineItemSeeder::class,
             TokenSeeder::class,
+            StorePlaceHolderSeeder::class,
         ]);
         User::firstOrCreate(
             ['email' => 'test@example.com'],

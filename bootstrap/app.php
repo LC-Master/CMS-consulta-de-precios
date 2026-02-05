@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
+        channels: __DIR__.'/../routes/channels.php',
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
@@ -38,7 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(fn(\App\Exceptions\MediaInUseException $e, $request)
             => back()->with('error', $e->getMessage()));
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
-            if (app()->environment('local') && in_array($response->getStatusCode(), [500, 503, 404, 403])) {
+            if (app()->environment('local') && in_array($response->getStatusCode(), [ 404, 403])) {
                 return Inertia::render('error', ['status' => $response->getStatusCode()])
                     ->toResponse($request)
                     ->setStatusCode($response->getStatusCode());

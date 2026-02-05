@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Store;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use App\Models\Center;
 use Illuminate\Database\Seeder;
 class TokenSeeder extends Seeder
 {
@@ -12,21 +12,20 @@ class TokenSeeder extends Seeder
      */
     public function run(): void
     {
-        $centers = Center::all();
+        $stores = Store::all();
 
-        if ($centers->isEmpty()) {
-            $this->command->error("No se encontraron centros. Por favor, ejecuta primero el CenterSeeder.");
+        if ($stores->isEmpty()) {
+            $this->command->error("No se encontraron centros. Por favor, ejecuta primero el storeSeeder.");
             return;
         }
 
-        $this->command->info("Generando tokens para " . $centers->count() . " centros...");
+        $this->command->info("Generando tokens para " . $stores->count() . " centros...");
+        foreach ($stores as $store) {
+            $store->tokens()->delete();
 
-        foreach ($centers as $center) {
-            $center->tokens()->delete();
+            $tokenResult = $store->createToken("api-token-{$store->store_code}");
 
-            $tokenResult = $center->createToken("api-token-{$center->code}");
-
-            $this->command->line("Centro: <info>{$center->name}</info> | Token: <comment>{$tokenResult->plainTextToken}</comment>");
+            $this->command->line("Centro: <info>{$store->name}</info> | Token: <comment>{$tokenResult->plainTextToken}</comment>");
         }
 
         $this->command->info("¡Proceso finalizado con éxito!");
