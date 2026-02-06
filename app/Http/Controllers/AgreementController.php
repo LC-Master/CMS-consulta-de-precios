@@ -119,13 +119,37 @@ class AgreementController extends Controller implements HasMiddleware
         ->orderBy('SupplierName')
         ->get();
 
+        $defaultSuppliers->transform(function ($supplier) {
+            foreach ($supplier->getAttributes() as $key => $value) {
+                if (is_string($value)) {
+                    // Forzar conversión a UTF-8
+                    $supplier->{$key} = mb_convert_encoding($value, 'UTF-8', 'UTF-8'); 
+                }
+            }
+            return $supplier;
+        });
+
+        foreach ($agreement->getAttributes() as $key => $value) {
+             if (is_string($value)) {
+                 $agreement->{$key} = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+             }
+        }
+
         $currentSupplier = null;
         if ($agreement->supplier_id) {
-            // Buscamos por el ID entero
             $currentSupplier = Supplier::find($agreement->supplier_id);
             
-            if ($currentSupplier && !$defaultSuppliers->contains('id', $currentSupplier->id)) {
-                $defaultSuppliers->push($currentSupplier);
+            // Asegurarnos de limpiar también este proveedor específico si se encontró
+            if ($currentSupplier) {
+                foreach ($currentSupplier->getAttributes() as $key => $value) {
+                    if (is_string($value)) {
+                        $currentSupplier->{$key} = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                    }
+                }
+
+                if (!$defaultSuppliers->contains('id', $currentSupplier->id)) {
+                    $defaultSuppliers->push($currentSupplier);
+                }
             }
         }
 
