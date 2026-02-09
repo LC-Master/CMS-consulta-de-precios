@@ -28,7 +28,6 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
     const [status, setStatus] = useState(filters.status || '')
     const { listen, stopListening } = useEcho('monitoring', '.sync.updated', () => router
         .get(window.location.pathname, {}, { preserveState: true, replace: true, preserveScroll: true, fresh: true }))
-    console.log(stores)
     useEffect(() => {
         listen()
         return () => {
