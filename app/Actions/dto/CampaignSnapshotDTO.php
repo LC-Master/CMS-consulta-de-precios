@@ -30,7 +30,7 @@ class CampaignSnapshotDTO
                 'id' => $store->syncState->placeholder->id ?? null,
                 'name' => $store->syncState->placeholder->name ?? null,
                 'checksum' => $store->syncState->placeholder->checksum ?? null,
-                'duration_seconds' => $store->syncState->placeholder->duration_seconds ?? 0,
+                'duration_seconds' => (int) $store->syncState->placeholder->duration_seconds ?? 0,
                 'position' => 0,
             ] ?? null,
             'campaigns' => [],

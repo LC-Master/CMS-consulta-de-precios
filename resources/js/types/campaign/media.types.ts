@@ -1,4 +1,4 @@
-import { MediaItem } from "./index.types"
+import { MediaItem } from "../media/index.type"
 
 export type MediaColumnProps = {
     title: string

@@ -8,6 +8,7 @@ import InputError from '../input-error';
 import SyncStatusPill from '../SyncStatusPill';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { formatDate } from '@/helpers/mediaTools';
 
 
 export default function StoreDetailsModal({ isOpen, onClose, store }: StoreDetailsModalProps) {
@@ -25,18 +26,6 @@ export default function StoreDetailsModal({ isOpen, onClose, store }: StoreDetai
     }, [store, setData]);
 
     if (!isOpen || !store) return null;
-
-    const formatDate = (dateString?: string) => {
-        if (!dateString) return 'No disponible';
-        return new Date(dateString).toLocaleString('es-VE', {
-            day: 'numeric',
-            month: 'numeric',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
-    };
 
     const formatBytes = (bytes: number, decimals = 2) => {
         if (!+bytes) return '0 Bytes';
