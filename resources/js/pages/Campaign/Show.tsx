@@ -13,6 +13,7 @@ import { show } from "@/routes/agreement";
 import { cdn } from "@/routes/media";
 
 export default function CampaignShow({ campaign }: { campaign: CampaignExtended }) {
+    console.log(campaign)
     const mediaAM = campaign.media
         .filter(m => m.pivot.slot === "am")
         .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));
