@@ -14,6 +14,7 @@ import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 import { Filter } from "@/components/Filter";
 import { Plus } from "lucide-react";
 import CreateCenterToken from "@/components/modals/CreateCenterToken";
+import { formatDate } from "@/helpers/mediaTools";
 
 export default function CenterTokensIndex({ stores, centerTokens, flash, filters }: Props) {
     const [tokenId, setTokenId] = useState<number | null>(null);
@@ -51,12 +52,12 @@ export default function CenterTokensIndex({ stores, centerTokens, flash, filters
         {
             key: 'last_used_at',
             header: 'Último uso',
-            render: (ct) => ct.last_used_at ? new Date(ct.last_used_at).toLocaleString() : 'Nunca',
+            render: (ct) => ct.last_used_at ? formatDate(ct.last_used_at) : 'Nunca',
         },
         {
             key: 'created_at',
             header: 'Creado',
-            render: (ct) => new Date(ct.created_at).toLocaleString(),
+            render: (ct) => formatDate(ct.created_at),
         },
         {
             key: 'actions',

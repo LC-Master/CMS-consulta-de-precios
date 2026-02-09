@@ -18,6 +18,7 @@ import { StatusCampaignEnum } from '@/enums/statusCampaignEnum';
 import DeleteCampaignModal from '@/components/modals/DeleteCampaignModal';
 import CancelCampaignModal from '@/components/modals/CancelCampaignModal';
 import { ActionMenu } from '@/components/ui/ActionMenu';
+import { formatDate } from '@/helpers/mediaTools';
 
 export default function CampaignsIndex({ campaigns, filters = {}, statuses = [], flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
@@ -43,26 +44,12 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
         {
             key: 'start_at',
             header: 'Inicio',
-            render: (a) => new Date(a.start_at).toLocaleString('es-ES', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            }),
+            render: (a) => formatDate(a.start_at)
         },
         {
             key: 'end_at',
             header: 'Fin',
-            render: (a) => new Date(a.end_at).toLocaleString('es-ES', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            }),
+            render: (a) => formatDate(a.end_at)
         },
         {
             key: 'actions',

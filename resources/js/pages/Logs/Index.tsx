@@ -3,6 +3,7 @@ import { Filter } from "@/components/Filter";
 import AuditModal from "@/components/modals/AuditModal";
 import { Button } from "@/components/ui/button";
 import { breadcrumbs } from "@/helpers/breadcrumbs";
+import { formatDate } from "@/helpers/mediaTools";
 import { LEVEL_STYLES, SUBJECT_CONFIG } from "@/helpers/styleModals";
 import useModal from "@/hooks/use-modal";
 import { useUpdateEffect } from "@/hooks/useUpdateEffect";
@@ -103,10 +104,10 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
             render: (log) => (
                 <div className="flex flex-col items-center text-center">
                     <span className="text-sm font-bold text-gray-700">
-                        {new Date(log.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}
+                        {formatDate(log.created_at, { year: 'numeric', month: 'short', day: 'numeric' })}
                     </span>
                     <span className="text-[10px] text-gray-400 font-medium">
-                        {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {formatDate(log.created_at, { hour: '2-digit', minute: '2-digit' })}
                     </span>
                 </div>
             ),
@@ -133,7 +134,7 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
             { preserveState: true, replace: true, preserveScroll: true }
         )
     }, [search, element])
-    
+
     return (
         <AppLayout breadcrumbs={breadcrumbs('Logs de actividad', index().url)}>
             <Head title="Logs de actividad" />

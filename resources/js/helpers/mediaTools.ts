@@ -9,12 +9,12 @@ export const formatBytes = (bytes: number | string, decimals = 2) => {
 }
 export function mediaNameNormalizer(name: string) {
     const cleanName = name.replace(/_/g, ' ').toLowerCase().split('.')[0];
-    
+
     return cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
 }
-export function formatDate(date?: string) {
+export function formatDate(date?: string | number | Date, options: Intl.DateTimeFormatOptions = {}) {
     if (!date) return "-";
-    return new Date(date).toLocaleString();
+    return new Date(date.toString().split('.')[0]).toLocaleString([], options);
 }
 
 export function isVideo(mime_type: string) {

@@ -20,6 +20,7 @@ import MediaErrorsModal from "@/components/modals/MediaErrorsModal";
 import SyncStatusPill from "@/components/SyncStatusPill";
 import { useEcho } from "@laravel/echo-react";
 import { SYNC_STATUS_TRANSLATIONS } from "@/i18n/sync-status";
+import { formatDate } from "@/helpers/mediaTools";
 
 export default function StoreIndex({ stores, filters = {}, flash }: Props) {
     const { ToastContainer } = useToast(flash);
@@ -27,7 +28,6 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
     const [status, setStatus] = useState(filters.status || '')
     const { listen, stopListening } = useEcho('monitoring', '.sync.updated', () => router
         .get(window.location.pathname, {}, { preserveState: true, replace: true, preserveScroll: true, fresh: true }))
-    console.log(stores)
     useEffect(() => {
         listen()
         return () => {
@@ -79,14 +79,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
                         <SyncStatusPill status={syncState.sync_status} />
                         {syncState.last_synced_at && (
                             <span className="text-[10px] text-gray-500 font-medium">
-                                {new Date(syncState.last_synced_at).toLocaleString('es-VE', {
-                                    day: 'numeric',
-                                    month: 'numeric',
-                                    year: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    hour12: true
-                                })}
+                                {formatDate(syncState.last_synced_at, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                             </span>
                         )}
                     </div>

@@ -12,10 +12,11 @@ import { breadcrumbs } from '@/helpers/breadcrumbs'
 import useModal from '@/hooks/use-modal'
 import UserActionModal from '@/components/modals/UserActionModal'
 import useToast from '@/hooks/use-toast'
+import { formatDate } from '@/helpers/mediaTools'
 
-export default function UsersIndex({ users, filters = {}, flash }: Props) { 
+export default function UsersIndex({ users, filters = {}, flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
-    
+
     const { ToastContainer } = useToast(flash);
 
     const { isOpen, closeModal, openModal } = useModal(false)
@@ -49,11 +50,10 @@ export default function UsersIndex({ users, filters = {}, flash }: Props) {
             key: 'status',
             header: 'Estatus',
             render: (u) => (
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    !u.deleted_at 
-                    ? 'bg-green-100 text-green-800 border border-green-200' 
-                    : 'bg-red-100 text-red-800 border border-red-200'
-                }`}>
+                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${!u.deleted_at
+                        ? 'bg-green-100 text-green-800 border border-green-200'
+                        : 'bg-red-100 text-red-800 border border-red-200'
+                    }`}>
                     {!u.deleted_at ? 'Activo' : 'Inactivo'}
                 </span>
             ),
@@ -61,14 +61,7 @@ export default function UsersIndex({ users, filters = {}, flash }: Props) {
         {
             key: 'created_at',
             header: 'Fecha Registro',
-            render: (u) => new Date(u.created_at).toLocaleString('es-ES', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            }),
+            render: (u) => formatDate(u.created_at, { year: 'numeric', month: 'short', day: 'numeric' }),
         },
         {
             key: 'actions',
@@ -115,10 +108,10 @@ export default function UsersIndex({ users, filters = {}, flash }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Lista de usuarios', index().url)}>
-            
+
             {ToastContainer()}
 
-            <UserActionModal 
+            <UserActionModal
                 isOpen={isOpen}
                 closeModal={closeModal}
                 userId={selectedUserId}

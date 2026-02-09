@@ -1,7 +1,7 @@
-import React from 'react';
 import Modal from '../Modal';
 import { MediaError } from '@/types/store/index.type';
 import { AlertCircle, X, CheckCircle, FileWarning, Clock, Hash } from 'lucide-react';
+import { formatDate } from '@/helpers/mediaTools';
 
 interface MediaErrorsModalProps {
     isOpen: boolean;
@@ -14,9 +14,9 @@ export default function MediaErrorsModal({ isOpen, onClose, errors, storeName }:
     if (!isOpen) return null;
 
     return (
-        <Modal 
-            closeModal={onClose} 
-            actionWhenCloseTouchOutside={onClose} 
+        <Modal
+            closeModal={onClose}
+            actionWhenCloseTouchOutside={onClose}
             blur={true}
             className="p-0 bg-white overflow-hidden max-w-4xl w-full rounded-xl shadow-2xl"
         >
@@ -31,8 +31,8 @@ export default function MediaErrorsModal({ isOpen, onClose, errors, storeName }:
                         <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{storeName || 'Tienda'}</p>
                     </div>
                 </div>
-                <button 
-                    onClick={onClose} 
+                <button
+                    onClick={onClose}
                     className="p-2 rounded-full hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors"
                 >
                     <X className="w-5 h-5" />
@@ -67,8 +67,8 @@ export default function MediaErrorsModal({ isOpen, onClose, errors, storeName }:
                                             <div className="flex items-start gap-3">
                                                 <FileWarning className="w-5 h-5 text-gray-400 mt-0.5 shrink-0 group-hover:text-red-500 transition-colors" />
                                                 <div className="min-w-0">
-                                                    <p className="font-medium text-gray-900 truncate max-w-50 md:max-w-xs" title={error.name || error.file_name}>
-                                                        {error.name || error.file_name || 'Desconocido'}
+                                                    <p className="font-medium text-gray-900 truncate max-w-50 md:max-w-xs" title={error.name}>
+                                                        {error.name || 'Desconocido'}
                                                     </p>
                                                     <div className="flex items-center gap-1 mt-1">
                                                         <Hash className="w-3 h-3 text-gray-300" />
@@ -81,22 +81,22 @@ export default function MediaErrorsModal({ isOpen, onClose, errors, storeName }:
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100">
-                                                {error.error_type || error.error_message || 'Error General'}
+                                                {error.error_type || 'Error General'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-center">
                                             <div className="inline-flex flex-col items-center justify-center">
-                                                 <span className="text-lg font-bold text-gray-700">{error.error_count || 1}</span>
-                                                 <span className="text-[10px] text-gray-400 uppercase">veces</span>
+                                                <span className="text-lg font-bold text-gray-700">{error.error_count || 1}</span>
+                                                <span className="text-[10px] text-gray-400 uppercase">veces</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2 text-gray-500">
                                                 <Clock className="w-3.5 h-3.5" />
                                                 <span className="text-xs whitespace-nowrap">
-                                                    {error.last_seen_at 
-                                                        ? new Date(error.last_seen_at).toLocaleString('es-VE', { dateStyle: 'medium', timeStyle: 'short' })
-                                                        : new Date(error.created_at).toLocaleString('es-VE', { dateStyle: 'medium', timeStyle: 'short' })
+                                                    {error.last_seen_at
+                                                        ? formatDate(error.last_seen_at)
+                                                        : formatDate(error.created_at)
                                                     }
                                                 </span>
                                             </div>
