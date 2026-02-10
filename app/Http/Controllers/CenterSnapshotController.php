@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use App\DTOs\HealthReportDTO;
 use App\DTOs\MediaErrorDTO;
+use Carbon\Carbon;
 
 class CenterSnapshotController extends Controller
 {
@@ -84,27 +85,36 @@ class CenterSnapshotController extends Controller
         $report = HealthReportDTO::fromRequest($request);
 
         try {
-    
+
             /** @var \App\Models\Store $store */
             $store = $request->user();
-
+        
             StoreSyncState::updateOrCreate(
                 [
                     'store_id' => $store->getKey(),
                 ],
                 [
-                    'sync_status' => $report->syncState,
-                    'last_synced_at' => $report->endAt ?? $report->startAt,
-                    'sync_started_at' => $report->startAt,
-                    'sync_ended_at' => $report->endAt,
+                    'last_synced_at' => Carbon::parse($report->endAt ?? $report->startAt)
+                        ->setTimezone('America/Caracas')
+                        ->format('Y-m-d H:i:s.v'),
+                    'sync_started_at' => Carbon::parse($report->startAt)
+                        ->setTimezone('America/Caracas')
+                        ->format('Y-m-d H:i:s.v'),
+                    'sync_ended_at' => $report->endAt
+                        ? Carbon::parse($report->endAt)->setTimezone('America/Caracas')->format('Y-m-d H:i:s.v')
+                        : null,
+                    'uptimed_at' => Carbon::parse($report->uptime)
+                        ->setTimezone('America/Caracas')
+                        ->format('Y-m-d H:i:s.v'),
+                    'last_reported_at' => $report->reportedAt
+                        ? Carbon::parse($report->reportedAt)->setTimezone('America/Caracas')->format('Y-m-d H:i:s.v')
+                        : null,
                     'disk' => [
                         'size' => $report->disk->size,
                         'free' => $report->disk->free,
                         'used' => $report->disk->used,
                     ],
-                    'uptimed_at' => $report->uptime,
                     'media_count' => $report->mediaCount,
-                    'last_reported_at' => $report->reportedAt,
                 ]
             );
 

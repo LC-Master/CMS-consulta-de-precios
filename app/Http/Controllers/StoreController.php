@@ -58,7 +58,7 @@ class StoreController extends Controller implements HasMiddleware
                         'sync_ended_at' => $store->syncState->sync_ended_at,
                         'disk' => $store->syncState->disk,
                         'uptimed_at' => $store->syncState->uptimed_at,
-                        'last_reported_at' => now(),
+                        'last_reported_at' => now()->format('Y-m-d H:i:s'),
                         'placeholder' => $store->syncState->placeholder ? [
                             'id' => $store->syncState->placeholder->id,
                             'mime_type' => $store->syncState->placeholder->mime_type,

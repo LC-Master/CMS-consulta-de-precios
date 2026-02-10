@@ -24,11 +24,6 @@ class StoreSyncState extends Model
     ];
     protected $casts = [
         'disk' => 'array',
-        'sync_started_at' => 'datetime',
-        'sync_ended_at' => 'datetime',
-        'uptimed_at' => 'datetime',
-        'last_synced_at' => 'datetime',
-        'last_reported_at' => 'datetime',
     ];
     public function store()
     {

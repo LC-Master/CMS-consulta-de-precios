@@ -34,7 +34,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
             stopListening()
         }
     }, [listen, stopListening])
-
+    console.log(stores)
     const { closeModal, isOpen, openModal } = useModal(false)
 
     const { closeModal: closeDetails, isOpen: isDetailsOpen, openModal: openDetails } = useModal(false)

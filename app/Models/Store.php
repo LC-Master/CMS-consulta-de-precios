@@ -29,16 +29,7 @@ class Store extends Model
         'country',
         'fax_number',
         'phone_number',
-        // 'inactive',
     ];
-    // protected $fillable = [
-    //     "Region",
-    //     "City",
-    //     "Country",
-    //     "FaxNumber",
-    //     "PhoneNumber",
-    //     "Inactive"
-    // ];
 
     protected $hidden = [
         "Region",
