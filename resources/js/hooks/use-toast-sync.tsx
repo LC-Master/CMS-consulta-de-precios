@@ -30,7 +30,10 @@ export default function useToastSync(flash: { status: SyncStatusEnum; message: s
     }, [flash]);
 
     const ToastComponent = (
-        <ToastContainer containerId={containerId} />
+        <ToastContainer 
+            containerId={containerId} 
+            style={{ zIndex: 100000, marginTop: '4rem' }} 
+        />
     );
     return { ToastContainer: () => ToastComponent };
 }

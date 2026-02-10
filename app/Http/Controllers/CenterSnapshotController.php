@@ -13,6 +13,10 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use App\DTOs\HealthReportDTO;
 use App\DTOs\MediaErrorDTO;
 use Carbon\Carbon;
+use App\Notifications\StoreSyncNotification; // Added
+use App\Models\User; // Added
+use App\Enums\SyncStatusEnum; // Added
+use Illuminate\Support\Facades\Notification; // Added
 
 class CenterSnapshotController extends Controller
 {
@@ -145,6 +149,11 @@ class CenterSnapshotController extends Controller
             }
 
             StoreSyncUpdated::dispatch($report->syncState, $store->getAttribute('Name'));
+
+            $recipients = User::role(['admin', 'supervisor'])->get();
+            if ($recipients->isNotEmpty()) {
+                Notification::send($recipients, new StoreSyncNotification($store->getAttribute('Name'), status: $report->syncState));
+            }
 
             return response()->json([
                 'status' => 'ok',
