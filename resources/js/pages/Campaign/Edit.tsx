@@ -57,7 +57,9 @@ export default function CampaignEdit({ departments, stores, agreements, media, f
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        put(update({ id: campaign.id }).url)
+        put(update({ id: campaign.id }).url, {
+            preserveScroll: true
+        })
     }
 
     return (
@@ -116,7 +118,6 @@ export default function CampaignEdit({ departments, stores, agreements, media, f
                                     value={data.start_at}
                                     required
                                     onChange={e => setData('start_at', e.target.value)}
-                                    // CORRECCIÓN: Alineación del icono
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio text-left [&::-webkit-calendar-picker-indicator]:ml-auto [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                                 />
                                 <InputError message={errors.start_at} />
@@ -130,7 +131,6 @@ export default function CampaignEdit({ departments, stores, agreements, media, f
                                     value={data.end_at}
                                     required
                                     onChange={e => setData('end_at', e.target.value)}
-                                    // CORRECCIÓN: Alineación del icono
                                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio text-left [&::-webkit-calendar-picker-indicator]:ml-auto [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                                 />
                                 <InputError message={errors.end_at} />
