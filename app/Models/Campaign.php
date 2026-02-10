@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Traits\FixSqlServerDates;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +21,7 @@ class Campaign extends Model
     use HasFactory;
     use SoftDeletes;
     use HasUuids;
+    use FixSqlServerDates;
 
     public $old_media_files;
     public $old_agreements;
@@ -37,15 +37,6 @@ class Campaign extends Model
         'updated_by',
     ];
 
-    protected $casts = [
-        'start_at' => 'datetime',
-        'end_at' => 'datetime',
-    ];
-
-    /**
-     * MUTADOR para start_at
-     * Se ejecuta automáticamente al hacer $model->start_at = 'valor';
-     */
     protected static function booted()
     {
         static::creating(function ($campaign) {
@@ -69,22 +60,7 @@ class Campaign extends Model
     {
         return $this->belongsTo(User::class);
     }
-    protected function startAt(): Attribute
-    {
-        return Attribute::make(
-            set: fn($value) => Carbon::parse($value)->format('Y-m-d H:i:s'),
-        );
-    }
 
-    /**
-     * MUTADOR para end_at
-     */
-    protected function endAt(): Attribute
-    {
-        return Attribute::make(
-            set: fn($value) => Carbon::parse($value)->format('Y-m-d H:i:s'),
-        );
-    }
     public function timeLineItems()
     {
         return $this->hasMany(TimeLineItem::class);

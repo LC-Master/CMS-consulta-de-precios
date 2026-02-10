@@ -24,6 +24,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Label } from '@/components/ui/label'
 import { MediaItem } from '@/types/media/index.type'
 import GroupedSelect from '@/components/ui/GroupedSelect'
+import { formatForEdit } from '@/helpers/mediaTools'
 
 export default function CampaignEdit({ departments, stores, agreements, media, flash, campaign }: CampaignEditProps) {
     const { mediaList, setMediaList, pm, setPm, am, setAm } = useMediaSync(media);
@@ -33,11 +34,10 @@ export default function CampaignEdit({ departments, stores, agreements, media, f
     const ToastComponent = useToast(flash)
     const { moveDown, moveUp, transfer, removeItem } = useMediaActions<MediaItem>()
     const { handlerSearch, search, filteredItems } = useSearch<MediaItem>(mediaList)
-    
     const { data, setData, processing, errors, put, transform, cancel } = useForm({
         title: campaign.title || '',
-        start_at: campaign.start_at ? new Date(campaign.start_at).toISOString().slice(0, 16) : '',
-        end_at: campaign.end_at ? new Date(campaign.end_at).toISOString().slice(0, 16) : '',
+        start_at: formatForEdit(campaign.start_at),
+        end_at: formatForEdit(campaign.end_at),
         stores: campaign.stores ? campaign.stores.map(store => store.id) : [],
         department_id: String(campaign.department_id || ''),
         agreements: campaign.agreements ? campaign.agreements.map(agreement => agreement.id) : [],
