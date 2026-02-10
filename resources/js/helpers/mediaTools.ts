@@ -12,11 +12,20 @@ export function mediaNameNormalizer(name: string) {
 
     return cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
 }
-export function formatDate(date?: string | number | Date, options: Intl.DateTimeFormatOptions = {}) {
+export function formatDate(date?: string | number | Date, options: Intl.DateTimeFormatOptions = {timeZone:'America/Caracas'}) {
     if (!date) return "-";
-    return new Date(date.toString().split('.')[0]).toLocaleString([], options);
+    return new Date(date).toLocaleString(['es-VE'], options);
 }
 
 export function isVideo(mime_type: string) {
     return mime_type.startsWith("video");
 }
+export const formatForEdit = (dateStr) => {
+    if (!dateStr) return '';
+
+    const localDate = new Date(dateStr).toLocaleString('sv-SE', {
+        timeZone: 'America/Caracas'
+    });
+
+    return localDate.replace(' ', 'T').substring(0, 16);
+};

@@ -5,7 +5,7 @@ namespace App\Actions\dto;
 use App\Enums\CampaignStatus;
 use App\Models\Store;
 use App\Models\Campaign;
-
+use Carbon\Carbon;
 class CampaignSnapshotDTO
 {
     /**
@@ -43,8 +43,8 @@ class CampaignSnapshotDTO
                 'status' => $c->status?->status,
                 'department' => $c->department?->name,
                 'agreements' => $c->agreements?->map(fn($a) => $a->name)->all(),
-                'start_at' => $c->start_at?->toIso8601String(),
-                'end_at' => $c->end_at?->toIso8601String(),
+                'start_at' => Carbon::parse($c->start_at)->toIso8601String(),
+                'end_at' => Carbon::parse($c->end_at)->toIso8601String(),
                 'media' => collect($c->media)
                     ->map(fn($m) => [
                         'id' => $m->id,

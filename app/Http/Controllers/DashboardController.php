@@ -54,7 +54,7 @@ class DashboardController extends Controller
         $mediaPerMonth = array_map(function ($ym) use ($mediaQuery) {
             return isset($mediaQuery[$ym]) ? (int) $mediaQuery[$ym] : 0;
         }, $months);
-        
+
         $active = Campaign::where('start_at', '<=', $now)->where('end_at', '>=', $now)->count();
         $pending = Campaign::where('start_at', '>', $now)->count();
         $finished = Campaign::where('end_at', '<', $now)->count();
@@ -75,9 +75,9 @@ class DashboardController extends Controller
             ->map(fn($c) => [
                 'id' => $c->id,
                 'title' => $c->title,
-                'created_at' => $c->created_at->toDateTimeString(),
-                'start_at' => $c->start_at?->toDateTimeString(),
-                'end_at' => $c->end_at?->toDateTimeString(),
+                'created_at' => $c->created_at,
+                'start_at' => $c->start_at,
+                'end_at' => $c->end_at,
                 'user' => $c->user?->name,
             ])->toArray();
 
