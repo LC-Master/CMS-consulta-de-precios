@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\FixSqlServerDates;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class CenterSnapshot extends Model
 {
 
-    use HasUuids;
+    use HasUuids, FixSqlServerDates;
     protected $fillable = [
         'store_id',
         'snapshot_json',

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\FixSqlServerDates;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class StoreSyncState extends Model
 {
     use HasUuids;
-
+    use FixSqlServerDates;
     protected $fillable = [
         'store_id',
         'url',

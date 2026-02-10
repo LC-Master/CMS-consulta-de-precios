@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\FixSqlServerDates;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use App\Models\Agreement;
@@ -9,7 +10,8 @@ use App\Models\Agreement;
 class Supplier extends Model
 {
     use HasUuids;
-
+    use FixSqlServerDates;
+    
     protected $table = 'Supplier';
     
     protected $primaryKey = 'id'; 

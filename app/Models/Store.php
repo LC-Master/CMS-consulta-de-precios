@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\FixSqlServerDates;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
@@ -10,6 +11,7 @@ use App\Models\StoreSyncState;
 class Store extends Model
 {
     use HasApiTokens;
+    use FixSqlServerDates;
 
     protected $table = 'Store';
     protected $primaryKey = 'ID';
