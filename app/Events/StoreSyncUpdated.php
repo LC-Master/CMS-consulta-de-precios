@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enums\SyncStatusEnum;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -17,7 +18,7 @@ class StoreSyncUpdated implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public string $message)
+    public function __construct(public SyncStatusEnum $status, public string $store_name)
     {
         //
     }
@@ -40,7 +41,8 @@ class StoreSyncUpdated implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'message' => $this->message,
+            'status' => $this->status->value,
+            'store_name' => $this->store_name,
         ];
     }
 }

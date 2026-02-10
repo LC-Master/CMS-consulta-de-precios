@@ -144,7 +144,7 @@ class CenterSnapshotController extends Controller
                 $store->centerMediaErrors()->delete();
             }
 
-            StoreSyncUpdated::dispatch('Health check recibida');
+            StoreSyncUpdated::dispatch($report->syncState, $store->getAttribute('Name'));
 
             return response()->json([
                 'status' => 'ok',

@@ -2,7 +2,6 @@
 
 namespace App\DTOs;
 use Carbon\Carbon;
-use Carbon\CarbonInterval;
 use App\Enums\SyncStatusEnum;
 use Illuminate\Http\Request;
 

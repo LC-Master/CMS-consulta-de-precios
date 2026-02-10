@@ -21,20 +21,27 @@ import SyncStatusPill from "@/components/SyncStatusPill";
 import { useEcho } from "@laravel/echo-react";
 import { SYNC_STATUS_TRANSLATIONS } from "@/i18n/sync-status";
 import { formatDate } from "@/helpers/mediaTools";
+import useToastSync from "@/hooks/use-toast-sync";
+import { SyncStatusEnum } from "@/enums/SyncStatusEnum";
 
 export default function StoreIndex({ stores, filters = {}, flash }: Props) {
     const { ToastContainer } = useToast(flash);
+    const [syncFlash, setSyncFlash] = useState<{ status: SyncStatusEnum; message: string } | undefined>(undefined);
+    const { ToastContainer: SyncToastContainer } = useToastSync(syncFlash)
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
-    const { listen, stopListening } = useEcho('monitoring', '.sync.updated', () => router
-        .get(window.location.pathname, {}, { preserveState: true, replace: true, preserveScroll: true, fresh: true }))
+    const { listen, stopListening } = useEcho('monitoring', '.sync.updated', (e) => {
+        console.log(e)
+        setSyncFlash({ status: e.status, message: `Tienda ${e.store_name}: ${SYNC_STATUS_TRANSLATIONS[e.status]}` })
+    })
+
     useEffect(() => {
         listen()
         return () => {
             stopListening()
         }
     }, [listen, stopListening])
-    console.log(stores)
+
     const { closeModal, isOpen, openModal } = useModal(false)
 
     const { closeModal: closeDetails, isOpen: isDetailsOpen, openModal: openDetails } = useModal(false)
@@ -170,6 +177,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Lista de Tiendas', index().url)}>
+            {SyncToastContainer()}
             {ToastContainer()}
             <PlaceHolderMangerModal isOpen={isOpen} store={storeSelected} onClose={closeModal} />
             <StoreDetailsModal isOpen={isDetailsOpen} store={storeSelected} onClose={closeDetails} />
