@@ -31,8 +31,11 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
     const { listen, stopListening } = useEcho('monitoring', '.sync.updated', (e) => {
-        console.log(e)
         setSyncFlash({ status: e.status, message: `Tienda ${e.store_name}: ${SYNC_STATUS_TRANSLATIONS[e.status]}` })
+        router.reload({
+            async: true,
+            reset: ['stores']
+        })
     })
 
     useEffect(() => {
