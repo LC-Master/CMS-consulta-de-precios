@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Models\User;
 
 class StoreSyncNotification extends Notification implements ShouldQueue
 {
@@ -19,7 +20,14 @@ class StoreSyncNotification extends Notification implements ShouldQueue
         public string $storeName,
         public SyncStatusEnum $status
     ) {}
+    public static function  sendToAdmins(string $storeName, SyncStatusEnum $status){
+        $users = User::role(['admin','supervisor'])->get();
 
+        \Illuminate\Support\Facades\Notification::send(
+            $users,
+            new self($storeName, $status)
+        );
+    }
     /**
      * Get the notification's delivery channels.
      *

@@ -14,11 +14,11 @@ class CleanOldMedia extends Command
 
     protected $signature = 'media:clean-old';
 
-    protected $description = 'Elimina archivos media y thumbnails de más de 3 meses que no estén asociados a campañas Activas o Borradores.';
+    protected $description = 'if there are media files that are older than 3 months and not associated with active or draft campaigns, they will be deleted from storage and the database. This command is intended to run monthly to keep the media storage clean and optimized.';
 
     public function handle()
     {
-        $this->info('Iniciando limpieza de archivos antiguos...');
+        $this->info('Starting cleanup of old media files...');
 
         $cutOffDate = now()->subMonths(3)->startOfDay();
 
@@ -30,35 +30,35 @@ class CleanOldMedia extends Command
         $mediasToDelete = Media::where('created_at', '<=', $cutOffDate)
             ->whereDoesntHave('campaigns', function (Builder $query) use ($protectedStatuses) {
                 $query->whereNull('deleted_at')
-                      ->whereHas('status', function (Builder $q) use ($protectedStatuses) {
-                          $q->whereIn('status', $protectedStatuses);
-                      });
+                    ->whereHas('status', function (Builder $q) use ($protectedStatuses) {
+                        $q->whereIn('status', $protectedStatuses);
+                    });
             })
-            ->with('thumbnail') 
+            ->with('thumbnail')
             ->get();
 
         $count = $mediasToDelete->count();
 
         if ($count === 0) {
-            $this->info('No hay archivos antiguos elegibles para eliminar.');
+            $this->info('No old media files eligible for deletion.');
             return;
         }
 
-        $this->info("Se encontraron {$count} archivos elegibles para eliminación.");
+        $this->info("Found {$count} media files eligible for deletion.");
 
         $bar = $this->output->createProgressBar($count);
         $bar->start();
 
         $deletedCount = 0;
         $errorsCount = 0;
-
+        /** @var \App\Models\Media $media */
         foreach ($mediasToDelete as $media) {
             try {
                 if ($media->path && Storage::disk('public')->exists($media->path)) {
                     Storage::disk('public')->delete($media->path);
                 }
 
-                if ($media->thumbnail && $media->thumbnail->path && Storage::disk('public')->exists($media->thumbnail->path)) {
+                if ($media?->thumbnail && Storage::disk('public')->exists($media->thumbnail->path)) {
                     Storage::disk('public')->delete($media->thumbnail->path);
                     $media->thumbnail->delete();
                 }
@@ -69,7 +69,7 @@ class CleanOldMedia extends Command
 
                 $deletedCount++;
             } catch (\Exception $e) {
-                Log::error("Error eliminando media ID {$media->id}: " . $e->getMessage());
+                Log::error("Error deleting media ID {$media->id}: " . $e->getMessage());
                 $errorsCount++;
             }
 
@@ -78,8 +78,8 @@ class CleanOldMedia extends Command
 
         $bar->finish();
         $this->newLine();
-        $this->info("Proceso finalizado. Eliminados: {$deletedCount}. Errores: {$errorsCount}.");
-        
-        Log::info("Limpieza de media ejecutada. Eliminados: {$deletedCount}. Errores: {$errorsCount}.");
+        $this->info("Cleanup process completed. Deleted: {$deletedCount}. Errors: {$errorsCount}.");
+
+        Log::info("Media cleanup executed. Deleted: {$deletedCount}. Errors: {$errorsCount}.");
     }
 }

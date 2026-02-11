@@ -6,19 +6,27 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-
-class ConsultorOfflineNotification extends Notification
+use App\Models\User;
+class ConsultorOfflineNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(public string $name, public string $failHour)
     {
         //
     }
+    public static function sendToAdmins(string $name, string $failHour)
+    {
+        $admins = User::role(['admin', 'supervisor'])->get();
 
+        \Illuminate\Support\Facades\Notification::send(
+            $admins,
+            new self($name, $failHour)
+        );
+    }
     /**
      * Get the notification's delivery channels.
      *
@@ -26,7 +34,7 @@ class ConsultorOfflineNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -35,9 +43,17 @@ class ConsultorOfflineNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
+            ->subject("Alerta de sincronización: tienda \"{$this->name}\" no sincronizó en el horario programado")
+            ->greeting('Estimado/a,')
+            ->line("Se ha detectado que la tienda \"{$this->name}\" no completó la sincronización en el horario previsto.")
+            ->line("Horario previsto de sincronización: {$this->failHour}")
+            ->line('Acciones recomendadas:')
+            ->line('• Verifique la conexión de red de la tienda.')
+            ->line('• Revise los registros de sincronización y reintente el proceso si procede.')
+            ->line('Si necesita asistencia adicional, contacte al equipo de soporte de CMS Locatel.')
+            ->level('error')
+            ->action('Ver listado de tiendas', url('/stores'))
+            ->salutation('Atentamente,\nEquipo CMS Locatel');
     }
 
     /**
@@ -48,7 +64,8 @@ class ConsultorOfflineNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'name' => $this->name,
+            'failHour' => $this->failHour
         ];
     }
 }

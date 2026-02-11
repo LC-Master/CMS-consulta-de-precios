@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\StoreSyncState;
 
+/**
+ * Summary of Store
+ * @property-read \App\Models\StoreSyncState|null $syncState
+ */
 class Store extends Model
 {
     use HasApiTokens;

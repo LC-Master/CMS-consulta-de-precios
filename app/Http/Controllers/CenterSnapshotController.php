@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\dto\CampaignSnapshotDTO;
+use App\Http\Requests\StoreHealthRequest;
 use App\Models\CenterSnapshot;
 use App\Models\StoreSyncState;
 use Illuminate\Http\Request;
@@ -13,10 +14,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use App\DTOs\HealthReportDTO;
 use App\DTOs\MediaErrorDTO;
 use Carbon\Carbon;
-use App\Notifications\StoreSyncNotification; // Added
-use App\Models\User; // Added
-use App\Enums\SyncStatusEnum; // Added
-use Illuminate\Support\Facades\Notification; // Added
+use App\Notifications\StoreSyncNotification;
 
 class CenterSnapshotController extends Controller
 {
@@ -55,44 +53,14 @@ class CenterSnapshotController extends Controller
             ], 500);
         }
     }
-    public function health(Request $request)
+    public function health(StoreHealthRequest $request)
     {
-        $validated = \Validator::make($request->all(), [
-            'syncState' => ['required', 'string', 'in:pending,syncing,success,failed,stale'],
-            'start_at' => ['required', 'date'],
-            'end_at' => ['nullable', 'date'],
-            'communicationKey' => ['nullable', 'string'],
-            'disk.size' => ['required', 'numeric'],
-            'disk.free' => ['required', 'numeric'],
-            'disk.used' => ['required', 'numeric'],
-            'dtoChanged' => ['required', 'boolean'],
-            'uptime' => ['required', 'decimal:1,1000'],
-            'mediaCount' => ['required', 'integer'],
-            'reported_at' => ['nullable', 'date'],
-            'mediaError' => ['nullable', 'array'],
-            'mediaError.*.id' => ['required_with:mediaError', 'string'],
-            'mediaError.*.name' => ['required_with:mediaError', 'string'],
-            'mediaError.*.checksum' => ['required_with:mediaError', 'string'],
-            'mediaError.*.errorType' => ['required_with:mediaError', 'string'],
-            'mediaError.*.errorCount' => ['required_with:mediaError', 'integer'],
-            'mediaError.*.lastErrorAt' => ['required_with:mediaError', 'date'],
-        ]);
-
-        if ($validated->fails()) {
-            \Log::error('Errors:', $validated->errors()->toArray());
-
-            return response()->json([
-                'message' => 'Validation Failed',
-            ], 422);
-        }
-
         $report = HealthReportDTO::fromRequest($request);
-
         try {
 
             /** @var \App\Models\Store $store */
             $store = $request->user();
-        
+
             StoreSyncState::updateOrCreate(
                 [
                     'store_id' => $store->getKey(),
@@ -147,13 +115,12 @@ class CenterSnapshotController extends Controller
             } else {
                 $store->centerMediaErrors()->delete();
             }
+            $store->syncState->processHealthReport($report);
 
             StoreSyncUpdated::dispatch($report->syncState, $store->getAttribute('Name'));
 
-            $recipients = User::role(['admin', 'supervisor'])->get();
-            if ($recipients->isNotEmpty()) {
-                Notification::send($recipients, new StoreSyncNotification($store->getAttribute('Name'), status: $report->syncState));
-            }
+            StoreSyncNotification::sendToAdmins($store->getAttribute('Name'), status: $report->syncState);
+
 
             return response()->json([
                 'status' => 'ok',
