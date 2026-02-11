@@ -2,6 +2,7 @@
 
 use App\Console\Commands\LowDiskSpace;
 use Illuminate\Foundation\Inspiring;
+use App\Console\Commands\CheckDeadSyncs;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 use App\Console\Commands\CheckStoreSyncStatus;
@@ -12,6 +13,7 @@ $margin = 30;
 $morning = Carbon::createFromFormat('H:i', config('services.syncMorningStart'))->addMinutes($margin)->format('H:i');
 $afternoon = Carbon::createFromFormat('H:i', config('services.syncAfternoonStart'))->addMinutes($margin)->format('H:i');
 
+Schedule::command(CheckDeadSyncs::class)->everyTenMinutes();
 Schedule::command(CheckStoreSyncStatus::class)->dailyAt($morning);
 Schedule::command(CheckStoreSyncStatus::class)->dailyAt($afternoon);
 Schedule::command(LowDiskSpace::class)->dailyAt('7:00');
