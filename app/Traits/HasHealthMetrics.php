@@ -5,6 +5,7 @@ namespace App\Traits;
 use App\DTOs\HealthReportDTO;
 use App\Enums\SyncStatusEnum;
 use App\Notifications\Alerts\StoreSyncAlertNotification;
+use Illuminate\Support\Facades\Log;
 
 trait HasHealthMetrics
 {
@@ -13,7 +14,7 @@ trait HasHealthMetrics
      */
     public function processHealthReport(HealthReportDTO $data)
     {
-        $status = $data->syncState ?? SyncStatusEnum::PENDING->value;
+        $status = $data->syncState->value;
         $error = $data->errorMessage ?? null;
 
         if ($status === SyncStatusEnum::SUCCESS->value) {
@@ -28,7 +29,6 @@ trait HasHealthMetrics
     protected function handleSyncSuccess()
     {
         $this->sync_status = SyncStatusEnum::SUCCESS->value;
-        $this->sync_retries = 0;
         $this->last_sync_error = null;
         $this->last_synced_at = now();
     }
@@ -39,11 +39,11 @@ trait HasHealthMetrics
         $this->last_sync_error = $error;
         $this->last_error_at = now();
 
-        $this->sendCriticalAlert();
+        $this->sendCriticalAlert($error);
     }
 
-    protected function sendCriticalAlert()
+    protected function sendCriticalAlert(string $error)
     {
-        StoreSyncAlertNotification::sendToAdmin($this->store_id, $this->last_sync_error ?? 'Error desconocido');
+        StoreSyncAlertNotification::sendToAdmin($this->store_id, $error ?? 'Error desconocido');
     }
 }

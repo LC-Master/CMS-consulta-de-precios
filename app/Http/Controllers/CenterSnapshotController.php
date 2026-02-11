@@ -55,9 +55,9 @@ class CenterSnapshotController extends Controller
     }
     public function health(StoreHealthRequest $request)
     {
+
         $report = HealthReportDTO::fromRequest($request);
         try {
-
             /** @var \App\Models\Store $store */
             $store = $request->user();
 
@@ -117,9 +117,9 @@ class CenterSnapshotController extends Controller
             }
             $store->syncState->processHealthReport($report);
 
-            StoreSyncUpdated::dispatch($report->syncState, $store->getAttribute('Name'));
+            StoreSyncUpdated::dispatch($report->syncState, $store->name);
 
-            StoreSyncNotification::sendToAdmins($store->getAttribute('Name'), status: $report->syncState);
+            StoreSyncNotification::sendToAdmins($store->name, status: $report->syncState);
 
 
             return response()->json([

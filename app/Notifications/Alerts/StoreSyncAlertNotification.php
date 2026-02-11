@@ -45,14 +45,15 @@ class StoreSyncAlertNotification extends Notification implements ShouldQueue
         $recipientName = ($notifiable->name ?? $notifiable->email) ?: 'equipo';
 
         return (new MailMessage)
-            ->subject("[Alerta] Error de sincronización - {$this->storeName}")
-            ->greeting("Hola {$recipientName},")
-            ->line(new HtmlString("Se ha detectado un error crítico en la sincronización de la tienda <strong>{$this->storeName}</strong>."))
-            ->line('Detalle del error:')
-            ->line($this->errorMessage)
-            ->line('Por favor, revisa la tienda y toma las acciones necesarias para corregir el problema.')
-            ->action('Abrir panel de tienda', url('/stores'))
-            ->salutation(new HtmlString('Atentamente,<br>Equipo de Integraciones'));
+            ->subject("Notificación Urgente: Error Crítico en Sincronización de Tienda {$this->storeName}")
+            ->greeting("Estimado {$recipientName},")
+            ->line(new HtmlString("Le informamos que se ha producido un error crítico durante el proceso de sincronización de datos en la tienda <strong>{$this->storeName}</strong>."))
+            ->line('Este incidente podría afectar la disponibilidad de información actualizada y el funcionamiento normal de los servicios asociados a esta tienda.')
+            ->line('Es imperativo que revise los detalles del error a continuación y tome las acciones correctivas necesarias de manera inmediata para minimizar cualquier interrupción en el servicio.')
+            ->line(new HtmlString("<strong>Detalles del Error:</strong><br>{$this->errorMessage}"))
+            ->line('Si requiere asistencia adicional o tiene alguna pregunta, no dude en contactar al equipo de soporte técnico.')
+            ->action('Acceder al Panel de Tiendas', url('/stores'))
+            ->salutation(new HtmlString('Atentamente,<br>Equipo de Integraciones de CMS'));
     }
 
     /**
