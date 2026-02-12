@@ -17,6 +17,8 @@ use Inertia\Inertia;
 
 class UserController extends Controller implements HasMiddleware
 {
+    use \App\Traits\IsAdmin;
+
     public static function middleware(): array
     {
         return [
@@ -39,6 +41,10 @@ class UserController extends Controller implements HasMiddleware
                     ->orWhere('email', 'like', "%{$search}%");
             });
         }
+
+        $query->whereDoesntHave('roles', function ($q) {
+            $q->where('name', 'supervisor');
+        });
 
         return Inertia::render('Users/Index', [
             'users' => Inertia::scroll($query->latest()->paginate()),
@@ -78,6 +84,8 @@ class UserController extends Controller implements HasMiddleware
 
     public function edit(User $user)
     {
+        $this->authorizeUserAccess($user);
+
         $permissionsAndRoles = $this->getPermissionsAndRoles();
 
         $user->load(['roles.permissions', 'permissions']);
@@ -92,6 +100,7 @@ class UserController extends Controller implements HasMiddleware
     public function update(UpdateUserRequest $request, User $user, UpdateUserAction $updateUserAction): RedirectResponse
     {
         try {
+            $this->authorizeUserAccess($user);
 
             $request->validated();
 
@@ -112,6 +121,8 @@ class UserController extends Controller implements HasMiddleware
 
     public function destroy(User $user)
     {
+        $this->authorizeUserAccess($user);
+
         if ($user->getKey() === Auth::id()) {
             return back()->withErrors('name', 'No puedes desactivar tu propia cuenta.');
         }

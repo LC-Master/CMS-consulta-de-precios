@@ -8,6 +8,7 @@ export const groupTranslations: Record<string, string> = {
     report: 'Reportes',
     dashboard: 'Panel de Control',
     center: 'Centros',
+    store: 'Tienda'
     // ... add others if needed
 };
 
