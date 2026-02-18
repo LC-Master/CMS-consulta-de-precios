@@ -24,7 +24,9 @@ class CenterSnapshotController extends Controller
     public function show(CampaignSnapshotDTO $campaignSnapshotDTO, Request $request)
     {
         try {
-            $campaignSnapshotDTO = $campaignSnapshotDTO->execute($request->user());
+            /** @var \App\Models\Store $store */
+            $store = $request->user();
+            $campaignSnapshotDTO = $campaignSnapshotDTO->execute($store);
             if (!empty($campaignSnapshotDTO['campaigns'])) {
                 $campaignSnapshotDTO['campaigns'] = CampaignSnapshotDTO::normalize($campaignSnapshotDTO['campaigns']);
             }

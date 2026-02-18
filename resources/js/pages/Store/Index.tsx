@@ -34,9 +34,21 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
         setSyncFlash({ status: e.status, message: `Tienda ${e.store_name}: ${SYNC_STATUS_TRANSLATIONS[e.status]}` })
         router.reload({
             async: true,
-            reset: ['stores']
+            fresh: true,
+            reset: ['stores'],
+            only: ['stores', 'flash', 'errors'],
         })
     })
+
+    const postToBackend = (endpoint: string): void => {
+        router.post(endpoint, undefined, {
+            preserveState: true,
+            preserveScroll: true,
+            only: ['flash', 'errors', 'stores'],
+            reset: ['stores'],
+            async: true,
+        })
+    }
 
     useEffect(() => {
         listen()
@@ -127,7 +139,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
                     <div className="flex gap-2">
                         <Button
                             disabled={!hasUrl}
-                            onClick={() => router.post(`/stores/${a.id}/force-sync`)}
+                            onClick={() => postToBackend(`/stores/${a.id}/force-sync`)}
                             className={`px-3 h-8 text-xs font-medium text-white rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 ${hasUrl
                                 ? 'bg-locatel-naranja hover:bg-orange-500 focus:ring-locatel-naranja'
                                 : 'bg-gray-300 cursor-not-allowed opacity-70'
@@ -137,7 +149,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
                         </Button>
                         <Button
                             disabled={!hasUrl}
-                            onClick={() => router.post(`/stores/${a.id}/force-token`)}
+                            onClick={() => postToBackend(`/stores/${a.id}/force-token`)}
                             className={`px-3 h-8 text-xs font-medium text-white rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 ${hasUrl
                                 ? 'bg-locatel-medio hover:bg-locatel-claro focus:ring-locatel-claro'
                                 : 'bg-gray-300 cursor-not-allowed opacity-70'
@@ -172,7 +184,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
                                 <span>Detalles de la tienda</span>
                             </ActionMenu.Item>
                         </ActionMenu>
-                    </div>
+                    </div >
                 )
             },
         },
@@ -228,6 +240,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
                     columns={columns}
                     rowKey={(a) => a.id}
                     infiniteData="stores"
+                    buffer={32}
                 />
 
             </div>

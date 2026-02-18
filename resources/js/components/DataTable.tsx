@@ -15,6 +15,7 @@ export interface DataTableProps<T> {
     emptyText?: string
     rowKey: (row: T) => string | number
     infiniteData: string
+    buffer?: number
 }
 
 
@@ -23,11 +24,12 @@ export function DataTable<T>({
     columns,
     rowKey,
     emptyText = 'No hay registros',
-    infiniteData
+    infiniteData,
+    buffer = 10,
 }: DataTableProps<T>) {
     return (
         <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-            <InfiniteScroll data={infiniteData} buffer={10} loading={() => (
+            <InfiniteScroll data={infiniteData} buffer={buffer} loading={() => (
                 <span className="px-4 py-3 flex justify-center items-center gap-2 text-center text-sm text-black">
                     <Spinner className='text-blue-400' /> Cargando más registros...
                 </span>

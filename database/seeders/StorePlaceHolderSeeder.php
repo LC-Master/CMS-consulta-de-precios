@@ -7,7 +7,6 @@ use App\Models\Store;
 use App\Enums\SyncStatusEnum;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
 
 class StorePlaceHolderSeeder extends Seeder
 {
@@ -38,7 +37,7 @@ class StorePlaceHolderSeeder extends Seeder
         }
 
         $absolutePath = Storage::disk('public')->path($imagePath);
-        $mimeType = File::mimeType($absolutePath);
+        $mimeType = Storage::disk('public')->mimeType($imagePath);
         $fileName = pathinfo($imagePath, PATHINFO_BASENAME);
 
         $media = Media::create([
