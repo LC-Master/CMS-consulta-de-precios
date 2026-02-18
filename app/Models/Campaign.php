@@ -12,16 +12,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Store;
 
-/**
- * @property-read \App\Models\User $user
- */
 class Campaign extends Model
 {
-    /** @use HasFactory<\Database\Factories\CampaignFactory> */
     use HasFactory;
     use SoftDeletes;
     use HasUuids;
     use FixSqlServerDates;
+
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     public $old_media_files;
     public $old_agreements;
@@ -35,6 +34,11 @@ class Campaign extends Model
         'department_id',
         'user_id',
         'updated_by',
+    ];
+
+    protected $casts = [
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
     ];
 
     protected static function booted()
@@ -56,6 +60,7 @@ class Campaign extends Model
             }
         });
     }
+    
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -76,7 +81,6 @@ class Campaign extends Model
     }
     public function stores()
     {
-        // Asegúrate que esta relación exista y esté correcta
         return $this->belongsToMany(Store::class, 'campaign_store', 'campaign_id', 'store_id')->withTimestamps();
     }
 

@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Agreement;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule; // <--- Importante
+use Illuminate\Validation\Rule;
 
 class UpdateAgreementRequest extends FormRequest
 {
@@ -15,7 +15,7 @@ class UpdateAgreementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'supplier_id' => 'nullable|integer',
+            'supplier_id' => 'nullable|string|max:50',
 
             'name' => [
                 'required',
@@ -48,7 +48,7 @@ class UpdateAgreementRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'supplier_id.integer' => 'El identificador del proveedor debe ser un número entero.',
+            'supplier_id.string' => 'El identificador del proveedor debe ser una cadena de texto.',
             
             'name.required' => 'El nombre del acuerdo es obligatorio.',
             'name.string' => 'El nombre del acuerdo debe ser texto.',

@@ -1,20 +1,41 @@
 <?php
 
 use App\Models\User;
-use App\Models\Center;
+use App\Models\Store;
 use Laravel\Sanctum\PersonalAccessToken;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Inertia\Testing\AssertableInertia as Assert;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function () {
-    Role::firstOrCreate(['name' => 'admin']);
+    if (!Schema::hasTable('Store')) {
+        Schema::create('Store', function (Blueprint $table) {
+            $table->integer('ID')->primary();
+            $table->string('Name');
+            $table->string('StoreCode')->nullable();
+            $table->boolean('Inactive')->default(false);
+            $table->timestamps();
+        });
+    }
 
-    $this->admin = User::factory()->create();
+    $permissions = ['token.list', 'token.create', 'token.delete'];
+    foreach ($permissions as $perm) {
+        Permission::firstOrCreate(['name' => $perm]);
+    }
+
+    $role = Role::firstOrCreate(['name' => 'admin']);
+    $role->syncPermissions($permissions);
+
+    $this->admin = User::factory()->create(['email_verified_at' => now()]);
     $this->admin->assignRole('admin');
 
-    $this->centerA = Center::factory()->create(['name' => 'Centro Norte', 'code' => 'CTR-001']);
-    $this->centerB = Center::factory()->create(['name' => 'Centro Sur', 'code' => 'CTR-002']);
+    $this->storeA = Store::forceCreate(['ID' => 1, 'Name' => 'Centro Norte', 'StoreCode' => 'CTR-001', 'Inactive' => false]);
+    $this->storeB = Store::forceCreate(['ID' => 2, 'Name' => 'Centro Sur', 'StoreCode' => 'CTR-002', 'Inactive' => false]);
 
     $this->actingAs($this->admin)
          ->withSession(['auth.password_confirmed_at' => time()]);
@@ -23,34 +44,34 @@ beforeEach(function () {
 describe('Visualización y Búsqueda de Tokens', function () {
 
     test('renderiza el listado de tokens existentes', function () {
-        $this->centerA->createToken('Token Norte APP');
-        $this->centerB->createToken('Token Sur API');
+        $this->storeA->createToken('Token Norte APP');
+        $this->storeB->createToken('Token Sur API');
 
         $this->get(route('centertokens.index'))
             ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page
                 ->component('CenterTokens/Index')
                 ->has('centerTokens.data', 2) 
-                ->has('centers') 
+                ->has('stores') 
             );
     });
 
-    test('filtra tokens por Centro específico', function () {
-        $this->centerA->createToken('Token A');
-        $this->centerB->createToken('Token B');
+    test('filtra tokens por Centro (Store) específico', function () {
+        $this->storeA->createToken('Token A');
+        $this->storeB->createToken('Token B');
 
-        $this->get(route('centertokens.index', ['center' => $this->centerA->id]))
+        $this->get(route('centertokens.index', ['store' => $this->storeA->ID]))
             ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page
                 ->has('centerTokens.data', 1)
                 ->where('centerTokens.data.0.name', 'Token A')
-                ->where('centerTokens.data.0.center.id', $this->centerA->id)
+                ->where('centerTokens.data.0.store.id', $this->storeA->ID)
             );
     });
 
     test('busca tokens por Nombre del Token', function () {
-        $this->centerA->createToken('Acceso Facturación');
-        $this->centerA->createToken('Acceso Inventario');
+        $this->storeA->createToken('Acceso Facturación');
+        $this->storeA->createToken('Acceso Inventario');
 
         $this->get(route('centertokens.index', ['search' => 'Facturación']))
             ->assertStatus(200)
@@ -61,14 +82,14 @@ describe('Visualización y Búsqueda de Tokens', function () {
     });
 
     test('busca tokens por Nombre del Centro asociado', function () {
-        $this->centerA->createToken('Token Generico 1'); 
-        $this->centerB->createToken('Token Generico 2'); 
+        $this->storeA->createToken('Token Generico 1'); 
+        $this->storeB->createToken('Token Generico 2'); 
 
         $this->get(route('centertokens.index', ['search' => 'Norte']))
             ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page
                 ->has('centerTokens.data', 1)
-                ->where('centerTokens.data.0.center.name', 'Centro Norte')
+                ->where('centerTokens.data.0.store.name', 'Centro Norte')
             );
     });
 
@@ -81,7 +102,7 @@ describe('Generación de Nuevos Tokens', function () {
 
         $postData = [
             'name' => 'Nuevo Token API 2026',
-            'center_id' => $this->centerA->id,
+            'store_id' => (string) $this->storeA->ID,
         ];
 
         $fromUrl = route('centertokens.index');
@@ -97,8 +118,8 @@ describe('Generación de Nuevos Tokens', function () {
 
         $this->assertDatabaseHas('personal_access_tokens', [
             'name' => 'Nuevo Token API 2026',
-            'tokenable_type' => Center::class,
-            'tokenable_id' => $this->centerA->id
+            'tokenable_type' => Store::class,
+            'tokenable_id' => $this->storeA->ID
         ]);
 
         Event::assertDispatched(\App\Events\CenterToken\CenterTokenEvent::class);
@@ -106,7 +127,7 @@ describe('Generación de Nuevos Tokens', function () {
 
     test('valida que el nombre y el centro sean obligatorios', function () {
         $this->post(route('centertokens.store'), [])
-            ->assertSessionHasErrors(['name', 'center_id']);
+            ->assertSessionHasErrors(['name', 'store_id']);
     });
 
 });
@@ -116,7 +137,7 @@ describe('Revocación de Tokens', function () {
     test('revoca (elimina) un token existente correctamente', function () {
         Event::fake([\App\Events\CenterToken\CenterTokenEvent::class]);
 
-        $token = $this->centerA->createToken('Token Para Borrar')->accessToken;
+        $token = $this->storeA->createToken('Token Para Borrar')->accessToken;
 
         $fromUrl = route('centertokens.index');
 
@@ -137,7 +158,6 @@ describe('Revocación de Tokens', function () {
 describe('Seguridad y Accesos', function () {
 
     test('bloquea acceso a usuarios sin confirmar contraseña', function () {
-
         $this->actingAs($this->admin)
              ->withSession(['auth.password_confirmed_at' => null]);
 
@@ -145,16 +165,15 @@ describe('Seguridad y Accesos', function () {
             ->assertRedirect(); 
     });
 
-    test('bloquea acceso a usuarios que NO son administradores', function () {
-
-    $user = User::factory()->create([
-        'email_verified_at' => now()
-    ]);
-    
-    $this->actingAs($user)
-         ->withSession(['auth.password_confirmed_at' => time()])
-         ->get(route('centertokens.index'))
-         ->assertStatus(302); 
-});
+    test('bloquea acceso a usuarios que NO tienen permisos', function () {
+        $user = User::factory()->create([
+            'email_verified_at' => now()
+        ]);
+        
+        $this->actingAs($user)
+             ->withSession(['auth.password_confirmed_at' => time()])
+             ->get(route('centertokens.index'))
+             ->assertStatus(302);
+    });
 
 });

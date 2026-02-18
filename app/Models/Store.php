@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\StoreSyncState;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Summary of Store
@@ -16,12 +17,30 @@ class Store extends Model
 {
     use HasApiTokens;
     use FixSqlServerDates;
+    use HasFactory;
 
     protected $table = 'Store';
     protected $primaryKey = 'ID';
     protected $keyType = 'integer';
     public $timestamps = false;
     public $incrementing = false;
+
+    protected $fillable = [
+        'ID',
+        'Name',
+        'StoreCode',
+        'Region',
+        'Address1',
+        'Address2',
+        'City',
+        'State',
+        'Zip',
+        'Country',
+        'PhoneNumber',
+        'FaxNumber',
+        'Inactive',
+        'LastUpdated',
+    ];
 
     protected $appends = [
         'id',

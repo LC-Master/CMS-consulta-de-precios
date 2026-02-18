@@ -8,24 +8,60 @@ use App\Enums\CampaignStatus;
 use App\Enums\Schedules;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\Models\Role;
-use Illuminate\Http\UploadedFile;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function () {
     Storage::fake('public');
 
-    $this->admin = User::factory()->create();
-    Role::firstOrCreate(['name' => 'admin']);
+    if (!Schema::hasTable('Store')) {
+        Schema::create('Store', function (Blueprint $table) {
+            $table->integer('ID')->primary();
+            $table->string('Name');
+            $table->timestamps();
+        });
+    }
+
+    if (!Schema::hasTable('time_line_items')) {
+        Schema::create('time_line_items', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('campaign_id');
+            $table->foreignUuid('media_id');
+            $table->string('slot');
+            $table->integer('position');
+            $table->timestamps();
+        });
+    }
+
+    $permissions = [
+        'media.list',
+        'media.show',
+        'media.create',
+        'media.update',
+        'media.delete',
+        'media.upload' 
+    ];
+
+    foreach ($permissions as $perm) {
+        Permission::firstOrCreate(['name' => $perm]);
+    }
+
+    $this->admin = User::factory()->create(['email_verified_at' => now()]);
+    $role = Role::firstOrCreate(['name' => 'admin']);
+    $role->syncPermissions($permissions);
     $this->admin->assignRole('admin');
 
     $this->draftStatus = Status::firstOrCreate(['status' => CampaignStatus::DRAFT->value]);
     $this->activeStatus = Status::firstOrCreate(['status' => CampaignStatus::ACTIVE->value]);
     $this->finishedStatus = Status::firstOrCreate(['status' => CampaignStatus::FINISHED->value]);
 
-    $this->actingAs($this->admin)
-         ->withSession(['auth.password_confirmed_at' => time()]);
+    $this->actingAs($this->admin);
 });
 
 describe('Visualización y Búsqueda', function () {
@@ -139,7 +175,7 @@ describe('Detalles del Archivo', function () {
             'created_by' => $this->admin->id
         ]);
 
-        $this->get('/media/cdn/' . $media->id)
+        $this->get(route('media.cdn', $media))
             ->assertStatus(200)
             ->assertHeader('content-type', 'text/plain; charset=utf-8'); 
     });

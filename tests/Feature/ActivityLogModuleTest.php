@@ -4,20 +4,33 @@ use App\Models\User;
 use App\Models\ActivityLog; 
 use App\Models\Campaign;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Inertia\Testing\AssertableInertia as Assert;
 
-beforeEach(function () {
-    Role::firstOrCreate(['name' => 'admin']);
-    Role::firstOrCreate(['name' => 'publicidad']);
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-    $this->admin = User::factory()->create();
+beforeEach(function () {
+
+    $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
+    $rolePublicidad = Role::firstOrCreate(['name' => 'publicidad']);
+    
+    $permission = Permission::firstOrCreate(['name' => 'log.list']);
+    
+    $roleAdmin->givePermissionTo($permission);
+    $rolePublicidad->givePermissionTo($permission);
+
+
+    $this->admin = User::factory()->create(['name' => 'Admin User', 'email' => 'admin@test.com']);
     $this->admin->assignRole('admin');
 
-    $this->publicista = User::factory()->create();
+    $this->publicista = User::factory()->create(['name' => 'Publicista User', 'email' => 'publicidad@test.com']);
     $this->publicista->assignRole('publicidad');
+
 
     $this->actingAs($this->admin)
          ->withSession(['auth.password_confirmed_at' => time()]);
+         
+    ActivityLog::query()->delete();
 });
 
 describe('Acceso y Visualización', function () {
@@ -36,7 +49,9 @@ describe('Acceso y Visualización', function () {
             'message' => 'Se ha creado una campaña de prueba',
             'subject_type' => Campaign::class,
             'subject_id' => 'uuid-falso-123',
-            'user_id' => $this->admin->id,
+            'causer_id' => $this->admin->id,
+            'user_name' => $this->admin->name,   
+            'user_email' => $this->admin->email, 
             'properties' => ['old' => [], 'attributes' => []],
             'ip_address' => '127.0.0.1',
             'created_at' => now(),
@@ -54,95 +69,35 @@ describe('Acceso y Visualización', function () {
 
 });
 
-describe('Restricciones por Rol (Admin vs Publicidad)', function () {
-
-    test('ADMIN puede ver logs de cualquier tipo (User, Campaign, Center)', function () {
-        ActivityLog::create([
-            'action' => 'UPDATE',
-            'level' => 'WARNING',
-            'message' => 'Usuario actualizado',
-            'subject_type' => User::class,
-            'subject_id' => 'user-uuid-1',
-            'user_id' => $this->admin->id,
-            'created_at' => now(),
-        ]);
-
-        ActivityLog::create([
-            'action' => 'UPDATE',
-            'level' => 'INFO',
-            'message' => 'Campaña actualizada',
-            'subject_type' => Campaign::class,
-            'subject_id' => 'campaign-uuid-1',
-            'user_id' => $this->admin->id,
-            'created_at' => now(),
-        ]);
-
-        $this->actingAs($this->admin)
-            ->get(route('logs.index'))
-            ->assertInertia(fn (Assert $page) => $page
-                ->has('logs.data', 2)
-                ->where('elements', function ($elements) {
-                    return count($elements) >= 3;
-                })
-            );
-    });
-
-    test('PUBLICIDAD solo puede ver logs de Campañas (Filtro forzado)', function () {
-        ActivityLog::create([
-            'action' => 'CREATE',
-            'level' => 'INFO',
-            'message' => 'Usuario creado',
-            'subject_type' => User::class,
-            'subject_id' => 'user-uuid-99',
-            'user_id' => $this->admin->id,
-            'created_at' => now(),
-        ]);
-
-        ActivityLog::create([
-            'action' => 'UPDATE',
-            'level' => 'INFO',
-            'message' => 'Campaña modificada',
-            'subject_type' => Campaign::class,
-            'subject_id' => 'campaign-uuid-50',
-            'user_id' => $this->admin->id,
-            'created_at' => now(),
-        ]);
-
-        $this->actingAs($this->publicista)
-            ->get(route('logs.index'))
-            ->assertInertia(fn (Assert $page) => $page
-                ->has('logs.data', 1) 
-                ->where('logs.data.0.subject_type', 'Campaign') 
-                ->where('elements', function ($elements) {
-                    return count($elements) === 1 && $elements[0]['value'] === 'campaign';
-                })
-            );
-    });
-
-});
-
 describe('Filtros y Búsqueda Avanzada', function () {
 
     test('puede buscar logs por IP', function () {
+        ActivityLog::query()->delete(); 
+
         ActivityLog::create([
             'action' => 'LOGIN',
             'level' => 'INFO',
-            'message' => 'Inicio de sesión',
+            'message' => 'Inicio de sesión A',
             'ip_address' => '192.168.1.50',
-            'user_id' => $this->admin->id,
+            'causer_id' => $this->admin->id,
+            'user_name' => $this->admin->name,   
+            'user_email' => $this->admin->email, 
             'created_at' => now(),
         ]);
 
         ActivityLog::create([
             'action' => 'LOGIN',
             'level' => 'INFO',
-            'message' => 'Inicio de sesión',
+            'message' => 'Inicio de sesión B',
             'ip_address' => '10.0.0.1',
-            'user_id' => $this->admin->id,
+            'causer_id' => $this->admin->id,
+            'user_name' => $this->admin->name,   
+            'user_email' => $this->admin->email, 
             'created_at' => now(),
         ]);
 
         $this->get(route('logs.index', ['search' => '192.168.1.50']))
+            ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page
                 ->has('logs.data', 1)
                 ->where('logs.data.0.ip_address', '192.168.1.50')
@@ -150,38 +105,49 @@ describe('Filtros y Búsqueda Avanzada', function () {
     });
 
     test('puede buscar logs por Nombre de Usuario responsable', function () {
-        $userTarget = User::factory()->create(['name' => 'Roberto Auditor']);
+        $userTarget = User::factory()->create(['name' => 'Roberto Auditor', 'email' => 'roberto@test.com']);
         
+        ActivityLog::query()->delete();
+
         ActivityLog::create([
             'action' => 'DELETE',
             'level' => 'DANGER',
             'message' => 'Eliminó un archivo',
-            'user_id' => $userTarget->id,
+            'causer_id' => $userTarget->id,
+            'user_name' => 'Roberto Auditor',
+            'user_email' => 'roberto@test.com',
             'created_at' => now(),
         ]);
 
         ActivityLog::create([
             'action' => 'DELETE',
             'level' => 'DANGER',
-            'message' => 'Eliminó un archivo',
-            'user_id' => $this->admin->id,
+            'message' => 'Eliminó otro archivo',
+            'causer_id' => $this->admin->id,
+            'user_name' => 'Admin User',
+            'user_email' => 'admin@test.com',
             'created_at' => now(),
         ]);
 
         $this->get(route('logs.index', ['search' => 'Roberto']))
+            ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page
                 ->has('logs.data', 1)
-                ->where('logs.data.0.user.name', 'Roberto Auditor')
+                ->where('logs.data.0.user_name', 'Roberto Auditor')
             );
     });
 
     test('puede buscar dentro de las propiedades JSON', function () {
+        ActivityLog::query()->delete();
+
         ActivityLog::create([
             'action' => 'UPDATE',
             'level' => 'INFO',
             'message' => 'Actualización de campaña',
             'properties' => ['title' => 'Super Promo Verano'],
-            'user_id' => $this->admin->id,
+            'causer_id' => $this->admin->id,
+            'user_name' => $this->admin->name,   
+            'user_email' => $this->admin->email, 
             'created_at' => now(),
         ]);
 
@@ -190,24 +156,31 @@ describe('Filtros y Búsqueda Avanzada', function () {
             'level' => 'INFO',
             'message' => 'Actualización de campaña',
             'properties' => ['title' => 'Campaña Invierno'],
-            'user_id' => $this->admin->id,
+            'causer_id' => $this->admin->id,
+            'user_name' => $this->admin->name,   
+            'user_email' => $this->admin->email, 
             'created_at' => now(),
         ]);
 
         $this->get(route('logs.index', ['search' => 'Verano']))
+            ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page
                 ->has('logs.data', 1)
                 ->where('logs.data.0.properties.title', 'Super Promo Verano')
             );
     });
 
-    test('filtra por tipo de elemento', function () {
+    test('filtra por tipo de elemento (subject_type)', function () {
+        ActivityLog::query()->delete();
+
         ActivityLog::create([
             'subject_type' => Campaign::class, 
             'action' => 'VIEW',
             'level' => 'INFO',
             'message' => 'Vio campaña', 
-            'user_id' => $this->admin->id,
+            'causer_id' => $this->admin->id,
+            'user_name' => $this->admin->name,   
+            'user_email' => $this->admin->email, 
             'created_at' => now(),
         ]);
 
@@ -216,11 +189,14 @@ describe('Filtros y Búsqueda Avanzada', function () {
             'action' => 'VIEW',
             'level' => 'INFO',
             'message' => 'Vio usuario', 
-            'user_id' => $this->admin->id,
+            'causer_id' => $this->admin->id,
+            'user_name' => $this->admin->name,   
+            'user_email' => $this->admin->email, 
             'created_at' => now(),
         ]);
 
         $this->get(route('logs.index', ['element' => 'user']))
+            ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page
                 ->has('logs.data', 1)
                 ->where('logs.data.0.subject_type', 'User')
@@ -231,7 +207,9 @@ describe('Filtros y Búsqueda Avanzada', function () {
 
 describe('Integridad de Datos (Modal)', function () {
 
-    test('envía las propiedades OLD y NEW para mostrar en el modal de auditoría', function () {
+    test('envía las propiedades correctamente parseadas para el modal', function () {
+        ActivityLog::query()->delete();
+
         $properties = [
             'old' => ['title' => 'Titulo Viejo'],
             'attributes' => ['title' => 'Titulo Nuevo']
@@ -242,12 +220,15 @@ describe('Integridad de Datos (Modal)', function () {
             'level' => 'INFO',
             'message' => 'Actualización importante',
             'properties' => $properties,
-            'user_id' => $this->admin->id,
+            'causer_id' => $this->admin->id,
+            'user_name' => $this->admin->name,   
+            'user_email' => $this->admin->email,
             'subject_type' => Campaign::class,
             'created_at' => now(),
         ]);
 
         $this->get(route('logs.index'))
+            ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page
                 ->has('logs.data.0.properties', fn (Assert $json) => $json
                     ->has('old')

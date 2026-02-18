@@ -65,7 +65,7 @@ class ActivityLogController extends Controller
                     'user_email' => $log->user_email,
                     'message' => $log->message,
                     'user_agent' => $log->user_agent,
-                    'properties' => json_decode($log->properties, true),
+                    'properties' => is_string($log->properties) ? json_decode($log->properties, true) : $log->properties,
                     'ip_address' => $log->ip_address,
                     'created_at' => $log->created_at,
                     'subject_type' => class_basename($log->subject_type),
