@@ -1,5 +1,7 @@
 <?php
 
+use Spatie\Permission\Models\Role;
+
 test('registration screen can be rendered', function () {
     $response = $this->get(route('register'));
 
@@ -7,13 +9,15 @@ test('registration screen can be rendered', function () {
 });
 
 test('new users can register', function () {
+    Role::firstOrCreate(['name' => 'publicidad']);
+
     $response = $this->post(route('register.store'), [
         'name' => 'Test User',
         'email' => 'test@example.com',
-        'password' => 'password',
-        'password_confirmation' => 'password',
+        'password' => 'Password1!',
+        'password_confirmation' => 'Password1!',
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('campaign', absolute: false));
+    $response->assertRedirect(route('dashboard'));
 });
