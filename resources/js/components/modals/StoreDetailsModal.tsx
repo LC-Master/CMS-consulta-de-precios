@@ -1,13 +1,13 @@
 import React from 'react';
-import Modal from '../Modal';
+import Modal from '@components/Modal';
 import { StoreDetailsModalProps } from '@/types/store/index.type';
 import { useForm } from '@inertiajs/react';
 import { X, Link as LinkIcon, Store as StoreIcon, HardDrive, Clock, Activity, Calendar } from 'lucide-react';
 import { update } from '@/routes/stores/sync/url';
-import InputError from '../input-error';
-import SyncStatusPill from '../SyncStatusPill';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import InputError from '@components/input-error';
+import SyncStatusPill from '@components/SyncStatusPill';
+import { Button } from '@components/ui/button';
+import { Input } from '@components/ui/input';
 import { formatDate } from '@/helpers/mediaTools';
 
 
