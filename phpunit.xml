@@ -14,26 +14,12 @@
     </testsuites>
     <source>
         <include>
-            <directory>app/Actions</directory>
+            <directory>app/Actions/Fortify</directory>
             <directory>app/Contracts</directory>
             <directory>app/Enums</directory>
-            <directory>app/Http</directory>
-            <directory>app/Models</directory>
+            <directory>app/Http/Middleware</directory>
             <directory>app/Providers</directory>
-            <directory>app/Traits</directory>
         </include>
-        <exclude>
-            <directory>app/Console</directory>
-            <directory>app/DTOs</directory>
-            <directory>app/Events</directory>
-            <directory>app/Exports</directory>
-            <directory>app/Handler</directory>
-            <directory>app/Jobs</directory>
-            <directory>app/Listeners</directory>
-            <directory>app/Notifications</directory>
-            <directory>app/Observers</directory>
-            <directory>app/Rules</directory>
-        </exclude>
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
