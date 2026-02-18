@@ -7,7 +7,7 @@ use App\Models\Store;
 use App\Enums\SyncStatusEnum;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
 
 class StorePlaceHolderSeeder extends Seeder
 {
@@ -16,22 +16,37 @@ class StorePlaceHolderSeeder extends Seeder
      */
     public function run(): void
     {
-        $relativePath = 'placeholder/placeholder.webp';
+        $baseDirectory = 'placeholder';
+        $allowedExtensions = ['jpeg', 'jpg', 'webp', 'png', 'gif', 'bmp', 'svg'];
 
-        if (!Storage::disk('public')->exists($relativePath)) {
-            $this->command->error("ERROR: El archivo no existe en: storage/app/public/{$relativePath}");
-            $this->command->warn("Por favor, coloca el archivo 'placeholder.webp' en la carpeta: storage/app/public/placeholder/");
+        if (!Storage::disk('public')->exists($baseDirectory)) {
+            $this->command->error("ERROR: El directorio no existe en: storage/app/public/{$baseDirectory}");
+            $this->command->warn("Por favor, coloca un archivo de imagen dentro de: storage/app/public/{$baseDirectory}/");
             return;
         }
 
-        $absolutePath = Storage::disk('public')->path($relativePath);
+        $files = collect(Storage::disk('public')->allFiles($baseDirectory));
+        $imagePath = $files->first(function (string $file) use ($allowedExtensions) {
+            $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            return \in_array($extension, $allowedExtensions, true);
+        });
+
+        if (!$imagePath) {
+            $this->command->error("ERROR: No se encontró ningún archivo de imagen dentro de storage/app/public/{$baseDirectory}/");
+            $this->command->warn("Por favor, coloca un archivo jpeg, jpg, webp u otro formato de imagen en la carpeta mencionada.");
+            return;
+        }
+
+        $absolutePath = Storage::disk('public')->path($imagePath);
+        $mimeType = File::mimeType($absolutePath);
+        $fileName = pathinfo($imagePath, PATHINFO_BASENAME);
 
         $media = Media::create([
             'disk' => 'public',
-            'path' => $relativePath, 
-            'name' => 'placeholder.webp',
-            'mime_type' => 'image/webp',
-            'size' => Storage::disk('public')->size($relativePath),
+            'path' => $imagePath,
+            'name' => $fileName,
+            'mime_type' => $mimeType,
+            'size' => Storage::disk('public')->size($imagePath),
             'checksum' => md5_file($absolutePath),
             'duration_seconds' => null,
             'created_by' => 1,
