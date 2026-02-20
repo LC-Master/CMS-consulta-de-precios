@@ -2,7 +2,7 @@
 
 use App\Models\User;
 use App\Models\Campaign;
-use App\Models\Center;
+use App\Models\Store;
 use App\Models\Department;
 use App\Models\Media;
 use App\Models\Status;
@@ -10,25 +10,115 @@ use App\Enums\CampaignStatus;
 use App\Enums\Schedules;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function () {
+    if (!Schema::hasTable('Store')) {
+        Schema::create('Store', function (Blueprint $table) {
+            $table->integer('ID')->primary();
+            $table->string('Name');
+            $table->string('StoreCode')->nullable();
+            $table->string('Region')->nullable();
+            $table->string('Address1')->nullable();
+            $table->string('City')->nullable();
+            $table->string('State')->nullable();
+            $table->string('Zip')->nullable();
+            $table->string('Country')->nullable();
+            $table->string('PhoneNumber')->nullable();
+            $table->string('FaxNumber')->nullable();
+            $table->boolean('Inactive')->default(false);
+            $table->dateTime('LastUpdated')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    if (!Schema::hasTable('Supplier')) {
+        Schema::create('Supplier', function (Blueprint $table) {
+            $table->string('ID')->primary();
+            $table->string('SupplierName')->nullable();
+            $table->string('AccountNumber')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    if (!Schema::hasTable('campaign_store')) {
+        Schema::create('campaign_store', function (Blueprint $table) {
+            $table->id();
+            $table->foreignUuid('campaign_id');
+            $table->integer('store_id');
+            $table->timestamps();
+        });
+    }
+
+    if (!Schema::hasTable('time_line_items')) {
+        Schema::create('time_line_items', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('campaign_id');
+            $table->foreignUuid('media_id');
+            $table->string('slot');
+            $table->integer('position');
+            $table->timestamps();
+        });
+    }
+
+    if (!Schema::hasTable('campaign_agreements')) {
+        Schema::create('campaign_agreements', function (Blueprint $table) {
+            $table->id();
+            $table->foreignUuid('campaign_id');
+            $table->foreignUuid('agreement_id');
+            $table->timestamps();
+        });
+    }
+
     $this->draftStatus = Status::firstOrCreate(['status' => CampaignStatus::DRAFT->value]);
     $this->activeStatus = Status::firstOrCreate(['status' => CampaignStatus::ACTIVE->value]);
     $this->finishedStatus = Status::firstOrCreate(['status' => CampaignStatus::FINISHED->value]);
+    $this->cancelledStatus = Status::firstOrCreate(['status' => CampaignStatus::CANCELLED->value]);
 
-    $this->admin = User::factory()->create();
-    Role::firstOrCreate(['name' => 'admin']);
+    $this->admin = User::factory()->create(['email_verified_at' => now()]);
+    $role = Role::firstOrCreate(['name' => 'admin']);
+
+    $permissions = [
+        'campaign.list',
+        'campaign.show',
+        'campaign.create',
+        'campaign.update',
+        'campaign.delete',
+        'campaign.activate',
+        'campaign.cancel',
+        'campaign.report'
+    ];
+
+    foreach ($permissions as $perm) {
+        Permission::firstOrCreate(['name' => $perm]);
+    }
+    
+    $role->syncPermissions($permissions);
     $this->admin->assignRole('admin');
 
     $this->department = Department::factory()->create();
-    $this->centers = Center::factory()->count(3)->create();
+    
+    $this->stores = collect();
+    for ($i = 1; $i <= 3; $i++) {
+        $this->stores->push(Store::forceCreate([
+            'ID' => 100 + $i,
+            'Name' => "TIENDA $i",
+            'StoreCode' => "T00$i",
+            'Region' => 'GROUP-TEST',
+            'Inactive' => false
+        ]));
+    }
 
     $this->mediaItems = Media::factory()->count(2)->create([
         'created_by' => $this->admin->id
     ]);
 
-    $this->actingAs($this->admin)
-        ->withSession(['auth.password_confirmed_at' => time()]);
+    $this->actingAs($this->admin);
 });
 
 describe('Vistas y Formularios', function () {
@@ -58,25 +148,32 @@ describe('Vistas y Formularios', function () {
             ->assertInertia(fn(Assert $page) => $page
                 ->component('Campaign/Create')
                 ->has('media')
-                ->has('centers')
+                ->has('stores')
                 ->has('departments')
             );
     });
 
     test('renderiza el detalle de una campaña cargando todas sus relaciones (Show)', function () {
 
-        $agreement = \App\Models\Agreement::factory()->create();
-        $agreement->delete(); 
+        DB::table('Supplier')->insert([
+            'ID' => 'SUP-TEST',
+            'SupplierName' => 'Proveedor Test',
+            'AccountNumber' => '123456',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
+        $agreement = \App\Models\Agreement::factory()->create(['supplier_id' => 'SUP-TEST']);
+        
         $campaign = Campaign::factory()->create([
             'department_id' => $this->department->id,
-            'agreement_id' => $agreement->id,
             'status_id' => $this->activeStatus->id,
             'user_id' => $this->admin->id,
             'updated_by' => $this->admin->id,
         ]);
 
-        $campaign->centers()->attach($this->centers->pluck('id'));
+        $campaign->agreements()->attach($agreement->id);
+        $campaign->stores()->attach($this->stores->pluck('ID'));
 
         $this->get(route('campaign.show', $campaign))
             ->assertStatus(200)
@@ -87,11 +184,9 @@ describe('Vistas y Formularios', function () {
                     ->where('title', $campaign->title)
                     ->has('department')       
                     ->has('status')          
-                    ->has('centers', 3)       
-                    ->where('agreement.id', $agreement->id) 
-                    ->where('agreement.name', $agreement->name)
-                    ->missing('department_id')
-                    ->missing('agreement_id')
+                    ->has('stores', 3)       
+                    ->where('agreements.0.id', $agreement->id) 
+                    ->where('agreements.0.name', $agreement->name)
                     ->etc()
                 )
             );
@@ -106,8 +201,8 @@ describe('Lógica de Creación', function () {
             'start_at' => now()->addDay()->format('Y-m-d'),
             'end_at' => now()->addDays(10)->format('Y-m-d'),
             'department_id' => $this->department->id,
-            'agreement_id' => null,
-            'centers' => $this->centers->pluck('id')->toArray(),
+            'agreements' => null,
+            'stores' => [(string) $this->stores[0]->ID],
             'am_media' => [$this->mediaItems[0]->id],
             'pm_media' => [$this->mediaItems[1]->id],
         ];
@@ -122,7 +217,7 @@ describe('Lógica de Creación', function () {
         ]);
 
         $campaign = Campaign::where('title', 'Nueva Campaña 2026')->first();
-        expect($campaign->centers)->toHaveCount(3);
+        expect($campaign->stores)->toHaveCount(1);
 
         $this->assertDatabaseHas('time_line_items', [
             'campaign_id' => $campaign->id,
@@ -141,11 +236,11 @@ describe('Lógica de Creación', function () {
         $postData = [
             'title' => 'Campaña Erronea',
             'department_id' => $this->department->id,
-            'centers' => [$this->centers[0]->id],
+            'stores' => [(string) $this->stores[0]->ID],
             'am_media' => [$this->mediaItems[0]->id],
             'pm_media' => [$this->mediaItems[0]->id],
             'start_at' => now()->addDays(5)->format('Y-m-d'),
-            'end_at' => now()->addDays(1)->format('Y-m-d'), // Error
+            'end_at' => now()->addDays(1)->format('Y-m-d'), 
         ];
 
         $this->post(route('campaign.store'), $postData)
@@ -156,7 +251,6 @@ describe('Lógica de Creación', function () {
 describe('Reglas de Negocio y Experiencia de Usuario', function () {
 
     test('respeta el orden exacto (posición) de los medios seleccionados', function () {
-        // Creamos 3 medios distintos
         $media1 = Media::factory()->create(['name' => 'Video 1.mp4', 'created_by' => $this->admin->id]);
         $media2 = Media::factory()->create(['name' => 'Video 2.mp4', 'created_by' => $this->admin->id]);
         $media3 = Media::factory()->create(['name' => 'Video 3.mp4', 'created_by' => $this->admin->id]);
@@ -166,7 +260,7 @@ describe('Reglas de Negocio y Experiencia de Usuario', function () {
             'start_at' => now()->format('Y-m-d'),
             'end_at' => now()->addDays(5)->format('Y-m-d'),
             'department_id' => $this->department->id,
-            'centers' => [$this->centers[0]->id],
+            'stores' => [(string) $this->stores[0]->ID],
             
             'am_media' => [$media2->id, $media3->id, $media1->id],
             'pm_media' => [$media1->id], 
@@ -176,7 +270,6 @@ describe('Reglas de Negocio y Experiencia de Usuario', function () {
     
         $campaign = Campaign::where('title', 'Campaña Ordenada')->first();
     
-        // Verificamos que en la BD la posición coincida
         $this->assertDatabaseHas('time_line_items', [
             'campaign_id' => $campaign->id,
             'media_id' => $media2->id,
@@ -208,7 +301,7 @@ describe('Reglas de Negocio y Experiencia de Usuario', function () {
             'start_at' => now()->format('Y-m-d'),
             'end_at' => now()->addDays(5)->format('Y-m-d'),
             'department_id' => $this->department->id,
-            'centers' => [$this->centers[0]->id],
+            'stores' => [(string) $this->stores[0]->ID],
             
             'am_media' => [$promoVideo->id, $contentVideo->id, $promoVideo->id],
             'pm_media' => [$contentVideo->id],
@@ -217,7 +310,6 @@ describe('Reglas de Negocio y Experiencia de Usuario', function () {
         $this->post(route('campaign.store'), $postData)
             ->assertSessionHasNoErrors();
     
-        // Verificamos que existen 2 entradas para el video Promo en el bloque AM
         $campaign = Campaign::where('title', 'Campaña Repetitiva')->first();
         
         $count = \Illuminate\Support\Facades\DB::table('time_line_items')
@@ -235,11 +327,11 @@ describe('Reglas de Negocio y Experiencia de Usuario', function () {
             'start_at' => now()->format('Y-m-d'),
             'end_at' => now()->addDays(5)->format('Y-m-d'),
             'department_id' => $this->department->id,
-            'centers' => [$this->centers[0]->id],
+            'stores' => [(string) $this->stores[0]->ID],
             'am_media' => [$this->mediaItems[0]->id],
             'pm_media' => [$this->mediaItems[0]->id],
             
-            'agreement_id' => null,
+            'agreements' => null, 
         ];
     
         $this->post(route('campaign.store'), $postData)
@@ -248,13 +340,15 @@ describe('Reglas de Negocio y Experiencia de Usuario', function () {
     
         $this->assertDatabaseHas('campaigns', [
             'title' => 'Campaña Sin Convenio',
-            'agreement_id' => null,
         ]);
+        
+        $campaign = Campaign::where('title', 'Campaña Sin Convenio')->first();
+        expect($campaign->agreements)->toHaveCount(0);
     });
 
     test('asigna correctamente múltiples centros a la campaña', function () {
 
-        $selectedCenterIds = $this->centers->pluck('id')->toArray();
+        $selectedStoreIds = $this->stores->pluck('ID')->map(fn($id) => (string)$id)->toArray();
     
         $postData = [
             'title' => 'Campaña Multicentro',
@@ -264,17 +358,17 @@ describe('Reglas de Negocio y Experiencia de Usuario', function () {
             'am_media' => [$this->mediaItems[0]->id],
             'pm_media' => [$this->mediaItems[0]->id],
             
-            // Enviamos TODOS los centros (Simulando selección múltiple en UI)
-            'centers' => $selectedCenterIds,
+            'stores' => $selectedStoreIds,
         ];
     
         $this->post(route('campaign.store'), $postData);
     
         $campaign = Campaign::where('title', 'Campaña Multicentro')->first();
     
-        expect($campaign->centers)->toHaveCount(3);
+        expect($campaign->stores)->toHaveCount(3);
         
-        expect($campaign->centers->pluck('id')->toArray())->toEqualCanonicalizing($selectedCenterIds);
+        $campaignStoreIds = $campaign->stores->pluck('ID')->map(fn($id) => (string)$id)->toArray();
+        expect($campaignStoreIds)->toEqualCanonicalizing($selectedStoreIds);
     });
 
 });
@@ -294,7 +388,7 @@ describe('Lógica de Actualización', function () {
             'start_at' => now()->addDay()->format('Y-m-d'),
             'end_at' => now()->addYear()->format('Y-m-d'),
             'department_id' => $this->department->id,
-            'centers' => [$this->centers[0]->id],
+            'stores' => [(string) $this->stores[0]->ID],
             'am_media' => [$this->mediaItems[1]->id],
             'pm_media' => [$this->mediaItems[0]->id],
         ];
@@ -338,20 +432,20 @@ describe('Gestión de Estados', function () {
         ]);
     });
 
-    test('cambia el estado a FINALIZADO', function () {
+    test('cambia el estado a CANCELADO', function () {
         $campaign = Campaign::factory()->create([
             'status_id' => $this->activeStatus->id,
             'user_id' => $this->admin->id,
             'updated_by' => $this->admin->id
         ]);
 
-        $this->get(route('campaign.finish', $campaign))
+        $this->get(route('campaign.cancel', $campaign))
             ->assertRedirect(route('campaign.index'))
-            ->assertSessionHas('success', 'Campaña finalizada.');
+            ->assertSessionHas('success', 'Campaña cancelada.');
 
         $this->assertDatabaseHas('campaigns', [
             'id' => $campaign->id,
-            'status_id' => $this->finishedStatus->id
+            'status_id' => $this->cancelledStatus->id
         ]);
     });
 });

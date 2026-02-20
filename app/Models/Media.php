@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\FixSqlServerDates;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -11,6 +12,7 @@ class Media extends Model
     /** @use HasFactory<\Database\Factories\MediaFactory> */
     use HasFactory;
     use HasUuids;
+    use FixSqlServerDates;
 
     protected $fillable = [
         'id',

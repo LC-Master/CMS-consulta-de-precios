@@ -7,12 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Supplier;
+use App\Traits\FixSqlServerDates;
 
 class Agreement extends Model
 {
     use HasFactory;
     use HasUuids;
     use SoftDeletes;
+    use FixSqlServerDates;
 
     protected $fillable = [
         'name',

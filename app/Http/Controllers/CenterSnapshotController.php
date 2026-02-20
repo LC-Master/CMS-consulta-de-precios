@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\dto\CampaignSnapshotDTO;
+use App\Http\Requests\StoreHealthRequest;
 use App\Models\CenterSnapshot;
 use App\Models\StoreSyncState;
 use Illuminate\Http\Request;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use App\DTOs\HealthReportDTO;
 use App\DTOs\MediaErrorDTO;
+use Carbon\Carbon;
+use App\Notifications\StoreSyncNotification;
 
 class CenterSnapshotController extends Controller
 {
@@ -21,7 +24,9 @@ class CenterSnapshotController extends Controller
     public function show(CampaignSnapshotDTO $campaignSnapshotDTO, Request $request)
     {
         try {
-            $campaignSnapshotDTO = $campaignSnapshotDTO->execute($request->user());
+            /** @var \App\Models\Store $store */
+            $store = $request->user();
+            $campaignSnapshotDTO = $campaignSnapshotDTO->execute($store);
             if (!empty($campaignSnapshotDTO['campaigns'])) {
                 $campaignSnapshotDTO['campaigns'] = CampaignSnapshotDTO::normalize($campaignSnapshotDTO['campaigns']);
             }
@@ -50,41 +55,11 @@ class CenterSnapshotController extends Controller
             ], 500);
         }
     }
-    public function health(Request $request)
+    public function health(StoreHealthRequest $request)
     {
-        $validated = \Validator::make($request->all(), [
-            'syncState' => ['required', 'string', 'in:pending,syncing,success,failed,stale'],
-            'start_at' => ['required', 'date'],
-            'end_at' => ['nullable', 'date'],
-            'communicationKey' => ['nullable', 'string'],
-            'disk.size' => ['required', 'numeric'],
-            'disk.free' => ['required', 'numeric'],
-            'disk.used' => ['required', 'numeric'],
-            'dtoChanged' => ['required', 'boolean'],
-            'uptime' => ['required', 'decimal:1,1000'],
-            'mediaCount' => ['required', 'integer'],
-            'reported_at' => ['nullable', 'date'],
-            'mediaError' => ['nullable', 'array'],
-            'mediaError.*.id' => ['required_with:mediaError', 'string'],
-            'mediaError.*.name' => ['required_with:mediaError', 'string'],
-            'mediaError.*.checksum' => ['required_with:mediaError', 'string'],
-            'mediaError.*.errorType' => ['required_with:mediaError', 'string'],
-            'mediaError.*.errorCount' => ['required_with:mediaError', 'integer'],
-            'mediaError.*.lastErrorAt' => ['required_with:mediaError', 'date'],
-        ]);
-
-        if ($validated->fails()) {
-            \Log::error('Errors:', $validated->errors()->toArray());
-
-            return response()->json([
-                'message' => 'Validation Failed',
-            ], 422);
-        }
 
         $report = HealthReportDTO::fromRequest($request);
-
         try {
-    
             /** @var \App\Models\Store $store */
             $store = $request->user();
 
@@ -93,18 +68,27 @@ class CenterSnapshotController extends Controller
                     'store_id' => $store->getKey(),
                 ],
                 [
-                    'sync_status' => $report->syncState,
-                    'last_synced_at' => $report->endAt ?? $report->startAt,
-                    'sync_started_at' => $report->startAt,
-                    'sync_ended_at' => $report->endAt,
+                    'last_synced_at' => Carbon::parse($report->endAt ?? $report->startAt)
+                        ->setTimezone('America/Caracas')
+                        ->format('Y-m-d H:i:s.v'),
+                    'sync_started_at' => Carbon::parse($report->startAt)
+                        ->setTimezone('America/Caracas')
+                        ->format('Y-m-d H:i:s.v'),
+                    'sync_ended_at' => $report->endAt
+                        ? Carbon::parse($report->endAt)->setTimezone('America/Caracas')->format('Y-m-d H:i:s.v')
+                        : null,
+                    'uptimed_at' => Carbon::parse($report->uptime)
+                        ->setTimezone('America/Caracas')
+                        ->format('Y-m-d H:i:s.v'),
+                    'last_reported_at' => $report->reportedAt
+                        ? Carbon::parse($report->reportedAt)->setTimezone('America/Caracas')->format('Y-m-d H:i:s.v')
+                        : null,
                     'disk' => [
                         'size' => $report->disk->size,
                         'free' => $report->disk->free,
                         'used' => $report->disk->used,
                     ],
-                    'uptimed_at' => $report->uptime,
                     'media_count' => $report->mediaCount,
-                    'last_reported_at' => $report->reportedAt,
                 ]
             );
 
@@ -133,8 +117,12 @@ class CenterSnapshotController extends Controller
             } else {
                 $store->centerMediaErrors()->delete();
             }
+            $store->syncState->processHealthReport($report);
 
-            StoreSyncUpdated::dispatch('Health check recibida');
+            StoreSyncUpdated::dispatch($report->syncState, $store->name);
+
+            StoreSyncNotification::sendToAdmins($store->name, status: $report->syncState);
+
 
             return response()->json([
                 'status' => 'ok',

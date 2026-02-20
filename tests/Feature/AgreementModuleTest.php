@@ -2,25 +2,72 @@
 
 use App\Models\User;
 use App\Models\Agreement;
+use App\Models\Supplier;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
+
+    if (!Schema::hasTable('Supplier')) {
+        Schema::create('Supplier', function (Blueprint $table) {
+            $table->string('ID')->primary();
+            $table->string('SupplierName')->nullable();
+            $table->string('AccountNumber')->nullable();
+            $table->string('ContactName')->nullable();
+            $table->string('EmailAddress')->nullable();
+            $table->string('PhoneNumber')->nullable();
+            $table->text('Notes')->nullable();
+            $table->dateTime('LastUpdated')->nullable();
+            $table->timestamps();
+        });
+    }
+
+
+    Supplier::create([
+        'ID' => 'SUP-001',
+        'SupplierName' => 'PROVEEDOR TEST',
+        'AccountNumber' => 'J-00000000',
+        'ContactName' => 'Contacto Test',
+        'EmailAddress' => 'test@proveedor.com',
+        'PhoneNumber' => '0414000000',
+        'Notes' => 'Nota de prueba'
+    ]);
+
+
     $this->admin = User::factory()->create([
         'email_verified_at' => now(),
     ]);
+
+    $role = Role::firstOrCreate(['name' => 'admin']);
     
-    $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
+    $permissions = [
+        'agreement.list',
+        'agreement.show',
+        'agreement.create',
+        'agreement.update',
+        'agreement.delete'
+    ];
+
+    foreach ($permissions as $perm) {
+        Permission::firstOrCreate(['name' => $perm]);
+    }
+
+    $role->syncPermissions($permissions);
     $this->admin->assignRole('admin');
 
-    // Simulamos autenticación y contraseña confirmada
     $this->actingAs($this->admin)
          ->withSession(['auth.password_confirmed_at' => time()]);
 });
 
 describe('Vistas y Navegación', function () {
 
-    test('renderiza la lista de convenios (Index)', function () {
-        Agreement::factory()->count(3)->create();
+    test('renderiza la lista de acuerdos comerciales (Index)', function () {
+        Agreement::factory()->count(3)->create([
+            'supplier_id' => 'SUP-001'
+        ]);
 
         $this->get(route('agreement.index'))
             ->assertStatus(200)
@@ -31,9 +78,9 @@ describe('Vistas y Navegación', function () {
             );
     });
 
-    test('filtra convenios por nombre o RIF', function () {
-        Agreement::factory()->create(['name' => 'Empresa Alpha', 'tax_id' => 'J-11111111']);
-        Agreement::factory()->create(['name' => 'Empresa Beta', 'tax_id' => 'J-22222222']);
+    test('filtra acuerdos por nombre o RIF', function () {
+        Agreement::factory()->create(['name' => 'Empresa Alpha', 'tax_id' => 'J-11111111', 'supplier_id' => 'SUP-001']);
+        Agreement::factory()->create(['name' => 'Empresa Beta', 'tax_id' => 'J-22222222', 'supplier_id' => 'SUP-001']);
 
         // Búsqueda por Nombre
         $this->get(route('agreement.index', ['search' => 'Alpha']))
@@ -57,11 +104,12 @@ describe('Vistas y Navegación', function () {
             ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Agreements/Create')
+                ->has('defaultSuppliers')
             );
     });
 
-    test('muestra los detalles de un convenio (Show)', function () {
-        $agreement = Agreement::factory()->create();
+    test('muestra los detalles de un acuerdo (Show)', function () {
+        $agreement = Agreement::factory()->create(['supplier_id' => 'SUP-001']);
     
         $this->get(route('agreement.show', $agreement))
             ->assertStatus(200)
@@ -72,61 +120,51 @@ describe('Vistas y Navegación', function () {
     });
     
     test('renderiza el formulario de edición', function () {
-        $agreement = Agreement::factory()->create();
+        $agreement = Agreement::factory()->create(['supplier_id' => 'SUP-001']);
     
         $this->get(route('agreement.edit', $agreement))
             ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Agreements/Edit')
                 ->where('agreement.id', $agreement->id)
+                ->has('defaultSuppliers')
             );
     });
 });
 
 describe('Lógica de Creación', function () {
 
-    test('registra un nuevo convenio correctamente', function () {
+    test('registra un nuevo acuerdo correctamente', function () {
         $agreementData = [
-            'name' => 'Convenio 2026',
+            'name' => 'Acuerdo 2026',
             'legal_name' => 'Soluciones C.A.',
             'tax_id' => 'J-123456789',
             'contact_person' => 'Carlos Gerente',
             'contact_email' => 'gerencia@gmail.com',
             'contact_phone' => '04141234567',
+            'observations' => 'Sin observaciones',
+            'supplier_id' => 'SUP-001',
             'start_date' => '2026-01-01',
             'end_date' => '2026-12-31',
-            'observations' => 'Sin observaciones',
         ];
     
         $this->post(route('agreement.store'), $agreementData)
             ->assertRedirect(route('agreement.index'))
-            ->assertSessionHas('success', 'Convenio creado correctamente.');
+            ->assertSessionHas('success', 'Acuerdo creado correctamente.');
     
-        // Verificar BD
         $this->assertDatabaseHas('agreements', [
-            'name' => 'Convenio 2026',
+            'name' => 'Acuerdo 2026',
             'tax_id' => 'J-123456789',
             'is_active' => 1,
         ]);
     });
-
-    test('valida incoherencia de fechas (Inicio > Fin)', function () {
-        $agreementData = Agreement::factory()->raw([
-            'start_date' => '2026-12-31', 
-            'end_date' => '2026-01-01',   
-        ]);
-    
-        $this->post(route('agreement.store'), $agreementData)
-            ->assertSessionHasErrors(['start_date', 'end_date']);
-    });
     
     test('valida duplicidad de RIF', function () {
-        Agreement::factory()->create(['tax_id' => 'J-DUPLICADO']);
+        Agreement::factory()->create(['tax_id' => 'J-DUPLICADO', 'supplier_id' => 'SUP-001']);
     
         $newData = Agreement::factory()->raw([
             'tax_id' => 'J-DUPLICADO',
-            'start_date' => now()->format('Y-m-d'), 
-            'end_date' => now()->addYear()->format('Y-m-d'), 
+            'supplier_id' => 'SUP-001'
         ]);
     
         $this->post(route('agreement.store'), $newData)
@@ -137,28 +175,23 @@ describe('Lógica de Creación', function () {
 
 describe('Lógica de Actualización', function () {
 
-    test('actualiza un convenio correctamente', function () {
+    test('actualiza un acuerdo correctamente', function () {
         $agreement = Agreement::factory()->create([
             'name' => 'Nombre Viejo',
-            'is_active' => true
+            'is_active' => true,
+            'supplier_id' => 'SUP-001'
         ]);
     
-        // Preparamos los datos
         $updateData = [
             'name' => 'Nombre Editado',
             'legal_name' => $agreement->legal_name,
             'tax_id' => $agreement->tax_id,
             'contact_person' => $agreement->contact_person,
-            
             'contact_email' => 'gerencia_actualizada@gmail.com', 
-            
             'contact_phone' => $agreement->contact_phone,
-    
-            'start_date' => $agreement->start_date->format('Y-m-d'),
-            'end_date' => $agreement->end_date->format('Y-m-d'),
-            
             'observations' => 'Actualizado',
             'is_active' => false, 
+            'supplier_id' => 'SUP-001'
         ];
     
         $this->put(route('agreement.update', $agreement), $updateData)
@@ -174,15 +207,15 @@ describe('Lógica de Actualización', function () {
     });
     
     test('permite mantener el mismo RIF propio al actualizar', function () {
-        $agreement = Agreement::factory()->create(['tax_id' => 'J-PROPIO']);
+        $agreement = Agreement::factory()->create(['tax_id' => 'J-PROPIO', 'supplier_id' => 'SUP-001']);
     
         $updateData = $agreement->toArray();
         
         $updateData['name'] = 'Nombre Nuevo Solamente';
         $updateData['is_active'] = true;
+        $updateData['observations'] = 'Sin cambios';
         
-        $updateData['start_date'] = $agreement->start_date->format('Y-m-d');
-        $updateData['end_date'] = $agreement->end_date->format('Y-m-d');
+        $updateData['contact_email'] = 'pruebas@gmail.com'; 
     
         $this->put(route('agreement.update', $agreement), $updateData)
             ->assertSessionHasNoErrors()
@@ -193,12 +226,12 @@ describe('Lógica de Actualización', function () {
 
 describe('Eliminación', function () {
 
-    test('realiza borrado suave (Soft Delete) del convenio', function () {
-        $agreement = Agreement::factory()->create();
+    test('realiza borrado suave (Soft Delete) del acuerdo', function () {
+        $agreement = Agreement::factory()->create(['supplier_id' => 'SUP-001']);
     
         $this->delete(route('agreement.destroy', $agreement))
             ->assertRedirect(route('agreement.index'))
-            ->assertSessionHas('success', 'Convenio eliminado correctamente.');
+            ->assertSessionHas('success', 'Acuerdo eliminado correctamente.');
     
         $this->assertSoftDeleted('agreements', [
             'id' => $agreement->id

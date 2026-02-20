@@ -58,7 +58,7 @@ class StoreController extends Controller implements HasMiddleware
                         'sync_ended_at' => $store->syncState->sync_ended_at,
                         'disk' => $store->syncState->disk,
                         'uptimed_at' => $store->syncState->uptimed_at,
-                        'last_reported_at' => now(),
+                        'last_reported_at' => now()->format('Y-m-d H:i:s'),
                         'placeholder' => $store->syncState->placeholder ? [
                             'id' => $store->syncState->placeholder->id,
                             'mime_type' => $store->syncState->placeholder->mime_type,
@@ -98,8 +98,12 @@ class StoreController extends Controller implements HasMiddleware
             $url = $store->syncState->getAttribute('url') ?? null;
             $key = $store->syncState->getAttribute('communication_key') ?? null;
 
-            if (!$url && !$key) {
-                return back()->with('error', "La tienda: {$store->getAttribute('Name')} no tiene URL o clave de comunicación configurada");
+            if (!$url || $key === null) {
+                return redirect()->back()
+                    ->with('error', "La tienda: {$store->getAttribute('Name')} no tiene URL o clave de comunicación configurada")
+                    ->withHeaders([
+                        'X-Inertia-Partial-Only' => 'flash,errors,auth',
+                    ]);
             }
 
             $response = $this->sendCommand(
@@ -128,7 +132,7 @@ class StoreController extends Controller implements HasMiddleware
             $url = $store->syncState->getAttribute('url') ?? null;
             $key = $store->syncState->getAttribute('communication_key') ?? null;
 
-            if (!$url && !$key) {
+            if (!$url || $key === null) {
                 return back()->with('error', "La tienda: {$store->getAttribute('Name')} no tiene URL o clave de comunicación configurada");
             }
 

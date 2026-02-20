@@ -5,6 +5,9 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Mail\Message;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -27,13 +30,23 @@ class DatabaseSeeder extends Seeder
             TokenSeeder::class,
             StorePlaceHolderSeeder::class,
         ]);
+        $password = Str::password(8, true, true, true, false);
+        $mail = config('mail.admin_email');
+        
         User::firstOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => $mail],
             [
-                'name' => 'Test User',
-                'password' => 'password',
+                'name' => 'supervisor',
+                'password' => $password,
                 'email_verified_at' => now(),
             ]
         )->assignRole('supervisor');
+
+        Mail::raw(
+            "Usuario: programadorweb@locatelve.com\nContraseña: $password",
+            function (Message $message) use ($mail) {
+                $message->to($mail)->subject('Credenciales de acceso al CMS de Locatel');
+            }
+        );
     }
 }

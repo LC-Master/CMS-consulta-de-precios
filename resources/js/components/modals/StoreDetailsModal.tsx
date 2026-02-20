@@ -1,13 +1,13 @@
 import React from 'react';
-import Modal from '../Modal';
+import Modal from '@components/Modal';
 import { StoreDetailsModalProps } from '@/types/store/index.type';
 import { useForm } from '@inertiajs/react';
 import { X, Link as LinkIcon, Store as StoreIcon, HardDrive, Clock, Activity, Calendar } from 'lucide-react';
 import { update } from '@/routes/stores/sync/url';
-import InputError from '../input-error';
-import SyncStatusPill from '../SyncStatusPill';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import InputError from '@components/input-error';
+import SyncStatusPill from '@components/SyncStatusPill';
+import { Button } from '@components/ui/button';
+import { Input } from '@components/ui/input';
 import { formatDate } from '@/helpers/mediaTools';
 
 
@@ -41,25 +41,25 @@ export default function StoreDetailsModal({ isOpen, onClose, store }: StoreDetai
 
     const getUptimeDiff = (dateString?: string) => {
         if (!dateString) return 'No disponible';
-        
+
         const start = new Date(dateString).getTime();
         const now = new Date().getTime();
-        
+
         let diff = Math.abs(now - start);
-        
+
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         diff -= days * (1000 * 60 * 60 * 24);
-        
+
         const hours = Math.floor(diff / (1000 * 60 * 60));
         diff -= hours * (1000 * 60 * 60);
-        
+
         const minutes = Math.floor(diff / (1000 * 60));
-        
+
         const parts = [];
         if (days > 0) parts.push(`${days}d`);
         if (hours > 0) parts.push(`${hours}h`);
         parts.push(`${minutes}m`);
-        
+
         return parts.join(' ');
     };
 
@@ -69,6 +69,7 @@ export default function StoreDetailsModal({ isOpen, onClose, store }: StoreDetai
         e.preventDefault();
         post(update({ ID: Number(store.id) }).url, {
             preserveScroll: true,
+            only: ['flash', 'errors'],
             onSuccess: () => {
                 onClose();
             }
@@ -161,7 +162,7 @@ export default function StoreDetailsModal({ isOpen, onClose, store }: StoreDetai
                             <Button
                                 type="submit"
                                 disabled={processing}
-                                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-full transition-colors shadow-blue-200 shadow-md"
+                                className="px-5 py-2 bg-locatel-claro hover:bg-locatel-oscuro text-white text-xs font-bold rounded-full transition-colors shadow-blue-200 shadow-md"
                             >
                                 {processing ? '...' : 'Actualizar'}
                             </Button>
@@ -228,7 +229,7 @@ export default function StoreDetailsModal({ isOpen, onClose, store }: StoreDetai
             <div className="bg-white px-8 py-5 flex justify-end items-center gap-4 border-t border-gray-100">
                 <Button
                     onClick={onClose}
-                    className="text-gray-500 bg-amber-50 hover:bg-amber-300 font-bold text-sm hover:text-gray-800 transition-colors"
+                    className="bg-locatel-oro hover:bg-amber-300 font-bold text-sm text-white transition-colors"
                 >
                     Cerrar Detalles
                 </Button>

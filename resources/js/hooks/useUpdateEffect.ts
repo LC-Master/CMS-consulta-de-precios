@@ -1,3 +1,4 @@
+import ms from 'ms';
 import { useEffect, useRef } from 'react';
 
 export function useUpdateEffect(effect: () => void | (() => void), deps: React.DependencyList) {
@@ -18,7 +19,11 @@ export function useUpdateEffect(effect: () => void | (() => void), deps: React.D
 
         previousDeps.current = deps;
 
-        return effect();
+        const timeout = setTimeout(() => {
+            effect();
+        }, ms('500ms'));
+
+        return () => clearTimeout(timeout);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, deps);

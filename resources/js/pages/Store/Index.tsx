@@ -21,13 +21,35 @@ import SyncStatusPill from "@/components/SyncStatusPill";
 import { useEcho } from "@laravel/echo-react";
 import { SYNC_STATUS_TRANSLATIONS } from "@/i18n/sync-status";
 import { formatDate } from "@/helpers/mediaTools";
+import useToastSync from "@/hooks/use-toast-sync";
+import { SyncStatusEnum } from "@/enums/SyncStatusEnum";
 
 export default function StoreIndex({ stores, filters = {}, flash }: Props) {
     const { ToastContainer } = useToast(flash);
+    const [syncFlash, setSyncFlash] = useState<{ status: SyncStatusEnum; message: string } | undefined>(undefined);
+    const { ToastContainer: SyncToastContainer } = useToastSync(syncFlash)
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
-    const { listen, stopListening } = useEcho('monitoring', '.sync.updated', () => router
-        .get(window.location.pathname, {}, { preserveState: true, replace: true, preserveScroll: true, fresh: true }))
+    const { listen, stopListening } = useEcho('monitoring', '.sync.updated', (e) => {
+        setSyncFlash({ status: e.status, message: `Tienda ${e.store_name}: ${SYNC_STATUS_TRANSLATIONS[e.status]}` })
+        router.reload({
+            async: true,
+            fresh: true,
+            reset: ['stores'],
+            only: ['stores', 'flash', 'errors'],
+        })
+    })
+
+    const postToBackend = (endpoint: string): void => {
+        router.post(endpoint, undefined, {
+            preserveState: true,
+            preserveScroll: true,
+            only: ['flash', 'errors', 'stores'],
+            reset: ['stores'],
+            async: true,
+        })
+    }
+
     useEffect(() => {
         listen()
         return () => {
@@ -117,7 +139,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
                     <div className="flex gap-2">
                         <Button
                             disabled={!hasUrl}
-                            onClick={() => router.post(`/stores/${a.id}/force-sync`)}
+                            onClick={() => postToBackend(`/stores/${a.id}/force-sync`)}
                             className={`px-3 h-8 text-xs font-medium text-white rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 ${hasUrl
                                 ? 'bg-locatel-naranja hover:bg-orange-500 focus:ring-locatel-naranja'
                                 : 'bg-gray-300 cursor-not-allowed opacity-70'
@@ -127,7 +149,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
                         </Button>
                         <Button
                             disabled={!hasUrl}
-                            onClick={() => router.post(`/stores/${a.id}/force-token`)}
+                            onClick={() => postToBackend(`/stores/${a.id}/force-token`)}
                             className={`px-3 h-8 text-xs font-medium text-white rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 ${hasUrl
                                 ? 'bg-locatel-medio hover:bg-locatel-claro focus:ring-locatel-claro'
                                 : 'bg-gray-300 cursor-not-allowed opacity-70'
@@ -162,7 +184,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
                                 <span>Detalles de la tienda</span>
                             </ActionMenu.Item>
                         </ActionMenu>
-                    </div>
+                    </div >
                 )
             },
         },
@@ -170,6 +192,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs('Lista de Tiendas', index().url)}>
+            {SyncToastContainer()}
             {ToastContainer()}
             <PlaceHolderMangerModal isOpen={isOpen} store={storeSelected} onClose={closeModal} />
             <StoreDetailsModal isOpen={isDetailsOpen} store={storeSelected} onClose={closeDetails} />
@@ -217,6 +240,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
                     columns={columns}
                     rowKey={(a) => a.id}
                     infiniteData="stores"
+                    buffer={32}
                 />
 
             </div>

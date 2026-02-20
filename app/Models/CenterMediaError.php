@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\FixSqlServerDates;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Store;
@@ -9,6 +10,7 @@ use App\Models\Store;
 class CenterMediaError extends Model
 {
     use HasUuids;
+    use FixSqlServerDates;
     protected $fillable = [
         'center_id',
         'media_id',

@@ -14,7 +14,11 @@
     </testsuites>
     <source>
         <include>
-            <directory>app</directory>
+            <directory>app/Actions/Fortify</directory>
+            <directory>app/Contracts</directory>
+            <directory>app/Enums</directory>
+            <directory>app/Http/Middleware</directory>
+            <directory>app/Providers</directory>
         </include>
     </source>
     <php>

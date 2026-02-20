@@ -12,15 +12,15 @@ export function mediaNameNormalizer(name: string) {
 
     return cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
 }
-export function formatDate(date?: string | number | Date, options: Intl.DateTimeFormatOptions = {timeZone:'America/Caracas'}) {
+export function formatDate(date?: string | number | Date, options: Intl.DateTimeFormatOptions = {}) {
     if (!date) return "-";
-    return new Date(date).toLocaleString(['es-VE'], options);
+    return new Date(date).toLocaleString([], options);
 }
 
 export function isVideo(mime_type: string) {
     return mime_type.startsWith("video");
 }
-export const formatForEdit = (dateStr) => {
+export const formatForEdit = (dateStr: string | Date) => {
     if (!dateStr) return '';
 
     const localDate = new Date(dateStr).toLocaleString('sv-SE', {

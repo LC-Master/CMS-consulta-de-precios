@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\FixSqlServerDates;
+use App\Traits\HasHealthMetrics;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class StoreSyncState extends Model
 {
     use HasUuids;
-
+    use FixSqlServerDates;
+    use HasHealthMetrics;
     protected $fillable = [
         'store_id',
         'url',
@@ -20,14 +23,12 @@ class StoreSyncState extends Model
         'sync_status',
         'last_synced_at',
         'last_reported_at',
+        'sync_retries',
+        'last_sync_error',
+        'last_error_at'
     ];
     protected $casts = [
         'disk' => 'array',
-        'sync_started_at' => 'datetime',
-        'sync_ended_at' => 'datetime',
-        'uptimed_at' => 'datetime',
-        'last_synced_at' => 'datetime',
-        'last_reported_at' => 'datetime',
     ];
     public function store()
     {

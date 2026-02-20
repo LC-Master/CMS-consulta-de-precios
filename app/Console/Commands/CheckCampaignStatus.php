@@ -21,21 +21,21 @@ class CheckCampaignStatus extends Command
      *
      * @var string
      */
-    protected $description = 'Verifica las campañas activas y las finaliza si su fecha de fin ha pasado';
+    protected $description = 'Verify active campaigns and finish them if their end date has passed';
 
     public function handle()
     {
-        $this->info('Comprobando campañas...');
+        $this->info('Checking campaigns...');
 
         $statusActiva = Status::where('status', CampaignStatus::ACTIVE->value)->first();
         $statusFinalizada = Status::where('status', CampaignStatus::FINISHED->value)->first();
 
         if (!$statusActiva) {
-            $this->error(string: 'Error: No se encontró el estatus con nombre "' . CampaignStatus::ACTIVE->value . '" en la tabla statuses.');
+            $this->error(string: 'Error: Status with name "' . CampaignStatus::ACTIVE->value . '" not found in statuses table.');
         }
 
         if (!$statusFinalizada) {
-            $this->error('Error: No se encontró el estatus con nombre "' . CampaignStatus::FINISHED->value . '" en la tabla statuses.');
+            $this->error('Error: Status with name "' . CampaignStatus::FINISHED->value . '" not found in statuses table.');
         }
 
         $now = now();
@@ -55,10 +55,10 @@ class CheckCampaignStatus extends Command
         }
 
         if ($affectedRows > 0) {
-            $this->info("¡Éxito! Se han finalizado {$affectedRows} campañas.");
+            $this->info("Success! {$affectedRows} campaigns have been finished.");
         } else {
-            $this->info("No se encontraron campañas vencidas para finalizar.");
+            $this->info("No expired campaigns found to finish.");
         }
-        $this->info('Proceso completado.');
+        $this->info('Process completed.');
     }
 }
