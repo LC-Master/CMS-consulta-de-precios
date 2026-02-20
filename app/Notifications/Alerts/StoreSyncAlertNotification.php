@@ -16,7 +16,10 @@ class StoreSyncAlertNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct(public string $storeName, public string $errorMessage)
+    /**
+     * @param  array<int, array{store_name: string, error_message: string}>|null  $summary
+     */
+    public function __construct(public string $storeName, public string $errorMessage, public ?array $summary = null)
     {
         //
     }
@@ -25,6 +28,19 @@ class StoreSyncAlertNotification extends Notification implements ShouldQueue
     {
         $users = User::role(['supervisor'])->get();
         \Illuminate\Support\Facades\Notification::send($users, new self($storeName, $errorMessage));
+    }
+
+    /**
+     * @param  array<int, array{store_name: string, error_message: string}>  $summary
+     */
+    public static function sendSummaryToAdmins(array $summary): void
+    {
+        if (empty($summary)) {
+            return;
+        }
+
+        $users = User::role(['supervisor'])->get();
+        \Illuminate\Support\Facades\Notification::send($users, new self('Resumen de tiendas', 'N/A', $summary));
     }
 
     /**
@@ -44,16 +60,34 @@ class StoreSyncAlertNotification extends Notification implements ShouldQueue
     {
         $recipientName = ($notifiable->name ?? $notifiable->email) ?: 'equipo';
 
+        if (is_array($this->summary) && count($this->summary) > 0) {
+            $message = (new MailMessage)
+                ->subject('Resumen crítico de sincronización: tiendas con incidencia')
+                ->greeting("Estimado {$recipientName},")
+                ->line('En esta ejecución se consolidaron tiendas con incidencias críticas de sincronización:')
+                ->line('');
+
+            foreach ($this->summary as $item) {
+                $message->line(new HtmlString("• <strong>{$item['store_name']}</strong>: {$item['error_message']}"));
+            }
+
+            return $message
+                ->line('Acción inmediata recomendada: priorizar atención de las tiendas listadas para restablecer continuidad operativa.')
+                ->line('Acción complementaria: documentar causa raíz y estado de remediación por tienda.')
+                ->action('Acceder al Panel de Tiendas', url('/stores'))
+                ->salutation(new HtmlString('Atentamente,<br>Plataforma CMS Locatel'));
+        }
+
         return (new MailMessage)
-            ->subject("Notificación Urgente: Error Crítico en Sincronización de Tienda {$this->storeName}")
+            ->subject("Alerta crítica de sincronización: {$this->storeName}")
             ->greeting("Estimado {$recipientName},")
-            ->line(new HtmlString("Le informamos que se ha producido un error crítico durante el proceso de sincronización de datos en la tienda <strong>{$this->storeName}</strong>."))
-            ->line('Este incidente podría afectar la disponibilidad de información actualizada y el funcionamiento normal de los servicios asociados a esta tienda.')
-            ->line('Es imperativo que revise los detalles del error a continuación y tome las acciones correctivas necesarias de manera inmediata para minimizar cualquier interrupción en el servicio.')
+            ->line(new HtmlString("Se registró una incidencia crítica durante la sincronización de la tienda <strong>{$this->storeName}</strong>."))
+            ->line('Este evento puede comprometer la actualización de contenidos y la continuidad operativa de la tienda afectada.')
+            ->line('Se recomienda ejecutar atención prioritaria para contención y recuperación del servicio.')
             ->line(new HtmlString("<strong>Detalles del Error:</strong><br>{$this->errorMessage}"))
-            ->line('Si requiere asistencia adicional o tiene alguna pregunta, no dude en contactar al equipo de soporte técnico.')
+            ->line('Si la incidencia persiste tras la intervención inicial, escalar inmediatamente al equipo técnico.')
             ->action('Acceder al Panel de Tiendas', url('/stores'))
-            ->salutation(new HtmlString('Atentamente,<br>Equipo de Integraciones de CMS'));
+            ->salutation(new HtmlString('Atentamente,<br>Plataforma CMS Locatel'));
     }
 
     /**
@@ -63,6 +97,13 @@ class StoreSyncAlertNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
+        if (is_array($this->summary) && count($this->summary) > 0) {
+            return [
+                'type' => 'summary',
+                'items' => $this->summary,
+            ];
+        }
+
         return [
             'store_name' => $this->storeName,
             'error_message' => $this->errorMessage,

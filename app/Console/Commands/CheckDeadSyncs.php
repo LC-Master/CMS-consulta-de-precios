@@ -29,22 +29,28 @@ class CheckDeadSyncs extends Command
     public function handle()
     {
         $fourHoursAgo = now()->subHours(4);
+        $failedStores = [];
         $staleSyncs = StoreSyncState::with('store')->where('sync_status', SyncStatusEnum::SYNCING->value)
             ->where('sync_started_at', '<', $fourHoursAgo)
             ->get();
 
-        $staleSyncs->each(function ($sync) {
+        $staleSyncs->each(function ($sync) use (&$failedStores) {
             $sync->sync_status = SyncStatusEnum::FAILED->value;
             $sync->sync_started_at = null;
             $sync->last_sync_error = 'Critical Error: The synchronization process for this store has exceeded the maximum allowed runtime of 4 hours and has been automatically marked as failed. Please investigate the underlying issues causing the delay and retry the sync operation.';
             $sync->last_error_at = now();
 
-            StoreSyncAlertNotification::sendToAdmin($sync->store->name, $sync->last_sync_error);
+            $failedStores[] = [
+                'store_name' => (string) $sync->store->name,
+                'error_message' => (string) $sync->last_sync_error,
+            ];
 
             $sync->save();
 
             $this->info("Marked sync for store {$sync->store_id} ({$sync->store->name}) as failed due to timeout.");
         });
+
+        StoreSyncAlertNotification::sendSummaryToAdmins($failedStores);
 
     }
 }

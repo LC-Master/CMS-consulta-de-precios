@@ -3,6 +3,8 @@
 namespace App\Notifications;
 
 use App\Enums\SyncStatusEnum;
+use App\Jobs\SendStoreSyncStatusSummaryMailJob;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -18,15 +20,40 @@ class StoreSyncNotification extends Notification implements ShouldQueue
      */
     public function __construct(
         public string $storeName,
-        public SyncStatusEnum $status
+        public SyncStatusEnum $status,
+        public ?array $summaryStores = null
     ) {}
-    public static function  sendToAdmins(string $storeName, SyncStatusEnum $status){
+
+    public static function sendToAdmins(string $storeName, SyncStatusEnum $status): void
+    {
         $users = User::role(['admin','supervisor'])->get();
 
         \Illuminate\Support\Facades\Notification::send(
             $users,
             new self($storeName, $status)
         );
+
+        $statusValue = $status->value;
+        $storesKey = "store_sync_summary_mail:{$statusValue}:stores";
+        $scheduledKey = "store_sync_summary_mail:{$statusValue}:scheduled";
+
+        $stores = Cache::get($storesKey, []);
+        $stores[] = $storeName;
+        $stores = array_values(array_unique($stores));
+
+        Cache::put($storesKey, $stores, now()->addMinutes(10));
+
+        if (Cache::add($scheduledKey, true, now()->addMinutes(2))) {
+            SendStoreSyncStatusSummaryMailJob::dispatch($statusValue)->delay(now()->addSeconds(30));
+        }
+    }
+
+    /**
+     * @param  array<int, string>  $stores
+     */
+    public static function summary(SyncStatusEnum $status, array $stores): self
+    {
+        return new self('Resumen', $status, $stores);
     }
     /**
      * Get the notification's delivery channels.
@@ -35,7 +62,7 @@ class StoreSyncNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return $this->summaryStores !== null ? ['mail'] : ['database'];
     }
 
     /**
@@ -45,57 +72,77 @@ class StoreSyncNotification extends Notification implements ShouldQueue
     {
         $statusValue = $this->status->value;
 
+        if ($this->summaryStores !== null) {
+            $translatedStatus = strtoupper($this->getTranslatedStatus($statusValue));
+
+            $mail = (new MailMessage)
+                ->subject("Resumen operativo de sincronización ({$translatedStatus})")
+                ->greeting('Estimado equipo,')
+                ->line("Se consolidaron eventos de sincronización clasificados en el estado: {$translatedStatus}.")
+                ->line('Tiendas incluidas en esta consolidación:');
+
+            foreach ($this->summaryStores as $store) {
+                $mail->line("• {$store}");
+            }
+
+            return $mail
+                ->action('Ver listado de tiendas', url('/stores'))
+                ->line('Acción sugerida: priorizar revisión de las tiendas listadas y validar su estado actual en el panel.')
+                ->line('Este envío corresponde a un resumen agrupado para optimizar el seguimiento operativo.')
+                ->salutation('Atentamente, Plataforma CMS Locatel');
+        }
+
         // Configuración visual y semántica según el estado
         $config = match ($statusValue) {
             'success' => [
-                'subject' => "✅ Sincronización Exitosa: {$this->storeName}",
+                'subject' => "✅ Confirmación de sincronización: {$this->storeName}",
                 'level' => 'success', 
-                'title' => '¡Sincronización Completada!',
-                'message' => "La tienda {$this->storeName} ha finalizado su proceso de sincronización correctamente. El sistema se encuentra actualizado y operativo.",
+                'title' => 'Sincronización finalizada correctamente',
+                'message' => "La tienda {$this->storeName} completó la sincronización de forma satisfactoria y quedó en estado operativo.",
             ],
             'failed' => [
-                'subject' => "🚨 Alerta Crítica: Fallo en {$this->storeName}",
+                'subject' => "🚨 Incidencia crítica de sincronización: {$this->storeName}",
                 'level' => 'error', 
-                'title' => 'Error de Sincronización Detectado',
-                'message' => "Se han reportado errores graves en {$this->storeName}. Es posible que el contenido multimedia no se esté reproduciendo correctamente. Se requiere atención inmediata.",
+                'title' => 'Fallo de sincronización detectado',
+                'message' => "La tienda {$this->storeName} reportó un fallo crítico de sincronización. Se recomienda atender el caso con prioridad para evitar impacto operativo.",
             ],
             'stale' => [
-                'subject' => "⚠️ Alerta de Conexión: {$this->storeName}",
+                'subject' => "⚠️ Alerta de conectividad/sin reporte: {$this->storeName}",
                 'level' => 'error', 
-                'title' => 'Sin Comunicación Reciente',
-                'message' => "La tienda {$this->storeName} ha dejado de reportar actividad (estado Obsoleto). Verifique si el equipo está encendido y conectado a la red.",
+                'title' => 'Tienda sin comunicación reciente',
+                'message' => "La tienda {$this->storeName} no registra reportes recientes (estado obsoleto). Validar conectividad y estado del equipo local.",
             ],
             'syncing' => [
-                'subject' => "🔄 Sincronizando: {$this->storeName}",
+                'subject' => "🔄 Sincronización en curso: {$this->storeName}",
                 'level' => 'info',
-                'title' => 'Sincronización en Curso',
-                'message' => "La tienda {$this->storeName} ha comenzado a descargar actualizaciones. Le notificaremos si ocurre algún imprevisto.",
+                'title' => 'Proceso de sincronización iniciado',
+                'message' => "La tienda {$this->storeName} inició su proceso de sincronización. Se recomienda monitorear hasta su cierre exitoso.",
             ],
             default => [
-                'subject' => "Notificación de Estado: {$this->storeName}",
+                'subject' => "Notificación operativa de estado: {$this->storeName}",
                 'level' => 'info',
-                'title' => 'Actualización de Estado',
-                'message' => "El estado de sincronización ha cambiado a: " . strtoupper($statusValue),
+                'title' => 'Actualización de estado de sincronización',
+                'message' => "La tienda {$this->storeName} reportó cambio de estado a: " . strtoupper($statusValue),
             ],
         };
 
         $footerMessage = match ($statusValue) {
-            'failed', 'stale' => 'Si el problema persiste, por favor revise los logs detallados en el panel de administración.',
-            'success' => 'El sistema continuará monitoreando la actividad automáticamente.',
-            'syncing' => 'Este proceso puede tardar unos minutos dependiendo de la conexión.',
-            default => 'Para más información, consulte el panel de control.',
+            'failed', 'stale' => 'Acción prioritaria: revisar logs técnicos, validar conectividad y ejecutar corrección en el menor tiempo posible.',
+            'success' => 'Se mantiene el monitoreo automático para detectar cualquier desviación posterior.',
+            'syncing' => 'Este proceso puede tardar algunos minutos según conectividad y volumen de actualización.',
+            default => 'Para seguimiento detallado, consulte el panel operativo de tiendas.',
         };
 
         return (new MailMessage)
             ->level($config['level'])
             ->subject($config['subject'])
-            ->greeting("Hola,")
+                ->greeting('Estimado equipo,')
             ->line("**{$config['title']}**")
             ->line($config['message'])
-            ->line("Estado reportado: **" . strtoupper($this->getTranslatedStatus($statusValue)) . "**")
+                ->line("Estado reportado: **" . strtoupper($this->getTranslatedStatus($statusValue)) . "**")
             ->action('Ver Detalles de la Tienda', url('/stores?search=' . urlencode($this->storeName)))
             ->line($footerMessage)
-            ->salutation('Atentamente, CMS Locatel');
+                ->salutation('Atentamente, Plataforma CMS Locatel');
     }
 
     protected function getTranslatedStatus(string $status): string
@@ -117,6 +164,14 @@ class StoreSyncNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
+        if ($this->summaryStores !== null) {
+            return [
+                'status' => $this->status->value,
+                'stores' => $this->summaryStores,
+                'message' => 'Resumen de estados de sincronización agrupados.',
+            ];
+        }
+
         return [
             'store_name' => $this->storeName,
             'status' => $this->status->value,
