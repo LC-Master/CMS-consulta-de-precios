@@ -21,6 +21,10 @@ class StoreController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('permission:store.list', only: ['index']),
+            new Middleware('permission:store.force.sync', only: ['forceSync']),
+            new Middleware('permission:store.force.token', only: ['forceToken']),
+            new Middleware('permission:store.sync.url.update', only: ['updateSyncUrl']),
+            new Middleware('permission:store.placeholder.update', only: ['updatePlaceholder']),
         ];
     }
 
@@ -44,8 +48,8 @@ class StoreController extends Controller implements HasMiddleware
             }
 
             return Inertia::render('Store/Index', [
-                'stores' => Inertia::scroll($query->orderBy('ID', 'desc')->paginate(10)->withQueryString()->through(fn($store) => [
-                    'id' => $store->id,
+                'stores' => Inertia::scroll($query->orderBy('ID', 'desc')->paginate(30)->withQueryString()->through(callback: fn($store) => [
+                    'id' => (int) $store->id,
                     'name' => $store->Name,
                     'store_code' => $store->StoreCode,
                     'region' => $store->Region,

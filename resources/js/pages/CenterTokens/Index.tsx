@@ -24,7 +24,6 @@ export default function CenterTokensIndex({ stores, centerTokens, flash, filters
     const [selectedStore, setSelectedStore] = useState(filters.store || '');
     const [search, setSearch] = useState(filters.search || '');
     useUpdateEffect(() => {
-        const timer = setTimeout(() => {
             router.get(
                 index().url,
                 { search: search, store: selectedStore },
@@ -35,8 +34,6 @@ export default function CenterTokensIndex({ stores, centerTokens, flash, filters
                     onSuccess: () => { router.reload({ only: ['centerTokens'], reset: ['centerTokens'] }); },
                 }
             );
-        }, 300);
-        return () => clearTimeout(timer);
     }, [search, selectedStore]);
     const columns: Column<CenterToken>[] = [
         {

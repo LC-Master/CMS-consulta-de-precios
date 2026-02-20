@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from 'react';
 import Modal from '@components/Modal';
 import { StoreDetailsModalProps } from '@/types/store/index.type';
 import { useForm } from '@inertiajs/react';
@@ -8,17 +8,18 @@ import InputError from '@components/input-error';
 import SyncStatusPill from '@components/SyncStatusPill';
 import { Button } from '@components/ui/button';
 import { Input } from '@components/ui/input';
-import { formatDate } from '@/helpers/mediaTools';
-
+import { formatBytes, formatDate } from '@/helpers/mediaTools';
+import { intervalToDuration } from 'date-fns';
+import useAuth from '@/hooks/useAuth';
 
 export default function StoreDetailsModal({ isOpen, onClose, store }: StoreDetailsModalProps) {
     const defaultSyncState = store?.sync_state;
-
+    const { can } = useAuth();
     const { data, setData, post, processing, errors } = useForm({
         url: defaultSyncState?.url || '',
     });
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (store) {
             setData('url', store.sync_state?.url || '');
         }
@@ -27,40 +28,15 @@ export default function StoreDetailsModal({ isOpen, onClose, store }: StoreDetai
 
     if (!isOpen || !store) return null;
 
-    const formatBytes = (bytes: number, decimals = 2) => {
-        if (!+bytes) return '0 Bytes';
-
-        const k = 1024;
-        const dm = decimals < 0 ? 0 : decimals;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-    };
-
     const getUptimeDiff = (dateString?: string) => {
         if (!dateString) return 'No disponible';
 
-        const start = new Date(dateString).getTime();
-        const now = new Date().getTime();
+        const { days, hours, minutes } = intervalToDuration({
+            start: new Date(dateString),
+            end: new Date()
+        });
 
-        let diff = Math.abs(now - start);
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        diff -= days * (1000 * 60 * 60 * 24);
-
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        diff -= hours * (1000 * 60 * 60);
-
-        const minutes = Math.floor(diff / (1000 * 60));
-
-        const parts = [];
-        if (days > 0) parts.push(`${days}d`);
-        if (hours > 0) parts.push(`${hours}h`);
-        parts.push(`${minutes}m`);
-
-        return parts.join(' ');
+        return `${days ? days + 'd ' : ''}${hours ? hours + 'h ' : ''}${minutes || 0}m`.trim();
     };
 
     const syncState = store.sync_state;
@@ -145,28 +121,32 @@ export default function StoreDetailsModal({ isOpen, onClose, store }: StoreDetai
                 <div className="bg-white rounded-2xl p-6 shadow-sm">
                     {/* Endpoint URL */}
                     <div className="mb-6">
-                        <label className="text-xs font-bold text-gray-700 mb-2 block">Endpoint de Sincronización (URL)</label>
-                        <form onSubmit={handleUpdateUrl} className="flex gap-3">
-                            <div className="relative flex-1 group">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <LinkIcon className="h-3.5 w-3.5 text-gray-400" />
-                                </div>
-                                <Input
-                                    type="url"
-                                    value={data.url}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('url', e.target.value)}
-                                    className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-full leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs text-gray-600 font-medium transition-shadow hover:shadow-sm"
-                                    placeholder="https://"
-                                />
-                            </div>
-                            <Button
-                                type="submit"
-                                disabled={processing}
-                                className="px-5 py-2 bg-locatel-claro hover:bg-locatel-oscuro text-white text-xs font-bold rounded-full transition-colors shadow-blue-200 shadow-md"
-                            >
-                                {processing ? '...' : 'Actualizar'}
-                            </Button>
-                        </form>
+                        {can('store.sync.url.update') && (
+                            <>
+                                <label className="text-xs font-bold text-gray-700 mb-2 block">Endpoint de Sincronización (URL)</label>
+                                <form onSubmit={handleUpdateUrl} className="flex gap-3">
+                                    <div className="relative flex-1 group">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <LinkIcon className="h-3.5 w-3.5 text-gray-400" />
+                                        </div>
+                                        <Input
+                                            type="url"
+                                            value={data.url}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('url', e.target.value)}
+                                            className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-full leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs text-gray-600 font-medium transition-shadow hover:shadow-sm"
+                                            placeholder="https://"
+                                        />
+                                    </div>
+                                    <Button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="px-5 py-2 bg-locatel-claro hover:bg-locatel-oscuro text-white text-xs font-bold rounded-full transition-colors shadow-blue-200 shadow-md"
+                                    >
+                                        {processing ? '...' : 'Actualizar'}
+                                    </Button>
+                                </form>
+                            </>
+                        )}
                         <InputError message={errors.url} className="mt-2" />
                     </div>
 

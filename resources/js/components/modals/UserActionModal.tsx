@@ -6,13 +6,13 @@ import { destroy, restore } from "@/routes/user";
 interface UserActionModalProps {
     isOpen: boolean;
     closeModal: () => void;
-    userId: string;
+    userId: number | null;
     actionType: 'delete' | 'restore' | null;
-    setUserId: (id: string) => void;
+    setUserId: (id: number | null) => void;
 }
 
 export default function UserActionModal({ isOpen, closeModal, userId, actionType, setUserId }: UserActionModalProps) {
-    if (!isOpen || !actionType) return null;
+    if (!isOpen || !actionType || userId === null) return null;
 
     const isDelete = actionType === 'delete';
 
@@ -24,7 +24,7 @@ export default function UserActionModal({ isOpen, closeModal, userId, actionType
         buttonText: isDelete ? 'Desactivar usuario' : 'Restaurar usuario',
         buttonColor: isDelete ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700',
         method: isDelete ? 'delete' : 'put' as 'delete' | 'put',
-        route: isDelete ? destroy({ id: Number(userId) }).url : restore({ id: Number(userId) }).url,
+        route: isDelete ? destroy({ id: userId }).url : restore({ id: userId }).url,
     };
 
     const handleAction = () => {
@@ -33,7 +33,7 @@ export default function UserActionModal({ isOpen, closeModal, userId, actionType
                 preserveScroll: true,
                 onSuccess: () => {
                     closeModal();
-                    setUserId('');
+                    setUserId(null);
                 }
             });
         } else {
@@ -41,7 +41,7 @@ export default function UserActionModal({ isOpen, closeModal, userId, actionType
                 preserveScroll: true,
                 onSuccess: () => {
                     closeModal();
-                    setUserId('');
+                    setUserId(null);
                 }
             });
         }

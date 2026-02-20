@@ -34,8 +34,8 @@ class ResetAdmin extends Command
     public function handle()
     {
         $email = $this->option('email') ?? config('mail.admin_email');
-        $role = $this->option('role') ?? 'supervisor';
-        $newName = $this->option('new_name') ?? 'supervisor';
+        $role = $this->option('role') ?? 'admin';
+        $newName = $this->option('new_name') ?? 'admin';
         $newEmail = $this->option('new_mail') ?? $email;
 
         $user = User::role($role)->orWhere('email', $email)->first();

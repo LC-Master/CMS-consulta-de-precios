@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react" 
 
 export default function useModal(initialState: boolean = false) {
-    const [isOpen, setIsOpen] = useState(initialState)
+    const [isOpen, setIsOpen] = useState<boolean>(initialState)
 
     const closeModal = (): void => {
         setIsOpen(false)

@@ -184,7 +184,7 @@ export default function UserEdit({ user, roles, permissions }: PropsEditPage) {
                             </div>
                         </div>
 
-                        {/* SECCIÓN 2.5: ASIGNACION DE ROL */}
+                        {/* SECCIÓN 2.5: ASIGNACIÓN DE ROL */}
                         <div className="border-t border-gray-100 pt-6">
                             <h3 className="text-sm font-semibold text-gray-900 mb-4">Rol del Usuario</h3>
                             <div className="max-w-md">

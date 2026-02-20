@@ -23,6 +23,8 @@ import { SYNC_STATUS_TRANSLATIONS } from "@/i18n/sync-status";
 import { formatDate } from "@/helpers/mediaTools";
 import useToastSync from "@/hooks/use-toast-sync";
 import { SyncStatusEnum } from "@/enums/SyncStatusEnum";
+import { sync, token } from "@/routes/stores/force"
+import useAuth from "@/hooks/useAuth";
 
 export default function StoreIndex({ stores, filters = {}, flash }: Props) {
     const { ToastContainer } = useToast(flash);
@@ -30,23 +32,26 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
     const { ToastContainer: SyncToastContainer } = useToastSync(syncFlash)
     const [search, setSearch] = useState(filters.search || '')
     const [status, setStatus] = useState(filters.status || '')
+    const { can } = useAuth();
+    const { closeModal, isOpen, openModal } = useModal(false)
+    const { closeModal: closeDetails, isOpen: isDetailsOpen, openModal: openDetails } = useModal(false)
+    const { closeModal: closeErrors, isOpen: isErrorsOpen, openModal: openErrors } = useModal(false)
+    const [dataTableKey, setDataTableKey] = useState(0);
+
     const { listen, stopListening } = useEcho('monitoring', '.sync.updated', (e) => {
         setSyncFlash({ status: e.status, message: `Tienda ${e.store_name}: ${SYNC_STATUS_TRANSLATIONS[e.status]}` })
+        setDataTableKey((key) => key + 1);
         router.reload({
-            async: true,
-            fresh: true,
             reset: ['stores'],
             only: ['stores', 'flash', 'errors'],
         })
     })
-
     const postToBackend = (endpoint: string): void => {
-        router.post(endpoint, undefined, {
+        router.post(endpoint, { force: true, }, {
             preserveState: true,
             preserveScroll: true,
             only: ['flash', 'errors', 'stores'],
             reset: ['stores'],
-            async: true,
         })
     }
 
@@ -57,11 +62,6 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
         }
     }, [listen, stopListening])
 
-    const { closeModal, isOpen, openModal } = useModal(false)
-
-    const { closeModal: closeDetails, isOpen: isDetailsOpen, openModal: openDetails } = useModal(false)
-
-    const { closeModal: closeErrors, isOpen: isErrorsOpen, openModal: openErrors } = useModal(false)
 
     const [storeSelected, setStoreSelected] = useState<Store | null>(null);
 
@@ -86,7 +86,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
         },
         {
             key: 'region',
-            header: 'Región',
+            header: 'Sociedad',
             render: (a) => a.region,
         },
         {
@@ -137,34 +137,40 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
 
                 return (
                     <div className="flex gap-2">
-                        <Button
-                            disabled={!hasUrl}
-                            onClick={() => postToBackend(`/stores/${a.id}/force-sync`)}
-                            className={`px-3 h-8 text-xs font-medium text-white rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 ${hasUrl
-                                ? 'bg-locatel-naranja hover:bg-orange-500 focus:ring-locatel-naranja'
-                                : 'bg-gray-300 cursor-not-allowed opacity-70'
-                                }`}
-                        >
-                            Forzar sincronización
-                        </Button>
-                        <Button
-                            disabled={!hasUrl}
-                            onClick={() => postToBackend(`/stores/${a.id}/force-token`)}
-                            className={`px-3 h-8 text-xs font-medium text-white rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 ${hasUrl
-                                ? 'bg-locatel-medio hover:bg-locatel-claro focus:ring-locatel-claro'
-                                : 'bg-gray-300 cursor-not-allowed opacity-70'
-                                }`}
-                        >
-                            Forzar Token
-                        </Button>
+                        {can('store.force.sync') && (
+                            <Button
+                                disabled={!hasUrl}
+                                onClick={() => postToBackend(sync({ ID: a.id }).url)}
+                                className={`px-3 h-8 text-xs font-medium text-white rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 ${hasUrl
+                                    ? 'bg-locatel-naranja hover:bg-orange-500 focus:ring-locatel-naranja'
+                                    : 'bg-gray-300 cursor-not-allowed opacity-70'
+                                    }`}
+                            >
+                                Forzar sincronización
+                            </Button>
+                        )}
+                        {can('store.force.token') && (
+                            <Button
+                                disabled={!hasUrl}
+                                onClick={() => postToBackend(token({ ID: a.id }).url)}
+                                className={`px-3 h-8 text-xs font-medium text-white rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 ${hasUrl
+                                    ? 'bg-locatel-medio hover:bg-locatel-claro focus:ring-locatel-claro'
+                                    : 'bg-gray-300 cursor-not-allowed opacity-70'
+                                    }`}
+                            >
+                                Forzar Token
+                            </Button>
+                        )}
                         <ActionMenu>
-                            <ActionMenu.Item onClick={() => {
-                                setStoreSelected(a);
-                                openModal();
-                            }}>
-                                <Eye className="w-4 h-4" />
-                                <span>Imagen de emergencia</span>
-                            </ActionMenu.Item>
+                            {can('store.placeholder.update') && (
+                                <ActionMenu.Item onClick={() => {
+                                    setStoreSelected(a);
+                                    openModal();
+                                }}>
+                                    <Eye className="w-4 h-4" />
+                                    <span>Imagen de emergencia</span>
+                                </ActionMenu.Item>
+                            )}
 
                             <ActionMenu.Item onClick={() => {
                                 setStoreSelected(a);
@@ -236,6 +242,7 @@ export default function StoreIndex({ stores, filters = {}, flash }: Props) {
                     ]}
                 />
                 <DataTable
+                    key={dataTableKey}
                     data={stores.data}
                     columns={columns}
                     rowKey={(a) => a.id}

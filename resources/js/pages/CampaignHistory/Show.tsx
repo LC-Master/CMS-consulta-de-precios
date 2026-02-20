@@ -38,8 +38,8 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                         {
                             campaign.deleted_at && (
                                 <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg" role="alert">
-                                    <strong className="font-bold">Esta campaña ha sido eliminada el {formatDate(campaign.deleted_at)}</strong>
-                                    <span className="block">No podrá ser editada ni asignada a nuevos centros.</span>
+                                    <strong className="font-bold">Esta campaña ha sido inhabilitada el {formatDate(campaign.deleted_at)}</strong>
+                                    <span className="block">No podrá ser editada ni asignada a nuevas Tiendas.</span>
                                 </div>
                             )
                         }
@@ -147,11 +147,11 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                     </div>
 
                     <InfoCard
-                        title="Centros asociados"
+                        title="Tiendas asociadas"
                         icon={<Store />}
                         headerEnd={
                             <span className="text-sm text-gray-500 bg-gray-300 rounded-lg px-3 py-1">
-                                {campaign.stores.length} centros
+                                {campaign.stores.length} tiendas    
                             </span>
                         }
                         contentClassName="py-4 flex flex-row overflow-x-auto"
@@ -159,7 +159,7 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                         {campaign.stores ? campaign.stores.map(store => (
                             <CenterCard key={store.id} id={store.id} name={store.name} code={store.store_code} />
                         )) : (
-                            <ErrorBanner message="No hay centros asociados" description="Esta campaña aún no tiene centros vinculados." />
+                            <ErrorBanner message="No hay tiendas asociadas" description="Esta campaña aún no tiene tiendas vinculadas." />
                         )}
                     </InfoCard>
                     {/* Media AM */}

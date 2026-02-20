@@ -1,4 +1,4 @@
-import { RegionData } from '@/types/store/index.type';
+import { RegionData, Store } from '@/types/store/index.type';
 import { useMemo, useState, useEffect, CSSProperties } from 'react';
 import Select, { MultiValue, ActionMeta, StylesConfig } from 'react-select';
 
@@ -70,24 +70,32 @@ const formatGroupLabel = (data: GroupedOption) => (
     </div>
 );
 
+const buildStoreOption = (store: Store, region: string): SelectOption => ({
+    value: store.id.toString(),
+    label: `${store.name} (${store.store_code})`,
+    region
+});
+
 const GroupedSelect = ({
     dataFromBackend,
     initialSelectedIds = [],
     onSelectionChange
 }: {
-    dataFromBackend: RegionData[],
-    initialSelectedIds?: string[],
-    onSelectionChange: (ids: string[]) => void
+    dataFromBackend: RegionData[];
+    initialSelectedIds?: string[];
+    onSelectionChange: (ids: string[]) => void;
 }) => {
     const [selectedValues, setSelectedValues] = useState<SelectOption[]>([]);
 
-    const options = useMemo(() => {
-        if (!dataFromBackend) return [];
+    const options = useMemo<GroupedOption[]>(() => {
+        if (!dataFromBackend || dataFromBackend.length === 0) {
+            return [];
+        }
 
         const totalStores = dataFromBackend.reduce((acc, curr) => acc + curr.stores.length, 0);
 
         const globalGroup: GroupedOption = {
-            label: "ADMINISTRACIÓN SISTEMA",
+            label: 'ADMINISTRACIÓN SISTEMA',
             quantity: totalStores,
             options: [
                 {
@@ -98,23 +106,18 @@ const GroupedSelect = ({
             ]
         };
 
-        const regionGroups: GroupedOption[] = dataFromBackend.map(item => ({
+        const regionGroups: GroupedOption[] = dataFromBackend.map((item) => ({
             label: item.region.toUpperCase(),
             quantity: item.stores.length,
             options: [
                 {
                     value: `REGION_ALL_${item.region}`,
-                    label: `SELECCIONAR TODA LA REGIÓN: ${item.region}`,
+                    label: `SELECCIONAR TODA LA SOCIEDAD: ${item.region}`,
                     isRegionAll: true,
                     region: item.region,
-                    storeIds: item.stores.map(s => s.id)
+                    storeIds: item.stores.map((s) => s.id.toString())
                 },
-                ...item.stores.map(store => ({
-                    value: store.id,
-                    label: `${store.name} (${store.store_code})`,
-                    region: item.region,
-                    ...store
-                }))
+                ...item.stores.map((store) => buildStoreOption(store, item.region))
             ]
         }));
 
@@ -126,36 +129,44 @@ const GroupedSelect = ({
 
         const calculateSelection = () => {
             if (!initialSelectedIds || initialSelectedIds.length === 0) {
-                return [];
+                return [] as SelectOption[];
             }
 
-            const allStoreIds = dataFromBackend.flatMap(r => r.stores.map(s => s.id));
-            const isGlobalAll = allStoreIds.length > 0 && allStoreIds.every(id => initialSelectedIds.includes(id));
+            const allStoreIds = dataFromBackend.flatMap((region) => region.stores.map((store) => store.id.toString()));
+            const isGlobalAll = allStoreIds.length > 0 && allStoreIds.every((id) => initialSelectedIds.includes(id));
 
             if (isGlobalAll) {
-                const globalOpt = options.find(g => g.options.some(o => o.isAll))?.options.find(o => o.isAll);
-                if (globalOpt) {
-                    return [globalOpt];
+                const globalOption = options.find((group) => group.options.some((opt) => opt.isAll))
+                    ?.options.find((opt) => opt.isAll);
+
+                if (globalOption) {
+                    return [globalOption];
                 }
             }
 
             const nextSelection: SelectOption[] = [];
 
-            dataFromBackend.forEach(region => {
-                const regionIds = region.stores.map(s => s.id);
-                const isRegionAll = regionIds.length > 0 && regionIds.every(id => initialSelectedIds.includes(id));
-
-                const regionGroup = options.find(g => g.label === region.region.toUpperCase());
+            dataFromBackend.forEach((region) => {
+                const regionGroup = options.find((group) => group.label === region.region.toUpperCase());
                 if (!regionGroup) return;
 
+                const regionIds = region.stores.map((store) => store.id.toString());
+                const isRegionAll = regionIds.length > 0 && regionIds.every((id) => initialSelectedIds.includes(id));
+
                 if (isRegionAll) {
-                    const regionAllOpt = regionGroup.options.find(o => o.isRegionAll);
-                    if (regionAllOpt) nextSelection.push(regionAllOpt);
+                    const regionAllOption = regionGroup.options.find((opt) => opt.isRegionAll);
+                    if (regionAllOption) {
+                        nextSelection.push(regionAllOption);
+                    }
                 } else {
-                    const storesInRegion = region.stores.filter(s => initialSelectedIds.includes(s.id));
-                    storesInRegion.forEach(store => {
-                        const storeOpt = regionGroup.options.find(o => o.value === store.id);
-                        if (storeOpt) nextSelection.push(storeOpt);
+                    region.stores.forEach((store) => {
+                        const storeValue = store.id.toString();
+                        if (initialSelectedIds.includes(storeValue)) {
+                            const storeOption = regionGroup.options.find((opt) => opt.value === storeValue);
+                            if (storeOption) {
+                                nextSelection.push(storeOption);
+                            }
+                        }
                     });
                 }
             });
@@ -163,15 +174,12 @@ const GroupedSelect = ({
             return nextSelection;
         };
 
-        const newSelection = calculateSelection();
-
         const timeoutId = setTimeout(() => {
-            setSelectedValues(newSelection);
+            setSelectedValues(calculateSelection());
         }, 0);
 
         return () => clearTimeout(timeoutId);
-
-    }, [initialSelectedIds, dataFromBackend, options]);
+    }, [dataFromBackend, initialSelectedIds, options]);
 
     const handleChange = (newValue: MultiValue<SelectOption>, actionMeta: ActionMeta<SelectOption>) => {
         let selectionArray = [...newValue] as SelectOption[];
@@ -181,46 +189,33 @@ const GroupedSelect = ({
         if (action === 'select-option' && option) {
             if (option.isAll) {
                 selectionArray = [option];
-            }
-            else if (option.isRegionAll) {
-                selectionArray = selectionArray.filter(o =>
-                    o.value === option.value ||
-                    (!o.isAll &&
-                        o.region !== option.region
-                    )
+            } else if (option.isRegionAll) {
+                selectionArray = selectionArray.filter(
+                    (opt) =>
+                        opt.value === option.value ||
+                        (!opt.isAll && opt.region !== option.region)
                 );
-            }
-            else {
-                const hasGlobal = selectionArray.some(o => o.isAll);
-                const regionAllOption = selectionArray.find(o => o.isRegionAll && o.region === option.region);
+            } else {
+                const hasGlobal = selectionArray.some((opt) => opt.isAll);
+                const regionAllOption = selectionArray.find(
+                    (opt) => opt.isRegionAll && opt.region === option.region
+                );
 
                 if (hasGlobal) {
-                    const allStores: SelectOption[] = [];
-                    dataFromBackend.forEach(r => {
-                        r.stores.forEach(s => {
-                            if (s.id !== option.value) {
-                                allStores.push({
-                                    value: s.id,
-                                    label: `${s.name} (${s.store_code})`,
-                                    region: r.region,
-                                    ...s
-                                });
-                            }
-                        });
-                    });
-                    selectionArray = allStores;
-                }
-                else if (regionAllOption) {
-                    const regionStores = dataFromBackend.find(r => r.region === option.region)?.stores || [];
+                    const allStores = dataFromBackend.flatMap((region) =>
+                        region.stores.map((store) => buildStoreOption(store, region.region))
+                    );
+                    selectionArray = allStores.filter((storeOpt) => storeOpt.value !== option.value);
+                } else if (regionAllOption) {
+                    const regionStores = dataFromBackend.find((region) => region.region === option.region)
+                        ?.stores || [];
                     const expandedStores = regionStores
-                        .filter(s => s.id !== option.value)
-                        .map(s => ({
-                            value: s.id,
-                            label: `${s.name} (${s.store_code})`,
-                            region: option.region,
-                            ...s
-                        }));
-                    selectionArray = selectionArray.filter(o => o.value !== regionAllOption.value && o.value !== option.value);
+                        .filter((store) => store.id.toString() !== option.value)
+                        .map((store) => buildStoreOption(store, option.region || ''));
+
+                    selectionArray = selectionArray.filter(
+                        (opt) => opt.value !== regionAllOption.value && opt.value !== option.value
+                    );
                     selectionArray = [...selectionArray, ...expandedStores];
                 }
             }
@@ -229,9 +224,9 @@ const GroupedSelect = ({
         setSelectedValues(selectionArray);
 
         let finalIds: string[] = [];
-        selectionArray.forEach(opt => {
+        selectionArray.forEach((opt) => {
             if (opt.isAll) {
-                finalIds = dataFromBackend.flatMap(r => r.stores.map(s => s.id));
+                finalIds = dataFromBackend.flatMap((region) => region.stores.map((store) => store.id.toString()));
             } else if (opt.isRegionAll && opt.storeIds) {
                 finalIds = [...finalIds, ...opt.storeIds];
             } else {
@@ -254,7 +249,7 @@ const GroupedSelect = ({
                 isClearable
                 closeMenuOnSelect={false}
                 styles={customStyles}
-                noOptionsMessage={() => "No se encontraron resultados"}
+                noOptionsMessage={() => 'No se encontraron resultados'}
             />
         </div>
     );

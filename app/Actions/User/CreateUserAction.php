@@ -18,36 +18,7 @@ class CreateUserAction
                 'password' => Hash::make($data->input('password')),
             ]);
 
-            $selectedRole = $data->input('role');
-            $selectedPermissions = $data->input('selectedPermissions', []);
-
-            $roleConfig = config("permissions.roles.{$selectedRole}");
-            $shouldKeepRole = true;
-
-            if ($data->has('selectedPermissions')) {
-                if ($roleConfig === '*') {
-                    $allPermissionsCount = \count(config('permissions.permissions'));
-                    if (\count($selectedPermissions) < $allPermissionsCount) {
-                        $shouldKeepRole = false;
-                    }
-                } elseif (\is_array($roleConfig)) {
-                    foreach ($roleConfig as $rolePerm) {
-                        if (!\in_array($rolePerm, $selectedPermissions)) {
-                            $shouldKeepRole = false;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if ($shouldKeepRole) {
-                $user->assignRole($selectedRole);
-                if (!empty($selectedPermissions)) {
-                    $user->syncPermissions($selectedPermissions);
-                }
-            } else {
-                $user->syncPermissions($selectedPermissions);
-            }
+            $user->assignRole('consultor');
 
             return $user;
         });

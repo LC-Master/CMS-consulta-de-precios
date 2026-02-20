@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
                 'password' => $password,
                 'email_verified_at' => now(),
             ]
-        )->assignRole('supervisor');
+        )->assignRole('admin');
 
         Mail::raw(
             "Usuario: programadorweb@locatelve.com\nContraseña: $password",

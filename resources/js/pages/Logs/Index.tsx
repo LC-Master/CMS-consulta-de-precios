@@ -6,6 +6,7 @@ import { breadcrumbs } from "@/helpers/breadcrumbs";
 import { formatDate } from "@/helpers/mediaTools";
 import { LEVEL_STYLES, SUBJECT_CONFIG } from "@/helpers/styleModals";
 import useModal from "@/hooks/use-modal";
+import useAuth from "@/hooks/useAuth";
 import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 import AppLayout from "@/layouts/app-layout";
 import { index } from "@/routes/logs";
@@ -22,11 +23,7 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
     const [element, setElement] = useState<string>(filters.element || '')
     const [search, setSearch] = useState(filters.search || '')
     const { isOpen, closeModal, openModal } = useModal(false)
-
-    const handleShowAudit = (log: Log) => {
-        setAuditLog(log);
-        openModal();
-    };
+    const { hasRole } = useAuth()
     const columns: Column<Log>[] = [
         {
             key: 'level',
@@ -88,12 +85,14 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
                 <div className="flex items-center gap-2.5">
                     <div className="flex flex-col">
                         <span className="text-sm font-bold text-gray-800">{log.user_email || 'Automático'}</span>
-                        <div className="flex items-center gap-1 text-[10px] text-gray-400 font-mono">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                            {log.ip_address}
-                        </div>
+                        {hasRole('admin') && (
+                            <div className="flex items-center gap-1 text-[10px] text-gray-400 font-mono">
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                {log.ip_address}
+                            </div>
+                        )}
                     </div>
                 </div>
             ),
@@ -117,12 +116,15 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
             header: 'Auditoria',
             render: (log) => (
                 <Button
-                    onClick={() => handleShowAudit(log)}
+                    onClick={() => {
+                        setAuditLog(log);
+                        openModal();
+                    }}
                     className="flex items-center  bg-white justify-center w-8 h-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-indigo-600 transition-all border border-transparent hover:border-gray-200"
                     title="Ver Auditoría"
                 >
                     <Eye className="w-4 h-4" />
-                </Button>
+                </Button >
             ),
         },
     ];

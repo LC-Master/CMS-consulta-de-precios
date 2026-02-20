@@ -30,6 +30,10 @@ return [
         'store.create',
         'store.update',
         'store.delete',
+        'store.force.token',
+        'store.force.sync',
+        'store.sync.url.update',
+        'store.placeholder.update',
 
         'campaign.activate',
         'campaign.cancel',
@@ -39,7 +43,6 @@ return [
         'campaign.history.restore',
         'campaign.history.clone',
         'campaign.history.calendar',
-
 
         'agreement.list',
         'agreement.show',
@@ -60,7 +63,7 @@ return [
     ],
 
     'roles' => [
-        'admin' => [
+        'supervisor' => [
             'media.upload',
 
             'log.list',
@@ -69,6 +72,9 @@ return [
             'store.create',
             'store.update',
             'store.delete',
+            'store.force.sync',
+            'store.placeholder.update',
+
             'user.list',
             'user.show',
             'user.create',
@@ -86,6 +92,10 @@ return [
             'campaign.create',
             'campaign.update',
             'campaign.delete',
+
+            'campaign.activate',
+            'campaign.cancel',
+            'campaign.report',
 
             'log.list',
 
@@ -108,7 +118,6 @@ return [
         ],
 
         'consultor' => [
-            'log.list',
             'media.upload',
             'store.list',
             'user.list',
@@ -129,18 +138,18 @@ return [
 
         ],
 
-        'supervisor' => '*',
+        'admin' => '*',
 
         'publicidad' => [
             'media.upload',
-
-            'log.list',
 
             'store.list',
             'store.show',
             'store.create',
             'store.update',
             'store.delete',
+            'store.force.sync',
+            'store.placeholder.update',
 
             'campaign.list',
             'campaign.show',
@@ -151,7 +160,10 @@ return [
             'campaign.history.restore',
             'campaign.history.clone',
             'campaign.history.calendar',
-
+            'campaign.activate',
+            'campaign.cancel',
+            'campaign.report',
+            
             'agreement.list',
             'agreement.show',
             'agreement.create',

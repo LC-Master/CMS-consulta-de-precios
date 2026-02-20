@@ -36,7 +36,7 @@ export interface MediaError {
 }
 
 export interface Store {
-    id: string;
+    id: number;
     name: string;
     store_code: string;
     address: string;

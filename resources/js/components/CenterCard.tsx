@@ -1,6 +1,6 @@
 import { Server } from "lucide-react";
 
-export default function ({ id, name, code }: { id: string; name: string; code: string }) {
+export default function ({ id, name, code }: { id: number; name: string; code: string }) {
     return (<div
         key={id}
         className="flex-none w-56 md:w-54 h-20 rounded-lg border border-transparent hover:border-blue-300 px-4 py-3 flex items-center gap-3 mx-3 shadow-lg transition-colors"

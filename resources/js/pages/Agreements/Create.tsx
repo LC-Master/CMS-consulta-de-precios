@@ -1,31 +1,22 @@
 import AppLayout from '@/layouts/app-layout'
 import { index, store } from '@/routes/agreement'
 import { breadcrumbs } from '@/helpers/breadcrumbs'
-import { useForm, Link, Head } from '@inertiajs/react'
+import { useForm, Link, Head, router } from '@inertiajs/react'
 import { Save, UserSearch } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import Select from 'react-select' 
+import Select from 'react-select'
+import type { InputActionMeta, SingleValue } from 'react-select'
 import { Label } from '@/components/ui/label'
 import InputError from '@/components/input-error'
 import { Input } from '@/components/ui/input'
 import { useState, useRef } from 'react'
-import axios from 'axios'
-
-interface Supplier {
-    id: number; 
-    SupplierName: string;
-    AccountNumber: string;
-    ContactName: string;
-    EmailAddress: string;
-    PhoneNumber: string;
-    Notes: string;
-}
+import { Supplier, SupplierOption } from '@/types/supplier'
 
 export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSuppliers: Supplier[] }) {
 
     const { data, setData, processing, errors, post } = useForm({
-        supplier_id: '' as string | number, // Acepta numero o string vacio
+        supplier_id: '' as string | number,
         name: '',
         legal_name: '',
         tax_id: '',
@@ -47,8 +38,8 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
     const [isLoading, setIsLoading] = useState(false);
     const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
-    const handleInputChange = (inputValue: string, { action }: any) => {
-        if (action !== 'input-change') return;
+    const handleInputChange = (inputValue: string, actionMeta: InputActionMeta) => {
+        if (actionMeta.action !== 'input-change') return;
 
         if (searchTimeout.current) {
             clearTimeout(searchTimeout.current);
@@ -61,26 +52,29 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
 
         searchTimeout.current = setTimeout(() => {
             setIsLoading(true);
-            axios.get('/api/suppliers/search', { params: { query: inputValue } })
-                .then((response) => {
-                    if (response.data && response.data.length > 0) {
-                        setOptions(response.data);
+            router.get('/api/suppliers/search', { query: inputValue }, {
+                preserveState: true,
+                onSuccess: (page) => {
+                    const resp = (page && (page.props?.suppliers || page.props?.data || page.props?.results || page.props));
+                    if (Array.isArray(resp) && resp.length > 0) {
+                        setOptions(resp);
                     } else {
                         setOptions([]);
                     }
-                })
-                .catch(err => console.error("Error buscando:", err))
-                .finally(() => setIsLoading(false));
+                },
+                onError: (err) => console.error('Error buscando:', err),
+                onFinish: () => setIsLoading(false),
+            })
         }, 300);
     };
-
-    const handleSupplierChange = (option: any) => {
+    
+    const handleSupplierChange = (option: SingleValue<SupplierOption>) => {
         if (!option) return;
         const s = option.original;
 
         setData(previousData => ({
             ...previousData,
-            supplier_id: s.id, // Ahora es un numero
+            supplier_id: s.id,
             name: s.SupplierName,
             legal_name: s.SupplierName,
             tax_id: s.AccountNumber,
@@ -109,8 +103,8 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
                     <form id="form" method="post" onSubmit={handleSubmit} className="space-y-4 ">
                         
                         <div className="bg-green-50 p-4 rounded-xl border border-green-100 mb-6">
-                            <Label className="block text-sm font-bold mb-2 text-green-800 flex items-center gap-2">
-                                <UserSearch className="w-4 h-4" /> Buscar Proveedor Maestro (Autollenado)
+                            <Label className="text-sm font-bold mb-2 text-green-800 flex items-center gap-2">
+                                <UserSearch className="w-4 h-4" /> Buscar Proveedor Maestro (Auto llenado)
                             </Label>
                             
                             <Select
@@ -143,7 +137,6 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
                                     required
                                     placeholder='Ej. Empresa X'
                                     onChange={e => setData('name', e.target.value)}
-                                    // Comprobamos si tiene valor (number o string no vacio)
                                     className={`mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-locatel-medio ${data.supplier_id ? 'bg-gray-50' : ''}`}
                                     readOnly={!!data.supplier_id} 
                                 />
@@ -250,7 +243,7 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
                     <div className="flex flex-wrap justify-center border-t border-gray-200 pt-20 mt-25 gap-3">
                         <Button
                             form="form"
-                            className="bg-locatel-medio flex flex-row h-12 gap-2 items-center text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
+                            className="bg-locatel-medio hover:bg-locatel-oscuro flex flex-row h-12 gap-2 items-center text-white rounded-md px-6 py-3 shadow hover:brightness-95 disabled:opacity-50"
                             disabled={processing}
                         >
                             {processing ? (<><Spinner /> Guardando....</>) : <><Save /> Guardar</>}
@@ -259,7 +252,7 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
                         <Link
                             viewTransition
                             href={index().url}
-                            className="bg-red-500 text-white rounded-md px-6 py-3 shadow hover:brightness-95 flex items-center"
+                            className="bg-red-500 hover:bg-red-600 text-white rounded-md px-6 py-3 shadow hover:brightness-95 flex items-center"
                         >
                             Cancelar
                         </Link>

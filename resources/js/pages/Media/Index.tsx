@@ -23,12 +23,14 @@ export default function MediaIndex({ medias, filters = {}, mimeTypes = [], flash
     const [mediaId, setMediaId] = useState<string>('');
     const [search, setSearch] = useState(filters.search || '')
     const [type, setType] = useState(filters.type || '')
+
     const typeOptions = useMemo(() => {
         return [
             { value: '', label: 'Todos los tipos' },
             ...mimeTypes.map(mime => ({ value: mime, label: mime }))
         ];
     }, [mimeTypes]);
+    
     const { ToastContainer } = useToast(flash);
     const columns: Column<MediaItem>[] = [
         {

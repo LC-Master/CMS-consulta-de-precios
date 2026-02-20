@@ -20,20 +20,8 @@ export default function UsersIndex({ users, filters = {}, flash }: Props) {
     const { ToastContainer } = useToast(flash);
 
     const { isOpen, closeModal, openModal } = useModal(false)
-    const [selectedUserId, setSelectedUserId] = useState<string>('')
+    const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
     const [actionType, setActionType] = useState<'delete' | 'restore' | null>(null)
-
-    const confirmDelete = (id: string) => {
-        setSelectedUserId(id);
-        setActionType('delete');
-        openModal();
-    }
-
-    const confirmRestore = (id: string) => {
-        setSelectedUserId(id);
-        setActionType('restore');
-        openModal();
-    }
 
     const columns: Column<User>[] = [
         {
@@ -51,8 +39,8 @@ export default function UsersIndex({ users, filters = {}, flash }: Props) {
             header: 'Estatus',
             render: (u) => (
                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${!u.deleted_at
-                        ? 'bg-green-100 text-green-800 border border-green-200'
-                        : 'bg-red-100 text-red-800 border border-red-200'
+                    ? 'bg-green-100 text-green-800 border border-green-200'
+                    : 'bg-red-100 text-red-800 border border-red-200'
                     }`}>
                     {!u.deleted_at ? 'Activo' : 'Inactivo'}
                 </span>
@@ -78,7 +66,11 @@ export default function UsersIndex({ users, filters = {}, flash }: Props) {
 
                     {!u.deleted_at ? (
                         <button
-                            onClick={() => confirmDelete(String(u.id))}
+                            onClick={() => {
+                                setSelectedUserId(u.id);
+                                setActionType('delete');
+                                openModal();
+                            }}
                             className="p-2 bg-red-500 rounded-md text-white hover:bg-red-600 transition-colors shadow-sm cursor-pointer"
                             title="Desactivar usuario"
                         >
@@ -86,7 +78,11 @@ export default function UsersIndex({ users, filters = {}, flash }: Props) {
                         </button>
                     ) : (
                         <button
-                            onClick={() => confirmRestore(String(u.id))}
+                            onClick={() => {
+                                setSelectedUserId(u.id);
+                                setActionType('restore');
+                                openModal();
+                            }}
                             className="p-2 bg-orange-500 rounded-md text-white hover:bg-orange-600 transition-colors shadow-sm cursor-pointer"
                             title="Restaurar usuario"
                         >
