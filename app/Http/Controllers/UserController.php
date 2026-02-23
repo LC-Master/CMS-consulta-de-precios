@@ -33,7 +33,6 @@ class UserController extends Controller implements HasMiddleware
     public function index(Request $request)
     {
         $query = User::withTrashed();
-
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -43,7 +42,7 @@ class UserController extends Controller implements HasMiddleware
         }
 
         $query->whereDoesntHave('roles', function ($q) {
-            $q->where('name', 'supervisor');
+            $q->where('name', 'admin');
         });
 
         return Inertia::render('Users/Index', [
@@ -84,8 +83,6 @@ class UserController extends Controller implements HasMiddleware
 
     public function edit(User $user)
     {
-        $this->authorizeUserAccess($user);
-
         $permissionsAndRoles = $this->getPermissionsAndRoles();
 
         $user->load(['roles.permissions', 'permissions']);
@@ -100,8 +97,6 @@ class UserController extends Controller implements HasMiddleware
     public function update(UpdateUserRequest $request, User $user, UpdateUserAction $updateUserAction): RedirectResponse
     {
         try {
-            $this->authorizeUserAccess($user);
-
             $request->validated();
 
             $updateUserAction->execute($user, $request);
@@ -152,11 +147,15 @@ class UserController extends Controller implements HasMiddleware
         $permissions = config('permissions.permissions');
         $roles = config('permissions.roles');
 
+        if (\is_array($permissions)) {
+            $permissions = array_values(array_filter($permissions, fn($p) => $p !== 'store.force.token' && $p !== 'store.sync.url.update'));
+        }
+
         $structured = [];
 
         foreach ($permissions as $perm) {
             $parts = explode('.', $perm);
-            $group = $parts[0];
+            $group = $parts[0] ?? $perm;
             $structured[$group][] = [
                 'id' => $perm,
                 'name' => str_replace($group . '.', '', $perm),
@@ -164,11 +163,20 @@ class UserController extends Controller implements HasMiddleware
             ];
         }
 
-        unset($roles['supervisor']);
+        // Remove admin role whether it's defined as a key or a value
+        if (\is_array($roles)) {
+            if (\array_key_exists('admin', $roles)) {
+                unset($roles['admin']);
+            } else {
+                $roles = array_values(array_filter($roles, function ($r) {
+                    return $r !== 'admin';
+                }));
+            }
+        }
 
         return [
             'matrix' => $structured,
-            'roles' => $roles
+            'roles' => $roles,
         ];
     }
 }

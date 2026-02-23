@@ -30,13 +30,14 @@ class CheckStoreSyncStatus extends Command
     public function handle()
     {
         $now = now();
+        $failedStores = [];
 
         $firstTime = config('services.syncMorningStart');
         $secondTime = config('services.syncAfternoonStart');
 
         $stores = Store::with('syncState')->get();
 
-        $stores->each(function ($store) use ($now, $firstTime, $secondTime) {
+        $stores->each(function ($store) use ($now, $firstTime, $secondTime, &$failedStores) {
             $syncState = $store->syncState;
             if (!$syncState) {
                 $this->warn("Store ID {$store->id} has no sync state.");
@@ -70,7 +71,10 @@ class CheckStoreSyncStatus extends Command
 
                     // Enviar notificación indicando la hora que falló y el nombre de la tienda
                     $failedTime = $secondTime;
-                    ConsultorOfflineNotification::sendToAdmins($store->name ?? $store->id, $failedTime);
+                    $failedStores[] = [
+                        'store_name' => (string) ($store->name ?? $store->id),
+                        'fail_hour' => (string) $failedTime,
+                    ];
 
                     // Marcar el estado de sync como fallido si es posible
                     try {
@@ -92,7 +96,10 @@ class CheckStoreSyncStatus extends Command
 
                     // Enviar notificación indicando la hora que falló y el nombre de la tienda
                     $failedTime = $firstTime;
-                    ConsultorOfflineNotification::sendToAdmins($store->name ?? $store->id, $failedTime);
+                    $failedStores[] = [
+                        'store_name' => (string) ($store->name ?? $store->id),
+                        'fail_hour' => (string) $failedTime,
+                    ];
 
                     // Marcar el estado de sync como fallido si es posible
                     try {
@@ -109,6 +116,8 @@ class CheckStoreSyncStatus extends Command
 
             $this->info("Store ID {$store->id}: sync window not yet reached.");
         });
+
+        ConsultorOfflineNotification::sendSummaryToAdmins($failedStores);
 
     }
 }

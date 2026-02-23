@@ -138,7 +138,7 @@ export default function CampaignEdit({ departments, stores, agreements, media, f
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 pl-6 pr-6 gap-4">
                             <div>
-                                <Label htmlFor="centers" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Centros. *</Label>
+                                <Label htmlFor="centers" className="block text-sm font-bold mb-4 ml-1 text-gray-700">Tiendas. *</Label>
                                 <GroupedSelect
                                     dataFromBackend={stores}
                                     onSelectionChange={handleSelection}

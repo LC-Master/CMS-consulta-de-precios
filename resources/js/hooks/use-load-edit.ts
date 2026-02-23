@@ -1,5 +1,5 @@
-import { MediaItem } from '@/types/campaign/index.types';
 import { CampaignEditProps } from '@/types/campaign/page.type';
+import { MediaItem } from '@/types/media/index.type';
 import { useEffect, useRef } from 'react';
 
 export default function useLoadEdit(
@@ -22,5 +22,5 @@ export default function useLoadEdit(
 
             hasLoaded.current = true;
         }
-    }, []); 
+    }, [campaign, setAm, setPm]); 
 }

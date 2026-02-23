@@ -16,7 +16,7 @@ class RolesPermissionsSeeder extends Seeder
 
         $permissions = config('permissions.permissions');
         $rolesConfig = config('permissions.roles');
-
+    
         foreach ($permissions as $perm) {
             Permission::firstOrCreate(['name' => $perm]);
         }

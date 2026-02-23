@@ -9,24 +9,15 @@ import { Save, UserSearch } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import InputError from "@/components/input-error"
 import { Input } from "@/components/ui/input"
-import Select from 'react-select'
+import Select, { InputActionMeta, SingleValue } from 'react-select'
 import { useState, useRef } from 'react'
 import axios from 'axios'
-
-interface Supplier {
-    id: number;
-    SupplierName: string;
-    AccountNumber: string;
-    ContactName: string;
-    EmailAddress: string;
-    PhoneNumber: string;
-    Notes: string;
-}
+import { Supplier, SupplierOption } from "@/types/supplier"
 
 export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { agreement: Agreement, defaultSuppliers: Supplier[] }) {
-    
-    const { data, setData, processing, errors, put, cancel } = useForm({
-        supplier_id: agreement.supplier_id ?? '' as string | number,
+
+    const { data, setData, processing, errors, put } = useForm({
+        supplier_id: agreement.supplier_id ?? '',
         name: agreement.name ?? '',
         legal_name: agreement.legal_name ?? '',
         tax_id: agreement.tax_id ?? '',
@@ -47,11 +38,11 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
     const [isLoading, setIsLoading] = useState(false);
     const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
-    const currentSupplierOption = options.find(op => op.value === data.supplier_id) || null;
+    const currentSupplierOption = options.find(op => String(op.value) === String(data.supplier_id)) || null;
 
-    const handleInputChange = (inputValue: string, { action }: any) => {
-        if (action !== 'input-change') return;
-        
+    const handleInputChange = (inputValue: string, actionMeta: InputActionMeta) => {
+        if (actionMeta.action !== 'input-change') return;
+
         if (searchTimeout.current) {
             clearTimeout(searchTimeout.current);
         }
@@ -76,19 +67,19 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
         }, 300);
     };
 
-    const handleSupplierChange = (option: any) => {
+    const handleSupplierChange = (option: SingleValue<SupplierOption>) => {
         if (!option) return;
         const s = option.original;
         setData(previousData => ({
             ...previousData,
-            supplier_id: s.id,
-            name: s.SupplierName,
-            legal_name: s.SupplierName,
-            tax_id: s.AccountNumber,
-            contact_person: s.ContactName || '',
-            contact_email: s.EmailAddress || '',
-            contact_phone: s.PhoneNumber || '',
-            observations: s.Notes || '',
+            supplier_id: String(s.id ?? ''),
+            name: s.SupplierName ?? '',
+            legal_name: s.SupplierName ?? '',
+            tax_id: String(s.AccountNumber ?? ''),
+            contact_person: s.ContactName ?? '',
+            contact_email: s.EmailAddress ?? '',
+            contact_phone: s.PhoneNumber ?? '',
+            observations: s.Notes ?? '',
         }));
     };
 
@@ -124,12 +115,12 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
                         </span>
                     </div>
                 </div>
-                
+
                 <div className="space-y-4 w-full pt-10 rounded-3xl p-6 bg-white shadow-[0_0_20px_rgba(0,0,0,0.08)]">
                     <form id="form" method="post" onSubmit={handleSubmit} className="space-y-4 ">
-                        
+
                         <div className="bg-green-50 p-4 rounded-xl border border-green-100 mb-6">
-                            <Label className="block text-sm font-bold mb-2 text-green-800 flex items-center gap-2">
+                            <Label className="text-sm font-bold mb-2 text-green-800 flex items-center gap-2">
                                 <UserSearch className="w-4 h-4" /> Proveedor Maestro (Actualizar datos)
                             </Label>
                             <Select
@@ -164,7 +155,7 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
                                 <InputError message={errors.legal_name} />
                             </div>
                         </div>
-                        
+
                         {/* Fila 2 */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -205,10 +196,10 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
                     </form>
 
                     <div className="flex flex-wrap justify-center border-t border-gray-200 pt-20 mt-25 gap-3">
-                        <Button form="form" className="bg-locatel-medio flex flex-row h-12 gap-2 items-center text-white rounded-md px-6 py-3 shadow" disabled={processing}>
+                        <Button form="form" className="bg-locatel-medio hover:bg-locatel-oscuro flex flex-row h-12 gap-2 items-center text-white rounded-md px-6 py-3 shadow" disabled={processing}>
                             {processing ? (<><Spinner /> Guardando....</>) : <><Save /> Guardar</>}
                         </Button>
-                        <Link href={index().url} className="bg-red-500 text-white rounded-md px-6 py-3 shadow flex items-center">Cancelar</Link>
+                        <Link href={index().url} className="bg-red-500 hover:bg-red-600 text-white rounded-md px-6 py-3 shadow flex items-center">Cancelar</Link>
                     </div>
                 </div>
             </div>

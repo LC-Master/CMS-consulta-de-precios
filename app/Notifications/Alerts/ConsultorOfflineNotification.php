@@ -14,7 +14,10 @@ class ConsultorOfflineNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct(public string $name, public string $failHour)
+    /**
+     * @param  array<int, array{store_name: string, fail_hour: string}>|null  $summary
+     */
+    public function __construct(public string $name, public string $failHour, public ?array $summary = null)
     {
         //
     }
@@ -25,6 +28,23 @@ class ConsultorOfflineNotification extends Notification implements ShouldQueue
         \Illuminate\Support\Facades\Notification::send(
             $admins,
             new self($name, $failHour)
+        );
+    }
+
+    /**
+     * @param  array<int, array{store_name: string, fail_hour: string}>  $summary
+     */
+    public static function sendSummaryToAdmins(array $summary): void
+    {
+        if (empty($summary)) {
+            return;
+        }
+
+        $admins = User::role(['admin', 'supervisor'])->get();
+
+            \Illuminate\Support\Facades\Notification::send(
+            $admins,
+            new self('Resumen de tiendas', 'N/A', $summary)
         );
     }
     /**
@@ -42,18 +62,39 @@ class ConsultorOfflineNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
+        if (is_array($this->summary) && \count($this->summary) > 0) {
+            $message = (new MailMessage)
+                ->subject('Resumen operativo: tiendas fuera de ventana de sincronización')
+                ->greeting('Estimado equipo,')
+                ->line('Se identificaron tiendas que no completaron sincronización dentro de la ventana horaria esperada:')
+                ->line('');
+
+            foreach ($this->summary as $item) {
+                $message->line("• {$item['store_name']} — horario esperado: {$item['fail_hour']}");
+            }
+
+            return $message
+                ->line('Plan de acción recomendado:')
+                ->line('• Verificar conectividad y estado del consultor en cada tienda listada.')
+                ->line('• Revisar logs de sincronización y ejecutar reintento controlado.')
+                ->line('• Escalar a soporte si la tienda permanece fuera de ventana tras el reintento.')
+                ->level('error')
+                ->action('Ver listado de tiendas', url('/stores'))
+                ->salutation('Atentamente, Plataforma CMS Locatel');
+        }
+
         return (new MailMessage)
-            ->subject("Alerta de sincronización: tienda \"{$this->name}\" no sincronizó en el horario programado")
-            ->greeting('Estimado/a,')
-            ->line("Se ha detectado que la tienda \"{$this->name}\" no completó la sincronización en el horario previsto.")
-            ->line("Horario previsto de sincronización: {$this->failHour}")
-            ->line('Acciones recomendadas:')
-            ->line('• Verifique la conexión de red de la tienda.')
-            ->line('• Revise los registros de sincronización y reintente el proceso si procede.')
-            ->line('Si necesita asistencia adicional, contacte al equipo de soporte de CMS Locatel.')
+            ->subject("Alerta operativa: tienda fuera de horario de sincronización ({$this->name})")
+            ->greeting('Estimado equipo,')
+                ->line("La tienda \"{$this->name}\" no completó la sincronización en la ventana planificada.")
+            ->line("Horario objetivo no cumplido: {$this->failHour}")
+            ->line('Acción táctica sugerida:')
+            ->line('• Validar estado de red y disponibilidad del consultor en sitio.')
+            ->line('• Revisar logs de sincronización y ejecutar reintento supervisado.')
+            ->line('• Escalar a soporte técnico si la incidencia persiste.')
             ->level('error')
             ->action('Ver listado de tiendas', url('/stores'))
-            ->salutation('Atentamente,\nEquipo CMS Locatel');
+            ->salutation('Atentamente, Plataforma CMS Locatel');
     }
 
     /**
@@ -63,6 +104,13 @@ class ConsultorOfflineNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
+        if (is_array($this->summary) && count($this->summary) > 0) {
+            return [
+                'type' => 'summary',
+                'items' => $this->summary,
+            ];
+        }
+
         return [
             'name' => $this->name,
             'failHour' => $this->failHour

@@ -9,6 +9,7 @@ export type Agreement = {
     contact_email: string;
     start_date: string;
     end_date: string;
+    supplier_id?: string;
     observations?: string;
 };
 

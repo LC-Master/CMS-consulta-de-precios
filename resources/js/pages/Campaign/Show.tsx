@@ -13,7 +13,6 @@ import { show } from "@/routes/agreement";
 import { cdn } from "@/routes/media";
 
 export default function CampaignShow({ campaign }: { campaign: CampaignExtended }) {
-    console.log(campaign)
     const mediaAM = campaign.media
         .filter(m => m.pivot.slot === "am")
         .sort((a, b) => Number(a.pivot.position) - Number(b.pivot.position));
@@ -131,11 +130,11 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                     </div>
 
                     <InfoCard
-                        title="Centros asociados"
+                        title="Tiendas asociadas"
                         icon={<Store />}
                         headerEnd={
                             <span className="text-sm text-gray-500 bg-gray-300 rounded-lg px-3 py-1">
-                                {campaign.stores.length} centros
+                                {campaign.stores.length} Tiendas
                             </span>
                         }
                         contentClassName="py-4 flex flex-row overflow-x-auto"
@@ -143,7 +142,7 @@ export default function CampaignShow({ campaign }: { campaign: CampaignExtended 
                         {campaign.stores ? campaign.stores.map(store => (
                             <CenterCard key={store.id} id={store.id} name={store.name} code={store.store_code} />
                         )) : (
-                            <ErrorBanner message="No hay centros asociados" description="Esta campaña aún no tiene centros vinculados." />
+                            <ErrorBanner message="No hay tiendas asociados" description="Esta campaña aún no tiene tiendas vinculados." />
                         )}
                     </InfoCard>
                     {/* Media AM */}

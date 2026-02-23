@@ -22,7 +22,7 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
     const [selectedStore, setSelectedStore] = useState<string>('all');
     const [currentViewDate, setCurrentViewDate] = useState<Date>(new Date());
     const [isExporting, setIsExporting] = useState(false);
-    
+
     const calendarRef = useRef<HTMLDivElement>(null);
 
     const centersList = useMemo(() => {
@@ -32,11 +32,11 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
 
     const centerColors = useMemo(() => {
         const palette = [
-            '#dc2626', '#ea580c', '#d97706', '#65a30d', 
-            '#059669', '#7c3aed', '#c026d3', '#db2777', 
+            '#dc2626', '#ea580c', '#d97706', '#65a30d',
+            '#059669', '#7c3aed', '#c026d3', '#db2777',
             '#e11d48', '#854d0e',
         ];
-        
+
         const uniqueCenters = centersList.filter(c => c !== 'all');
         return uniqueCenters.reduce((acc, center, i) => {
             acc[center] = palette[i % palette.length];
@@ -52,12 +52,12 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
                 if (selectedStore !== 'all') {
                     return storeIds.includes(selectedStore);
                 }
-                
+
                 // Filtro por Región
                 if (selectedRegion !== 'all') {
                     const regionData = stores.find(r => r.region === selectedRegion);
                     if (regionData) {
-                        const regionStoreIds = regionData.stores.map(s => s.id);
+                        const regionStoreIds = regionData.stores.map(s => String(s.id));
                         return storeIds.some(id => regionStoreIds.includes(id));
                     }
                 }
@@ -98,10 +98,10 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
 
             const imageBase64 = await toPng(calendarRef.current, {
                 cacheBust: true,
-                pixelRatio: 1.5, 
+                pixelRatio: 1.5,
                 backgroundColor: 'white',
                 skipFonts: true,
-                fontEmbedCSS: '', 
+                fontEmbedCSS: '',
                 filter: (node) => {
                     if (node.tagName === 'IMG' || (node.classList && node.classList.contains('hide-on-export'))) {
                         return false;
@@ -119,7 +119,7 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            
+
             const contentDisposition = response.headers['content-disposition'];
             let fileName = 'calendario.xlsx';
             if (contentDisposition) {
@@ -127,14 +127,14 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
                 if (fileNameMatch && fileNameMatch.length === 2 && fileNameMatch[1])
                     fileName = fileNameMatch[1];
             }
-            
+
             link.setAttribute('download', fileName);
             document.body.appendChild(link);
             link.click();
-            
+
             link.remove();
             window.URL.revokeObjectURL(url);
-            
+
             setIsExporting(false);
 
         } catch (error) {
@@ -170,14 +170,14 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
         right: 'today prev,next'
     }), []);
 
- 
+
     const handleDatesSet = useCallback((dateInfo: DatesSetArg) => {
         const middleDate = new Date(
             (dateInfo.start.getTime() + dateInfo.end.getTime()) / 2
         );
-        
-       setCurrentViewDate((prevDate) => {
-            if (middleDate.getMonth() !== prevDate.getMonth() || 
+
+        setCurrentViewDate((prevDate) => {
+            if (middleDate.getMonth() !== prevDate.getMonth() ||
                 middleDate.getFullYear() !== prevDate.getFullYear()) {
                 return middleDate;
             }
@@ -196,8 +196,8 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
                             <h3 className="text-sm font-black text-[#008a4f] uppercase tracking-tighter">
                                 Filtros de Calendario
                             </h3>
-                            
-                            <Button 
+
+                            <Button
                                 onClick={handleExportImage}
                                 disabled={isExporting}
                                 className="bg-locatel-medio hover:bg-locatel-oscuro text-white flex items-center gap-2"
@@ -209,14 +209,14 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-500 uppercase">Región / Grupo</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase">Sociedad / Grupo</label>
                                 <Select value={selectedRegion} onValueChange={handleRegionChange}>
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Seleccionar Región" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem value="all">TODAS LAS REGIONES</SelectItem>
+                                            <SelectItem value="all">TODAS LAS SOCIEDADES</SelectItem>
                                             {stores.map((region) => (
                                                 <SelectItem key={region.region} value={region.region}>
                                                     {region.region.toUpperCase()}
@@ -226,9 +226,9 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
                                     </SelectContent>
                                 </Select>
                             </div>
-                            
+
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-500 uppercase">Sucursal / Centro</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase">Sucursal / Tienda</label>
                                 <Select value={selectedStore} onValueChange={setSelectedStore} disabled={availableStores.length === 0}>
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Seleccionar Sucursal" />
@@ -237,7 +237,7 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
                                         <SelectGroup>
                                             <SelectItem value="all">TODAS LAS SUCURSALES</SelectItem>
                                             {availableStores.map((store) => (
-                                                <SelectItem key={store.id} value={store.id}>
+                                                <SelectItem key={store.id} value={String(store.id)}>
                                                     {store.name}
                                                 </SelectItem>
                                             ))}
@@ -252,10 +252,10 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
                         <div className="mb-4 text-center">
                             <h2 className="text-xl font-bold text-gray-800">Calendario de Campañas</h2>
                             <p className="text-sm text-gray-500 uppercase">
-                                {currentViewDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' })} 
-                                {' - '} 
-                                {selectedStore !== 'all' 
-                                    ? availableStores.find(s => s.id === selectedStore)?.name 
+                                {currentViewDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' })}
+                                {' - '}
+                                {selectedStore !== 'all'
+                                    ? availableStores.find(s => String(s.id) === selectedStore)?.name
                                     : (selectedRegion !== 'all' ? `REGIÓN ${selectedRegion}` : 'NACIONAL (TODOS)')
                                 }
                             </p>
@@ -287,7 +287,7 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
                     </div>
                 </div>
             </div>
-            
+
             <style>{`
                 .fc-header-toolbar {
                     background: #f8fafc;
