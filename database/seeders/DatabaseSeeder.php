@@ -42,6 +42,9 @@ class DatabaseSeeder extends Seeder
             ]
         )->assignRole('admin');
 
+        \Log::info("Usuario admin creado con email: {$mail} y contraseña: {$password}");
+        \Log::warning("Por favor limpie la consola para proteger las credenciales de acceso.");
+
         Mail::raw(
             "Usuario: programadorweb@locatelve.com\nContraseña: $password",
             function (Message $message) use ($mail) {
