@@ -18,7 +18,14 @@ class CreateUserAction
                 'password' => Hash::make($data->input('password')),
             ]);
 
-            $user->assignRole('consultor');
+            $selectedRole = $data->input('role');
+            $roleToAssign = $selectedRole ?: 'consultor';
+            $user->syncRoles($roleToAssign);
+
+            $selectedPermissions = $data->input('selectedPermissions', []);
+            if (!empty($selectedPermissions)) {
+                $user->syncPermissions($selectedPermissions);
+            }
 
             return $user;
         });
