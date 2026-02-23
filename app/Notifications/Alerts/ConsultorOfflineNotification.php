@@ -62,9 +62,9 @@ class ConsultorOfflineNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        if (is_array($this->summary) && count($this->summary) > 0) {
+        if (is_array($this->summary) && \count($this->summary) > 0) {
             $message = (new MailMessage)
-                ->subject('Resumen táctico: tiendas fuera de ventana de sincronización')
+                ->subject('Resumen operativo: tiendas fuera de ventana de sincronización')
                 ->greeting('Estimado equipo,')
                 ->line('Se identificaron tiendas que no completaron sincronización dentro de la ventana horaria esperada:')
                 ->line('');

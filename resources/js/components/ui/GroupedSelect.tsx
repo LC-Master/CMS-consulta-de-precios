@@ -66,7 +66,7 @@ const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
 const formatGroupLabel = (data: GroupedOption) => (
     <div style={groupStyles}>
         <span>{data.label}</span>
-        <span style={groupBadgeStyles}>{data.quantity !== undefined ? data.quantity : data.options.length - 1} SUCURSALES</span>
+        <span style={groupBadgeStyles}>{data.quantity !== undefined ? data.quantity : data.options.length - 1} SOCIEDADES</span>
     </div>
 );
 
@@ -100,7 +100,7 @@ const GroupedSelect = ({
             options: [
                 {
                     value: 'GLOBAL_ALL',
-                    label: 'SELECCIONAR TODAS LAS SUCURSALES (NACIONAL)',
+                    label: 'SELECCIONAR TODAS LAS SOCIEDADES (NACIONAL)',
                     isAll: true
                 }
             ]
@@ -245,7 +245,7 @@ const GroupedSelect = ({
                 options={options}
                 formatGroupLabel={formatGroupLabel}
                 onChange={handleChange}
-                placeholder="Búsqueda de sucursales..."
+                placeholder="Búsqueda de sociedades..."
                 isClearable
                 closeMenuOnSelect={false}
                 styles={customStyles}

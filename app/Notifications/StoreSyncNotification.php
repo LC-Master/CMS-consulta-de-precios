@@ -88,7 +88,6 @@ class StoreSyncNotification extends Notification implements ShouldQueue
             return $mail
                 ->action('Ver listado de tiendas', url('/stores'))
                 ->line('Acción sugerida: priorizar revisión de las tiendas listadas y validar su estado actual en el panel.')
-                ->line('Este envío corresponde a un resumen agrupado para optimizar el seguimiento operativo.')
                 ->salutation('Atentamente, Plataforma CMS Locatel');
         }
 
