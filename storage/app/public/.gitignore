@@ -1,2 +1,5 @@
 *
 !.gitignore
+!placeholder/
+!placeholder/*
+!placeholder/.gitignore
