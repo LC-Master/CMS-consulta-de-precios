@@ -1,0 +1,20 @@
+<service>
+  <id>laravel-scheduler</id>
+  <name>Laravel Scheduler (Production)</name>
+  <description>Ejecutor de tareas programadas de Laravel</description>
+  <executable>php</executable>
+  <arguments>artisan schedule:work</arguments>
+  <workingdirectory>%BASE%\..</workingdirectory>
+
+  <onfailure action="restart" delay="30sec"/>
+  <resetfailuretag>1hr</resetfailuretag>
+
+  <logpath>%BASE%\service-logs\schedule</logpath>
+  
+  <log mode="roll">
+    <sizeThreshold>10240</sizeThreshold>
+    <keepFiles>10</keepFiles>
+  </log>
+
+  <stopparentprocessfirst>true</stopparentprocessfirst>
+</service>

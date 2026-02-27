@@ -1,0 +1,18 @@
+<service>
+  <id>laravel-mail-service</id>
+  <name>Laravel Mail Service</name>
+  <description>Servicio de soporte para envío de correos</description>
+  <executable>%BASE%\MailHog_windows_386.exe</executable>
+  <workingdirectory>%BASE%</workingdirectory>
+
+  <onfailure action="restart" delay="10sec"/>
+  <resetfailuretag>1hr</resetfailuretag>
+
+  <logpath>%BASE%\service-logs\email</logpath>
+  <log mode="roll">
+    <sizeThreshold>10240</sizeThreshold>
+    <keepFiles>5</keepFiles>
+  </log>
+
+  <stopparentprocessfirst>true</stopparentprocessfirst>
+</service>

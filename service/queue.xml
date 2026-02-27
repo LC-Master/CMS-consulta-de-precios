@@ -1,0 +1,20 @@
+<service>
+  <id>laravel-queue</id>
+  <name>Laravel Queue Worker (Production)</name>
+  <description>Procesador de colas y envíos de email</description>
+  <executable>php</executable>
+  <arguments>artisan queue:work --tries=3 --backoff=5</arguments>
+  <workingdirectory>%BASE%\..</workingdirectory>
+
+  <onfailure action="restart" delay="5sec"/>
+  <resetfailuretag>1hr</resetfailuretag>
+
+  <logpath>%BASE%\service-logs\queue</logpath>
+  <log mode="roll">
+    <sizeThreshold>10240</sizeThreshold>
+    <keepFiles>10</keepFiles>
+  </log>
+
+  <stopparentprocessfirst>true</stopparentprocessfirst>
+  <stoptimeout>30sec</stoptimeout>
+</service>

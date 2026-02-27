@@ -1,0 +1,21 @@
+<service>
+  <id>laravel-reverb</id>
+  <name>Laravel Reverb (Production)</name>
+  <description>Canal de WebSockets para Laravel</description>
+  <executable>php</executable>
+  <arguments>artisan reverb:start --port 8085</arguments>
+  <workingdirectory>%BASE%\..</workingdirectory>
+  
+  <onfailure action="restart" delay="10sec"/>
+  <resetfailuretag>1hr</resetfailuretag>
+  
+  <logpath>%BASE%\service-logs\reverb</logpath>
+  <log mode="roll">
+    <sizeThreshold>10240</sizeThreshold>
+    <keepFiles>10</keepFiles>
+  </log>
+
+  <stopparentprocessfirst>true</stopparentprocessfirst>
+  <stoptimeout>20sec</stoptimeout>
+  <waithint>30sec</waithint>
+</service>

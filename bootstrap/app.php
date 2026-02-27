@@ -30,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+        $middleware->trustProxies('*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(fn(\Spatie\Permission\Exceptions\UnauthorizedException $e, $request) => to_route('campaign.index')->with(
