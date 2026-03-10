@@ -10,12 +10,9 @@ class SupplierController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
+        $page = $request->input('page', 1);
 
-        if (empty($query) || strlen($query) < 2) {
-            return response()->json([]);
-        }
-
-        $suppliers = Supplier::select([
+        $q = Supplier::select([
                 'id', 
                 'SupplierName', 
                 'AccountNumber', // RIF
@@ -23,13 +20,18 @@ class SupplierController extends Controller
                 'EmailAddress', 
                 'PhoneNumber', 
                 'Notes'
-            ])
-            ->where('SupplierName', 'LIKE', "%{$query}%")
-            ->orWhere('AccountNumber', 'LIKE', "%{$query}%")
-            ->limit(20)
-            ->get();
+            ]);
 
-        $formatted = $suppliers->map(function ($s) {
+        if (!empty($query) && strlen($query) >= 2) {
+            $q->where(function($w) use ($query) {
+                $w->where('SupplierName', 'LIKE', "%{$query}%")
+                  ->orWhere('AccountNumber', 'LIKE', "%{$query}%");
+            });
+        }
+
+        $suppliers = $q->paginate(10, ['*'], 'page', $page);
+
+        $formatted = collect($suppliers->items())->map(function ($s) {
             return [
                 'value' => $s->id,
                 'label' => "{$s->SupplierName} - {$s->AccountNumber}",
@@ -37,6 +39,9 @@ class SupplierController extends Controller
             ];
         });
 
-        return response()->json($formatted);
+        return response()->json([
+            'options' => $formatted,
+            'hasMore' => $suppliers->hasMorePages()
+        ]);
     }
 }

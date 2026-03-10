@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout'
 import { index, store } from '@/routes/agreement'
 import { breadcrumbs } from '@/helpers/breadcrumbs'
-import { useForm, Link, Head, router } from '@inertiajs/react'
+import { useForm, Link, Head } from '@inertiajs/react'
 import { Save, UserSearch } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
@@ -12,6 +12,7 @@ import InputError from '@/components/input-error'
 import { Input } from '@/components/ui/input'
 import { useState, useRef } from 'react'
 import { Supplier, SupplierOption } from '@/types/supplier'
+import axios from 'axios'
 
 export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSuppliers: Supplier[] }) {
 
@@ -36,36 +37,48 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
 
     const [options, setOptions] = useState(initialOptions);
     const [isLoading, setIsLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(defaultSuppliers.length >= 10);
+    const [searchQuery, setSearchQuery] = useState("");
     const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+
+    const loadOptions = (query: string, pageNum: number, append: boolean = false) => {
+        setIsLoading(true);
+        axios.get('/api/suppliers/search', { params: { query: query, page: pageNum } })
+            .then((response) => {
+                const newOptions = response.data.options || [];
+                setHasMore(response.data.hasMore || false);
+                if (append) {
+                    setOptions(prev => [...prev, ...newOptions]);
+                } else {
+                    setOptions(newOptions);
+                }
+            })
+            .catch(err => console.error('Error buscando:', err))
+            .finally(() => setIsLoading(false));
+    };
 
     const handleInputChange = (inputValue: string, actionMeta: InputActionMeta) => {
         if (actionMeta.action !== 'input-change') return;
+
+        setSearchQuery(inputValue);
+        setPage(1);
 
         if (searchTimeout.current) {
             clearTimeout(searchTimeout.current);
         }
 
-        if (!inputValue) {
-            setOptions(initialOptions);
-            return;
-        }
-
         searchTimeout.current = setTimeout(() => {
-            setIsLoading(true);
-            router.get('/api/suppliers/search', { query: inputValue }, {
-                preserveState: true,
-                onSuccess: (page) => {
-                    const resp = (page && (page.props?.suppliers || page.props?.data || page.props?.results || page.props));
-                    if (Array.isArray(resp) && resp.length > 0) {
-                        setOptions(resp);
-                    } else {
-                        setOptions([]);
-                    }
-                },
-                onError: (err) => console.error('Error buscando:', err),
-                onFinish: () => setIsLoading(false),
-            })
+            loadOptions(inputValue, 1, false);
         }, 300);
+    };
+
+    const handleMenuScrollToBottom = () => {
+        if (!isLoading && hasMore) {
+            const nextPage = page + 1;
+            setPage(nextPage);
+            loadOptions(searchQuery, nextPage, true);
+        }
     };
     
     const handleSupplierChange = (option: SingleValue<SupplierOption>) => {
@@ -111,6 +124,7 @@ export default function AgreementCreate({ defaultSuppliers = [] }: { defaultSupp
                                 options={options}
                                 onInputChange={handleInputChange}
                                 onChange={handleSupplierChange}
+                                onMenuScrollToBottom={handleMenuScrollToBottom}
                                 isLoading={isLoading}
                                 placeholder="Escriba nombre o RIF..."
                                 classNamePrefix="react-select"

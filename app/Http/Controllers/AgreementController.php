@@ -66,6 +66,7 @@ class AgreementController extends Controller implements HasMiddleware
             'Notes'
         ])
         ->orderBy('SupplierName')
+        ->limit(10)
         ->get();
 
         return Inertia::render('Agreements/Create', [
@@ -117,11 +118,12 @@ class AgreementController extends Controller implements HasMiddleware
             'id', 'SupplierName', 'AccountNumber', 'ContactName', 'EmailAddress', 'PhoneNumber', 'Notes'
         ])
         ->orderBy('SupplierName')
+        ->limit(10)
         ->get();
 
         $defaultSuppliers->transform(function ($supplier) {
             foreach ($supplier->getAttributes() as $key => $value) {
-                if (is_string($value)) {
+                if (\is_string($value)) {
                     // Forzar conversión a UTF-8
                     $supplier->{$key} = mb_convert_encoding($value, 'UTF-8', 'UTF-8'); 
                 }
@@ -142,7 +144,7 @@ class AgreementController extends Controller implements HasMiddleware
             // Asegurarnos de limpiar también este proveedor específico si se encontró
             if ($currentSupplier) {
                 foreach ($currentSupplier->getAttributes() as $key => $value) {
-                    if (is_string($value)) {
+                    if (\is_string($value)) {
                         $currentSupplier->{$key} = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
                     }
                 }

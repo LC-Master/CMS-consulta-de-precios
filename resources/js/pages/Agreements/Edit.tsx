@@ -36,35 +36,50 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
 
     const [options, setOptions] = useState(initialOptions);
     const [isLoading, setIsLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(defaultSuppliers.length >= 10);
+    const [searchQuery, setSearchQuery] = useState("");
     const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
     const currentSupplierOption = options.find(op => String(op.value) === String(data.supplier_id)) || null;
 
+    const loadOptions = (query: string, pageNum: number, append: boolean = false) => {
+        setIsLoading(true);
+        axios.get('/api/suppliers/search', { params: { query: query, page: pageNum } })
+            .then((response) => {
+                const newOptions = response.data.options || [];
+                setHasMore(response.data.hasMore || false);
+                if (append) {
+                    setOptions(prev => [...prev, ...newOptions]);
+                } else {
+                    setOptions(newOptions);
+                }
+            })
+            .catch(err => console.error(err))
+            .finally(() => setIsLoading(false));
+    };
+
     const handleInputChange = (inputValue: string, actionMeta: InputActionMeta) => {
         if (actionMeta.action !== 'input-change') return;
+
+        setSearchQuery(inputValue);
+        setPage(1);
 
         if (searchTimeout.current) {
             clearTimeout(searchTimeout.current);
         }
 
-        if (!inputValue) {
-            setOptions(initialOptions);
-            return;
-        }
-
         searchTimeout.current = setTimeout(() => {
-            setIsLoading(true);
-            axios.get('/api/suppliers/search', { params: { query: inputValue } })
-                .then((response) => {
-                    if (response.data && response.data.length > 0) {
-                        setOptions(response.data);
-                    } else {
-                        setOptions([]);
-                    }
-                })
-                .catch(err => console.error(err))
-                .finally(() => setIsLoading(false));
+            loadOptions(inputValue, 1, false);
         }, 300);
+    };
+
+    const handleMenuScrollToBottom = () => {
+        if (!isLoading && hasMore) {
+            const nextPage = page + 1;
+            setPage(nextPage);
+            loadOptions(searchQuery, nextPage, true);
+        }
     };
 
     const handleSupplierChange = (option: SingleValue<SupplierOption>) => {
@@ -128,6 +143,7 @@ export default function AgreementsEdit({ agreement, defaultSuppliers = [] }: { a
                                 onInputChange={handleInputChange}
                                 value={currentSupplierOption}
                                 onChange={handleSupplierChange}
+                                onMenuScrollToBottom={handleMenuScrollToBottom}
                                 isLoading={isLoading}
                                 placeholder="Buscar proveedor para actualizar..."
                                 classNamePrefix="react-select"
