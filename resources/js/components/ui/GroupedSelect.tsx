@@ -66,7 +66,7 @@ const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
 const formatGroupLabel = (data: GroupedOption) => (
     <div style={groupStyles}>
         <span>{data.label}</span>
-        <span style={groupBadgeStyles}>{data.quantity !== undefined ? data.quantity : data.options.length - 1} SOCIEDADES</span>
+        <span style={groupBadgeStyles}>{data.quantity !== undefined ? data.quantity : data.options.length - 1} Tiendas</span>
     </div>
 );
 

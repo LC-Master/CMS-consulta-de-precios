@@ -206,11 +206,11 @@ class CampaignController extends Controller implements HasMiddleware
 
             $referer = request()->headers->get('referer');
             if ($referer && str_contains($referer, '/history/campaigns')) {
-                return back()->with('success', 'Campaña eliminada permanentemente.');
+                return back()->with('success', 'Campaña inhabilitada permanentemente.');
             }
 
             return to_route('campaign.index')
-                ->with('success', 'Campaña eliminada.');
+                ->with('success', 'Campaña inhabilitada.');
         } catch (\Throwable $e) {
             Log::error('Error deleting campaign: ' . $e->getMessage(), ['user_id' => Auth::id()]);
 
