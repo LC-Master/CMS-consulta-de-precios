@@ -68,7 +68,7 @@ export default function CampaignsIndex({ campaigns, filters = {}, statuses = [],
                         </Button>
                     ) : (
                         a.status.status === StatusCampaignEnum.ACTIVE && (
-                            <Button title='Cancelar campaña' onClick={() => {
+                            <Button title='Interrumpir campaña' onClick={() => {
                                 setCampaignId(a.id);
                                 openModal();
                             }} className='p-2 bg-red-600 h-8 hover:bg-red-400 text-white rounded-md'>
