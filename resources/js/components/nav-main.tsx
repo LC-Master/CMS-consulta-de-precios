@@ -35,7 +35,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
 
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel className='text-white'>Navegación</SidebarGroupLabel>
+            <SidebarGroupLabel className='text-white'> </SidebarGroupLabel>
             <SidebarMenu>
                 {items.map((item) => {
                     const mainUrl = item.url || item.href || "#";

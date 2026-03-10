@@ -46,12 +46,12 @@ export function AppSidebar() {
             isActive: currentPath.includes('/campaign') || currentPath.includes('/calendar'),
             items: [
                 can('campaign.create') ? {
-                    title: 'Crear campaña',
+                    title: 'Crear',
                     url: create().url,
                     icon: SquarePlus,
                 } : undefined,
                 can('campaign.list') ? {
-                    title: 'Listado de campañas',
+                    title: 'Listado',
                     url: index().url,
                     icon: List,
                 } : undefined,
@@ -80,12 +80,12 @@ export function AppSidebar() {
             isActive: currentPath.includes('/agreement'),
             items: [
                 can('agreement.create') ? {
-                    title: 'Crear Acuerdo',
+                    title: 'Crear',
                     url: agreementCreate().url,
                     icon: SquarePlus,
                 } : undefined,
                 can('agreement.list') ? {
-                    title: 'Listado de Acuerdos',
+                    title: 'Listado',
                     url: agreement().url,
                     icon: Handshake,
                 } : undefined,
