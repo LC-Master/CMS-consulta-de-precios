@@ -22,8 +22,8 @@ class StoreCampaignRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:155'],
-            'start_at' => ['required', 'date', 'before:end_at'],
-            'end_at' => ['required', 'date', 'after:start_at'],
+            'start_at' => ['required', 'date'],
+            'end_at' => ['required', 'date', 'after_or_equal:today', 'after:start_at'],
             'department_id' => ['required', 'exists:departments,id'],
             'agreements' => ['nullable', 'array', 'min:1'],
             'agreements.*' => ['string', 'exists:agreements,id'],
@@ -48,10 +48,10 @@ class StoreCampaignRequest extends FormRequest
 
             'start_at.required' => 'La fecha de inicio es obligatoria.',
             'start_at.date' => 'La fecha de inicio no es una fecha válida.',
-            'start_at.before' => 'La fecha de inicio debe ser anterior a la fecha de finalización.',
 
             'end_at.required' => 'La fecha de finalización es obligatoria.',
             'end_at.date' => 'La fecha de finalización no es una fecha válida.',
+            'end_at.after_or_equal' => 'La fecha de finalización debe ser hoy o una fecha futura.',
             'end_at.after' => 'La fecha de finalización debe ser posterior a la fecha de inicio.',
 
             'stores.required' => 'Debe seleccionar al menos un centro.',
