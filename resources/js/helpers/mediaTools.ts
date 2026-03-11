@@ -22,10 +22,14 @@ export function isVideo(mime_type: string) {
 }
 export const formatForEdit = (dateStr: string | Date) => {
     if (!dateStr) return '';
+    if (typeof dateStr === 'string') {
+        if (dateStr.includes('T')) {
+            return dateStr.slice(0, 16);
+        }
+        return dateStr.replace(' ', 'T').slice(0, 16);
+    }
 
-    const localDate = new Date(dateStr).toLocaleString('sv-SE', {
-        timeZone: 'America/Caracas'
-    });
-
-    return localDate.replace(' ', 'T').substring(0, 16);
+    const d = new Date(dateStr);
+    const tzOffset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
 };

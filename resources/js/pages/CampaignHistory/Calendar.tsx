@@ -32,9 +32,12 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
 
     const centerColors = useMemo(() => {
         const palette = [
-            '#dc2626', '#ea580c', '#d97706', '#65a30d',
-            '#059669', '#7c3aed', '#c026d3', '#db2777',
-            '#e11d48', '#854d0e',
+            '#14532d', '#166534', '#15803d', '#22c55e', '#4ade80',
+            '#65a30d', '#84cc16', '#a3e635', '#d97706', '#f59e0b',
+            '#f97316', '#fb923c', '#fbbf24', '#fde047', '#bef264',
+            '#86efac', '#34d399', '#10b981', '#06b6d4', '#22d3ee',
+            '#38bdf8', '#60a5fa', '#818cf8', '#a78bfa', '#c084fc',
+            '#e879f9', '#f472b6', '#fb7185', '#fda4af', '#fecdd3',
         ];
 
         const uniqueCenters = centersList.filter(c => c !== 'all');
@@ -320,7 +323,7 @@ export default function Calendar({ campaigns, stores }: { campaigns: CampaignEve
                 }
                 .fc-scrollgrid { border: 2px solid #e5e7eb !important; }
                 .fc-col-header-cell {
-                    background: #111827 !important;
+                    background: #00953B !important; /* Changed to light green */
                     padding: 12px 0 !important;
                     border: 1px solid #374151 !important;
                 }

@@ -34,8 +34,6 @@ return new class extends Migration {
             $table->index(['subject_id', 'subject_type']);
             $table->index('action');
             $table->index('created_at');
-
-            $table->softDeletes();
         });
     }
 

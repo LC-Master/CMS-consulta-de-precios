@@ -198,17 +198,6 @@ class Store extends Model
         );
     }
 
-    // /**
-    //  * Accessor para el Inactive
-    //  * Permite usar $store->inactive en lugar de $store->Inactive
-    //  */
-    // protected function inactive(): Attribute
-    // {
-    //     return Attribute::make(
-    //         get: fn() => $this->attributes['Inactive'] ?? null,
-    //     );
-    // }
-
     protected static function boot()
     {
         parent::boot();

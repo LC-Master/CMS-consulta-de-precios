@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,12 +16,11 @@ return new class extends Migration
                 ->constrained();
             $table->foreignUuid('media_id')
                 ->constrained();
-            $table->enum('slot', ['am', 'pm']);   
-            $table->unsignedInteger('position');  
+            $table->enum('slot', ['am', 'pm']);
+            $table->unsignedInteger('position');
 
-            $table->index(['campaign_id', 'slot', 'position']);
-            $table->index(['campaign_id', 'media_id']);
-
+            $table->index(['campaign_id', 'slot', 'position','media_id']);
+            $table->unique(['campaign_id', 'slot', 'position']);
             $table->timestamps();
         });
     }

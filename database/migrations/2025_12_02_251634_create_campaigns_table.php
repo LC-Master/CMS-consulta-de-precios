@@ -13,17 +13,15 @@ return new class extends Migration {
         Schema::create('campaigns', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('title');
-            $table->dateTime('start_at');
-            $table->dateTime('end_at');
+            $table->timestamp('start_at');
+            $table->timestamp('end_at');
             $table->foreignUuid('status_id')->constrained();
             $table->foreignUuid('department_id')->constrained();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->softDeletes();
 
-            $table->index(['start_at', 'end_at']);
-            $table->index(['status_id', 'start_at']);
-            $table->index(['department_id', 'status_id']);
+            $table->index(['start_at', 'end_at','status_id','department_id']);
             $table->index('deleted_at');
 
             $table->timestamps();

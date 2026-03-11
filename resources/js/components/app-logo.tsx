@@ -41,8 +41,11 @@ export default function AppLogo() {
             </div>
             {showLargeLogo && (
                 <div className="ml-1 grid flex-1 text-left text-sm transition-opacity duration-300 ease-in-out">
-                    <span className="mb-0.5 truncate leading-tight font-semibold">
-                        CMS Locatel
+                    <span className="mb-0.5 leading-tight text-xs font-semibold">
+                        Gestor
+                    </span>
+                    <span className="leading-tight text-sm">
+                        Publicidad
                     </span>
                 </div>
             )}
