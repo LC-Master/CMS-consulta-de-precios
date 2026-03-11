@@ -236,15 +236,18 @@ describe('Lógica de Creación', function () {
         $postData = [
             'title' => 'Campaña Erronea',
             'department_id' => $this->department->id,
-            'stores' => [(string) $this->stores[0]->ID],
+            'stores' => [(string) $this->stores[0]->id],
             'am_media' => [$this->mediaItems[0]->id],
             'pm_media' => [$this->mediaItems[0]->id],
             'start_at' => now()->addDays(5)->format('Y-m-d'),
             'end_at' => now()->addDays(1)->format('Y-m-d'), 
         ];
 
-        $this->post(route('campaign.store'), $postData)
-            ->assertSessionHasErrors(['start_at', 'end_at']);
+        $response = $this->post(route('campaign.store'), $postData);
+
+        $response->assertSessionHasErrors([
+            'end_at' => 'La fecha de finalización debe ser posterior a la fecha de inicio.'
+        ]);
     });
 });
 
@@ -461,7 +464,7 @@ describe('Eliminación', function () {
 
         $this->delete(route('campaign.destroy', $campaign))
             ->assertRedirect(route('campaign.index'))
-            ->assertSessionHas('success', 'Campaña eliminada.');
+            ->assertSessionHas('success', 'Campaña inhabilitada.');
 
         $this->assertSoftDeleted('campaigns', [
             'id' => $campaign->id
