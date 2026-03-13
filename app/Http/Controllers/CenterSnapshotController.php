@@ -27,6 +27,7 @@ class CenterSnapshotController extends Controller
             /** @var \App\Models\Store $store */
             $store = $request->user();
             $campaignSnapshotDTO = $campaignSnapshotDTO->execute($store);
+
             if (!empty($campaignSnapshotDTO['campaigns'])) {
                 $campaignSnapshotDTO['campaigns'] = CampaignSnapshotDTO::normalize($campaignSnapshotDTO['campaigns']);
             }
@@ -63,7 +64,7 @@ class CenterSnapshotController extends Controller
             /** @var \App\Models\Store $store */
             $store = $request->user();
 
-            StoreSyncState::updateOrCreate(
+            $syncState = StoreSyncState::updateOrCreate(
                 [
                     'store_id' => $store->getKey(),
                 ],
@@ -107,7 +108,7 @@ class CenterSnapshotController extends Controller
                     'error_type' => $e->error_type,
                     'error_count' => $e->error_count,
                     'last_seen_at' => $e->last_seen_at,
-                ], $report->mediaErrors);
+                ], $report->mediaErrors); 
 
                 $store->centerMediaErrors()->upsert(
                     $errorsArray,
@@ -117,7 +118,8 @@ class CenterSnapshotController extends Controller
             } else {
                 $store->centerMediaErrors()->delete();
             }
-            $store->syncState->processHealthReport($report);
+
+            $syncState->processHealthReport($report);
 
             StoreSyncUpdated::dispatch($report->syncState, $store->name);
 

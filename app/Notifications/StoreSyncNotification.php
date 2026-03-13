@@ -37,11 +37,20 @@ class StoreSyncNotification extends Notification implements ShouldQueue
         $storesKey = "store_sync_summary_mail:{$statusValue}:stores";
         $scheduledKey = "store_sync_summary_mail:{$statusValue}:scheduled";
 
-        $stores = Cache::get($storesKey, []);
-        $stores[] = $storeName;
-        $stores = array_values(array_unique($stores));
-
-        Cache::put($storesKey, $stores, now()->addMinutes(10));
+        $lock = Cache::lock("{$storesKey}:lock", 10);
+        try {
+            $lock->block(5, function () use ($storesKey, $storeName) {
+                $stores = Cache::get($storesKey, []);
+                $stores[] = $storeName;
+                $stores = array_values(array_unique($stores));
+                Cache::put($storesKey, $stores, now()->addMinutes(10));
+            });
+        } catch (\Throwable $e) {
+            $stores = Cache::get($storesKey, []);
+            $stores[] = $storeName;
+            $stores = array_values(array_unique($stores));
+            Cache::put($storesKey, $stores, now()->addMinutes(10));
+        }
 
         if (Cache::add($scheduledKey, true, now()->addMinutes(2))) {
             SendStoreSyncStatusSummaryMailJob::dispatch($statusValue)->delay(now()->addSeconds(30));

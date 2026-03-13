@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Campaigns;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class UpdateCampaignRequest extends FormRequest
 {
@@ -22,18 +21,38 @@ class UpdateCampaignRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:155'],
-            'start_at' => ['required', 'date', 'before:end_at'],
-            'end_at' => ['required', 'date', 'after:start_at'],
+            'start_at' => ['required', 'date'],
+            'end_at' => ['required', 'date', 'after_or_equal:today', 'after:start_at'],
             'department_id' => ['required', 'exists:departments,id'],
             'agreements' => ['nullable', 'array', 'min:1'],
             'agreements.*' => ['string', 'exists:agreements,id'],
             'stores' => ['required', 'array', 'min:1'],
             'stores.*' => ['string', 'exists:Store,ID'],
-            'am_media' => ['required', 'array', 'min:1'],
+            'am_media' => ['nullable', 'array'],
             'am_media.*' => ['string', 'exists:media,id'],
-            'pm_media' => ['required', 'array', 'min:1'],
+            'pm_media' => ['nullable', 'array'],
             'pm_media.*' => ['string', 'exists:media,id'],
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $start = \Carbon\Carbon::parse($this->start_at);
+            $end = \Carbon\Carbon::parse($this->end_at);
+
+            $isAmRequired = $start->format('A') === 'AM' || $end->diffInHours($start) >= 12;
+
+            if ($isAmRequired && empty($this->am_media)) {
+                $validator->errors()->add('am_media', 'El bloque AM no puede estar vacío porque la campaña inicia en la mañana o cubre ese horario.');
+            }
+
+            $isPmRequired = $end->format('A') === 'PM' || $start->format('A') === 'AM' && $end->format('A') === 'PM';
+
+            if ($isPmRequired && empty($this->pm_media)) {
+                $validator->errors()->add('pm_media', 'El bloque PM es obligatorio ya que la campaña finaliza o pasa por la tarde.');
+            }
+        });
     }
 
     /**

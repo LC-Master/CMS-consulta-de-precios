@@ -29,11 +29,31 @@ class StoreCampaignRequest extends FormRequest
             'agreements.*' => ['string', 'exists:agreements,id'],
             'stores' => ['required', 'array', 'min:1'],
             'stores.*' => ['string', 'exists:Store,ID'],
-            'am_media' => ['required', 'array', 'min:1'],
+            'am_media' => ['nullable', 'array'],
             'am_media.*' => ['string', 'exists:media,id'],
-            'pm_media' => ['required', 'array', 'min:1'],
+            'pm_media' => ['nullable', 'array'],
             'pm_media.*' => ['string', 'exists:media,id'],
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $start = \Carbon\Carbon::parse($this->start_at);
+            $end = \Carbon\Carbon::parse($this->end_at);
+
+            $isAmRequired = $start->format('A') === 'AM' || $end->diffInHours($start) >= 12;
+
+            if ($isAmRequired && empty($this->am_media)) {
+                $validator->errors()->add('am_media', 'El bloque AM no puede estar vacío porque la campaña inicia en la mañana o cubre ese horario.');
+            }
+
+            $isPmRequired = $end->format('A') === 'PM' || $start->format('A') === 'AM' && $end->format('A') === 'PM';
+
+            if ($isPmRequired && empty($this->pm_media)) {
+                $validator->errors()->add('pm_media', 'El bloque PM es obligatorio ya que la campaña finaliza o pasa por la tarde.');
+            }
+        });
     }
 
     /**

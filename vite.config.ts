@@ -15,7 +15,7 @@ export default defineConfig({
     plugins: [
         tsconfigPaths(),
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.tsx'],
+            input: ['resources/css/app.css', 'resources/js/app.tsx', 'resources/css/custom-scrollbar.css'],
             ssr: 'resources/js/ssr.tsx',
             refresh: true,
         }),

@@ -140,7 +140,7 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent className='bg-locatel-medio text-white'>
+            <SidebarContent className='bg-locatel-medio text-white custom-scrollbar'>
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 

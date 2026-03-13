@@ -6,6 +6,7 @@ use App\Enums\CampaignStatus;
 use App\Models\Store;
 use App\Models\Campaign;
 use Carbon\Carbon;
+
 class CampaignSnapshotDTO
 {
     /**
@@ -18,10 +19,10 @@ class CampaignSnapshotDTO
             fn($q) =>
             $q->where('store.ID', $store->getKey())
         )->whereHas(
-                'status',
-                fn($q) =>
-                $q->where('status', CampaignStatus::ACTIVE->value)
-            )
+            'status',
+            fn($q) =>
+            $q->where('status', CampaignStatus::ACTIVE->value)
+        )
             ->with(['status', 'department', 'agreements', 'media'])
             ->get();
         $snapshot = [
@@ -66,19 +67,16 @@ class CampaignSnapshotDTO
     public static function normalize(array $data): array
     {
         $sorted = collect($data)->map(function ($item) {
-            $mediaCollection = collect($item['media']);
-
-            $mediaCollection = collect($item['media']);
-
-            $normalizedMedia = $mediaCollection->map(function ($m) {
+            $normalizedMedia = collect($item['media'])->map(function ($m) {
                 $m['position'] = isset($m['position']) ? (int) $m['position'] : 0;
                 $m['duration_seconds'] = isset($m['duration_seconds']) ? (int) $m['duration_seconds'] : 0;
                 return $m;
             });
 
             $item['slots'] = [
-                'am' => $normalizedMedia->where('slot', 'am')
-                    ->sortBy('position')
+                'am' => ($am = $normalizedMedia->where('slot', 'am'))->isEmpty()
+                    ? null
+                    : $am->sortBy('position')
                     ->values()
                     ->map(function ($m) {
                         unset($m['slot']);
@@ -86,8 +84,9 @@ class CampaignSnapshotDTO
                     })
                     ->all(),
 
-                'pm' => $normalizedMedia->where('slot', 'pm')
-                    ->sortBy('position')
+                'pm' => ($pm = $normalizedMedia->where('slot', 'pm'))->isEmpty()
+                    ? null
+                    : $pm->sortBy('position')
                     ->values()
                     ->map(function ($m) {
                         unset($m['slot']);

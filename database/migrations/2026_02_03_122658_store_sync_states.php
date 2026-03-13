@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->foreignUuid('placeholder_id')->nullable()->constrained('media');
             $table->timestamp('sync_started_at')->nullable();
             $table->timestamp('sync_ended_at')->nullable();
+            $table->text('last_sync_error')->nullable();
             $table->json('disk')->nullable();
             $table->timestamp('uptimed_at')->nullable();
             $table->enum('sync_status', array_column(SyncStatusEnum::cases(), 'value'))

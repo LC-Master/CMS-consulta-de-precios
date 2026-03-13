@@ -1,0 +1,39 @@
+/* --- Scrollbar para fondos de color sólido (como el verde de tu sidebar) --- */
+
+.custom-scrollbar {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    /* Para Firefox: Blanco al 50% de opacidad sobre fondo transparente */
+    scrollbar-color: rgba(255, 255, 255, 0.5) transparent; 
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 10px; /* Un poco más de margen para agarrarla fácil */
+}
+
+/* 2. Pista transparente para que se vea solo el verde del fondo */
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent; 
+}
+
+/* 3. El pulgar (la barrita) en BLANCO SEMI-TRANSPARENTE */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    /* Blanco al 40%: Da excelente contraste sin ser un blanco chillón que distraiga */
+    background-color: rgba(255, 255, 255, 0.4); 
+    border-radius: 10px;
+    
+    /* El truco de usabilidad: 10px de ancho total, pero restamos 3px por lado 
+       para que visualmente se vea de 4px de grosor */
+    border: 3px solid transparent; 
+    background-clip: padding-box; 
+}
+
+/* 4. Efecto Hover: Se vuelve más blanco y sólido al pasar el mouse */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.8); /* Blanco al 80% */
+}
+
+/* 5. Sin flechas */
+.custom-scrollbar::-webkit-scrollbar-button {
+    display: none; 
+}
