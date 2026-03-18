@@ -1,11 +1,13 @@
 import { destroy } from "@/routes/media";
 import { router } from "@inertiajs/react";
+import { useState } from "react";
 import Modal from "../Modal";
 import { Button } from "../ui/button";
 
-export default function DeleteMedia({isOpen, closeModal, mediaId, setMediaId }: { isOpen: boolean; closeModal: () => void; mediaId: string; setMediaId: (id: string) => void }) {
-    if (!isOpen) return null;
+export default function DeleteMedia({ isOpen, closeModal, mediaId, setMediaId }: { isOpen: boolean; closeModal: () => void; mediaId: string; setMediaId: (id: string) => void }) {
+    const [isDeleting, setIsDeleting] = useState(false);
 
+    if (!isOpen) return null;
     return (<Modal className='w-90 bg-white p-6 ' closeModal={closeModal}>
         <h2 className="text-lg font-semibold mb-4">Confirmar eliminación de media</h2>
         <p className="mb-6">¿Estás seguro de que deseas eliminar este media? Esta acción no se puede deshacer.</p>
@@ -15,7 +17,11 @@ export default function DeleteMedia({isOpen, closeModal, mediaId, setMediaId }: 
             </Button>
             <Button
                 className="bg-red-600 text-white hover:bg-red-700"
+                disabled={isDeleting}
                 onClick={() => {
+                    if (isDeleting) return;
+                    setIsDeleting(true);
+
                     router.delete(destroy({ id: mediaId }).url, {
                         reset: ['medias', 'flash'],
                         only: ['medias', 'flash'],
@@ -23,11 +29,14 @@ export default function DeleteMedia({isOpen, closeModal, mediaId, setMediaId }: 
                         onSuccess: () => {
                             closeModal();
                             setMediaId('');
+                        },
+                        onFinish: () => {
+                            setIsDeleting(false);
                         }
                     });
                 }}
             >
-                Eliminar media
+                {isDeleting ? 'Eliminando...' : 'Eliminar media'}
             </Button>
         </div>
     </Modal>)
