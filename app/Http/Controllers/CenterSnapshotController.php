@@ -15,6 +15,7 @@ use App\DTOs\HealthReportDTO;
 use App\DTOs\MediaErrorDTO;
 use Carbon\Carbon;
 use App\Notifications\StoreSyncNotification;
+use Illuminate\Support\Facades\Log;
 
 class CenterSnapshotController extends Controller
 {
@@ -106,18 +107,24 @@ class CenterSnapshotController extends Controller
                     'name' => $e->name,
                     'checksum' => $e->checksum,
                     'error_type' => $e->error_type,
-                    'error_count' => $e->error_count,
-                    'last_seen_at' => $e->last_seen_at,
-                ], $report->mediaErrors); 
-
+                    'error_count' => Carbon::parse($e->error_count)->setTimezone('America/Caracas')->format('Y-m-d H:i:s.v'),
+                    'last_seen_at' => Carbon::parse($e->last_seen_at)->format('Y-m-d\TH:i:sP'),
+                ], $report->mediaErrors);
                 $store->centerMediaErrors()->upsert(
                     $errorsArray,
                     ['media_id'],
                     ['name', 'checksum', 'error_type', 'error_count', 'last_seen_at']
                 );
             } else {
-                $store->centerMediaErrors()->delete();
+                $currentMediaIds = $store->centerMediaErrors()->pluck('media_id')->toArray();
+                $reportMediaIds = array_map(fn(MediaErrorDTO $e) => $e->id, $report->mediaErrors);
+                $mediaIdsToDelete = array_diff($currentMediaIds, $reportMediaIds);
+
+                $store->centerMediaErrors()->whereIn('media_id', $mediaIdsToDelete)->delete();
             }
+
+            $store->centerMediaErrors()->whereIn('media_id', array_column($errorsArray ?? [], 'media_id'))
+                ->update(['updated_at' => now()]);
 
             $syncState->processHealthReport($report);
 
