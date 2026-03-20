@@ -155,7 +155,7 @@ export default function PlaceHolderMangerModal({ isOpen, store, onClose }: { isO
                                     : 'bg-locatel-medio text-white hover:bg-locatel-claro'
                                 }`}
                         >
-                            {processing ? 'Uploading...' : 'Save Changes'}
+                            {processing ? 'Cargando...' : 'Guardar cambios'}
                         </Button>
                         <Button
                             onClick={onClose}

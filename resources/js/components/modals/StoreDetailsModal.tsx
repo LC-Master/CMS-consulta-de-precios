@@ -60,7 +60,7 @@ export default function StoreDetailsModal({ isOpen, onClose, store }: StoreDetai
             blur={true}
         >
             {/* Header Green */}
-            <div className="bg-[#10b981] px-6 py-4 flex items-center justify-between text-white">
+            <div className="bg-locatel-medio px-6 py-4 flex items-center justify-between text-white">
                 <div className="flex items-center gap-4">
                     <div className="p-2 bg-white/20 rounded-full">
                         <StoreIcon className="w-5 h-5 text-white" />
