@@ -1,9 +1,9 @@
 import { LogLevelEnum } from "@/enums/LogsEnum";
 
 export const SUBJECT_CONFIG: Record<string, { label: string; url: string; color: string }> = {
-    'Campaign': { label: 'Campaña', url: '/campaigns', color: 'text-purple-600' },
-    'User': { label: 'Usuario', url: '/users', color: 'text-blue-600' },
-    'CenterToken': { label: 'Token', url: '/centers', color: 'text-emerald-600' },
+    'Campaign': { label: 'Campaña', url: '/campaign', color: 'text-purple-600' },
+    'User': { label: 'Usuario', url: '/user', color: 'text-blue-600' },
+    'CenterToken': { label: 'Token', url: '/center', color: 'text-emerald-600' },
 };
 
 export const LEVEL_STYLES: Record<LogLevelEnum, string> = {

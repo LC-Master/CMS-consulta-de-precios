@@ -12,7 +12,6 @@ import AppLayout from "@/layouts/app-layout";
 import { index } from "@/routes/logs";
 import { Log, Props } from "@/types/logs/index.type";
 import { Head, router } from "@inertiajs/react";
-import { Link } from '@inertiajs/react';
 import {
     Eye,
 } from "lucide-react";
@@ -42,17 +41,20 @@ export default function LogsIndex({ logs, filters, elements }: Props) {
             header: 'Recurso Afectado',
             render: (log) => {
                 const config = SUBJECT_CONFIG[log.subject_type];
+                const hasReference = !!(
+                    log.properties?.payload?.name || log.properties?.payload?.title
+                );
+                const reference = hasReference
+                    ? log.properties?.payload?.name ?? log.properties?.payload?.title
+                    : 'Referencia no disponible';
                 return (
                     <div className="flex flex-col gap-0.5">
                         <span className="text-[10px] font-bold text-gray-400 uppercase leading-none">
                             {config?.label || 'SISTEMA'}
                         </span>
-                        <Link
-                            href={`${config?.url || '#'}/${log.subject_id}/edit`}
-                            className="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors truncate max-w-45"
-                        >
-                            {log.properties?.title || 'Referencia no disponible'}
-                        </Link>
+                        <span className="text-sm font-bold text-gray-400 truncate max-w-45" aria-disabled>
+                            {reference}
+                        </span>
                     </div>
                 );
             },

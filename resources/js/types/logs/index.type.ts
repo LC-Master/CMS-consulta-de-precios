@@ -28,6 +28,7 @@ export interface Payload {
     id: string
     title: string
     start_at: string
+    name?: string
     end_at: string
     status_id: string
     department_id: string

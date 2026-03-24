@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\User\CreateUserAction;
 use App\Actions\User\UpdateUserAction;
+use App\Http\Middleware\IsAdmin;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
@@ -24,6 +25,7 @@ class UserController extends Controller implements HasMiddleware
         return [
             new Middleware('permission:user.list', only: ['index']),
             new Middleware('permission:user.show', only: ['show']),
+            new Middleware(IsAdmin::class, except: ['index', 'create', 'store']),
             new Middleware('permission:user.create', only: ['create', 'store']),
             new Middleware('permission:user.update', only: ['edit', 'update']),
             new Middleware('permission:user.delete', only: ['destroy']),
@@ -70,7 +72,6 @@ class UserController extends Controller implements HasMiddleware
 
             return to_route('user.index')
                 ->with('success', 'Usuario creado correctamente.');
-
         } catch (\Throwable $e) {
             Log::error('Error creating user: ' . $e->getMessage(), ['admin_id' => Auth::id()]);
 
@@ -103,8 +104,6 @@ class UserController extends Controller implements HasMiddleware
 
             return to_route('user.index')
                 ->with('success', 'Usuario actualizado correctamente.');
-
-
         } catch (\Throwable $e) {
             Log::error('Error updating user: ' . $e->getMessage(), ['admin_id' => Auth::id()]);
 
