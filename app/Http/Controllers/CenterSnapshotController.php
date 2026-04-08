@@ -107,7 +107,7 @@ class CenterSnapshotController extends Controller
                     'name' => $e->name,
                     'checksum' => $e->checksum,
                     'error_type' => $e->error_type,
-                    'error_count' => Carbon::parse($e->error_count)->setTimezone('America/Caracas')->format('Y-m-d H:i:s.v'),
+                    'error_count' => $e->error_count,
                     'last_seen_at' => Carbon::parse($e->last_seen_at)->format('Y-m-d\TH:i:sP'),
                 ], $report->mediaErrors);
                 $store->centerMediaErrors()->upsert(
